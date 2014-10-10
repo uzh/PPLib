@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp.crowdflower
 
 
-import com.typesafe.config.ConfigFactory
 import dispatch.Defaults._
 import dispatch._
 import play.api.libs.json.{JsValue, Json}
@@ -15,10 +14,9 @@ import scala.concurrent.duration.Duration
  * @param title The title of the job
  * @param instructions The instructions for the job
  */
-class CrowdFlowerJobRequest(title: String, instructions: String) {
+class CrowdFlowerJobRequest(title: String, instructions: String, apiKey: String) {
 	// Default Constructor
 	val secureHost = host("api.crowdflower.com").secure
-	val apiKey = ConfigFactory.load().getString("hit.crowdflower.api.key")
 	val jobsURL = secureHost / "v1" / "jobs.json"
 	var underlying = jobsURL.POST.addQueryParameter("key", apiKey)
 	underlying = underlying.addQueryParameter("job[title]", title)

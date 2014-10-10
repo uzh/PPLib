@@ -22,7 +22,7 @@ case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAns
 //TODO add more types than just string
 case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1) extends HCompQuery
 
-case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) {
+case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer {
 	def selectedAnswers: List[String] = answer.collect({
 		case x if x._2 => x._1
 	}).toList

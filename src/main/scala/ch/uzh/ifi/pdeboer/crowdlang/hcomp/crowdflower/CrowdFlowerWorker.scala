@@ -15,12 +15,12 @@ import scala.concurrent.duration._
  *
  * TODO: what is name?
  */
-class CrowdFlowerWorker(val name: String) {
+class CrowdFlowerWorker(val name: String, apiKey: String) {
 	val secureHost = host("api.crowdflower.com").secure
 	val apiKey = ConfigFactory.load().getString("hit.crowdflower.api.key")
 
 	def writeText(work: FreetextQuery): scala.concurrent.Future[FreetextAnswer] = scala.concurrent.Future {
-		val request = new CrowdFlowerJobRequest(s"freetext by " + name, work.question)
+		val request = new CrowdFlowerJobRequest(s"freetext by " + name, work.question, apiKey)
 		//TODO replaceall is very ugly here
 		var cml = s"""<cml:textarea label="${work.question.replaceAll("\"", "")}" name="response" class="" instructions="" default="" validates="required"/>"""
 		request.setCML(cml)
@@ -63,7 +63,7 @@ class CrowdFlowerWorker(val name: String) {
 	}
 
 	private def chooseSingleOption(work: MultipleChoiceQuery): scala.concurrent.Future[MultipleChoiceAnswer] = scala.concurrent.Future {
-		val request = new CrowdFlowerJobRequest(s"singlechoice by " + work.question, work.question)
+		val request = new CrowdFlowerJobRequest(s"singlechoice by " + work.question, work.question, apiKey)
 		var cml = s"""<cml:radios label="Choose one" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.foreach(option => cml += s"""<cml:radio label="${option}"/>""")
 		cml += "</cml:radios>"
@@ -91,7 +91,7 @@ class CrowdFlowerWorker(val name: String) {
 	private def chooseMultipleOptions(work: MultipleChoiceQuery): scala.concurrent.Future[MultipleChoiceAnswer] = scala.concurrent.Future {
 		//TODO Can only handle String data atm
 		val stringOptions = List.empty[String] ++ work.options.map(_.toString)
-		val request = new CrowdFlowerJobRequest(s"multiplechoice by " + name, work.question)
+		val request = new CrowdFlowerJobRequest(s"multiplechoice by " + name, work.question, apiKey)
 		var cml = s"""<cml:checkboxes label="Check all that apply" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.zipWithIndex.foreach(option => cml += s"""<cml:checkbox label="{{option_${option._2}}}"/>""")
 		cml += "</cml:checkboxes>"
