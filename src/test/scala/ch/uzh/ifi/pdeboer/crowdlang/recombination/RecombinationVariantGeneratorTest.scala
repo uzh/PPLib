@@ -33,7 +33,7 @@ class RecombinationVariantGeneratorTest {
 
 	private def listContentsEqual(a: List[_], b: List[_]) = {
 		a.forall(b.contains(_)) && b.forall(a.contains(_))
-  }
+	}
 
 	private class TestRecombinationStub(val id: Int) extends SimpleRecombinationStub[Int, Int](i => i)
 
