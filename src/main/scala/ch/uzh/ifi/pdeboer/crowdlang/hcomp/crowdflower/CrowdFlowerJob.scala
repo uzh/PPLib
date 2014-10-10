@@ -50,7 +50,7 @@ abstract class CrowdFlowerJob[Output](val jobId: Int, val apiKey: String) {
 		var request = order_url.POST.addQueryParameter("key", apiKey)
 		request = request.addHeader("Content-Type", "application/x-www-form-urlencoded")
 		if (sandbox)
-			request = request.setBody(s"channels[0]=cf_internal&debit[units_count]=1")
+			request = request.setBody(s"channels[0]=cf_internal&debit[units_count]=0")
 		else
 			request = request.setBody(s"channels[0]=on_demand&debit[units_count]=1")
 		try {

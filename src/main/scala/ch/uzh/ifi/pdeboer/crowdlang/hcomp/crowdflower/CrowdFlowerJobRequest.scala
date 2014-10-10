@@ -23,7 +23,7 @@ class CrowdFlowerJobRequest(title: String, instructions: String, apiKey: String)
 	underlying = underlying.addQueryParameter("job[instructions]", instructions)
 	underlying = underlying.addQueryParameter("job[judgments_per_unit]", "1")
 	underlying = underlying.addQueryParameter("job[units_per_assignment]", "1")
-	underlying = underlying.addQueryParameter("job[payment_cents]", "1")
+	underlying = underlying.addQueryParameter("job[payment_cents]", "0")
 	underlying = underlying.addQueryParameter("job[auto_order]", "true")
 
 	//

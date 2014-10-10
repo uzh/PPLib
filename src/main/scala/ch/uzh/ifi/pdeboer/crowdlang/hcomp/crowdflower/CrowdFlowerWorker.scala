@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp.crowdflower
 
 import ch.uzh.ifi.pdeboer.crowdlang.hcomp.{FreetextAnswer, FreetextQuery, MultipleChoiceAnswer, MultipleChoiceQuery}
-import com.typesafe.config.ConfigFactory
 import dispatch._
 import play.api.libs.json._
 
@@ -13,14 +12,12 @@ import scala.concurrent.duration._
  * Created by Marc Tobler on 23.07.2014.
  * adapted by pdeboer on 10/10/14.
  *
- * TODO: what is name?
  */
-class CrowdFlowerWorker(val name: String, apiKey: String) {
+class CrowdFlowerWorker(val applicationName: String, apiKey: String) {
 	val secureHost = host("api.crowdflower.com").secure
-	val apiKey = ConfigFactory.load().getString("hit.crowdflower.api.key")
 
-	def writeText(work: FreetextQuery): scala.concurrent.Future[FreetextAnswer] = scala.concurrent.Future {
-		val request = new CrowdFlowerJobRequest(s"freetext by " + name, work.question, apiKey)
+	def writeText(work: FreetextQuery) = {
+		val request = new CrowdFlowerJobRequest(s"freetext by " + applicationName, work.question, apiKey)
 		//TODO replaceall is very ugly here
 		var cml = s"""<cml:textarea label="${work.question.replaceAll("\"", "")}" name="response" class="" instructions="" default="" validates="required"/>"""
 		request.setCML(cml)
@@ -28,7 +25,7 @@ class CrowdFlowerWorker(val name: String, apiKey: String) {
 		val job = new CFFreeTextJob(jobId, apiKey)
 		job.addDataUnit("{}")
 		job.launch(sandbox = true)
-		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
+		val timer = new GrowingTimer(start = 10 seconds, factor = 1.5, max = 1 minute)
 		var answer: Option[String] = None
 		while (answer.isEmpty) {
 			timer.waitTime
@@ -37,14 +34,14 @@ class CrowdFlowerWorker(val name: String, apiKey: String) {
 		FreetextAnswer(work, answer.get)
 	}
 
-	def chooseOption(work: MultipleChoiceQuery): scala.concurrent.Future[MultipleChoiceAnswer] = scala.concurrent.Future {
+	def chooseOption(work: MultipleChoiceQuery) =
 		if (work.maxNumberOfResults == work.minNumberOfResults && work.minNumberOfResults == 1) {
-			Await.result(chooseSingleOption(work), 3 days)
+			chooseSingleOption(work)
 		}
 		else {
-			Await.result(chooseMultipleOptions(work), 3 days)
+			chooseMultipleOptions(work)
 		}
-	}
+
 
 	/**
 	 * Method used to retry some code that may fail n times.
@@ -62,7 +59,7 @@ class CrowdFlowerWorker(val name: String, apiKey: String) {
 		}
 	}
 
-	private def chooseSingleOption(work: MultipleChoiceQuery): scala.concurrent.Future[MultipleChoiceAnswer] = scala.concurrent.Future {
+	private def chooseSingleOption(work: MultipleChoiceQuery) = {
 		val request = new CrowdFlowerJobRequest(s"singlechoice by " + work.question, work.question, apiKey)
 		var cml = s"""<cml:radios label="Choose one" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.foreach(option => cml += s"""<cml:radio label="${option}"/>""")
@@ -88,10 +85,10 @@ class CrowdFlowerWorker(val name: String, apiKey: String) {
 		MultipleChoiceAnswer(work, resultMap.toMap[String, Boolean])
 	}
 
-	private def chooseMultipleOptions(work: MultipleChoiceQuery): scala.concurrent.Future[MultipleChoiceAnswer] = scala.concurrent.Future {
+	private def chooseMultipleOptions(work: MultipleChoiceQuery) = {
 		//TODO Can only handle String data atm
 		val stringOptions = List.empty[String] ++ work.options.map(_.toString)
-		val request = new CrowdFlowerJobRequest(s"multiplechoice by " + name, work.question, apiKey)
+		val request = new CrowdFlowerJobRequest(s"multiplechoice by " + applicationName, work.question, apiKey)
 		var cml = s"""<cml:checkboxes label="Check all that apply" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.zipWithIndex.foreach(option => cml += s"""<cml:checkbox label="{{option_${option._2}}}"/>""")
 		cml += "</cml:checkboxes>"
