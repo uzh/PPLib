@@ -10,3 +10,4 @@ class RecombinationStub[INPUT, PROCESS_INPUT, PROCESS_OUTPUT, OUTPUT](
   def run(data: INPUT): OUTPUT =
     outputPostprocessor(processor(inputPreprocessor(data)))
 }
+
