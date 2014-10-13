@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.crowdlang.hcomp
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, _}
+import scala.concurrent.{Future, _}
 
 
 /**
@@ -30,6 +30,8 @@ trait HCompPortalAdapter {
 		Await.result(future, maxWaitTime)
 		future.value.get.get
 	}
+
+	def getDefaultPortalKey: String
 
 	def getQueries() = queryLog
 }

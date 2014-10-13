@@ -13,7 +13,7 @@ import scala.concurrent.duration._
  * adapted by pdeboer on 10/10/14.
  *
  */
-class CrowdFlowerWorker(val applicationName: String, apiKey: String) {
+class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Boolean) {
 	val secureHost = host("api.crowdflower.com").secure
 
 	def writeText(work: FreetextQuery) = {
@@ -24,7 +24,7 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String) {
 		val jobId = retry(2)(request.send(10 seconds))
 		val job = new CFFreeTextJob(jobId, apiKey)
 		job.addDataUnit("{}")
-		job.launch(sandbox = true)
+		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 10 seconds, factor = 1.5, max = 1 minute)
 		var answer: Option[String] = None
 		while (answer.isEmpty) {
@@ -72,7 +72,7 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String) {
 		jsonString += "}"
 		val job = new CFSingleChoiceJob(jobId, apiKey)
 		job.addDataUnit(jsonString)
-		job.launch(sandbox = true)
+		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
 		var answer: Option[String] = None
 		while (answer.isEmpty) {
@@ -100,7 +100,7 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String) {
 		jsonString += "}"
 		val job = new CFMultipleChoiceJob(jobId, apiKey)
 		job.addDataUnit(jsonString)
-		job.launch(sandbox = true)
+		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
 		var answers: Option[List[String]] = None
 		while (answers.isEmpty) {

@@ -5,8 +5,10 @@ import ch.uzh.ifi.pdeboer.crowdlang.hcomp._
 /**
  * Created by pdeboer on 10/10/14.
  */
-class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String) extends HCompPortalAdapter {
-	protected val worker = new CrowdFlowerWorker(applicationName, apiKey)
+class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
+	protected val worker = new CrowdFlowerWorker(applicationName, apiKey, sandbox)
+
+	override def getDefaultPortalKey: String = "crowdFlower"
 
 	protected override def processQuery(query: HCompQuery) = {
 		query match {
