@@ -44,6 +44,10 @@ trait HCompAnswer {
 	def query: HCompQuery
 }
 
+case class CompositeQuery(queries: List[HCompQuery], instructions: String = "") extends HCompQuery
+
+case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, HCompAnswer]) extends HCompAnswer
+
 case class FreetextQuery(question: String) extends HCompQuery
 
 case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer

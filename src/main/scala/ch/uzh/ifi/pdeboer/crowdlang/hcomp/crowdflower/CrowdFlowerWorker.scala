@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp.crowdflower
 
-import ch.uzh.ifi.pdeboer.crowdlang.hcomp.{FreetextAnswer, FreetextQuery, MultipleChoiceAnswer, MultipleChoiceQuery}
+import ch.uzh.ifi.pdeboer.crowdlang.hcomp._
 import dispatch._
 import play.api.libs.json._
 
@@ -16,13 +16,16 @@ import scala.concurrent.duration._
 class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Boolean) {
 	val secureHost = host("api.crowdflower.com").secure
 
-	def writeText(work: FreetextQuery) = {
+	def compositeQuery(work: CompositeQuery) = {
+		val request = new CrowdFlowerJobRequest(s"composite question by " + applicationName, work.instructions, apiKey)
+
+	}
+
+	def writeText(work: FreetextQuery, fieldName: String = "response") = {
 		val request = new CrowdFlowerJobRequest(s"freetext by " + applicationName, work.question, apiKey)
-		//TODO replaceall is very ugly here
-		var cml = s"""<cml:textarea label="${work.question.replaceAll("\"", "")}" name="response" class="" instructions="" default="" validates="required"/>"""
-		request.setCML(cml)
+		request.setCML(getTextareaCML(work.question, fieldName))
 		val jobId = retry(2)(request.send(10 seconds))
-		val job = new CFFreeTextJob(jobId, apiKey)
+		val job = new CFFreeTextJob(jobId, apiKey, fieldName)
 		job.addDataUnit("{}")
 		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 10 seconds, factor = 1.5, max = 1 minute)
@@ -42,7 +45,6 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Bo
 			chooseMultipleOptions(work)
 		}
 
-
 	/**
 	 * Method used to retry some code that may fail n times.
 	 * @param n  how often to retry
@@ -59,9 +61,12 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Bo
 		}
 	}
 
-	private def chooseSingleOption(work: MultipleChoiceQuery) = {
+	private def getTextareaCML(label: String, fieldName: String) =
+		s"""<cml:textarea label="${label.replaceAll("\"", "")}" name="${fieldName}" class="" instructions="" default="" validates="required"/>"""
+
+	private def chooseSingleOption(work: MultipleChoiceQuery, fieldName: String = "agg") = {
 		val request = new CrowdFlowerJobRequest(s"singlechoice by " + work.question, work.question, apiKey)
-		var cml = s"""<cml:radios label="Choose one" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
+		var cml = s"""<cml:radios label="Choose one" name="${fieldName}"  class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.foreach(option => cml += s"""<cml:radio label="${option}"/>""")
 		cml += "</cml:radios>"
 		request.setCML(cml)
@@ -70,7 +75,7 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Bo
 		work.options.zipWithIndex.foreach(option => jsonString += s""""option_${option._2}" : "${option._1.replaceAll("\"", "")}", \n""")
 		jsonString = jsonString.substring(0, jsonString.size - 3) //trim last comma
 		jsonString += "}"
-		val job = new CFSingleChoiceJob(jobId, apiKey)
+		val job = new CFSingleChoiceJob(jobId, apiKey, fieldName)
 		job.addDataUnit(jsonString)
 		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
@@ -85,11 +90,11 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Bo
 		MultipleChoiceAnswer(work, resultMap.toMap[String, Boolean])
 	}
 
-	private def chooseMultipleOptions(work: MultipleChoiceQuery) = {
+	private def chooseMultipleOptions(work: MultipleChoiceQuery, fieldName: String = "agg") = {
 		//TODO Can only handle String data atm
 		val stringOptions = List.empty[String] ++ work.options.map(_.toString)
 		val request = new CrowdFlowerJobRequest(s"multiplechoice by " + applicationName, work.question, apiKey)
-		var cml = s"""<cml:checkboxes label="Check all that apply" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
+		var cml = s"""<cml:checkboxes name="${fieldName}"  label="Check all that apply" class="" instructions="${work.question.replaceAll("\"", "")}" validates="required">"""
 		work.options.zipWithIndex.foreach(option => cml += s"""<cml:checkbox label="{{option_${option._2}}}"/>""")
 		cml += "</cml:checkboxes>"
 		request.setCML(cml)
@@ -98,7 +103,7 @@ class CrowdFlowerWorker(val applicationName: String, apiKey: String, sandBox: Bo
 		stringOptions.zipWithIndex.foreach(option => jsonString += s""""option_${option._2}" : "${option._1.replaceAll("\"", "")}", \n""")
 		jsonString = jsonString.substring(0, jsonString.size - 3) //trim last comma
 		jsonString += "}"
-		val job = new CFMultipleChoiceJob(jobId, apiKey)
+		val job = new CFMultipleChoiceJob(jobId, apiKey, fieldName)
 		job.addDataUnit(jsonString)
 		job.launch(sandbox = this.sandBox)
 		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
