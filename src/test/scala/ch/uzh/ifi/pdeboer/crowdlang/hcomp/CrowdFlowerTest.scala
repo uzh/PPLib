@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp
 
 import ch.uzh.ifi.pdeboer.crowdlang.hcomp.crowdflower.CrowdFlowerPortalAdapter
-import org.junit.Assert
+import org.junit.{Assert, Test}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,7 +14,7 @@ import scala.concurrent.duration._
  * Therefore the Tests are commented out by default for the TestSuite to run thru
  */
 class CrowdFlowerTest {
-	//@Test
+	@Test
 	def testFreeText() {
 		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", "s2xE6ApWLDRobTg5yj8a", sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(FreetextQuery("wie heisst du?"))

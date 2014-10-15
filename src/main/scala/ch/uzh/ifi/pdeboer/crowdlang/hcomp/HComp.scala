@@ -19,9 +19,9 @@ object HComp {
 	}
 
 	//convenience methods
-	def crowdFlower: CrowdFlowerPortalAdapter = portals.get("crowdFlower").asInstanceOf[CrowdFlowerPortalAdapter]
+	def crowdFlower: CrowdFlowerPortalAdapter = portals.get("crowdFlower").get.asInstanceOf[CrowdFlowerPortalAdapter]
 
-	def mechanicalTurk: CrowdFlowerPortalAdapter = portals.get("mechanicalTurk").asInstanceOf[CrowdFlowerPortalAdapter]
+	def mechanicalTurk: CrowdFlowerPortalAdapter = portals.get("mechanicalTurk").get.asInstanceOf[CrowdFlowerPortalAdapter]
 
 	def allDefinedPortals() = portals.values.filter(_ != null).toList
 }

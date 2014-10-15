@@ -18,7 +18,7 @@ import scala.util.Try
  *
  * TODO at some point this needs to be refactored. Code is super ugly
  */
-class CFJobCreator(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
+class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	val jobResourceJSONUrl = apiURL / "jobs.json"
 	private val apiURL = host("api.crowdflower.com").secure / "v1"
 	var jobId: Int = -1
@@ -26,6 +26,7 @@ class CFJobCreator(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 
 	def performQuery(parameters: CFQueryParameterSet = new CFQueryParameterSet(query.rawQuery.question, query.rawQuery.question), maxTries: Int = 100) = {
 		this.jobId = U.retry(2)(createJob(1 hour, parameters))
+		addDataUnit("{}")
 		launch()
 
 		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
@@ -46,18 +47,26 @@ class CFJobCreator(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	 * @return
 	 */
 	private def createJob(timeout: Duration, parameters: CFQueryParameterSet): Int = {
-		val req: Req = jobResourceJSONUrl.POST.addQueryParameter("key", apiKey)
-		val future = Http(parameters.fill(req) OK as.String).either
-		val either: Either[Throwable, String] = Await.result(future, timeout)
-		either match {
-			case Right(content) =>
-				val response: String = content
-				val json: JsValue = Json.parse(response)
-				val jobId = (json \ "id").as[Int]
-				jobId
-			case Left(StatusCode(code)) =>
-				throw StatusCode(code)
+		var req: Req = jobResourceJSONUrl.POST.addQueryParameter("key", apiKey)
+		req = req.addQueryParameter("job[cml]", query.getCML())
+
+		val result = Http(parameters.fill(req)).map { response =>
+			response.getStatusCode match {
+				case code if code / 100 == 4 || code / 100 == 2 => (code, true, response.getResponseBody)
+				case code => (code, false, new OkFunctionHandler(as.String).onCompleted(response))
+			}
 		}
+		println(parameters.fill(req).url)
+		val data = Await.result(result, timeout)
+
+		if (!data._2) {
+			println(data._3) //output exact answer of server
+			throw new StatusCode(data._1)
+		}
+		val response: String = data._3
+		val json: JsValue = Json.parse(response)
+		val jobId = (json \ "id").as[Int]
+		jobId
 	}
 
 	private def fetchResult(): Option[HCompAnswer] = {
@@ -79,7 +88,7 @@ class CFJobCreator(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		var request = order_url.POST.addQueryParameter("key", apiKey)
 		request = request.addHeader("Content-Type", "application/x-www-form-urlencoded")
 		if (sandbox)
-			request = request.setBody(s"channels[0]=cf_internal&debit[units_count]=0")
+			request = request.setBody(s"channels[0]=cf_internal&debit[units_count]=1")
 		else
 			request = request.setBody(s"channels[0]=on_demand&debit[units_count]=1")
 		try {
@@ -116,7 +125,7 @@ class CFJobCreator(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 
 class CFQueryParameterSet(
 							 title: String, instructions: String, judgementsPerUnit: Int = 1, unitsPerJudgement: Int = 1,
-							 paymentCents: Double = 0d, autoOrder: Boolean = true) {
+							 paymentCents: Double = 1d, autoOrder: Boolean = true) {
 
 	def fill(request: Req) = {
 		var ret = request.addQueryParameter("job[title]", title)
