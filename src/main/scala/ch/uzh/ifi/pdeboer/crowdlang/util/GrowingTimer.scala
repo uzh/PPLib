@@ -12,7 +12,6 @@ class GrowingTimer(val start: Duration, val factor: Double, val max: Duration) {
 	var currentTime = start
 
 	/**
-	 *
 	 * Waits the current amount of time
 	 */
 	def waitTime = {

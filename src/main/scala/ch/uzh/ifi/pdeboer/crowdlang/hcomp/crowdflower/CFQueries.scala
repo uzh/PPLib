@@ -54,11 +54,24 @@ class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: Stri
 	}
 }
 
-object CFConversions {
-	implicit def freeTextQueryToCFQuery(q: FreetextQuery) = new CFFreetextQuery(q)
+class CFCompositeQuery(val rawQuery: CompositeQuery) extends CFQuery {
+	val children = rawQuery.queries.zipWithIndex.map((t) => CFConversions.convertQueryToCFQuery(t._1, "field" + t._2)).toList
 
-	implicit def multipleChoiceQueryToCFQuery(q: MultipleChoiceQuery) =
-		if (q.maxNumberOfResults == 1) new CFSingleChoiceQuery(q) else new CFMultipleChoiceQuery(q)
+	override def getCML(): String = children.map(_.getCML()).mkString("<p>  </p>")
+
+	override def interpretResult(json: JsValue): Option[HCompAnswer] = {
+		val answers = children.map(c => (c.rawQuery, c.interpretResult(json))).toMap
+		Some(new CompositeQueryAnswer(rawQuery, answers))
+	}
+}
+
+
+object CFConversions {
+	implicit def convertQueryToCFQuery(q: HCompQuery, fieldName: String = "field"): CFQuery = q match {
+		case q: FreetextQuery => new CFFreetextQuery(q, fieldName)
+		case q: MultipleChoiceQuery => if (q.maxNumberOfResults == 1) new CFSingleChoiceQuery(q, fieldName) else new CFMultipleChoiceQuery(q, fieldName)
+		case q: CompositeQuery => new CFCompositeQuery(q)
+	}
 }
 
 trait CFQuery {
