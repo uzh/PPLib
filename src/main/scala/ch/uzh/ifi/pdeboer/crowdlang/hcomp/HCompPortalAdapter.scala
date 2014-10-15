@@ -38,13 +38,15 @@ trait HCompPortalAdapter {
 
 case class HCompQueryStats(query: HCompQuery, answer: HCompAnswer, timeMillis: Long)
 
-trait HCompQuery {}
+trait HCompQuery {
+	def question: String
+}
 
 trait HCompAnswer {
 	def query: HCompQuery
 }
 
-case class CompositeQuery(queries: List[HCompQuery], instructions: String = "") extends HCompQuery
+case class CompositeQuery(queries: List[HCompQuery], question: String = "") extends HCompQuery
 
 case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, HCompAnswer]) extends HCompAnswer
 
