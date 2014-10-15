@@ -56,7 +56,6 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 				case code => (code, false, new OkFunctionHandler(as.String).onCompleted(response))
 			}
 		}
-		println(parameters.fill(req).url)
 		val data = Await.result(result, timeout)
 
 		if (!data._2) {
@@ -78,7 +77,7 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 			println(s" $jobId : Timed out")
 			None
 		}
-		val json = json_try.get
+		val json = json_try.get //TODO fix bug
 		query.interpretResult(json)
 	}
 
