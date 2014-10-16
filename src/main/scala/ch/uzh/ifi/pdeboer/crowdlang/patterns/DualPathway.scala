@@ -26,7 +26,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 		}
 	}
 
-	protected def step(pathway: DPPathway): Boolean = {
+	protected def step(pathway: DPPathway) = {
 		if (pathway1.elements.isEmpty) init()
 
 		val pathwayChunks = pathway.getNElements(chunkCountToInclude)
@@ -35,9 +35,19 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 		val updatedPreviousChunks = driver.processNextChunkAndReturnResult(previousChunks,
 			if (advancementAllowed(pathway)) Some(pathway.mostRecentElementIdInPathway + 1) else None)
 
-		if (updatedPreviousChunks.size != pathwayChunks.size) false
+		val numberOfNewElements: Int = if (advancementAllowed(pathway)) 1 else 0
+		val expectedLength = previousChunks.length + numberOfNewElements
+
+		if (updatedPreviousChunks.size != expectedLength) throw new IllegalArgumentException("unexpected answer")
 		else {
-			pathwayChunks zip updatedPreviousChunks foreach (t => t._1.addMostRecentCandidate(t._2))
+			//add updated elements
+			updatedPreviousChunks.drop(numberOfNewElements).zip(pathwayChunks).foreach(t => t._2.addMostRecentCandidate(t._1))
+
+			//add new element
+			if (advancementAllowed(pathway)) {
+				pathway.addElement(new DPPathwayChunk(updatedPreviousChunks(0)))
+			}
+
 			val otherPathway = if (pathway == pathway1) pathway2 else pathway1
 			val minElementIdInList = updatedPreviousChunks.minBy(_.elementIndex).elementIndex
 
@@ -49,12 +59,11 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 					.takeWhile(_.elementIndex <= minElementIdInList).toList)
 
 			advancementAllowed += (pathway -> pathwaysAreEqual)
-			true
 		}
 	}
 
 	protected def init() {
-		val elems = (1 to chunkCountToInclude).map(i => driver.processNextChunkAndReturnResult(List.empty[DPChunk], Some(i))(0))
+		val elems = (0 to chunkCountToInclude - 1).map(i => driver.processNextChunkAndReturnResult(List.empty[DPChunk], Some(i))(0))
 
 		List(pathway1, pathway2).foreach(p => {
 			elems.foreach(e => p.addElement(new DPPathwayChunk(e)))
@@ -84,6 +93,7 @@ class DPPathwayChunk(initialChunk: DPChunk) {
 	addMostRecentCandidate(initialChunk)
 
 	def addMostRecentCandidate(chunk: DPChunk): Unit = {
+		if (!candidates.forall(_.elementIndex == chunk.elementIndex)) throw new IllegalArgumentException("indices unaligned")
 		candidates = chunk :: candidates
 	}
 

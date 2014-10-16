@@ -12,7 +12,7 @@ class DualPathwayTest {
 		val dpe = new DualPathwayExecutor(driver, 2)
 		dpe.runUntilConverged()
 
-		driver.data zip dpe.data forall (t => {
+		driver.data zip dpe.data.reverse forall (t => {
 			val number = t._1.replaceAll("[^0-9]", "")
 			Assert.assertEquals(number, t._2.answer)
 			Assert.assertEquals(t._1, t._2.data)
