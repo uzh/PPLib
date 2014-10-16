@@ -7,8 +7,30 @@ import org.junit.{Assert, Test}
  */
 class DualPathwayTest {
 	@Test
-	def testDualPathwayExecutor(): Unit = {
+	def testDualPathwayExecutorAllGood(): Unit = {
 		val driver: TestDPDriver = new TestDPDriver
+		runTest(driver)
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorAfterInit(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(1)
+		runTest(driver)
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorInMiddle(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(2)
+		runTest(driver)
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorAtEnd(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(3)
+		runTest(driver)
+	}
+
+	def runTest(driver: TestDPDriver): Unit = {
 		val dpe = new DualPathwayExecutor(driver, 2)
 		dpe.runUntilConverged()
 
@@ -20,10 +42,30 @@ class DualPathwayTest {
 		})
 	}
 
-	private class TestDPDriver extends DPDriver {
-		val data = List("test1", "test2", "test3", "test4")
+	@Test
+	def testDualPathwayExecutorOneErrorAfterInitUnevenPathway(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(1, false)
+		runTest(driver)
+	}
 
-		var lastIdChecked = -1
+	@Test
+	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(2, false)
+		runTest(driver)
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorAtEndUnevenPathway(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(3, false)
+		runTest(driver)
+	}
+
+	private class TestDPDriver(introduceErrorAtStepId: Int = -1, introduceIntoFirstPathway: Boolean = true) extends DPDriver {
+		val data = List("test1", "test2", "test3", "test4")
+		var errorIntroduced: Boolean = false
+		var errorIntroducedAndCheckDone: Boolean = false
+
+		var lastStepId: Int = -1
 
 		/**
 		 * return newest chunk first
@@ -31,22 +73,38 @@ class DualPathwayTest {
 		 * @return
 		 */
 		override def processNextChunkAndReturnResult(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int]): List[DPChunk] = {
-			if (newChunkElementId.isEmpty) previousChunksToCheck
+			Thread.sleep(10)
+
+			val fixedPrevChunks: List[DPChunk] = previousChunksToCheck.map(c => {
+				DPChunk(c.elementIndex, c.data, c.data.replaceAll("[^0-9]", ""))()
+			}).toList
+
+			if (newChunkElementId.isEmpty) {
+				fixedPrevChunks
+			}
 			else {
 				val dataPacket: String = data(newChunkElementId.get)
-				val numericVersion: String = dataPacket.replaceAll("[^0-9]", "")
+				val answer: String = if (newChunkElementId.getOrElse(-1) == introduceErrorAtStepId && !errorIntroduced
+					&& (introduceIntoFirstPathway || !introduceIntoFirstPathway && lastStepId == newChunkElementId.getOrElse(-1))) {
+					errorIntroduced = true
+					"bla"
+				} else dataPacket.replaceAll("[^0-9]", "")
 
-				lastIdChecked = newChunkElementId.get
+				lastStepId = newChunkElementId.get
 
-				DPChunk(newChunkElementId.get, dataPacket, numericVersion)() :: previousChunksToCheck
+				DPChunk(newChunkElementId.get, dataPacket, answer)() :: fixedPrevChunks
 			}
 		}
 
 		override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
+			val isErrorComparison = errorIntroduced && !errorIntroducedAndCheckDone
+			if (isErrorComparison) {
+				this.errorIntroducedAndCheckDone = true
+			}
 			simpleEqualityTest(pathway1, pathway2)
 		}
 
-		override def hasMoreElements(): Boolean = lastIdChecked + 1 < data.length
+		override def elementIndexExists(index: Int): Boolean = index > -1 && index < data.length
 	}
 
 }

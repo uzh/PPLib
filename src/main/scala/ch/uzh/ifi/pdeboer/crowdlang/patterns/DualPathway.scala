@@ -19,7 +19,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 			pathway1.mostRecentElementIdInPathway == -1 ||
 				pathway1.mostRecentElementIdInPathway != pathway2.mostRecentElementIdInPathway ||
 				advancementAllowed.values.exists(_ == false) ||
-				driver.hasMoreElements()
+				driver.elementIndexExists(pathway1.mostRecentElementIdInPathway + 1)
 		) {
 			step(pathway1)
 			step(pathway2)
@@ -32,10 +32,12 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 		val pathwayChunks = pathway.getNElements(chunkCountToInclude)
 
 		val previousChunks = pathwayChunks.map(_.mostRecentCandidate).toList
+		val nextIndexToProcess: Int = pathway.mostRecentElementIdInPathway + 1
+		val newElementToAddInThisRound: Boolean = advancementAllowed(pathway) && driver.elementIndexExists(nextIndexToProcess)
 		val updatedPreviousChunks = driver.processNextChunkAndReturnResult(previousChunks,
-			if (advancementAllowed(pathway)) Some(pathway.mostRecentElementIdInPathway + 1) else None)
+			if (newElementToAddInThisRound) Some(nextIndexToProcess) else None)
 
-		val numberOfNewElements: Int = if (advancementAllowed(pathway)) 1 else 0
+		val numberOfNewElements: Int = if (newElementToAddInThisRound) 1 else 0
 		val expectedLength = previousChunks.length + numberOfNewElements
 
 		if (updatedPreviousChunks.size != expectedLength) throw new IllegalArgumentException("unexpected answer")
@@ -44,21 +46,21 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 			updatedPreviousChunks.drop(numberOfNewElements).zip(pathwayChunks).foreach(t => t._2.addMostRecentCandidate(t._1))
 
 			//add new element
-			if (advancementAllowed(pathway)) {
+			if (newElementToAddInThisRound) {
 				pathway.addElement(new DPPathwayChunk(updatedPreviousChunks(0)))
 			}
 
+			advancementAllowed += (pathway -> false)
 			val otherPathway = if (pathway == pathway1) pathway2 else pathway1
-			val minElementIdInList = updatedPreviousChunks.minBy(_.elementIndex).elementIndex
 
-			val pathwaysAreEqual = driver.comparePathwaysAndDecideWhetherToAdvance(
-				pathway.getNElementsPayload(chunkCountToInclude),
-				otherPathway.elements.toStream //get only elements with the same index range
-					.map(_.mostRecentCandidate)
-					.dropWhile(_.elementIndex > pathway.mostRecentElementIdInPathway)
-					.takeWhile(_.elementIndex <= minElementIdInList).toList)
+			if (otherPathway.mostRecentElementIdInPathway == pathway.mostRecentElementIdInPathway) {
+				val pathwaysAreEqual = driver.comparePathwaysAndDecideWhetherToAdvance(
+					pathway.getNElementsPayload(chunkCountToInclude),
+					otherPathway.getNElementsPayload(chunkCountToInclude))
 
-			advancementAllowed += (pathway -> pathwaysAreEqual)
+				advancementAllowed += (pathway -> pathwaysAreEqual)
+				advancementAllowed += (otherPathway -> pathwaysAreEqual)
+			}
 		}
 	}
 
@@ -112,11 +114,11 @@ trait DPDriver {
 
 	def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean
 
-	def hasMoreElements(): Boolean
+	def elementIndexExists(index: Int): Boolean
 
 	def simpleEqualityTest(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
 		pathway1 zip pathway2 forall (t => t._1 equals t._2)
 	}
 }
 
-case class DPChunk(elementIndex: Int, data: String, answer: String = "")(created: Date = new Date(), var aux: String = "")
+case class DPChunk(elementIndex: Int, data: String, answer: String = "")(val created: Date = new Date(), var aux: String = "")
