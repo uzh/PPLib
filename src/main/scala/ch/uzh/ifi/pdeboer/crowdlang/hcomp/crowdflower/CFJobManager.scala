@@ -29,12 +29,14 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		addDataUnit("{}")
 		launch()
 
-		val timer = new GrowingTimer(start = 30 seconds, factor = 2.0, max = 1 minute)
+		val timer = new GrowingTimer(start = 1 seconds, factor = 1.5, max = 1 minute)
 
 		var answer: Option[HCompAnswer] = None
 		U.retry(maxTries)({
 			timer.waitTime
 			answer = fetchResult()
+
+			if (answer.isEmpty) throw new Exception() //continue waiting
 		})
 
 		cachedResult = answer
@@ -77,8 +79,23 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 			println(s" $jobId : Timed out")
 			None
 		}
-		val json = json_try.get //TODO fix bug
+		val json = json_try.get
 		query.interpretResult(json)
+	}
+
+	def jobIdResourceURL = apiURL / "jobs" / jobId
+
+	private def sendAndAwaitJson(request: Req, timeout: Duration) = {
+		val future = Http(request OK as.String).either
+		val either: Either[Throwable, String] = Await.result(future, timeout)
+		either match {
+			case Right(content) =>
+				val response: String = content
+				val json: JsValue = Json.parse(response)
+				json
+			case Left(StatusCode(code)) =>
+				throw StatusCode(code)
+		}
 	}
 
 	private def launch() {
@@ -95,21 +112,6 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		} catch {
 			case e: TimeoutException =>
 				println(s"Timed out: ${request.toRequest.toString}")
-		}
-	}
-
-	def jobIdResourceURL = apiURL / "jobs" / jobId
-
-	private def sendAndAwaitJson(request: Req, timeout: Duration) = {
-		val future = Http(request OK as.String).either
-		val either: Either[Throwable, String] = Await.result(future, timeout)
-		either match {
-			case Right(content) =>
-				val response: String = content
-				val json: JsValue = Json.parse(response)
-				json
-			case Left(StatusCode(code)) =>
-				throw StatusCode(code)
 		}
 	}
 

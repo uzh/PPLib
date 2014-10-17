@@ -21,7 +21,7 @@ class CrowdFlowerTest {
 
 		Await.result(query, 1 day)
 		query onSuccess {
-			case answer => println(answer.asInstanceOf[FreetextAnswer].answer)
+			case answer => println(answer.get.asInstanceOf[FreetextAnswer].answer)
 		}
 		Assert.assertTrue(true)
 	}

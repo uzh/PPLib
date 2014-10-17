@@ -6,7 +6,7 @@ import play.api.libs.json.JsValue
 /**
  * Created by pdeboer on 14/10/14.
  */
-class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "freetextQuery") extends CFQuery {
+class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "field") extends CFQuery {
 	val xml = <cml:textarea name={name} label={rawQuery.question} class=" " instructions=" " default=" " validates="required"/>
 
 	override def getCML(): String = xml.toString()
@@ -20,7 +20,7 @@ class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "freetextQ
 	}
 }
 
-class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "multipleChoice") extends CFQuery {
+class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "field") extends CFQuery {
 	val xml = <cml:checkboxes name={fieldName} label={rawQuery.question} class=" " instructions={rawQuery.question} validates="required">
 		{rawQuery.options.map(o => <cml:checkbox label={o}/>)}
 	</cml:checkboxes>
@@ -37,7 +37,7 @@ class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: St
 	}
 }
 
-class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "singleChoice") extends CFQuery {
+class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "field") extends CFQuery {
 	val xml = <cml:radios name={fieldName} label={rawQuery.question} class=" " instructions={rawQuery.question} validates="required">
 		{rawQuery.options.map(o => <cml:radio label={o}/>)}
 	</cml:radios>
