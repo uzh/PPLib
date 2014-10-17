@@ -48,19 +48,24 @@ trait HCompAnswer {
 
 case class CompositeQuery(queries: List[HCompQuery], question: String = "") extends HCompQuery
 
-case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer
+case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer {
+	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
+}
 
 case class FreetextQuery(question: String) extends HCompQuery
 
-case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer
+case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer {
+	override def toString() = answer
+}
 
-//TODO add more types than just string
 case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1) extends HCompQuery
 
 case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer {
 	def selectedAnswers: List[String] = answer.collect({
 		case x if x._2 => x._1
 	}).toList
+
+	override def toString() = selectedAnswers.mkString(", ")
 }
 
 case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer

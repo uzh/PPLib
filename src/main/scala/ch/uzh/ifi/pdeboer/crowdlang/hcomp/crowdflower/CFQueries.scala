@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp.crowdflower
 
 import ch.uzh.ifi.pdeboer.crowdlang.hcomp._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsArray, JsValue}
 
 /**
  * Created by pdeboer on 14/10/14.
@@ -28,9 +28,9 @@ class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: St
 	override def getCML(): String = xml.toString()
 
 	override def interpretResult(json: JsValue): Option[HCompAnswer] = {
-		val result_field = json \\ fieldName
-		if (result_field != Nil) {
-			val result = result_field.map(_.as[String]).toSet
+		val resultField = json \\ fieldName
+		if (resultField != Nil) {
+			val result = (resultField(0) \ "res")(0).asInstanceOf[JsArray].value.map(s => s.toString.substring(1, s.toString().length - 1)).toSet
 			val selectedElementsOutOfOriginalQuery = rawQuery.options.map(o => (o -> result.contains(o))).toMap
 			Some(MultipleChoiceAnswer(rawQuery, selectedElementsOutOfOriginalQuery))
 		} else None
@@ -45,9 +45,9 @@ class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: Stri
 	override def getCML(): String = xml.toString()
 
 	override def interpretResult(json: JsValue): Option[HCompAnswer] = {
-		val result_field = json \\ fieldName
-		if (result_field != Nil) {
-			val result = result_field.map(_.as[String]).toSet
+		val resultField = json \\ fieldName
+		if (resultField != Nil) {
+			val result = (resultField(0) \ "res").asInstanceOf[JsArray].value.map(s => s.toString.substring(1, s.toString().length - 1)).toSet
 			val selectedElementsOutOfOriginalQuery = rawQuery.options.map(o => (o -> result.contains(o))).toMap
 			Some(MultipleChoiceAnswer(rawQuery, selectedElementsOutOfOriginalQuery))
 		} else None
@@ -61,7 +61,9 @@ class CFCompositeQuery(val rawQuery: CompositeQuery) extends CFQuery {
 
 	override def interpretResult(json: JsValue): Option[HCompAnswer] = {
 		val answers = children.map(c => (c.rawQuery, c.interpretResult(json))).toMap
-		Some(new CompositeQueryAnswer(rawQuery, answers))
+		if (answers.values.exists(_.isDefined))
+			Some(new CompositeQueryAnswer(rawQuery, answers)) //only return if defined
+		else None
 	}
 }
 
