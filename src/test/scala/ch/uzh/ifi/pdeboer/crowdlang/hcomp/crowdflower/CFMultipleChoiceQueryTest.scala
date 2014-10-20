@@ -10,6 +10,8 @@ class CFMultipleChoiceQueryTest {
 	@Test
 	def testXMLMarshalling(): Unit = {
 		val q = new CFMultipleChoiceQuery(new MultipleChoiceQuery("test?", List("test1", "test2"), 1, 1))
-		Assert.assertEquals("<cml:checkboxes name=\"multipleChoice\" label=\"test?\" class=\"\" instructions=\"test?\" validates=\"required\"><cml:checkbox label=\"test1\"/><cml:checkbox label=\"test2\"/></cml:checkboxes>", q.getCML())
+		Assert.assertEquals( """<cml:checkboxes name="field" label="test?" class=" " instructions="test?" validates="required">
+							   |		<cml:checkbox label="test1"/><cml:checkbox label="test2"/>
+							   |	</cml:checkboxes>""".stripMargin, q.getCML())
 	}
 }

@@ -35,6 +35,8 @@ class RecombinationVariantGeneratorTest {
 		a.forall(b.contains(_)) && b.forall(a.contains(_))
 	}
 
-	private class TestRecombinationStub(val id: Int) extends SimpleRecombinationStub[Int, Int](i => i)
+	private class TestRecombinationStub(val id: Int) extends RecombinationStub[Integer, Integer] {
+		override def run[I >: Integer, O >: Integer](data: I): O = data.asInstanceOf[Integer]
+	}
 
 }

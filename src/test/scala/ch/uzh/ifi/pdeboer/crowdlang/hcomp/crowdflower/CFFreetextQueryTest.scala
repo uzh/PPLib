@@ -10,6 +10,6 @@ class CFFreetextQueryTest {
 	@Test
 	def testXMLMarshalling(): Unit = {
 		val q = new CFFreetextQuery(FreetextQuery("mylabel"), "mynam\"e")
-		Assert.assertEquals("<cml:textarea name=\"mynam&quot;e\" label=\"mylabel\" class=\"\" instructions=\"\" default=\"\" validates=\"required\"/>", q.getCML())
+		Assert.assertEquals("<cml:textarea name=\"mynam&quot;e\" label=\"mylabel\" class=\" \" instructions=\" \" default=\" \" validates=\"required\"/>", q.getCML())
 	}
 }

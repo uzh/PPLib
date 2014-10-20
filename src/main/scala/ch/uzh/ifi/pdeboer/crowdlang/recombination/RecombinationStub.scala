@@ -5,15 +5,13 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationStub[INPUT, PROCESS_INPUT, PROCESS_OUTPUT, OUTPUT](
-																		 val inputPreprocessor: INPUT => PROCESS_INPUT, processor: PROCESS_INPUT => PROCESS_OUTPUT,
-																		 val outputPostprocessor: PROCESS_OUTPUT => OUTPUT,
-																		 val recombinationCategories: List[String] = Nil,
-																		 var params: Map[String, Any] = Map.empty[String, Any]
-																		 ) {
+//TODO use param class for map
+abstract class RecombinationStub[+INPUT, +OUTPUT](
+													 var params: Map[String, Any] = Map.empty[String, Any],
+													 val recombinationCategories: List[String] = Nil
+													 ) {
 
-	def run(data: INPUT): OUTPUT =
-		outputPostprocessor(processor(inputPreprocessor(data)))
+	def run[I >: INPUT, O >: INPUT](data: I): O
 
 	def isParameterTypeCorrect(key: String, value: Any): Boolean = {
 		val allParams = expectedParameters ::: optionalParameters
@@ -41,17 +39,10 @@ class RecombinationStub[INPUT, PROCESS_INPUT, PROCESS_OUTPUT, OUTPUT](
 	}))
 }
 
-class OnlineRecombination(val identifier: String) extends Iterable[RecombinationStub[_, _, _, _]] {
-	override def iterator: Iterator[RecombinationStub[_, _, _, _]] = RecombinationDB.get(identifier).stubs.iterator
+class OnlineRecombination[I, O](val identifier: String) extends Iterable[RecombinationStub[I, O]] {
+	override def iterator: Iterator[RecombinationStub[I, O]] = RecombinationDB.get(identifier).asInstanceOf[RecombinationCategory[I, O]].stubs.iterator
 }
 
 case class RecombinationParameter[T: ClassTag](key: String, candidateDefinitions: Option[Iterable[T]] = None) {
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
 }
-
-class SimpleRecombinationStub[PROCESS_INPUT, PROCESS_OUTPUT](
-																val processor: PROCESS_INPUT => PROCESS_OUTPUT,
-																recombinationCategories: List[String] = Nil,
-																params: Map[String, AnyRef] = Map.empty[String, AnyRef]
-																) extends RecombinationStub[PROCESS_INPUT, PROCESS_INPUT,
-	PROCESS_OUTPUT, PROCESS_OUTPUT](i => i, processor, o => o, recombinationCategories, params)

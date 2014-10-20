@@ -34,8 +34,10 @@ class RecombinationStubParameterTest {
 		}
 	}
 
-	private class TestRecombImplparams(chk: List[RecombinationParameter[_]], params: Map[String, AnyRef]) extends SimpleRecombinationStub[String, String](k => "asdf", params = params) {
+	private class TestRecombImplparams(chk: List[RecombinationParameter[_]], params: Map[String, AnyRef]) extends RecombinationStub[String, String](params = params) {
 		override def expectedParameters: List[RecombinationParameter[_]] = chk
+
+		override def run[I >: String, O >: String](data: I): O = "test"
 	}
 
 }

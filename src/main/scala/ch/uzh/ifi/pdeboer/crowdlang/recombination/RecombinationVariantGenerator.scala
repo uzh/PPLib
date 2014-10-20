@@ -6,16 +6,16 @@ import scala.collection.mutable
  * Created by pdeboer on 09/10/14.
  */
 //TODO get rid of ugly _,_,_
-class RecombinationVariantGenerator[I, O](configs: Map[String, List[RecombinationStub[I, _, _, O]]]) {
+class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[_, _]]]) {
 	lazy val variants = {
-		val listOfTupleLists: List[List[(String, RecombinationStub[I, _, _, O])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
+		val listOfTupleLists: List[List[(String, RecombinationStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			RecombinationVariant(k.asInstanceOf[List[(String, RecombinationStub[_, _, _, _])]].toMap)
+			RecombinationVariant(k.asInstanceOf[List[(String, RecombinationStub[_, _])]].toMap)
 		})
 	}
 }
 
-class RecombinationStubParameterVariantGenerator[I, O](val base: RecombinationStub[I, _, _, O]) {
+class RecombinationStubParameterVariantGenerator[I, O](val base: RecombinationStub[I, O]) {
 	private var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
 
 	def initAllParamsWithCandidates(): Unit = {
