@@ -17,8 +17,12 @@ object RecombinationDB {
 	}
 }
 
-case class RecombinationCategory(name: String, private var stubs: mutable.Set[RecombinationStub[_, _, _, _]] = mutable.HashSet.empty[RecombinationStub[_, _, _, _]]) {
+case class RecombinationCategory(name: String) {
+	private var _stubs: mutable.Set[RecombinationStub[_, _, _, _]] = mutable.HashSet.empty[RecombinationStub[_, _, _, _]]
+
 	def addStub(s: RecombinationStub[_, _, _, _]): Unit = {
-		stubs += s
+		_stubs += s
 	}
+
+	def stubs = _stubs.toSet
 }
