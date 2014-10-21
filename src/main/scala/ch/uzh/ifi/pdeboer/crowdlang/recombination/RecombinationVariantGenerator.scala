@@ -5,7 +5,6 @@ import scala.collection.mutable
 /**
  * Created by pdeboer on 09/10/14.
  */
-//TODO get rid of ugly _,_,_
 class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[_, _]]]) {
 	lazy val variants = {
 		val listOfTupleLists: List[List[(String, RecombinationStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
@@ -15,16 +14,16 @@ class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[
 	}
 }
 
-class RecombinationStubParameterVariantGenerator[I, O](val base: RecombinationStub[I, O]) {
-	private var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
+class RecombinationStubParameterVariantGenerator[I >: AnyRef, O >: AnyRef](val base: RecombinationStub[I, O]) {
+	protected var parameterValues = new mutable.HashMap[String, mutable.Set[AnyRef]]()
 
 	def initAllParamsWithCandidates(): Unit = {
-		val expected = base.expectedParameters
-		expected.foreach(k => addParameterVariations(k.key, k.candidateDefinitions.getOrElse(Nil).toList))
+		val expected = base.expectedParameters ::: base.optionalParameters
+		expected.foreach(k => addParameterVariations(k.key, k.candidateDefinitions.getOrElse(Nil).toList.asInstanceOf[List[AnyRef]]))
 	}
 
-	def addParameterVariations(paramKey: String, values: List[Any]): Unit = {
-		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[Any])
+	def addParameterVariations(paramKey: String, values: List[AnyRef]): Unit = {
+		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[AnyRef])
 		values.foreach(k => {
 			if (base.isParameterTypeCorrect(paramKey, k))
 				cur += k

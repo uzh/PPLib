@@ -7,13 +7,19 @@ import scala.reflect.ClassTag
  */
 //TODO use param class for map
 abstract class RecombinationStub[+INPUT, +OUTPUT](
-													 var params: Map[String, Any] = Map.empty[String, Any],
+													 var params: Map[String, AnyRef] = Map.empty[String, AnyRef],
 													 val recombinationCategories: List[String] = Nil
 													 ) {
-
+	/**
+	 * central method of recombination.
+	 * @param data
+	 * @tparam I
+	 * @tparam O
+	 * @return
+	 */
 	def run[I >: INPUT, O >: INPUT](data: I): O
 
-	def isParameterTypeCorrect(key: String, value: Any): Boolean = {
+	def isParameterTypeCorrect(key: String, value: AnyRef): Boolean = {
 		val allParams = expectedParameters ::: optionalParameters
 		val e = allParams.find(_.key.equals(key))
 		if (e.isDefined) {
@@ -30,8 +36,9 @@ abstract class RecombinationStub[+INPUT, +OUTPUT](
 
 	def optionalParameters = List.empty[RecombinationParameter[_]]
 
+	//TODO: should we defer this to an init method that's only executed when running?
 	assert(expectedParameters.forall(k => {
-		val definedParam: Option[Any] = params.get(k.key)
+		val definedParam: Option[AnyRef] = params.get(k.key)
 		val r = definedParam.isDefined && isParameterTypeCorrect(k.key, definedParam.getOrElse(None))
 		if (!r)
 			throw new IllegalArgumentException("Parameter not defined or type wrong: " + k.key + ":" + k.clazz.getCanonicalName)
