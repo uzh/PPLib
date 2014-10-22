@@ -23,6 +23,13 @@ class FindFixVerifyTest {
 		Assert.assertEquals("verify errorous", badPatches.map(_.best).toSet, bestPatches.toSet)
 	}
 
+	@Test
+	def testFFVOneShot(): Unit = {
+		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
+
+		checkOneShot(badPatches.map(_.original), badPatches, exec)
+	}
+
 	private def prepareData: (List[FFVTestDriverBadPatch], FindFixVerifyTestVisibilityBreaker) = {
 		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
 		val badPatches = dataSet.map(d => new FFVTestDriverBadPatch(d,
@@ -36,14 +43,27 @@ class FindFixVerifyTest {
 		(badPatches, exec)
 	}
 
-	@Test
-	def testFFVOneShot(): Unit = {
-		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
+	def checkOneShot(dataSet: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) {
+		val badPatchesWithoutInfo = badPatches.map(_.original).toSet
+		val badPatchesInclBest = dataSet.filterNot(d => badPatchesWithoutInfo.contains(d)) ::: badPatches.map(_.best)
 
-		Assert.assertEquals("oneshot comparison FFV",
-			badPatches.map(_.best).sortBy(_.patch),
-			exec.bestPatches.sortBy(_.patch)
+		Assert.assertEquals("FFV one shot",
+			badPatchesInclBest.toSet,
+			exec.bestPatches.toSet
 		)
+	}
+
+	@Test
+	def testFFVOnlyFewFixes(): Unit = {
+		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
+		val patchesToCreateBadPatchesFor = dataSet.map(d => (d, new Random().nextDouble())).sortBy(_._2).take(10).map(_._1)
+		val badPatches = patchesToCreateBadPatchesFor.map(p => new FFVTestDriverBadPatch(
+			p,
+			(1 to 3).map(i => new FFVPatch[String](p.patch + i, p.patchIndex)).toList,
+			new FFVPatch[String](p.patch + 2, p.patchIndex)
+		))
+
+		checkOneShot(dataSet, badPatches, new FindFixVerifyTestVisibilityBreaker(new FFVTestDriver(dataSet, badPatches, 3)))
 	}
 
 	private class FFVTestDriverBadPatch(var original: FFVPatch[String], val alternatives: List[FFVPatch[String]], val best: FFVPatch[String], var remainingFinds: Int = 3) {
