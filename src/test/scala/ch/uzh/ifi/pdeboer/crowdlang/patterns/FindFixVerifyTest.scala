@@ -1,0 +1,101 @@
+package ch.uzh.ifi.pdeboer.crowdlang.patterns
+
+import org.junit.{Assert, Test}
+
+import scala.util.Random
+
+/**
+ * Created by pdeboer on 22/10/14.
+ */
+class FindFixVerifyTest {
+	@Test
+	def testFFV(): Unit = {
+		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
+		val badPatches = dataSet.map(d => new FFVTestDriverBadPatch(d,
+			(1 to 3).map(i => new FFVPatch[String](d.patch + i, d.patchIndex)).toList,
+			new FFVPatch[String](d.patch + 2, d.patchIndex)
+		))
+
+		val driver = new FFVTestDriver(dataSet, badPatches, 10)
+
+		val exec = new FindFixVerifyTestVisibilityBreaker(driver)
+
+		val toFix = exec.getPatchesToFix()
+		Assert.assertEquals("finds errorous", badPatches.map(_.original).toSet, toFix.toSet)
+
+		val fixes = exec.getAlternativesForPatchesToFix(toFix)
+		Assert.assertEquals("fixes erroneous", badPatches.map(_.alternatives).flatten.sortBy(_.patch), fixes.sortBy(_.patch))
+
+		exec.addFixesAsAlternativesToAllPatches(fixes)
+		val bestPatches = exec.getBestPatchesFromAllPatchesVAR()
+		Assert.assertEquals("verify errorous", badPatches.map(_.best).toSet, bestPatches.toSet)
+	}
+
+	private class FFVTestDriverBadPatch(var original: FFVPatch[String], val alternatives: List[FFVPatch[String]], val best: FFVPatch[String], var remainingFinds: Int = 3) {
+		var remainingAlternatives: List[FFVPatch[String]] = alternatives
+	}
+
+	private class FFVTestDriver(val orderedPatches: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], numberOfPatchesReturnedInFind: Int = 3) extends FindFixVerifyDriver[String] {
+		/**
+		 * all alternatives collected for a single patch in the previous step are evaluated here
+		 * and a best version is selected. Consider banning people who participated in the "Fix"-step
+		 * from this step.
+		 * @param patch
+		 * @param alternatives
+		 */
+		override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
+			val badPatch = badPatches.find(_.original == patch).get
+			badPatch.best
+		}
+
+		/**
+		 * use a single crowd worker to fix this patch. If working with strings, you may
+		 * want to show crowd workers context to that patch
+		 * @param patch
+		 * @return fixed version of that patch, that will be shown as an alternative in the next step
+		 */
+		override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
+			badPatches.synchronized {
+				val badPatch = badPatches.find(_.original == patch).get
+				val ret = badPatch.remainingAlternatives.head
+				badPatch.remainingAlternatives = badPatch.remainingAlternatives.drop(1)
+				ret
+			}
+		}
+
+		/**
+		 * given a list of patches, return all patches a single crowd worker selected as imperfect.
+		 * This method will be called repeatedly
+		 * @param patches
+		 * @return
+		 */
+		override def find(patches: List[FFVPatch[String]]): List[FFVPatch[String]] = {
+			badPatches.synchronized {
+				val candidates = patches.filter(p => badPatches.exists(b => b.original == p && b.remainingFinds > 0))
+
+				val randomlySelectedCandidates = candidates.map(c => (c, new Random().nextDouble())).sortBy(_._2).take(numberOfPatchesReturnedInFind)
+				randomlySelectedCandidates.foreach(c => badPatches.find(b => b.original == c._1).get.remainingFinds -= 1)
+				randomlySelectedCandidates.map(_._1)
+			}
+		}
+	}
+
+	private class FindFixVerifyTestVisibilityBreaker(driver: FindFixVerifyDriver[String],
+													 maxPatchesCountInFind: Int = 10,
+													 findersCount: Int = 3,
+													 minFindersCountThatNeedToAgreeForFix: Int = 2,
+													 fixersPerPatch: Int = 3) extends FindFixVerifyExecutor[String](driver, maxPatchesCountInFind, findersCount, minFindersCountThatNeedToAgreeForFix, fixersPerPatch) {
+		def allPatchesVal = allPatches
+
+		override def getBestPatchesFromAllPatchesVAR(): List[FFVPatch[String]] = super.getBestPatchesFromAllPatchesVAR()
+
+		override def getAlternativesForPatchesToFix(toFix: List[FFVPatch[String]]): List[FFVPatch[String]] = super.getAlternativesForPatchesToFix(toFix)
+
+		override def getPatchesToFix(): List[FFVPatch[String]] = super.getPatchesToFix()
+
+		override def saveBestPatchesToAllPatches(): Unit = super.saveBestPatchesToAllPatches
+
+		override def addFixesAsAlternativesToAllPatches(fixes: List[FFVPatch[String]]): Unit = super.addFixesAsAlternativesToAllPatches(fixes)
+	}
+
+}
