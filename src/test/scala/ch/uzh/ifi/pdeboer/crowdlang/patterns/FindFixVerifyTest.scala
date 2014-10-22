@@ -9,16 +9,8 @@ import scala.util.Random
  */
 class FindFixVerifyTest {
 	@Test
-	def testFFV(): Unit = {
-		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
-		val badPatches = dataSet.map(d => new FFVTestDriverBadPatch(d,
-			(1 to 3).map(i => new FFVPatch[String](d.patch + i, d.patchIndex)).toList,
-			new FFVPatch[String](d.patch + 2, d.patchIndex)
-		))
-
-		val driver = new FFVTestDriver(dataSet, badPatches, 10)
-
-		val exec = new FindFixVerifyTestVisibilityBreaker(driver)
+	def testFFVDetailed(): Unit = {
+		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
 
 		val toFix = exec.getPatchesToFix()
 		Assert.assertEquals("finds errorous", badPatches.map(_.original).toSet, toFix.toSet)
@@ -29,6 +21,29 @@ class FindFixVerifyTest {
 		exec.addFixesAsAlternativesToAllPatches(fixes)
 		val bestPatches = exec.getBestPatchesFromAllPatchesVAR()
 		Assert.assertEquals("verify errorous", badPatches.map(_.best).toSet, bestPatches.toSet)
+	}
+
+	private def prepareData: (List[FFVTestDriverBadPatch], FindFixVerifyTestVisibilityBreaker) = {
+		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
+		val badPatches = dataSet.map(d => new FFVTestDriverBadPatch(d,
+			(1 to 3).map(i => new FFVPatch[String](d.patch + i, d.patchIndex)).toList,
+			new FFVPatch[String](d.patch + 2, d.patchIndex)
+		))
+
+		val driver = new FFVTestDriver(dataSet, badPatches, 10)
+
+		val exec = new FindFixVerifyTestVisibilityBreaker(driver)
+		(badPatches, exec)
+	}
+
+	@Test
+	def testFFVOneShot(): Unit = {
+		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
+
+		Assert.assertEquals("oneshot comparison FFV",
+			badPatches.map(_.best).sortBy(_.patch),
+			exec.bestPatches.sortBy(_.patch)
+		)
 	}
 
 	private class FFVTestDriverBadPatch(var original: FFVPatch[String], val alternatives: List[FFVPatch[String]], val best: FFVPatch[String], var remainingFinds: Int = 3) {
@@ -93,9 +108,9 @@ class FindFixVerifyTest {
 
 		override def getPatchesToFix(): List[FFVPatch[String]] = super.getPatchesToFix()
 
-		override def saveBestPatchesToAllPatches(): Unit = super.saveBestPatchesToAllPatches
-
 		override def addFixesAsAlternativesToAllPatches(fixes: List[FFVPatch[String]]): Unit = super.addFixesAsAlternativesToAllPatches(fixes)
+
+		override protected def saveBestPatchesToAllPatches(bestPatchesFound: List[FFVPatch[String]]): Unit = super.saveBestPatchesToAllPatches(bestPatchesFound)
 	}
 
 }

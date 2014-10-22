@@ -24,12 +24,12 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 		val fixes = getAlternativesForPatchesToFix(toFix)
 		addFixesAsAlternativesToAllPatches(fixes)
 
-		val bestPatches = getBestPatchesFromAllPatchesVAR()
-		saveBestPatchesToAllPatches()
+		val bestPatchesFound = getBestPatchesFromAllPatchesVAR()
+		saveBestPatchesToAllPatches(bestPatchesFound)
 	}
 
-	protected def saveBestPatchesToAllPatches() {
-		bestPatches.foreach(p => allPatches(p.patchIndex).best = Some(p))
+	protected def saveBestPatchesToAllPatches(bestPatchesFound: List[FFVPatch[T]]) {
+		bestPatchesFound.foreach(p => allPatches(p.patchIndex).best = Some(p))
 	}
 
 	protected def addFixesAsAlternativesToAllPatches(fixes: List[FFVPatch[T]]) {
