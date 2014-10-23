@@ -23,13 +23,6 @@ class FindFixVerifyTest {
 		Assert.assertEquals("verify errorous", badPatches.map(_.best).toSet, bestPatches.toSet)
 	}
 
-	@Test
-	def testFFVOneShot(): Unit = {
-		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
-
-		checkOneShot(badPatches.map(_.original), badPatches, exec)
-	}
-
 	private def prepareData: (List[FFVTestDriverBadPatch], FindFixVerifyTestVisibilityBreaker) = {
 		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
 		val badPatches = dataSet.map(d => new FFVTestDriverBadPatch(d,
@@ -43,14 +36,11 @@ class FindFixVerifyTest {
 		(badPatches, exec)
 	}
 
-	def checkOneShot(dataSet: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) {
-		val badPatchesWithoutInfo = badPatches.map(_.original).toSet
-		val badPatchesInclBest = dataSet.filterNot(d => badPatchesWithoutInfo.contains(d)) ::: badPatches.map(_.best)
+	@Test
+	def testFFVOneShot(): Unit = {
+		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
 
-		Assert.assertEquals("FFV one shot",
-			badPatchesInclBest.toSet,
-			exec.bestPatches.toSet
-		)
+		checkOneShot(badPatches.map(_.original), badPatches, exec)
 	}
 
 	@Test
@@ -63,7 +53,20 @@ class FindFixVerifyTest {
 			new FFVPatch[String](p.patch + 2, p.patchIndex)
 		))
 
-		checkOneShot(dataSet, badPatches, new FindFixVerifyTestVisibilityBreaker(new FFVTestDriver(dataSet, badPatches, 3)))
+		//we need to return at least 7 patches in find-step such that we return 3*7=21 patches
+		// in total, which basically means 2 in 3 turkers agreeing that this patch is not
+		// optimal
+		checkOneShot(dataSet, badPatches, new FindFixVerifyTestVisibilityBreaker(new FFVTestDriver(dataSet, badPatches, 7)))
+	}
+
+	def checkOneShot(dataSet: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) {
+		val badPatchesWithoutInfo = badPatches.map(_.original).toSet
+		val badPatchesInclBest = dataSet.filterNot(d => badPatchesWithoutInfo.contains(d)) ::: badPatches.map(_.best)
+
+		Assert.assertEquals("FFV one shot",
+			badPatchesInclBest.toSet,
+			exec.bestPatches.toSet
+		)
 	}
 
 	private class FFVTestDriverBadPatch(var original: FFVPatch[String], val alternatives: List[FFVPatch[String]], val best: FFVPatch[String], var remainingFinds: Int = 3) {
