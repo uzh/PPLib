@@ -5,24 +5,47 @@ import scala.util.Random
 /**
  * Created by pdeboer on 24/10/14.
  */
-class ContestExecutor[T](val driver: ContestDriver[T], val showsPerElements: Int = 3, val maxElementsPerGo: Int = 100) {
-	private val alternatives = driver.getAlternatives().zipWithIndex.map(a => a._2 -> new AlternativeDetails(a._1)).toMap
+class ContestExecutor[T](val driver: ContestDriver[T], val showsPerElement: Int = 3, val maxElementsPerGo: Int = 100) {
+	lazy val winner: T = {
+		do {
+			step()
+		} while (alternatives.minBy(_._2.numberOfShows)._2.numberOfShows < showsPerElement)
 
-	def step: Unit = {
-		val target = alternatives.values.view.filter(_.numberOfShows < showsPerElements).map((_, new Random().nextDouble())).toList.sortBy(_._2).take(maxElementsPerGo)
+		val candidates = winnerCandidates
+		if (candidates.size == 1)
+			candidates(0)._2.alternative
+		else
+			voteOnTargetsAndReturnWinner(candidates.map(_._2)).alternative
+	}
+	protected val alternatives = driver.alternatives.zipWithIndex.map(a => a._2 -> new AlternativeDetails(a._1)).toMap
+
+	protected def winnerCandidates = {
+		val maxSelects = alternatives.maxBy(_._2.numberOfSelects)._2.numberOfSelects
+		alternatives.filter(_._2.numberOfSelects == maxSelects).toList
+	}
+
+	protected def step(): Unit = {
+		val target = alternatives.values.view.filter(_.numberOfShows < showsPerElement).map((_, new Random().nextDouble())).toList.sortBy(_._2).take(maxElementsPerGo)
 		target.foreach(e => {
 			e._1.numberOfShows += 1
 		})
-		val selected = driver.getSingleVote(target.map(_._1.alternative))
-		val selectedAlt = target.find(_._1.alternative == selected).get //crash if not found is ok
+		val selectedAlt = voteOnTargetsAndReturnWinner(target.map(_._1))
+		selectedAlt.numberOfSelects += 1
 	}
 
-	private case class AlternativeDetails(alternative: T, numberOfShows: Int = 0, numberOfSelects: Int = 0)
+	protected def voteOnTargetsAndReturnWinner(target: List[AlternativeDetails]) = {
+		val selected = driver.castSingleVote(target.map(_.alternative))
+		val selectedAlt = target.find(_.alternative == selected).get //crash if not found is ok
+
+		selectedAlt
+	}
+
+	protected case class AlternativeDetails(alternative: T, var numberOfShows: Int = 0, var numberOfSelects: Int = 0)
 
 }
 
 trait ContestDriver[T] {
-	def getAlternatives(): List[T]
+	def alternatives: List[T]
 
-	def getSingleVote(options: List[T]): T
+	def castSingleVote(options: List[T]): T
 }
