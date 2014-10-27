@@ -22,8 +22,12 @@ class ContestTest {
 
 		val winner = exec.winner
 		Assert.assertEquals(
-			exec.castedVotes.groupBy(_.alternative).maxBy(_._2.length)._2(0).alternative,
+			getMostVotedElement(exec),
 			exec.winner)
+	}
+
+	private def getMostVotedElement(exec: TestableContestExec): String = {
+		exec.castedVotes.groupBy(_.alternative).maxBy(_._2.length)._2(0).alternative
 	}
 
 	@Test
@@ -31,7 +35,8 @@ class ContestTest {
 		val exec = new TestableContestExec(
 			new NaiveContestDriver(List("a", "b", "c", "d")), 3, 100)
 
-		Assert.assertEquals("a", exec.winner)
+		val winner = exec.winner
+		Assert.assertEquals(getMostVotedElement(exec), winner)
 	}
 
 	private class TestableContestExec(driver: ContestDriver[String], showsPerElement: Int, maxElementsPerGo: Int) extends ContestExecutor(driver, showsPerElement, maxElementsPerGo) {

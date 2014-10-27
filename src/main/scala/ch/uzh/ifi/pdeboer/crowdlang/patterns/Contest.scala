@@ -1,5 +1,8 @@
 package ch.uzh.ifi.pdeboer.crowdlang.patterns
 
+import ch.uzh.ifi.pdeboer.crowdlang.hcomp.{HCompPortalAdapter, MultipleChoiceAnswer, MultipleChoiceQuery}
+
+import scala.concurrent.duration._
 import scala.util.Random
 
 /**
@@ -48,4 +51,17 @@ trait ContestDriver[T] {
 	def alternatives: List[T]
 
 	def castSingleVote(options: List[T]): T
+}
+
+class ContestHCompDriver(
+							val alternatives: List[String],
+							hcompPortal: HCompPortalAdapter,
+							val question: String = "Please select the best element from this list",
+							val maxWait: Duration = 2 days) extends ContestDriver[String] {
+	override def castSingleVote(options: List[String]): String = {
+		hcompPortal.sendQueryAndAwaitResult(
+			MultipleChoiceQuery(question, options, 1, 1),
+			maxWait
+		).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+	}
 }
