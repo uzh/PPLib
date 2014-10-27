@@ -43,6 +43,16 @@ class FindFixVerifyTest {
 		checkOneShot(badPatches.map(_.original), badPatches, exec)
 	}
 
+	def checkOneShot(dataSet: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) {
+		val badPatchesWithoutInfo = badPatches.map(_.original).toSet
+		val badPatchesInclBest = dataSet.filterNot(d => badPatchesWithoutInfo.contains(d)) ::: badPatches.map(_.best)
+
+		Assert.assertEquals("FFV one shot",
+			badPatchesInclBest.toSet,
+			exec.bestPatches.toSet
+		)
+	}
+
 	@Test
 	def testFFVOnlyFewFixes(): Unit = {
 		val dataSet = (1 to 20).map(i => ("test" + i, i)).map(t => new FFVPatch[String](t._1, t._2)).toList
@@ -56,17 +66,8 @@ class FindFixVerifyTest {
 		//we need to return at least 7 patches in find-step such that we return 3*7=21 patches
 		// in total, which basically means 2 in 3 turkers agreeing that this patch is not
 		// optimal
-		checkOneShot(dataSet, badPatches, new FindFixVerifyTestVisibilityBreaker(new FFVTestDriver(dataSet, badPatches, 7)))
-	}
-
-	def checkOneShot(dataSet: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) {
-		val badPatchesWithoutInfo = badPatches.map(_.original).toSet
-		val badPatchesInclBest = dataSet.filterNot(d => badPatchesWithoutInfo.contains(d)) ::: badPatches.map(_.best)
-
-		Assert.assertEquals("FFV one shot",
-			badPatchesInclBest.toSet,
-			exec.bestPatches.toSet
-		)
+		val exec: FindFixVerifyTestVisibilityBreaker = new FindFixVerifyTestVisibilityBreaker(new FFVTestDriver(dataSet, badPatches, 7))
+		checkOneShot(dataSet, badPatches, exec)
 	}
 
 	private class FFVTestDriverBadPatch(var original: FFVPatch[String], val alternatives: List[FFVPatch[String]], val best: FFVPatch[String], var remainingFinds: Int = 3) {
