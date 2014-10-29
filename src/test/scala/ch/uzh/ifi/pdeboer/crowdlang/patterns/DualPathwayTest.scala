@@ -30,18 +30,6 @@ class DualPathwayTest {
 		runTest(driver)
 	}
 
-	def runTest(driver: TestDPDriver): Unit = {
-		val dpe = new DualPathwayExecutor(driver, 2)
-		dpe.runUntilConverged()
-
-		driver.data zip dpe.data.reverse forall (t => {
-			val number = t._1.replaceAll("[^0-9]", "")
-			Assert.assertEquals(number, t._2.answer)
-			Assert.assertEquals(t._1, t._2.data)
-			true
-		})
-	}
-
 	@Test
 	def testDualPathwayExecutorOneErrorAfterInitUnevenPathway(): Unit = {
 		val driver: TestDPDriver = new TestDPDriver(1, false)
@@ -52,6 +40,18 @@ class DualPathwayTest {
 	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
 		val driver: TestDPDriver = new TestDPDriver(2, false)
 		runTest(driver)
+	}
+
+	def runTest(driver: TestDPDriver): Unit = {
+		val dpe = new DualPathwayExecutor(driver, 2)
+		dpe.runUntilConverged()
+
+		driver.data zip dpe.data.reverse forall (t => {
+			val number = t._1.replaceAll("[^0-9]", "")
+			Assert.assertEquals(number, t._2.answer)
+			Assert.assertEquals(t._1, t._2.data)
+			true
+		})
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class DualPathwayTest {
 		 * @param previousChunksToCheck
 		 * @return
 		 */
-		override def processNextChunkAndReturnResult(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int]): List[DPChunk] = {
+		override def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int]): List[DPChunk] = {
 			Thread.sleep(10)
 
 			val fixedPrevChunks: List[DPChunk] = previousChunksToCheck.map(c => {

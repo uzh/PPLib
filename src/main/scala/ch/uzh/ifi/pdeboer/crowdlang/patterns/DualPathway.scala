@@ -2,6 +2,10 @@ package ch.uzh.ifi.pdeboer.crowdlang.patterns
 
 import java.util.Date
 
+import ch.uzh.ifi.pdeboer.crowdlang.hcomp.{CompositeQuery, CompositeQueryAnswer, FreetextQuery, HCompPortalAdapter}
+
+import scala.concurrent.duration._
+
 /**
  * Created by pdeboer on 13/10/14.
  */
@@ -34,7 +38,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 		val previousChunks = pathwayChunks.map(_.mostRecentCandidate).toList
 		val nextIndexToProcess: Int = pathway.mostRecentElementIdInPathway + 1
 		val newElementToAddInThisRound: Boolean = advancementAllowed(pathway) && driver.elementIndexExists(nextIndexToProcess)
-		val updatedPreviousChunks = driver.processNextChunkAndReturnResult(previousChunks,
+		val updatedPreviousChunks = driver.processChunksAndPossiblyAddNew(previousChunks,
 			if (newElementToAddInThisRound) Some(nextIndexToProcess) else None)
 
 		val numberOfNewElements: Int = if (newElementToAddInThisRound) 1 else 0
@@ -65,7 +69,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 	}
 
 	protected def init() {
-		val elems = (0 to chunkCountToInclude - 1).map(i => driver.processNextChunkAndReturnResult(List.empty[DPChunk], Some(i))(0))
+		val elems = (0 to chunkCountToInclude - 1).map(i => driver.processChunksAndPossiblyAddNew(List.empty[DPChunk], Some(i))(0))
 
 		List(pathway1, pathway2).foreach(p => {
 			elems.foreach(e => p.addElement(new DPPathwayChunk(e)))
@@ -110,7 +114,7 @@ trait DPDriver {
 	 * @param previousChunksToCheck
 	 * @return
 	 */
-	def processNextChunkAndReturnResult(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk]
+	def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk]
 
 	def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean
 
@@ -122,3 +126,41 @@ trait DPDriver {
 }
 
 case class DPChunk(elementIndex: Int, data: String, answer: String = "")(val created: Date = new Date(), var aux: String = "")
+
+class DefaultDualPathWayHCompDriver(
+									   val data: List[String],
+									   val questionPerOldProcessedElement: String,
+									   val questionPerNewProcessedElement: String,
+									   val questionPerProcessingTask: String,
+									   val portal: HCompPortalAdapter,
+									   val timeout: Duration = 2 days) extends DPDriver {
+
+	lazy val indexMap = data.zipWithIndex.map(d => (d._2, d._1)).toMap
+
+	/**
+	 * return newest chunk first
+	 * @param previousChunksToCheck
+	 * @return
+	 */
+	override def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int]): List[DPChunk] = {
+		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement, c.answer, c)).toList
+		val newQuery = if (newChunkElementId.isDefined) {
+			val c = DPChunk(newChunkElementId.get, indexMap(newChunkElementId.get))()
+			Some(List(new DPFreetextQuery(questionPerNewProcessedElement, "", c)))
+		} else None
+
+		val composite = CompositeQuery(newQuery.getOrElse(Nil) ::: previousQueries, questionPerProcessingTask)
+		val res = portal.sendQueryAndAwaitResult(composite, timeout)
+
+		val answer = res.get.asInstanceOf[CompositeQueryAnswer]
+
+		answer.answers.map(_.asInstanceOf[DPFreetextQuery].chunk).toList
+	}
+
+	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = ???
+
+	override def elementIndexExists(index: Int): Boolean = indexMap.contains(index)
+
+	private class DPFreetextQuery(queryQuestion: String, queryDefaultAnswer: String, val chunk: DPChunk) extends FreetextQuery(queryQuestion, queryDefaultAnswer) {}
+
+}

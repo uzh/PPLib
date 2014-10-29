@@ -53,7 +53,7 @@ trait ContestDriver[T] {
 	def castSingleVote(options: List[T]): T
 }
 
-class ContestHCompDriver(
+class DefaultContestHCompDriver(
 							val alternatives: List[String],
 							hcompPortal: HCompPortalAdapter,
 							val question: String = "Please select the best element from this list",

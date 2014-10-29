@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.crowdlang.hcomp
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, _}
@@ -38,8 +40,16 @@ trait HCompPortalAdapter {
 
 case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long)
 
+private object HCompIDGen {
+	private val current = new AtomicInteger(0)
+
+	def next() = current.incrementAndGet()
+}
+
 trait HCompQuery {
 	def question: String
+
+	final val identifier: Int = HCompIDGen.next()
 }
 
 trait HCompAnswer {
@@ -52,7 +62,7 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
-case class FreetextQuery(question: String) extends HCompQuery
+case class FreetextQuery(question: String, defaultAnswer: String = "") extends HCompQuery
 
 case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer {
 	override def toString() = answer
