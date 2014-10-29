@@ -14,7 +14,6 @@ class DualPathWayDefaultHCompDriverComparisonTest {
 	@Test
 	def testComparisonAndAdvance(): Unit = {
 		val ADVANCE_IS_OK: String = "AdvanceIsOK"
-		//set up oracle
 		val f = (q: HCompQuery) => {
 			if (q.question.contains(ADVANCE_IS_OK))
 				Some(MultipleChoiceAnswer(
@@ -38,7 +37,6 @@ class DualPathWayDefaultHCompDriverComparisonTest {
 	@Test
 	def testComparisonAndDontAdvance(): Unit = {
 		val ADVANCE_NOT_OK: String = "AdvanceNotOK"
-		//set up oracle
 		val f = (q: HCompQuery) => {
 			if (q.question.contains(ADVANCE_NOT_OK))
 				Some(MultipleChoiceAnswer(
