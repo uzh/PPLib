@@ -20,7 +20,7 @@ class DefaultDualPathWayHCompDriverTest {
 
 		val ret = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(0, "a", "b"),
+				DPChunk(0, "a", "b"), //somethings wrong
 				DPChunk(1, "b", "c")),
 			Some(2)
 		)
