@@ -36,12 +36,6 @@ class DualPathwayTest {
 		runTest(driver)
 	}
 
-	@Test
-	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
-		val driver: TestDPDriver = new TestDPDriver(2, false)
-		runTest(driver)
-	}
-
 	def runTest(driver: TestDPDriver): Unit = {
 		val dpe = new DualPathwayExecutor(driver, 2)
 		dpe.runUntilConverged()
@@ -52,6 +46,12 @@ class DualPathwayTest {
 			Assert.assertEquals(t._1, t._2.data)
 			true
 		})
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(2, false)
+		runTest(driver)
 	}
 
 	@Test
@@ -76,7 +76,7 @@ class DualPathwayTest {
 			Thread.sleep(10)
 
 			val fixedPrevChunks: List[DPChunk] = previousChunksToCheck.map(c => {
-				DPChunk(c.elementIndex, c.data, c.data.replaceAll("[^0-9]", ""))()
+				DPChunk(c.elementIndex, c.data, c.data.replaceAll("[^0-9]", ""))
 			}).toList
 
 			if (newChunkElementId.isEmpty) {
@@ -92,7 +92,7 @@ class DualPathwayTest {
 
 				lastStepId = newChunkElementId.get
 
-				DPChunk(newChunkElementId.get, dataPacket, answer)() :: fixedPrevChunks
+				DPChunk(newChunkElementId.get, dataPacket, answer) :: fixedPrevChunks
 			}
 		}
 

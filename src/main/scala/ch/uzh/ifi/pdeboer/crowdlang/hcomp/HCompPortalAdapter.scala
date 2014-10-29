@@ -60,6 +60,19 @@ trait HCompInstructions {
 	def toString: String
 }
 
+case class HCompInstructionsWithData(question: String) {
+	def getInstructions(data: String) = <div>
+		<p>
+			{question}
+		</p>
+		<p>
+			<i>
+				{data}
+			</i>
+		</p>
+	</div>.toString
+}
+
 object HCompConversions {
 	implicit def hcompInstrToString(instr: HCompInstructions): String = instr.toString
 }
