@@ -36,12 +36,6 @@ class DualPathwayTest {
 		runTest(driver)
 	}
 
-	@Test
-	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
-		val driver: TestDPDriver = new TestDPDriver(2, false)
-		runTest(driver)
-	}
-
 	def runTest(driver: TestDPDriver): Unit = {
 		val dpe = new DualPathwayExecutor(driver, 2)
 		dpe.runUntilConverged()
@@ -52,6 +46,12 @@ class DualPathwayTest {
 			Assert.assertEquals(t._1, t._2.data)
 			true
 		})
+	}
+
+	@Test
+	def testDualPathwayExecutorOneErrorInMiddleUnevenPathway(): Unit = {
+		val driver: TestDPDriver = new TestDPDriver(2, false)
+		runTest(driver)
 	}
 
 	@Test
@@ -101,7 +101,7 @@ class DualPathwayTest {
 			if (isErrorComparison) {
 				this.errorIntroducedAndCheckDone = true
 			}
-			simpleEqualityTest(pathway1, List.empty[DPChunk])
+			simpleEqualityTest(pathway1, pathway2)
 		}
 
 		override def elementIndexExists(index: Int): Boolean = index > -1 && index < data.length
