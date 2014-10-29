@@ -125,7 +125,7 @@ case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var
 }
 
 
-class DefaultDualPathWayHCompDriver(
+class DualPathWayDefaultHCompDriver(
 									   val data: List[String],
 									   val portal: HCompPortalAdapter,
 									   val questionPerOldProcessedElement: HCompInstructionsWithData,
@@ -160,13 +160,13 @@ class DefaultDualPathWayHCompDriver(
 	}
 
 	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
-		//currently issues single request. We might want to allow for other mechanisms of consent
-		val positiveAnswer: String = "Yes"
+		//TODO currently issues single request. We might want to allow for other mechanisms of consent
+		val POSITIVE_ANSWER: String = "Yes"
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
-				List(positiveAnswer, "No"), 1, 1),
+				List(POSITIVE_ANSWER, "No"), 1, 1),
 			timeout)
-		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == positiveAnswer
+		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == POSITIVE_ANSWER
 	}
 
 	override def elementIndexExists(index: Int): Boolean = indexMap.contains(index)

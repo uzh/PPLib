@@ -1,4 +1,4 @@
-name := "CrowdLang"
+name := "PPLib"
 
 version := "1.0"
 
