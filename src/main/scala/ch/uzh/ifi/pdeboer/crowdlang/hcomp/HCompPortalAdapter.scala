@@ -56,6 +56,14 @@ trait HCompAnswer {
 	def query: HCompQuery
 }
 
+trait HCompInstructions {
+	def toString: String
+}
+
+object HCompConversions {
+	implicit def hcompInstrToString(instr: HCompInstructions): String = instr.toString
+}
+
 case class CompositeQuery(queries: List[HCompQuery], question: String = "") extends HCompQuery
 
 case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer {

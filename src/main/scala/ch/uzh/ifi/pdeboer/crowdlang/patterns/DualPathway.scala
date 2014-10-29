@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.crowdlang.patterns
 
 import java.util.Date
 
-import ch.uzh.ifi.pdeboer.crowdlang.hcomp.{CompositeQuery, CompositeQueryAnswer, FreetextQuery, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.crowdlang.hcomp._
 
 import scala.concurrent.duration._
 
@@ -132,6 +132,7 @@ class DefaultDualPathWayHCompDriver(
 									   val questionPerOldProcessedElement: String,
 									   val questionPerNewProcessedElement: String,
 									   val questionPerProcessingTask: String,
+									   val questionPerComparisonTask: DefaultComparisonInstructionsConfig,
 									   val portal: HCompPortalAdapter,
 									   val timeout: Duration = 2 days) extends DPDriver {
 
@@ -157,10 +158,54 @@ class DefaultDualPathWayHCompDriver(
 		answer.answers.map(_.asInstanceOf[DPFreetextQuery].chunk).toList
 	}
 
-	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = ???
+	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
+		//currently issues single request. We might want to allow for other mechanisms of consent
+		val positiveAnswer: String = "Yes"
+		val res = portal.sendQueryAndAwaitResult(
+			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
+				List(positiveAnswer, "No"), 1, 1),
+			timeout)
+		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == positiveAnswer
+	}
 
 	override def elementIndexExists(index: Int): Boolean = indexMap.contains(index)
 
 	private class DPFreetextQuery(queryQuestion: String, queryDefaultAnswer: String, val chunk: DPChunk) extends FreetextQuery(queryQuestion, queryDefaultAnswer) {}
 
+}
+
+class DefaultComparisonInstructionsConfig(val title: String,
+										  val preText: String = "Please compare both pathways and answer if the answers are equal or not",
+										  val questionTitle: String = "Question",
+										  val leftTitle: String = "Pathway 1",
+										  val rightTitle: String = "Pathway 2") {
+	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = <div>
+		<h1>
+			{title}
+		</h1>{preText}<table>
+			<tr>
+				<td>
+					{questionTitle}
+				</td>
+				<td>
+					{leftTitle}
+				</td>
+				<td>
+					{rightTitle}
+				</td>
+			</tr>{left.zip(right).map(lr => {
+				<tr>
+					<td>
+						{lr._1.data}
+					</td>
+					<td>
+						{lr._1.answer}
+					</td>
+					<td>
+						{lr._2.answer}
+					</td>
+				</tr>
+			})}
+		</table>
+	</div>.toString()
 }
