@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib
+package ch.uzh.ifi.pdeboer.pplib.examples
 
 /**
  * Created by pdeboer on 30/10/14.
