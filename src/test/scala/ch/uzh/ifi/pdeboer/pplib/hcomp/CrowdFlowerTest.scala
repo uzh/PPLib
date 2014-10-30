@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
+import com.typesafe.config.ConfigFactory
 import org.junit.Assert
 
 import scala.concurrent.Await
@@ -14,9 +15,12 @@ import scala.concurrent.duration._
  * Therefore the Tests are commented out by default for the TestSuite to run thru
  */
 class CrowdFlowerTest {
+	val config = ConfigFactory.load()
+	val apiKey = config.getString("hcomp.crowdflower.apikey")
+
 	//@Test
 	def testFreeText() {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", "s2xE6ApWLDRobTg5yj8a", sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey, sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(FreetextQuery("wie heisst du?"))
 
 		Await.result(query, 1 day)
@@ -28,7 +32,7 @@ class CrowdFlowerTest {
 
 	//@Test
 	def testMultipleChoice: Unit = {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", "s2xE6ApWLDRobTg5yj8a", sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey, sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(MultipleChoiceQuery("what's 1+1", List("1", "2", "3"), 2))
 
 		Await.result(query, 1 day)
@@ -40,7 +44,7 @@ class CrowdFlowerTest {
 
 	//@Test
 	def testCompositeChoice: Unit = {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", "s2xE6ApWLDRobTg5yj8a", sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(
 			CompositeQuery(List(
 				FreetextQuery("what's your name?"),
