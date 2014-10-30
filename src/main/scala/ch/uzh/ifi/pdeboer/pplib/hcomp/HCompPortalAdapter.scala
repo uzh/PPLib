@@ -49,6 +49,9 @@ private object HCompIDGen {
 trait HCompQuery {
 	def question: String
 
+	def title: String
+
+
 	final val identifier: Int = HCompIDGen.next()
 }
 
@@ -77,19 +80,41 @@ object HCompConversions {
 	implicit def hcompInstrToString(instr: HCompInstructions): String = instr.toString
 }
 
-case class CompositeQuery(queries: List[HCompQuery], question: String = "") extends HCompQuery
+case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery {
+	def this(queries: List[HCompQuery], question: String) = this(queries, question, question)
+}
+
+object CompositeQuery {
+	def apply(queries: List[HCompQuery], question: String): CompositeQuery = apply(queries, question, question)
+}
 
 case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer {
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
-case class FreetextQuery(question: String, defaultAnswer: String = "") extends HCompQuery
+case class FreetextQuery(question: String, defaultAnswer: String = "", title: String = "") extends HCompQuery {
+	def this(question: String, defaultAnswer: String) = this(question, defaultAnswer, question)
+
+	def this(question: String) = this(question, "", question)
+}
+
+object FreetextQuery {
+	def apply(question: String, defaultAnswer: String): FreetextQuery = apply(question, defaultAnswer, question)
+
+	def apply(question: String): FreetextQuery = apply(question, "", question)
+}
 
 case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer {
 	override def toString() = answer
 }
 
-case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1) extends HCompQuery
+case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery {
+	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, title = question)
+}
+
+object MultipleChoiceQuery {
+	def apply(question: String, options: List[String], maxNumberOfResults: Int): MultipleChoiceQuery = apply(question, options, maxNumberOfResults, title = question)
+}
 
 case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer {
 	def selectedAnswers: List[String] = answer.collect({

@@ -22,7 +22,9 @@ class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "field") e
 
 class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "field") extends CFQuery {
 	val xml = <cml:checkboxes name={fieldName} label={rawQuery.question} class=" " instructions={rawQuery.question} validates="required">
-		{rawQuery.options.map(o => <cml:checkbox label={o}/>)}
+		{rawQuery.options.zipWithIndex.map {
+			case (label, index) => <cml:checkbox label={label} value={index.toString}/>
+		}}
 	</cml:checkboxes>
 
 	override def getCML(): String = xml.toString()
@@ -31,7 +33,7 @@ class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: St
 		val resultField = json \\ fieldName
 		if (resultField != Nil) {
 			val result = (resultField(0) \ "res")(0).asInstanceOf[JsArray].value.map(s => s.toString.substring(1, s.toString().length - 1)).toSet
-			val selectedElementsOutOfOriginalQuery = rawQuery.options.map(o => (o -> result.contains(o))).toMap
+			val selectedElementsOutOfOriginalQuery = rawQuery.options.zipWithIndex.map(o => o._1 -> result.contains(o._2.toString)).toMap
 			Some(MultipleChoiceAnswer(rawQuery, selectedElementsOutOfOriginalQuery))
 		} else None
 	}
@@ -39,7 +41,7 @@ class CFMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: St
 
 class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: String = "field") extends CFQuery {
 	val xml = <cml:radios name={fieldName} label={rawQuery.question} class=" " instructions={rawQuery.question} validates="required">
-		{rawQuery.options.map(o => <cml:radio label={o}/>)}
+		{rawQuery.options.zipWithIndex.map(o => <cml:radio label={o._1} value={o._2.toString}/>)}
 	</cml:radios>
 
 	override def getCML(): String = xml.toString()
@@ -48,7 +50,7 @@ class CFSingleChoiceQuery(val rawQuery: MultipleChoiceQuery, val fieldName: Stri
 		val resultField = json \\ fieldName
 		if (resultField != Nil) {
 			val result = (resultField(0) \ "res").asInstanceOf[JsArray].value.map(s => s.toString.substring(1, s.toString().length - 1)).toSet
-			val selectedElementsOutOfOriginalQuery = rawQuery.options.map(o => (o -> result.contains(o))).toMap
+			val selectedElementsOutOfOriginalQuery = rawQuery.options.zipWithIndex.map(o => o._1 -> result.contains(o._2.toString)).toMap
 			Some(MultipleChoiceAnswer(rawQuery, selectedElementsOutOfOriginalQuery))
 		} else None
 	}

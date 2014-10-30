@@ -24,7 +24,10 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	var jobId: Int = -1
 	var cachedResult: Option[HCompAnswer] = Option.empty[HCompAnswer]
 
-	def performQuery(parameters: CFQueryParameterSet = new CFQueryParameterSet(query.rawQuery.question, query.rawQuery.question), maxTries: Int = 100) = {
+	def performQuery(parameters: CFQueryParameterSet =
+					 new CFQueryParameterSet(
+						 query.rawQuery.title.take(100),
+						 query.rawQuery.question), maxTries: Int = 100) = {
 		this.jobId = U.retry(2)(createJob(1 hour, parameters))
 		addDataUnit("{}")
 		launch()
@@ -93,7 +96,7 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		else
 			request = request.setBody(s"channels[0]=on_demand&debit[units_count]=1")
 		try {
-			sendAndAwaitJson(request, 10 seconds)
+			U.retry(3)(sendAndAwaitJson(request, 10 seconds))
 		} catch {
 			case e: TimeoutException =>
 				println(s"Timed out: ${request.toRequest.toString}")
@@ -120,7 +123,7 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		var units_request = unitsURL.POST.addQueryParameter("key", apiKey)
 		units_request = units_request.addHeader("Content-Type", "application/json")
 		units_request = units_request.setBody(jsonString)
-		sendAndAwaitJson(units_request, 10 seconds)
+		U.retry(3)(sendAndAwaitJson(units_request, 10 seconds))
 	}
 }
 

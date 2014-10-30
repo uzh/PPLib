@@ -9,9 +9,9 @@ import org.junit.{Assert, Test}
 class CFMultipleChoiceQueryTest {
 	@Test
 	def testXMLMarshalling(): Unit = {
-		val q = new CFMultipleChoiceQuery(new MultipleChoiceQuery("test?", List("test1", "test2"), 1, 1))
+		val q = new CFMultipleChoiceQuery(new MultipleChoiceQuery("test?", List("test1", "test2"), -1, 1))
 		Assert.assertEquals( """<cml:checkboxes name="field" label="test?" class=" " instructions="test?" validates="required">
-							   |		<cml:checkbox label="test1"/><cml:checkbox label="test2"/>
+							   |		<cml:checkbox label="test1" value="0"/><cml:checkbox label="test2" value="1"/>
 							   |	</cml:checkboxes>""".stripMargin, q.getCML())
 	}
 }

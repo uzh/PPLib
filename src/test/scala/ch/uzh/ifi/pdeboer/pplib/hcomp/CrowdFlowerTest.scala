@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import com.typesafe.config.ConfigFactory
-import org.junit.Assert
+import org.junit.{Test, Assert}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,6 +28,21 @@ class CrowdFlowerTest {
 			case answer => println(answer.get.asInstanceOf[FreetextAnswer].answer)
 		}
 		Assert.assertTrue(true)
+	}
+
+	//@Test
+	def testFreeTextFixTask() {
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", sandbox = true))
+		val data: String = """The particles should be able to dock with cells,
+							 | proteins or other molecules within a human body, explained Andrew Conrad, head of the
+							 | team for life sciences laboratory Google X at the conference WSJD Live the
+							 | Wall Street Journal.""".stripMargin
+		val res = HComp.crowdFlower.sendQueryAndAwaitResult(
+			FreetextQuery(HCompInstructionsWithData("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
+				.getInstructions(data))
+		).get.asInstanceOf[FreetextAnswer]
+
+		Assert.assertNotNull(res.answer)
 	}
 
 	//@Test
