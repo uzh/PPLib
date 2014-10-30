@@ -19,8 +19,8 @@ import scala.util.Try
  * TODO at some point this needs to be refactored. Code is super ugly
  */
 class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
-	val jobResourceJSONUrl = apiURL / "jobs.json"
 	private val apiURL = host("api.crowdflower.com").secure / "v1"
+	val jobResourceJSONUrl = apiURL / "jobs.json"
 	var jobId: Int = -1
 	var cachedResult: Option[HCompAnswer] = Option.empty[HCompAnswer]
 
