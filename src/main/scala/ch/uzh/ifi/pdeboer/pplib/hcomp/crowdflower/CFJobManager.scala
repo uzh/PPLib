@@ -83,21 +83,6 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		query.interpretResult(json)
 	}
 
-	def jobIdResourceURL = apiURL / "jobs" / jobId
-
-	private def sendAndAwaitJson(request: Req, timeout: Duration) = {
-		val future = Http(request OK as.String).either
-		val either: Either[Throwable, String] = Await.result(future, timeout)
-		either match {
-			case Right(content) =>
-				val response: String = content
-				val json: JsValue = Json.parse(response)
-				json
-			case Left(StatusCode(code)) =>
-				throw StatusCode(code)
-		}
-	}
-
 	private def launch() {
 		println(s"$jobId : launching.")
 		val order_url = jobIdResourceURL / "orders.json"
@@ -112,6 +97,21 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 		} catch {
 			case e: TimeoutException =>
 				println(s"Timed out: ${request.toRequest.toString}")
+		}
+	}
+
+	def jobIdResourceURL = apiURL / "jobs" / jobId
+
+	private def sendAndAwaitJson(request: Req, timeout: Duration) = {
+		val future = Http(request OK as.String).either
+		val either: Either[Throwable, String] = Await.result(future, timeout)
+		either match {
+			case Right(content) =>
+				val response: String = content
+				val json: JsValue = Json.parse(response)
+				json
+			case Left(StatusCode(code)) =>
+				throw StatusCode(code)
 		}
 	}
 

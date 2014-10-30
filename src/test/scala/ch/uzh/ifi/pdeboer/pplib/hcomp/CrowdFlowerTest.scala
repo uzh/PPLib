@@ -20,7 +20,7 @@ class CrowdFlowerTest {
 
 	//@Test
 	def testFreeText() {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey, sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(FreetextQuery("wie heisst du?"))
 
 		Await.result(query, 1 day)
@@ -32,7 +32,7 @@ class CrowdFlowerTest {
 
 	//@Test
 	def testMultipleChoice: Unit = {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey, sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(MultipleChoiceQuery("what's 1+1", List("1", "2", "3"), 2))
 
 		Await.result(query, 1 day)
@@ -44,7 +44,7 @@ class CrowdFlowerTest {
 
 	//@Test
 	def testCompositeChoice: Unit = {
-		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", apiKey sandbox = true))
+		HComp.addPortal(new CrowdFlowerPortalAdapter("PatrickTest", sandbox = true))
 		val query = HComp.crowdFlower.sendQuery(
 			CompositeQuery(List(
 				FreetextQuery("what's your name?"),

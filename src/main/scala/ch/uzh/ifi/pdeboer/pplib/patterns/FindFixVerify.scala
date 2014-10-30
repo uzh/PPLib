@@ -15,7 +15,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
 
-		allPatches.toArray.sortBy(_._1).map(p => p._2.best.getOrElse(p._2.original)).toList
+		allPatches.toArray.map(p => p._2.best.getOrElse(p._2.original)).sortBy(_.patchIndex).toList
 	}
 	protected val allPatches = driver.orderedPatches.map(p => p.patchIndex -> new FFVPatchContainer[T](p)).toMap
 	private var ran: Boolean = false

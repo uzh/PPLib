@@ -33,7 +33,7 @@ trait HCompPortalAdapter {
 		future.value.get.get
 	}
 
-	def getDefaultPortalKey: String
+	def getDefaultPortalKey: Symbol
 
 	def getQueries() = queryLog
 }

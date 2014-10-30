@@ -6,7 +6,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 class MockHCompPortal extends HCompPortalAdapter {
 	var filters = List.empty[(HCompQuery) => Option[HCompAnswer]]
 
-	override def getDefaultPortalKey: String = "testPortal"
+	override def getDefaultPortalKey: Symbol = 'testPortal
 
 	def createMultipleChoiceFilterRule(trigger: String, selected: Set[String]) {
 		val f = (q: HCompQuery) => {
