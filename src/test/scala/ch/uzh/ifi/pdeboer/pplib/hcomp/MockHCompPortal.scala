@@ -8,6 +8,28 @@ class MockHCompPortal extends HCompPortalAdapter {
 
 	override def getDefaultPortalKey: String = "testPortal"
 
+	def createMultipleChoiceFilterRule(trigger: String, selected: Set[String]) {
+		val f = (q: HCompQuery) => {
+			if (q.question.contains(trigger)) {
+				val query: MultipleChoiceQuery = q.asInstanceOf[MultipleChoiceQuery]
+				Some(MultipleChoiceAnswer(query,
+					query.options.map(o => (o, selected.contains(o))).toMap
+				))
+			} else None
+		}
+		filters ::= f
+	}
+
+	def createFreeTextFilterRule(trigger: String, answer: String): Unit = {
+		val f = (q: HCompQuery) => {
+			if (q.question.contains(trigger)) {
+				val query: FreetextQuery = q.asInstanceOf[FreetextQuery]
+				Some(FreetextAnswer(query, answer))
+			} else None
+		}
+		filters ::= f
+	}
+
 	override protected def processQuery(query: HCompQuery): Option[HCompAnswer] = {
 		query match {
 			case composite: CompositeQuery =>

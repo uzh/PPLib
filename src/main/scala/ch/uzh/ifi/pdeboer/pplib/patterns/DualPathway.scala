@@ -131,7 +131,7 @@ class DualPathWayDefaultHCompDriver(
 									   val questionPerOldProcessedElement: HCompInstructionsWithData,
 									   val questionPerNewProcessedElement: HCompInstructionsWithData,
 									   val questionPerProcessingTask: String,
-									   val questionPerComparisonTask: DefaultComparisonInstructionsConfig,
+									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
 									   val timeout: Duration = 2 days) extends DPDriver {
 
 	lazy val indexMap = data.zipWithIndex.map(d => (d._2, d._1)).toMap
@@ -175,7 +175,7 @@ class DualPathWayDefaultHCompDriver(
 
 }
 
-class DefaultComparisonInstructionsConfig(val title: String,
+class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String,
 										  val preText: String = "Please compare both pathways and answer if the answers are equal or not",
 										  val questionTitle: String = "Question",
 										  val leftTitle: String = "Pathway 1",
