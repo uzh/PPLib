@@ -11,7 +11,7 @@ object Survey extends App {
 
 	private val participantCount: Int = 2
 
-	val submissions = (1 to participantCount).map(n => {
+	val submissions = (1 to participantCount).par.map(n => {
 		val participantName = FreetextQuery("What's your name?")
 		val participantContinent = MultipleChoiceQuery("Where are you from?",
 			List("Europe", "Americas", "Asia", "Australia", "Africa"),
