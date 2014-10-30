@@ -74,7 +74,7 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	}
 
 	private def fetchResult(): Option[HCompAnswer] = {
-		println(s" $jobId : Fetching result.")
+		println(s" $jobId : Fetching result for ${query.rawQuery.title}")
 		val judgments_url = jobIdResourceURL / "judgments.json"
 		var request = judgments_url.GET.addQueryParameter("key", apiKey)
 		val json_try = Try(sendAndAwaitJson(request, 10 seconds))
@@ -87,7 +87,7 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	}
 
 	private def launch() {
-		println(s"$jobId : launching.")
+		println(s"$jobId : launching task '${query.rawQuery.title}'")
 		val order_url = jobIdResourceURL / "orders.json"
 		var request = order_url.POST.addQueryParameter("key", apiKey)
 		request = request.addHeader("Content-Type", "application/x-www-form-urlencoded")
