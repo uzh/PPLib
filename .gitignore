@@ -13,6 +13,8 @@ project/target/
 ehthumbs.db
 Thumbs.db
 
+test/resources/application.conf
+
 # sbt specific
 .cache/
 .history/
