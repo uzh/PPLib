@@ -92,8 +92,10 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	def get[T](query: HCompQuery): T = answers(query).get.asInstanceOf[T]
 
 	def getByTitle[T](title: String): Option[T] = {
-		val k = answers.keys.find(_.title == title)
-		if (k.isDefined) Some(answers(k.get).get.asInstanceOf[T]) else None
+		answers.keys.find(_.title == title) match {
+			case Some(k) => Some(answers(k).get.asInstanceOf[T])
+			case None => None
+		}
 	}
 
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")

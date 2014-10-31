@@ -20,7 +20,7 @@ object HComp {
 		portals += (key -> portal)
 	}
 
-	def allDefinedPortals() = portals.values.filter(_ != null).toList
+	def allDefinedPortals = portals.values.filter(_ != null).toList
 
 	def apply(key: Symbol) = portals(key)
 

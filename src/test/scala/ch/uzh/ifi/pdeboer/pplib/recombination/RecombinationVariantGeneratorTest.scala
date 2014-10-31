@@ -36,7 +36,7 @@ class RecombinationVariantGeneratorTest {
 	}
 
 	private class TestRecombinationStub(val id: Int) extends RecombinationStub[Integer, Integer] {
-		override def run[I >: Integer, O >: Integer](data: I): O = data.asInstanceOf[Integer]
+		override def run(data: Integer): Integer = data.asInstanceOf[Integer]
 	}
 
 }

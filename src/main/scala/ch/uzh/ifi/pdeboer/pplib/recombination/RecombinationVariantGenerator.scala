@@ -14,11 +14,11 @@ class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[
 	}
 }
 
-class RecombinationStubParameterVariantGenerator[I >: AnyRef, O >: AnyRef](val base: RecombinationStub[I, O]) {
+class RecombinationStubParameterVariantGenerator[I, O](val base: RecombinationStub[I, O]) {
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[AnyRef]]()
 
 	def initAllParamsWithCandidates(): Unit = {
-		val expected = base.expectedParameters ::: base.optionalParameters
+		val expected = base.expectedParametersOnConstruction ::: base.optionalParameters
 		expected.foreach(k => addParameterVariations(k.key, k.candidateDefinitions.getOrElse(Nil).toList.asInstanceOf[List[AnyRef]]))
 	}
 

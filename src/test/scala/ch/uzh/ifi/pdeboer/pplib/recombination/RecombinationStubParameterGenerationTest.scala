@@ -10,10 +10,11 @@ class RecombinationStubParameterGenerationTest {
 	def testParameterVariation(): Unit = {
 		val defaultValueTestParam1: List[String] = List("a", "s")
 		val defaultValueTestParam2: List[Integer] = List(1, 2, 3)
-		val gen = new RecombinationStubParameterVariantGenerator(new TestRecombinationStub(Map.empty, List(
-			RecombinationParameter("testparam1", Some(defaultValueTestParam1)),
-			RecombinationParameter[Integer]("testparam2", Some(defaultValueTestParam2))
-		))) {
+		val gen = new RecombinationStubParameterVariantGenerator(
+			new TestRecombinationStub(Map.empty, List(
+				new RecombinationParameter("testparam1", Some(defaultValueTestParam1)),
+				new RecombinationParameter[Integer]("testparam2", Some(defaultValueTestParam2))
+			))) {
 			def paramVals = parameterValues
 		}
 
@@ -47,16 +48,10 @@ class RecombinationStubParameterGenerationTest {
 	}
 
 	private class TestRecombinationStub(params: Map[String, AnyRef], optionalParams: List[RecombinationParameter[_]]) extends RecombinationStub[String, String](params) {
-		/**
-		 * central method of recombination.
-		 * @param data
-		 * @tparam I
-		 * @tparam O
-		 * @return
-		 */
-		override def run[I >: String, O >: String](data: I): O = data + "1"
 
 		override def optionalParameters: List[RecombinationParameter[_]] = this.optionalParams
+
+		override def run(data: String): String = data + "1"
 	}
 
 }

@@ -8,36 +8,36 @@ import org.junit.{Assert, Test}
 class RecombinationStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(chk = List(RecombinationParameter[String]("test")), Map("test" -> "asdf"))
+		new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test")), Map("test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(RecombinationParameter[String]("test2")), Map("test" -> "asdf"))
+			new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test2")), Map("test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
-			case e: IllegalArgumentException => Assert.assertTrue(true) //exception happened
+			case e: AssertionError => Assert.assertTrue(true) //exception happened
 		}
 	}
 
 	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(RecombinationParameter[String]("test")), Map("test" -> List.empty[String]))
+			new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test")), Map("test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {
-			case e: IllegalArgumentException => Assert.assertTrue(true)
+			case e: AssertionError => Assert.assertTrue(true)
 		}
 	}
 
 	private class TestRecombImplparams(chk: List[RecombinationParameter[_]], params: Map[String, AnyRef]) extends RecombinationStub[String, String](params = params) {
-		override def expectedParameters: List[RecombinationParameter[_]] = chk
+		override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = chk
 
-		override def run[I >: String, O >: String](data: I): O = "test"
+		override def run(data: String): String = "test"
 	}
 
 }

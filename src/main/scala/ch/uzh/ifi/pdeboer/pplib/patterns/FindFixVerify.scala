@@ -1,6 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStub
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternative
 
 import scala.collection.mutable
 
@@ -109,20 +111,21 @@ class FFVDefaultHCompDriver(
 							   val portal: HCompPortalAdapter,
 							   val findQuestion: String = "Please mark sentences you think are erroneous and should be improved",
 							   val fixQuestion: HCompInstructionsWithData = HCompInstructionsWithData("Other crowd workers have agreed on this sentence being erroneous. Please fix it"),
-							   val verifyQuestion: HCompInstructionsWithData = HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best"),
 							   val findTitle: String = "Find erroneous sentences",
 							   val fixTitle: String = "Please fix these sentences",
-							   val verifyTitle: String = "Choose the best sentence"
-							   ) extends FindFixVerifyDriver[String] {
-	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
-		//TODO another "select-best"-kind of process. let's use recombination here as soon as we're ready
-		//we're only using a single turker right now. let's change this later
-		val res = portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(verifyQuestion.getInstructions(patch.patch),
-				alternatives.map(_.patch), 1, 1, verifyTitle))
-			.get.asInstanceOf[MultipleChoiceAnswer]
+							   val verifyProcess: RecombinationStub[List[String], String] = new SelectBestAlternative(Map(
+								   SelectBestAlternative.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best"),
+								   SelectBestAlternative.TITLE_PARAMETER.key -> "Choose the best sentence"
+							   ))) extends FindFixVerifyDriver[String] {
 
-		FFVPatch[String](res.selectedAnswer, patch.patchIndex)
+	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
+		verifyProcess.params += "portal" -> portal
+	}
+
+	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
+		val result = verifyProcess.process(alternatives.map(_.patch))
+
+		FFVPatch[String](result, patch.patchIndex)
 	}
 
 	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
