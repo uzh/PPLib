@@ -116,7 +116,7 @@ case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAns
 }
 
 case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery {
-	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, question)
+	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, 1, question)
 }
 
 object MultipleChoiceQuery {
