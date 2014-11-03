@@ -30,7 +30,7 @@ class MockHCompPortal extends HCompPortalAdapter {
 		filters ::= f
 	}
 
-	override protected def processQuery(query: HCompQuery): Option[HCompAnswer] = {
+	override protected def processQuery(query: HCompQuery, props: HCompQueryProperties = HCompQueryProperties()): Option[HCompAnswer] = {
 		query match {
 			case composite: CompositeQuery =>
 				Some(CompositeQueryAnswer(composite, composite.queries.map(q => (q, processQuery(q))).toMap))

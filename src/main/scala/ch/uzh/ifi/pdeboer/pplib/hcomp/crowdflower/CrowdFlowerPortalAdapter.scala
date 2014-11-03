@@ -17,9 +17,9 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 
 	override def getDefaultPortalKey: Symbol = CrowdFlowerPortalAdapter.PORTAL_KEY
 
-	protected override def processQuery(query: HCompQuery) = {
+	protected override def processQuery(query: HCompQuery, properties: HCompQueryProperties) = {
 		val cfQuery: CFQuery = CFConversions.convertQueryToCFQuery(query)
-		val jobManager = new CFJobManager(apiKey, cfQuery, sandbox)
+		val jobManager = new CFJobManager(apiKey, cfQuery, properties, sandbox)
 		jobManager.performQuery()
 	}
 }

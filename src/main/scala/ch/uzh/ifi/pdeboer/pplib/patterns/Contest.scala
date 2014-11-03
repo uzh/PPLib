@@ -61,7 +61,7 @@ class DefaultContestHCompDriver(
 	override def castSingleVote(options: List[String]): String = {
 		hcompPortal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(question, options, 1, 1),
-			maxWait
+			maxWaitTime = maxWait
 		).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
 	}
 }

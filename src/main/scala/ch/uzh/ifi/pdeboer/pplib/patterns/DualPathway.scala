@@ -149,7 +149,7 @@ class DualPathWayDefaultHCompDriver(
 		} else None
 
 		val composite = CompositeQuery(newQuery.getOrElse(Nil) ::: previousQueries, questionPerProcessingTask)
-		val res = portal.sendQueryAndAwaitResult(composite, timeout)
+		val res = portal.sendQueryAndAwaitResult(composite, maxWaitTime = timeout)
 
 		val answer = res.get.asInstanceOf[CompositeQueryAnswer]
 		answer.answers.map(t => {
@@ -165,7 +165,7 @@ class DualPathWayDefaultHCompDriver(
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
 				List(POSITIVE_ANSWER, "No"), 1, 1),
-			timeout)
+			maxWaitTime = timeout)
 		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == POSITIVE_ANSWER
 	}
 
@@ -176,10 +176,10 @@ class DualPathWayDefaultHCompDriver(
 }
 
 class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String,
-										  val preText: String = "Please compare both pathways and answer if the answers are equal or not",
-										  val questionTitle: String = "Question",
-										  val leftTitle: String = "Pathway 1",
-										  val rightTitle: String = "Pathway 2") {
+													   val preText: String = "Please compare both pathways and answer if the answers are equal or not",
+													   val questionTitle: String = "Question",
+													   val leftTitle: String = "Pathway 1",
+													   val rightTitle: String = "Pathway 2") {
 	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = <div>
 		<h1>
 			{title}

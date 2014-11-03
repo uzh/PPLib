@@ -12,13 +12,13 @@ import scala.concurrent.{Future, _}
  */
 
 trait HCompPortalAdapter {
-	protected def processQuery(query: HCompQuery): Option[HCompAnswer]
+	protected def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
 
-	def sendQuery(query: HCompQuery): Future[Option[HCompAnswer]] = Future {
+	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
 		val timeBefore = System.currentTimeMillis()
-		val answer = processQuery(query)
+		val answer = processQuery(query, properties)
 		val timeAfter = System.currentTimeMillis()
 
 		//we risk the querylog to be incomplete if a query is being answered right now
@@ -27,7 +27,7 @@ trait HCompPortalAdapter {
 		answer
 	}
 
-	def sendQueryAndAwaitResult(query: HCompQuery, maxWaitTime: Duration = 2 days) = {
+	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days) = {
 		val future = sendQuery(query)
 		Await.result(future, maxWaitTime)
 		future.value.get.get
@@ -136,3 +136,5 @@ case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, 
 }
 
 case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer
+
+case class HCompQueryProperties(paymentCents: Double = 1d)

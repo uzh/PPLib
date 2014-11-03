@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStub
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternative
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeSingleGo
 
 import scala.collection.mutable
 
@@ -113,9 +113,9 @@ class FFVDefaultHCompDriver(
 							   val fixQuestion: HCompInstructionsWithData = HCompInstructionsWithData("Other crowd workers have agreed on this sentence being erroneous. Please fix it"),
 							   val findTitle: String = "Find erroneous sentences",
 							   val fixTitle: String = "Please fix these sentences",
-							   val verifyProcess: RecombinationStub[List[String], String] = new SelectBestAlternative(Map(
-								   SelectBestAlternative.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best"),
-								   SelectBestAlternative.TITLE_PARAMETER.key -> "Choose the best sentence"
+							   val verifyProcess: RecombinationStub[List[String], String] = new SelectBestAlternativeSingleGo(Map(
+								   SelectBestAlternativeSingleGo.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best"),
+								   SelectBestAlternativeSingleGo.TITLE_PARAMETER.key -> "Choose the best sentence"
 							   ))) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {

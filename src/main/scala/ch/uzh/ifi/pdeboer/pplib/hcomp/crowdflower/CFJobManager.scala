@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
 
 import ch.uzh.ifi.pdeboer.pplib.U
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompAnswer
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.util.GrowingTimer
 import dispatch.Defaults._
 import dispatch._
@@ -18,7 +18,7 @@ import scala.util.Try
  *
  * TODO at some point this needs to be refactored. Code is super ugly
  */
-class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
+class CFJobManager(apiKey: String, query: CFQuery, properties: HCompQueryProperties, sandbox: Boolean = true) {
 	private val apiURL = host("api.crowdflower.com").secure / "v1"
 	val jobResourceJSONUrl = apiURL / "jobs.json"
 	var jobId: Int = -1
@@ -27,7 +27,8 @@ class CFJobManager(apiKey: String, query: CFQuery, sandbox: Boolean = true) {
 	def performQuery(parameters: CFQueryParameterSet =
 					 new CFQueryParameterSet(
 						 query.rawQuery.title.take(100),
-						 query.rawQuery.question), maxTries: Int = 100) = {
+						 query.rawQuery.question,
+						 paymentCents = properties.paymentCents), maxTries: Int = 100) = {
 		this.jobId = U.retry(2)(createJob(1 hour, parameters))
 		addDataUnit("{}")
 		launch()
