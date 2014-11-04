@@ -34,8 +34,9 @@ class MockHCompPortal extends HCompPortalAdapter {
 		query match {
 			case composite: CompositeQuery =>
 				Some(CompositeQueryAnswer(composite, composite.queries.map(q => (q, processQuery(q))).toMap))
-			case _ =>
+			case _ => {
 				filters.find(f => f(query).isDefined).get.apply(query)
+			}
 		}
 	}
 }
