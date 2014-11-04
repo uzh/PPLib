@@ -1,6 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
+import java.lang.reflect.Constructor
+
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /**
  * Created by pdeboer on 09/10/14.
@@ -14,30 +17,43 @@ class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[
 	}
 }
 
-class RecombinationStubParameterVariantGenerator[I, O](val base: RecombinationStub[I, O]) {
-	protected var parameterValues = new mutable.HashMap[String, mutable.Set[AnyRef]]()
+class RecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) {
+	//very ugly stuff //TODO check
+	private val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
+	val base = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[RecombinationStub[_, _]]
 
-	def initAllParamsWithCandidates(): Unit = {
-		val expected = base.expectedParametersOnConstruction ::: base.optionalParameters
-		expected.foreach(k => addParameterVariations(k.key, k.candidateDefinitions.getOrElse(Nil).toList.asInstanceOf[List[AnyRef]]))
+	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
+
+	def initAllParamsWithCandidates() = {
+		base.allParams.foreach(k => addParameterVariations(k.key, k.candidateDefinitions.getOrElse(Nil).toList.asInstanceOf[List[AnyRef]]))
+		this
 	}
 
-	def addParameterVariations(paramKey: String, values: List[AnyRef]): Unit = {
-		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[AnyRef])
+	def addParameterVariations(paramKey: String, values: List[Any]) = {
+		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[Any])
 		values.foreach(k => {
 			if (base.isParameterTypeCorrect(paramKey, k))
 				cur += k
 			else throw new IllegalArgumentException("Parameter type incorrect for " + paramKey)
 		})
 		parameterValues += (paramKey -> cur)
+		this
 	}
 
-	def generateParameterVariations() = {
+	def generateParameterVariations(): List[Map[String, Any]] = {
 		val listOfTupleLists = parameterValues.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
 			k.asInstanceOf[List[(String, Any)]].toMap
 		})
 	}
+
+	def generateVariationsAndInstanciate(): List[T] =
+		generateParameterVariations()
+			.map(params => targetConstructor.newInstance(params))
+			.asInstanceOf[List[T]]
+
+
+	if (initWithDefaults) initAllParamsWithCandidates()
 }
 
 object CombinationGenerator {

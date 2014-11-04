@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination
 /**
  * Created by pdeboer on 09/10/14.
  */
-class Recombinator(subject: RecombinatedSubject, configurations: List[RecombinationVariant]) {
+class Recombinator(subject: Recombinable[_], configurations: List[RecombinationVariant]) {
 	lazy val results = {
 		configurations.map(c => {
 			//TODO: more metrics

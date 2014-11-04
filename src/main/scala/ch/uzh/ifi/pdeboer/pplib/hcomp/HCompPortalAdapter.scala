@@ -12,17 +12,22 @@ import scala.concurrent.{Future, _}
  */
 
 trait HCompPortalAdapter {
+	private var spentCents = 0d
+
 	protected def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
 		val timeBefore = System.currentTimeMillis()
+		this.synchronized {
+			spentCents += properties.paymentCents
+		}
 		val answer = processQuery(query, properties)
 		val timeAfter = System.currentTimeMillis()
 
 		//we risk the querylog to be incomplete if a query is being answered right now
-		queryLog = HCompQueryStats(query, answer, timeAfter - timeBefore) :: queryLog
+		queryLog = HCompQueryStats(query, answer, timeAfter - timeBefore, properties.paymentCents) :: queryLog
 
 		answer
 	}
@@ -38,7 +43,7 @@ trait HCompPortalAdapter {
 	def getQueries() = queryLog
 }
 
-case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long)
+case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long, moneySpent: Double)
 
 private object HCompIDGen {
 	private val current = new AtomicInteger(0)

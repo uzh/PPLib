@@ -106,18 +106,30 @@ trait FindFixVerifyDriver[T] {
 
 case class FFVPatch[T](patch: T, patchIndex: Int)
 
+object FFVDefaultHCompDriver {
+	val DEFAULT_FIND_QUESTION = "Please mark sentences you think are erroneous and should be improved"
+	val DEFAULT_FIND_TITLE = "Find erroneous sentences"
+
+	val DEFAULT_FIX_QUESTION = HCompInstructionsWithData("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
+	val DEFAULT_FIX_TITLE = "Please fix these sentences"
+
+	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
+	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
+	val DEFAULT_VERIFY_PROCESS = new SelectBestAlternativeWithFixWorkerCount(Map(
+		SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
+		SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
+		SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3
+	))
+}
+
 class FFVDefaultHCompDriver(
 							   val orderedPatches: List[FFVPatch[String]],
 							   val portal: HCompPortalAdapter,
-							   val findQuestion: String = "Please mark sentences you think are erroneous and should be improved",
-							   val fixQuestion: HCompInstructionsWithData = HCompInstructionsWithData("Other crowd workers have agreed on this sentence being erroneous. Please fix it"),
-							   val findTitle: String = "Find erroneous sentences",
-							   val fixTitle: String = "Please fix these sentences",
-							   val verifyProcess: RecombinationStub[List[String], String] = new SelectBestAlternativeWithFixWorkerCount(Map(
-								   SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best"),
-								   SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER.key -> "Choose the best sentence",
-								   SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3
-							   ))) extends FindFixVerifyDriver[String] {
+							   val findQuestion: String = FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION,
+							   val fixQuestion: HCompInstructionsWithData = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
+							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
+							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
+							   val verifyProcess: RecombinationStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
 		verifyProcess.params += "portal" -> portal

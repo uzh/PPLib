@@ -1,0 +1,72 @@
+package ch.uzh.ifi.pdeboer.pplib.examples.translator
+
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{FindFixVerifyProcess, DualPathwayProcess, SelectBestAlternativeStatisticalReduction}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationVariantGenerator, Recombinable, RecombinationStubParameterVariantGenerator, RecombinationVariant}
+
+/**
+ * Created by pdeboer on 04/11/14.
+ */
+object TranslatorApp extends App {
+	//src: google translate of http://www.heise.de/newsticker/meldung/China-testet-erfolgreich-zweite-Mondsonde-2440834.html
+	private val textToImprove: String =
+		"""China has for the first time sent a probe to the moon and back to Earth. The return capsule landed after a circumlunar flight of the orbiter on Saturday morning in Mongolia. Eight days took the 840,000 km long journey. It was the world's first mission of its kind since almost 40 years, state media reported.
+		  |After the US and the former Soviet Union, China is therefore the third country to which such a successful project. The test was in preparation for China's first lunar landing with subsequent return. In this planned for 2017 Flight China will not only put a probe on the Earth's satellite, but this then get back together with soil samples again to the earth.
+		  |China is pushing its space program with great strides. The first space probe 'Chang'e 3 "had landed on 15 December 2013, the Moon and the vehicle had" Jadehase "exposed (Yutu). This was China after the United States and the Soviet Union the third nation in the world that has made a moon landing.
+		  |The moon flights to demonstrate the technological capability of China's second largest economy""".stripMargin
+
+	val tp = new TranslationProcess(textToImprove)
+
+	val candidateProcessesParameterGenerators = Map(
+		tp.REWRITE_PART -> List(
+			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
+				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
+				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)))),
+			new RecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
+				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
+				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
+				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
+				new SelectBestAlternativeStatisticalReduction(Map(
+					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9
+				))
+			))
+		),
+		tp.SYNTAX_CHECK -> List(
+			new RecombinationStubParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
+				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
+				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
+				new SelectBestAlternativeStatisticalReduction(Map(
+					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9
+				))
+			))
+		))
+
+	val candidateProcesses = candidateProcessesParameterGenerators.map {
+		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten)
+	}
+
+	val candidateProcessCombinations = new RecombinationVariantGenerator(candidateProcesses).variants
+
+	println(candidateProcessCombinations)
+
+	candidateProcessCombinations.foreach(c => tp.runRecombinedVariant(c))
+}
+
+class TranslationProcess(val textToImprove: String) extends Recombinable[String] {
+	override def runRecombinedVariant(config: RecombinationVariant): String = {
+		val sentenceRewriter = config[List[String], List[String]](REWRITE_PART)
+		val syntaxChecker = config[String, String](SYNTAX_CHECK)
+
+		val paragraphs = textToImprove.split("\n").map(_.trim).toList
+
+		val rewrittenPatches = sentenceRewriter.process(paragraphs)
+		val textWithGoodSyntax = syntaxChecker.process(rewrittenPatches.mkString("\n"))
+
+		textWithGoodSyntax
+	}
+
+	override def allRecombinationKeys: List[String] = List(REWRITE_PART, SYNTAX_CHECK)
+
+	val REWRITE_PART = "1rewrite"
+	val SYNTAX_CHECK = "2syntax"
+}

@@ -8,7 +8,7 @@ import scala.collection.mutable
 object RecombinationDB {
 	private var db = new mutable.HashMap[String, RecombinationCategory]()
 
-	def get(category: String) = db(category)
+	def get(category: String): RecombinationCategory = db(category)
 
 	def put(category: String, stub: RecombinationStub[_, _]): Unit = {
 		val cat = db.getOrElse(category, RecombinationCategory(category))

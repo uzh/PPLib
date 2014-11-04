@@ -81,6 +81,9 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		}
 	}
 
+	def getParamUnsafe[T](param: RecombinationParameter[T], useDefaultValues: Boolean = true): T =
+		getParam[T](param, useDefaultValues).get
+
 	def getParamByKey[T](param: String, useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param) match {
 			case Some(p) => Some(p.asInstanceOf[T])
@@ -91,6 +94,8 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 			else None
 		}
 	}
+
+	def to[IN, OUT] = this.asInstanceOf[RecombinationStub[IN, OUT]]
 
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
 }
