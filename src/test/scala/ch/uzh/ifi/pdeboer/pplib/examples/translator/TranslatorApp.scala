@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.translator
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{FindFixVerifyProcess, DualPathwayProcess, SelectBestAlternativeStatisticalReduction}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationVariantGenerator, Recombinable, RecombinationStubParameterVariantGenerator, RecombinationVariant}
+import ch.uzh.ifi.pdeboer.pplib.recombination._
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, SelectBestAlternativeStatisticalReduction}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -21,36 +21,40 @@ object TranslatorApp extends App {
 		tp.REWRITE_PART -> List(
 			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
-				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)))),
+				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)))), //usage of functional patterns
 			new RecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
-				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
+				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
-				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
-				new SelectBestAlternativeStatisticalReduction(Map(
-					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9
-				))
-			))
+				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
+					RecombinationDB.getProcesses[List[String], List[String]]("selectbest") //online recombination
+				)
 		),
 		tp.SYNTAX_CHECK -> List(
 			new RecombinationStubParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
 				new SelectBestAlternativeStatisticalReduction(Map(
-					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9
+					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9 //inject processes to processes
 				))
 			))
 		))
-
 	val candidateProcesses = candidateProcessesParameterGenerators.map {
 		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten)
 	}
-
 	val candidateProcessCombinations = new RecombinationVariantGenerator(candidateProcesses).variants
 
-	println(candidateProcessCombinations)
-
-	candidateProcessCombinations.foreach(c => tp.runRecombinedVariant(c))
+	val trials = candidateProcessCombinations.map(c => {
+		val timeBefore = System.currentTimeMillis()
+		RecombinationStats(System.currentTimeMillis() - timeBefore,
+			0d, //c.getCost(),
+			c,
+			tp.runRecombinedVariant(c))
+	})
+	val fastestProcess = trials.minBy(_.processDuration).process
+	println(s"the fastest process was $fastestProcess")
 }
+
+case class RecombinationStats(processDuration: Long, processCost: Double, process: RecombinationVariant, result: String)
 
 class TranslationProcess(val textToImprove: String) extends Recombinable[String] {
 	override def runRecombinedVariant(config: RecombinationVariant): String = {

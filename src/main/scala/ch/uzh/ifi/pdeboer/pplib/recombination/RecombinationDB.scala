@@ -10,6 +10,8 @@ object RecombinationDB {
 
 	def get(category: String): RecombinationCategory = db(category)
 
+	def getProcesses[IN,OUT](category:String) = db(category).stubs.toList
+
 	def put(category: String, stub: RecombinationStub[_, _]): Unit = {
 		val cat = db.getOrElse(category, RecombinationCategory(category))
 		cat.addStub(stub)
