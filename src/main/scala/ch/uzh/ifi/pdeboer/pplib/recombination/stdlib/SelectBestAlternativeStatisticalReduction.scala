@@ -8,6 +8,9 @@ import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
  * Created by pdeboer on 03/11/14.
  */
 class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) {
+
+	import SelectBestAlternativeStatisticalReduction._
+
 	protected val MONTECARLO_ITERATIONS: Int = 100000
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
 
@@ -29,10 +32,10 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 	}
 
 	def castVote(alternatives: List[String]) = {
-		val portal = getParam(SelectBestAlternativeStatisticalReduction.PORTAL_PARAMETER).get
-		val instructions = getParam(SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER).get
-		val auxString = getParam(SelectBestAlternativeStatisticalReduction.AUX_STRING_PARAMETER).get
-		val title = getParam(SelectBestAlternativeStatisticalReduction.TITLE_PARAMETER).get
+		val portal = getParamUnsafe(PORTAL_PARAMETER)
+		val instructions = getParamUnsafe(INSTRUCTIONS_PARAMETER)
+		val auxString = getParamUnsafe(AUX_STRING_PARAMETER)
+		val title = getParamUnsafe(TITLE_PARAMETER)
 
 		portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title))
@@ -42,17 +45,17 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 		}
 	}
 
-	protected def confidence = getParam(SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER).get
+	protected def confidence = getParamUnsafe(CONFIDENCE_PARAMETER)
 
 	override val recombinationCategoryNames: List[String] = List("selectbest.statistical")
 
 	override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = {
-		List(SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER)
+		List(INSTRUCTIONS_PARAMETER)
 	}
 
-	override def optionalParameters: List[RecombinationParameter[_]] = List(SelectBestAlternativeStatisticalReduction.AUX_STRING_PARAMETER, SelectBestAlternativeStatisticalReduction.TITLE_PARAMETER, SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER)
+	override def optionalParameters: List[RecombinationParameter[_]] = List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
 
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List(SelectBestAlternativeStatisticalReduction.PORTAL_PARAMETER)
+	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List(PORTAL_PARAMETER)
 
 }
 

@@ -21,7 +21,7 @@ class FFVParagraphRewrite(params: Map[String, Any] = Map.empty[String, Any]) ext
 	}
 }
 
-//TODO finish me
+//TODO implement me
 class NaiveRewriteSelectBest(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.examples.translator.NaiveRewriteSelectBest._

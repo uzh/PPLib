@@ -7,12 +7,15 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, Recombina
  * Created by pdeboer on 31/10/14.
  */
 class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) {
+
+	import SelectBestAlternativeWithFixWorkerCount._
+
 	override def run(alternatives: List[String]): String = {
-		val portal = getParam(SelectBestAlternativeWithFixWorkerCount.PORTAL_PARAMETER).get
-		val instructions = getParam(SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER).get
-		val auxString = getParam(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER).get
-		val title = getParam(SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER).get
-		val workerCount = getParam(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER).get
+		val portal = getParamUnsafe(PORTAL_PARAMETER)
+		val instructions = getParamUnsafe(INSTRUCTIONS_PARAMETER)
+		val auxString = getParamUnsafe(AUX_STRING_PARAMETER)
+		val title = getParamUnsafe(TITLE_PARAMETER)
+		val workerCount = getParamUnsafe(WORKER_COUNT_PARAMETER)
 
 		val answers = (1 to workerCount).map(e =>
 			portal.sendQueryAndAwaitResult(
@@ -28,16 +31,16 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 	override val recombinationCategoryNames: List[String] = List("selectbest.single")
 
 	override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = {
-		List(SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER,
-			SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER)
+		List(INSTRUCTIONS_PARAMETER,
+			WORKER_COUNT_PARAMETER)
 	}
 
 	override def optionalParameters: List[RecombinationParameter[_]] =
-		List(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER,
-			SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER)
+		List(AUX_STRING_PARAMETER,
+			TITLE_PARAMETER)
 
 	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
-		List(SelectBestAlternativeWithFixWorkerCount.PORTAL_PARAMETER)
+		List(PORTAL_PARAMETER)
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
