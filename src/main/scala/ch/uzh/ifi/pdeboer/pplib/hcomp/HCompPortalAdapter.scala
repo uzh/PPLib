@@ -40,7 +40,7 @@ trait HCompPortalAdapter {
 	def getQueries() = queryLog
 }
 
-class CostCountingHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
+class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties): Future[Option[HCompAnswer]] = {

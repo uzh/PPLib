@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.translator
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
 import ch.uzh.ifi.pdeboer.pplib.recombination._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{SelectBestAlternativeStatisticalReduction, FindFixVerifyProcess, DualPathwayProcess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, SelectBestAlternativeStatisticalReduction}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -48,16 +48,18 @@ object TranslatorApp extends App {
 
 	val trials = candidateProcessCombinations.map(c => {
 		val timeBefore = System.currentTimeMillis()
-		RecombinationStats(System.currentTimeMillis() - timeBefore,
-			0d, //c.getCost(),
+		RecombinationStats(
 			c,
-			tp.runRecombinedVariant(c))
+			tp.runRecombinedVariant(c),
+			System.currentTimeMillis() - timeBefore,
+			c.totalCost
+		)
 	})
 	val fastestProcess = trials.minBy(_.processDuration).process
 	println(s"the fastest process was $fastestProcess")
 }
 
-case class RecombinationStats(processDuration: Long, processCost: Double, process: RecombinationVariant, result: String)
+case class RecombinationStats(process: RecombinationVariant, result: String, processDuration: Long, processCost: Double)
 
 class TranslationProcess(val textToImprove: String) extends Recombinable[String] {
 	override def runRecombinedVariant(config: RecombinationVariant): String = {

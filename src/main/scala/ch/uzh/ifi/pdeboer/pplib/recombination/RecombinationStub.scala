@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingHCompPortal, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
@@ -103,21 +103,14 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 }
 
 trait HCompPortalAccess[IN, OUT] extends RecombinationStub[IN, OUT] {
-	def portal: HCompPortalAdapter = getParamUnsafe(PORTAL)
+	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL))
 
 	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
 
 	val PORTAL = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
-
 object HCompPortalAccess {
 	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
-}
-
-trait PriceDecoratedPortal[IN, OUT] extends HCompPortalAccess[IN, OUT] {
-	lazy val decoratedPortal = new CostCountingHCompPortal(super.portal)
-
-	override def portal: CostCountingHCompPortal = decoratedPortal
 }
 
 class OnlineRecombination[I, O](val identifier: String) extends Iterable[RecombinationStub[I, O]] {
