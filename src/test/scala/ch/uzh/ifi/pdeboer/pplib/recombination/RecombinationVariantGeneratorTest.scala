@@ -6,7 +6,6 @@ import org.junit.{Assert, Test}
  * Created by pdeboer on 10/10/14.
  */
 class RecombinationVariantGeneratorTest {
-
 	@Test
 	def testSimpleCombination(): Unit = {
 		val list1 = List(new TestRecombinationStub(1), new TestRecombinationStub(2))

@@ -19,6 +19,7 @@ class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[
 
 class RecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) {
 	//very ugly stuff //TODO check
+	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
 	private val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
 	val base = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[RecombinationStub[_, _]]
 
