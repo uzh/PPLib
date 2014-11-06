@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
 
 import scala.concurrent.duration.{Duration, _}
 
@@ -10,7 +10,7 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) with HCompPortalAccess[List[String], List[String]] {
+class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], List[String]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess._
 

@@ -102,14 +102,15 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
 }
 
-trait HCompPortalAccess[IN, OUT] extends RecombinationStub[IN, OUT] {
+abstract class RecombinationStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends RecombinationStub[INPUT, OUTPUT](params) {
 	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL))
 
 	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
 
 	val PORTAL = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
-object HCompPortalAccess {
+
+object RecombinationStubWithHCompPortalAccess {
 	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 

@@ -1,14 +1,14 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 31/10/14.
  */
-class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) with HCompPortalAccess[List[String], String] {
+class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
 
-	import SelectBestAlternativeWithFixWorkerCount._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
 
 	override def run(alternatives: List[String]): String = {
 		val instructions = getParamUnsafe(INSTRUCTIONS_PARAMETER)

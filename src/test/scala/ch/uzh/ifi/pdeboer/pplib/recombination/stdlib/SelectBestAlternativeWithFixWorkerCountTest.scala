@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationStub}
 import org.junit.{Assert, Test}
 
 /**
@@ -36,7 +36,7 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
 			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3,
-				HCompPortalAccess.PORTAL_PARAMETER.key -> portal,
+				RecombinationStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("")))
 
 		val res = subject.run(data)
@@ -74,7 +74,7 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
 			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 5,
-				HCompPortalAccess.PORTAL_PARAMETER.key -> portal,
+				RecombinationStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("")))
 
 		val res = subject.run(data)

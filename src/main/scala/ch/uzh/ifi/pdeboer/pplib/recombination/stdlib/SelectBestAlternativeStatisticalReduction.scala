@@ -1,13 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
  * Created by pdeboer on 03/11/14.
  */
-class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) with HCompPortalAccess[List[String], String] {
+class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
 
 	import SelectBestAlternativeStatisticalReduction._
 

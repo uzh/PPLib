@@ -3,14 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FindFixVerifyExecutor, FFVDefaultHCompDriver, FFVPatch}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
 
 import scala.concurrent.duration._
 
 /**
  * Created by pdeboer on 04/11/14.
  */
-class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) with HCompPortalAccess[List[String], List[String]] {
+class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], List[String]](params) {
 	override protected def run(data: List[String]): List[String] = {
 		val driver = new FFVDefaultHCompDriver(
 			data.zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
