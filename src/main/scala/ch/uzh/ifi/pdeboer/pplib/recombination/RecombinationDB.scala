@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /**
  * Created by pdeboer on 20/10/14.
@@ -8,9 +9,10 @@ import scala.collection.mutable
 object RecombinationDB {
 	private var db = new mutable.HashMap[String, RecombinationCategory]()
 
-	def get(category: String): RecombinationCategory = db(category)
+	def getByKey(category: String): RecombinationCategory = db(category)
 
-	def getProcesses[IN,OUT](category:String) = db(category).stubs.toList
+	def get[IN, OUT](simpleName: String) =
+		db(RecombinationCategory.generateKey(simpleName)).stubs.toList
 
 	def put(category: String, stub: RecombinationStub[_, _]): Unit = {
 		val cat = db.getOrElse(category, RecombinationCategory(category))
@@ -27,4 +29,9 @@ case class RecombinationCategory(name: String) {
 	}
 
 	def stubs = _stubs.toSet
+}
+
+object RecombinationCategory {
+	def generateKey[INPUT: ClassTag, OUTPUT: ClassTag](name: String): String =
+		s"in:${implicitly[ClassTag[INPUT]].runtimeClass.getSimpleName},out:${implicitly[ClassTag[OUTPUT]].runtimeClass.getSimpleName},name:$name"
 }

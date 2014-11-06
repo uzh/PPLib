@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingHCompPortal, HComp, HCompPortalAdapter}
+
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
@@ -28,17 +30,17 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	 * Expected parameters of type "Option" will default to NONE if checked against.
 	 * @return
 	 */
-	def expectedParametersOnConstruction = List.empty[RecombinationParameter[_]]
+	def expectedParametersOnConstruction: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
 
-	def expectedParametersBeforeRun = List.empty[RecombinationParameter[_]]
+	def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
 
-	def optionalParameters = List.empty[RecombinationParameter[_]]
+	def optionalParameters: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
 
 	protected def recombinationCategoryNames: List[String] = Nil
 
 	def recombinationCategories =
 		(if (recombinationCategoryNames == null) Nil else recombinationCategoryNames).
-			map(n => s"in:${implicitly[ClassTag[INPUT]].runtimeClass.getSimpleName},out:${implicitly[ClassTag[OUTPUT]].runtimeClass.getSimpleName},name:" + n)
+			map(n => RecombinationCategory.generateKey[INPUT, OUTPUT](n))
 
 	assert(allParameterTypesCorrect,
 		s"some parameter types were not correct: ${
@@ -100,9 +102,27 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
 }
 
+trait HCompPortalAccess[IN, OUT] extends RecombinationStub[IN, OUT] {
+	def portal: HCompPortalAdapter = getParamUnsafe(PORTAL)
+
+	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
+
+	val PORTAL = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+}
+
+object HCompPortalAccess {
+	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+}
+
+trait PriceDecoratedPortal[IN, OUT] extends HCompPortalAccess[IN, OUT] {
+	lazy val decoratedPortal = new CostCountingHCompPortal(super.portal)
+
+	override def portal: CostCountingHCompPortal = decoratedPortal
+}
+
 class OnlineRecombination[I, O](val identifier: String) extends Iterable[RecombinationStub[I, O]] {
 	override def iterator: Iterator[RecombinationStub[I, O]] =
-		RecombinationDB.get(identifier).stubs.iterator.asInstanceOf[Iterator[RecombinationStub[I, O]]]
+		RecombinationDB.getByKey(identifier).stubs.iterator.asInstanceOf[Iterator[RecombinationStub[I, O]]]
 }
 
 class RecombinationParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {

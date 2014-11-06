@@ -3,18 +3,18 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FindFixVerifyExecutor, FFVDefaultHCompDriver, FFVPatch}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
 
 import scala.concurrent.duration._
 
 /**
  * Created by pdeboer on 04/11/14.
  */
-class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) {
+class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) with HCompPortalAccess[List[String], List[String]] {
 	override protected def run(data: List[String]): List[String] = {
 		val driver = new FFVDefaultHCompDriver(
 			data.zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
-			getParamUnsafe(PORTAL_PARAMETER), getParamUnsafe(FIND_QUESTION), getParamUnsafe(FIX_QUESTION),
+			portal, getParamUnsafe(FIND_QUESTION), getParamUnsafe(FIX_QUESTION),
 			getParamUnsafe(FIND_TITLE), getParamUnsafe(FIX_TITLE), getParamUnsafe(VERIFY_PROCESS)
 		)
 
@@ -25,9 +25,6 @@ class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStub[L
 
 		exec.bestPatches.map(_.patch)
 	}
-
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
-		List(PORTAL_PARAMETER)
 
 	override def optionalParameters: List[RecombinationParameter[_]] = List(
 		TIMEOUT, FIND_QUESTION,
@@ -40,7 +37,6 @@ class FindFixVerifyProcess(params: Map[String, Any]) extends RecombinationStub[L
 }
 
 object FindFixVerifyProcess {
-	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 	val TIMEOUT = new RecombinationParameter[Duration]("timeout", Some(List(2 days)))
 	val FIND_QUESTION = new RecombinationParameter[String]("findQuestion", Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION)))
 	val FIND_TITLE = new RecombinationParameter[String]("findTitle", Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_TITLE)))

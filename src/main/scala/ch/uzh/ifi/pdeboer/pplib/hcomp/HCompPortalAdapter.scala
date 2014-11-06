@@ -12,17 +12,14 @@ import scala.concurrent.{Future, _}
  */
 
 trait HCompPortalAdapter {
-	private var spentCents = 0d
 
-	protected def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
+	//TODO how can we make this one protected
+	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
 		val timeBefore = System.currentTimeMillis()
-		this.synchronized {
-			spentCents += properties.paymentCents
-		}
 		val answer = processQuery(query, properties)
 		val timeAfter = System.currentTimeMillis()
 
@@ -41,6 +38,24 @@ trait HCompPortalAdapter {
 	def getDefaultPortalKey: Symbol
 
 	def getQueries() = queryLog
+}
+
+class CostCountingHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
+	private var spentCents = 0d
+
+	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties): Future[Option[HCompAnswer]] = {
+		decoratedPortal.synchronized {
+			spentCents += properties.paymentCents
+		}
+		decoratedPortal.sendQuery(query, properties)
+	}
+
+	def cost = spentCents
+
+	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] =
+		decoratedPortal.processQuery(query, properties)
+
+	override def getDefaultPortalKey: Symbol = decoratedPortal.getDefaultPortalKey
 }
 
 case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long, moneySpent: Double)

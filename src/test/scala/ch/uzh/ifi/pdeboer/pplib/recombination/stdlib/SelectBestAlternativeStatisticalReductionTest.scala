@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithData}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 import org.junit.{Assert, Test}
 
@@ -21,7 +22,7 @@ class SelectBestAlternativeStatisticalReductionTest {
 			Map(
 				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9,
-				SelectBestAlternativeStatisticalReduction.PORTAL_PARAMETER.key -> new MockHCompPortal()
+				HCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
 			))
 
 		Assert.assertEquals("2", subject.process(data))
@@ -44,7 +45,7 @@ class SelectBestAlternativeStatisticalReductionTest {
 			Map(
 				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.95,
-				SelectBestAlternativeStatisticalReduction.PORTAL_PARAMETER.key -> new MockHCompPortal()
+				HCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
 			))
 
 		Assert.assertEquals("2", subject.process(data))

@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
 
 import scala.concurrent.duration.{Duration, _}
 
@@ -10,7 +10,7 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) {
+class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) with HCompPortalAccess[List[String], List[String]] {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess._
 
@@ -20,7 +20,6 @@ class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[Lis
 	 * @return
 	 */
 	override protected def run(data: List[String]): List[String] = {
-		val portal = getParamUnsafe(PORTAL_PARAMETER)
 		val questionOldProcessedElement = getParamUnsafe(QUESTION_OLD_PROCESSED_ELEMENT)
 		val questionNewProcessedElement = getParamUnsafe(QUESTION_NEW_PROCESSED_ELEMENT)
 		val questionPerProcessingTask = getParamUnsafe(QUESTION_PER_PROCESSING_TASK)
@@ -36,8 +35,7 @@ class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[Lis
 	}
 
 	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
-		List(PORTAL_PARAMETER,
-			QUESTION_OLD_PROCESSED_ELEMENT,
+		List(QUESTION_OLD_PROCESSED_ELEMENT,
 			QUESTION_NEW_PROCESSED_ELEMENT,
 			QUESTION_PER_PROCESSING_TASK,
 			QUESTION_PER_COMPARISON_TASK)
@@ -48,7 +46,6 @@ class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStub[Lis
 }
 
 object DualPathwayProcess {
-	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 	val QUESTION_OLD_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_old_el")
 	val QUESTION_NEW_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_new_el")
 	val QUESTION_PER_PROCESSING_TASK = new RecombinationParameter[String]("question_proc_task")

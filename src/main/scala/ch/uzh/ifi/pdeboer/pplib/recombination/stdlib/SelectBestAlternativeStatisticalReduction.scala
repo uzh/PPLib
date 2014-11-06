@@ -1,13 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{HCompPortalAccess, RecombinationParameter, RecombinationStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
  * Created by pdeboer on 03/11/14.
  */
-class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) {
+class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStub[List[String], String](params) with HCompPortalAccess[List[String], String] {
 
 	import SelectBestAlternativeStatisticalReduction._
 
@@ -32,7 +32,6 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 	}
 
 	def castVote(alternatives: List[String]) = {
-		val portal = getParamUnsafe(PORTAL_PARAMETER)
 		val instructions = getParamUnsafe(INSTRUCTIONS_PARAMETER)
 		val auxString = getParamUnsafe(AUX_STRING_PARAMETER)
 		val title = getParamUnsafe(TITLE_PARAMETER)
@@ -54,13 +53,9 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 	}
 
 	override def optionalParameters: List[RecombinationParameter[_]] = List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
-
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List(PORTAL_PARAMETER)
-
 }
 
 object SelectBestAlternativeStatisticalReduction {
-	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", candidateDefinitions = Some(HComp.allDefinedPortals))
 	val INSTRUCTIONS_PARAMETER = new RecombinationParameter[HCompInstructionsWithData]("question")
 	val AUX_STRING_PARAMETER = new RecombinationParameter[String]("auxString", Some(List("")))
 	val TITLE_PARAMETER = new RecombinationParameter[String]("title", Some(List("SelectBestAlternative")))

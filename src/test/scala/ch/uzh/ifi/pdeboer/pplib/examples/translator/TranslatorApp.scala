@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.translator
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
 import ch.uzh.ifi.pdeboer.pplib.recombination._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, SelectBestAlternativeStatisticalReduction}
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{SelectBestAlternativeStatisticalReduction, FindFixVerifyProcess, DualPathwayProcess}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -18,7 +18,7 @@ object TranslatorApp extends App {
 	val tp = new TranslationProcess(textToImprove)
 
 	val candidateProcessesParameterGenerators = Map(
-		tp.REWRITE_PART -> List(
+		tp.REWRITE_PART -> List[RecombinationStubParameterVariantGenerator[_]](
 			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
 				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)))), //usage of functional patterns
@@ -26,10 +26,10 @@ object TranslatorApp extends App {
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
-					RecombinationDB.getProcesses[List[String], List[String]]("selectbest") //online recombination
+					RecombinationDB.get[List[String], List[String]]("selectbest") //online recombination
 				)
 		),
-		tp.SYNTAX_CHECK -> List(
+		tp.SYNTAX_CHECK -> List[RecombinationStubParameterVariantGenerator[_]](
 			new RecombinationStubParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
@@ -39,7 +39,7 @@ object TranslatorApp extends App {
 			))
 		))
 	val candidateProcesses = candidateProcessesParameterGenerators.map {
-		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten)
+		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten.asInstanceOf[List[RecombinationStub[_, _]]])
 	}
 	val candidateProcessCombinations = new RecombinationVariantGenerator(candidateProcesses).variants
 
