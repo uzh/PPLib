@@ -52,7 +52,8 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 		List(INSTRUCTIONS_PARAMETER)
 	}
 
-	override def optionalParameters: List[RecombinationParameter[_]] = List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
+	override def optionalParameters: List[RecombinationParameter[_]] =
+		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
 }
 
 object SelectBestAlternativeStatisticalReduction {

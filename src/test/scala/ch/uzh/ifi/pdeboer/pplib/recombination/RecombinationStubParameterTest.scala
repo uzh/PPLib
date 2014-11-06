@@ -19,7 +19,7 @@ class RecombinationStubParameterTest {
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
-			case e: AssertionError => Assert.assertTrue(true) //exception happened
+			case e: Throwable => Assert.assertTrue(true) //exception happened
 		}
 	}
 

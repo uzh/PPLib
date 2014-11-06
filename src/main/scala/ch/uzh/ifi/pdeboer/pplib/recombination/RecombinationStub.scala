@@ -42,16 +42,6 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		(if (recombinationCategoryNames == null) Nil else recombinationCategoryNames).
 			map(n => RecombinationCategory.generateKey[INPUT, OUTPUT](n))
 
-	assert(allParameterTypesCorrect,
-		s"some parameter types were not correct: ${
-			allParams
-				.filter(p => params.contains(p.key))
-				.filterNot(p => isParameterTypeCorrect(p.key, params(p.key)))
-				.map(p => s"${p.key} is ${params(p.key).getClass.getCanonicalName}, should be ${p.clazz.getCanonicalName}").mkString(", ")
-		}")
-
-	ensureExpectedParametersGiven(expectedParametersOnConstruction)
-
 	def isParameterTypeCorrect(key: String, value: Any): Boolean = {
 		val e = allParams.find(_.key.equals(key))
 		val ret = if (e.isDefined) {
@@ -65,7 +55,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 
 	def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
 
-	final def allParams: List[RecombinationParameter[_]] = {
+	def allParams: List[RecombinationParameter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters
 	}
 
@@ -99,6 +89,16 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 
 	def to[IN, OUT] = this.asInstanceOf[RecombinationStub[IN, OUT]]
 
+	/*
+	assert(allParameterTypesCorrect,
+		s"some parameter types were not correct: ${
+			allParams
+				.filter(p => params.contains(p.key))
+				.filterNot(p => isParameterTypeCorrect(p.key, params(p.key)))
+				.map(p => s"${p.key} is ${params(p.key).getClass.getCanonicalName}, should be ${p.clazz.getCanonicalName}").mkString(", ")
+		}")
+	*/
+	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
 }
 

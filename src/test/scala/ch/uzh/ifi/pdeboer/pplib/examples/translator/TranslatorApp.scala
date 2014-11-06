@@ -17,6 +17,7 @@ object TranslatorApp extends App {
 
 	val tp = new TranslationProcess(textToImprove)
 
+	//list type explicitly stated to speed up compilation. remove before production release
 	val candidateProcessesParameterGenerators = Map(
 		tp.REWRITE_PART -> List[RecombinationStubParameterVariantGenerator[_]](
 			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
@@ -39,7 +40,9 @@ object TranslatorApp extends App {
 			))
 		))
 	val candidateProcesses = candidateProcessesParameterGenerators.map {
-		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten.asInstanceOf[List[RecombinationStub[_, _]]])
+		//asinstanceof here is only used to speed up compilation. remove before production release
+		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate())
+			.flatten.asInstanceOf[List[RecombinationStub[_, _]]])
 	}
 	val candidateProcessCombinations = new RecombinationVariantGenerator(candidateProcesses).variants
 
