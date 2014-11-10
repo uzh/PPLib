@@ -175,7 +175,7 @@ class DualPathWayDefaultHCompDriver(
 
 }
 
-class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String,
+class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String = "Comparison",
 													   val preText: String = "Please compare both pathways and answer if the answers are equal or not",
 													   val questionTitle: String = "Question",
 													   val leftTitle: String = "Pathway 1",

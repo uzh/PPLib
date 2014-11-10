@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationProcess, RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
 
 import scala.concurrent.duration.{Duration, _}
 
@@ -10,8 +10,8 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], List[String]](params) {
-
+@RecombinationProcess("refine")
+class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], List[String]](params) {
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess._
 
 	/**
@@ -46,10 +46,10 @@ class DualPathwayProcess(params: Map[String, Any]) extends RecombinationStubWith
 }
 
 object DualPathwayProcess {
-	val QUESTION_OLD_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_old_el")
-	val QUESTION_NEW_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_new_el")
-	val QUESTION_PER_PROCESSING_TASK = new RecombinationParameter[String]("question_proc_task")
-	val QUESTION_PER_COMPARISON_TASK = new RecombinationParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task")
-	val TIMEOUT = new RecombinationParameter[Duration]("timeout", Some(List(2 days)))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_old_el", Some(List(HCompInstructionsWithData("Is the following question answered correctly?"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new RecombinationParameter[HCompInstructionsWithData]("question_new_el", Some(List(HCompInstructionsWithData("Please provide an answer to the following question"))))
+	val QUESTION_PER_PROCESSING_TASK = new RecombinationParameter[String]("question_proc_task", Some(List("Please compare (and fix) the following elements")))
+	val QUESTION_PER_COMPARISON_TASK = new RecombinationParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
+	val TIMEOUT = new RecombinationParameter[Duration]("timeout", Some(List(2 days, 1 day)))
 	val CHUNK_COUNT_TO_INCLUDE = new RecombinationParameter[Integer]("chunk_count", Some(List(2)))
 }

@@ -9,6 +9,7 @@ import scala.reflect.runtime.{universe => ru}
  * Created by pdeboer on 09/10/14.
  */
 abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) {
+	def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
 
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
@@ -38,9 +39,18 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 
 	protected def recombinationCategoryNames: List[String] = Nil
 
-	def recombinationCategories =
-		(if (recombinationCategoryNames == null) Nil else recombinationCategoryNames).
-			map(n => RecombinationCategory.generateKey[INPUT, OUTPUT](n))
+	def recombinationCategories = {
+		val names: List[String] =
+			if (recombinationCategoryNames == null)
+				Nil
+			else recombinationCategoryNames
+		val annotation =
+			if (this.getClass.isAnnotationPresent(classOf[RecombinationProcess]))
+				this.getClass.getAnnotation(classOf[RecombinationProcess]).value()
+			else ""
+		(annotation :: names).map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
+	}
+
 
 	def isParameterTypeCorrect(key: String, value: Any): Boolean = {
 		val e = allParams.find(_.key.equals(key))
@@ -115,8 +125,7 @@ object RecombinationStubWithHCompPortalAccess {
 }
 
 class OnlineRecombination[I, O](val identifier: String) extends Iterable[RecombinationStub[I, O]] {
-	override def iterator: Iterator[RecombinationStub[I, O]] =
-		RecombinationDB.getByKey(identifier).stubs.iterator.asInstanceOf[Iterator[RecombinationStub[I, O]]]
+	override def iterator: Iterator[RecombinationStub[I, O]] = ??? //TODO implement online recombination
 }
 
 class RecombinationParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {

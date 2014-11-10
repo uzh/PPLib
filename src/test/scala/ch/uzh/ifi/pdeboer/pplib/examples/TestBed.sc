@@ -1,4 +1,3 @@
-import ch.uzh.ifi.pdeboer.pplib.examples.translator.DPParagraphRewrite
+import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationDB
 
-classOf[DPParagraphRewrite].getDeclaredConstructor(classOf[Map[String, Any]])
-
+RecombinationDB.findClassesThatExtendRecombinationStubAndAddThem()
