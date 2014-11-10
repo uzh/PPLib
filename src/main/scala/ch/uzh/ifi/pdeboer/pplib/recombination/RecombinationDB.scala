@@ -6,6 +6,7 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
+import scala.collection.immutable.Iterable
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -14,10 +15,30 @@ import scala.reflect.ClassTag
  * Created by pdeboer on 20/10/14.
  */
 object RecombinationDB {
-	//TODO implement recomb db
-	def get[IN: ClassTag, OUT: ClassTag](simpleName: String) = ???
+	private var processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 
-	def put(category: RecombinationCategory, stub: RecombinationStub[_, _]): Unit = ???
+	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
+		val category: RecombinationCategory = RecombinationCategory.get[IN, OUT](name)
+		if (includeDescendants) {
+			val keys = processes.keySet.filter(k => {
+				//this probably wont work
+				k.inputType.isAssignableFrom(category.inputType) &&
+					k.outputType.isAssignableFrom(category.outputType) &&
+					k.path.startsWith(category.path)
+			})
+
+			keys.map(k => processes(k).stubs).flatten.toList
+		} else {
+			val pointSearchOption = processes.get(category)
+			if (pointSearchOption.isDefined) pointSearchOption.get.stubs.toList else Nil
+		}
+	}
+
+	def put(category: RecombinationCategory, stub: RecombinationStub[_, _]): Unit = {
+		val content = processes.getOrElse(category, RecombinationCategoryContent(category))
+		content.addStub(stub)
+		processes += (category -> content)
+	}
 
 	def findClassesThatExtendRecombinationStubAndAddThem(): Unit = {
 		try {
@@ -40,8 +61,7 @@ object RecombinationDB {
 	findClassesThatExtendRecombinationStubAndAddThem()
 }
 
-class RecombinationCategory(val inputType: Class[_], val outputType: Class[_], val name: String) {}
-
+case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) {}
 object RecombinationCategory {
 	def get[INPUT: ClassTag, OUTPUT: ClassTag](name: String) =
 		new RecombinationCategory(
@@ -57,17 +77,12 @@ object TestStuff extends App {
 
 case class RecombinationSetting[IN, OUT]()
 
-case class RecombinationCategoryContent(name: String) {
-	private var _stubs: mutable.Set[RecombinationStub[_, _]] = mutable.HashSet.empty[RecombinationStub[_, _]]
+case class RecombinationCategoryContent(category: RecombinationCategory) {
+	private var _stubs = List.empty[RecombinationStub[_, _]]
 
 	def addStub(s: RecombinationStub[_, _]): Unit = {
-		_stubs += s
+		_stubs = s :: _stubs
 	}
 
-	def stubs = _stubs.toSet
-}
-
-object RecombinationCategoryContent {
-	def generateKey[INPUT: ClassTag, OUTPUT: ClassTag](name: String): String =
-		s"in:${implicitly[ClassTag[INPUT]].runtimeClass.getSimpleName},out:${implicitly[ClassTag[OUTPUT]].runtimeClass.getSimpleName},name:$name"
+	def stubs: List[RecombinationStub[_, _]] = _stubs.toList
 }
