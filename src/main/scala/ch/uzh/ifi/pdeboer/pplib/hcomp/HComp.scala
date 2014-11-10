@@ -30,10 +30,19 @@ object HComp {
 	def mechanicalTurk: CrowdFlowerPortalAdapter = portals.get('mechanicalTurk).get.asInstanceOf[CrowdFlowerPortalAdapter]
 
 
+	private def configContainsKey(key: String): Boolean =
+		try {
+			ConfigFactory.load().getString(key)
+			true
+		}
+		catch {
+			case _ => false
+		}
+
 	private def autoloadConfiguredPortals() {
 		val config: Config = ConfigFactory.load()
 
-		if (config.getString(CrowdFlowerPortalAdapter.CONFIG_API_KEY) != null)
+		if (configContainsKey(CrowdFlowerPortalAdapter.CONFIG_API_KEY))
 			addPortal(CrowdFlowerPortalAdapter.PORTAL_KEY, new CrowdFlowerPortalAdapter("PPLib @ CrowdFlower"))
 
 		//TODO add config directive to automatically load portals using reflection and their full classname
