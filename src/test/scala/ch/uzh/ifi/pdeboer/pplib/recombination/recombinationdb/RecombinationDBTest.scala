@@ -69,7 +69,6 @@ class RecombinationDBTest {
 	def testAnnotatedClassFinder: Unit = {
 		val c = RecombinationDB.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName)
 		Assert.assertEquals(Set(classOf[TestRecombinationStubParent2], classOf[TestRecombinationStubChild], classOf[TestRecombinationStubUnrelated]), c)
-		Assert.assertTrue(false)
 	}
 
 	@Before
