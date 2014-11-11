@@ -17,13 +17,16 @@ import scala.reflect.ClassTag
 object RecombinationDB {
 	private var processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 
-	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
-		val category: RecombinationCategory = RecombinationCategory.get[IN, OUT](name)
+	def reset(): Unit = {
+		processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
+	}
+
+	def getCategory(category: RecombinationCategory, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
 		if (includeDescendants) {
 			val keys = processes.keySet.filter(k => {
 				//this probably wont work
-				k.inputType.isAssignableFrom(category.inputType) &&
-					k.outputType.isAssignableFrom(category.outputType) &&
+				category.inputType.isAssignableFrom(k.inputType) &&
+					category.outputType.isAssignableFrom(k.outputType) &&
 					k.path.startsWith(category.path)
 			})
 
@@ -34,10 +37,21 @@ object RecombinationDB {
 		}
 	}
 
+	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
+		val category: RecombinationCategory = RecombinationCategory.get[IN, OUT](name)
+		getCategory(category, includeDescendants)
+	}
+
+	def put(stub: RecombinationStub[_, _]): Unit = {
+		stub.recombinationCategories.foreach(c => put(c, stub))
+	}
+
 	def put(category: RecombinationCategory, stub: RecombinationStub[_, _]): Unit = {
-		val content = processes.getOrElse(category, RecombinationCategoryContent(category))
-		content.addStub(stub)
-		processes += (category -> content)
+		this.synchronized {
+			val content = processes.getOrElse(category, RecombinationCategoryContent(category))
+			content.addStub(stub)
+			processes += (category -> content)
+		}
 	}
 
 	def findClassesThatExtendRecombinationStubAndAddThem(): Unit = {
@@ -71,17 +85,11 @@ object RecombinationCategory {
 		)
 }
 
-object TestStuff extends App {
-	RecombinationDB.findClassesThatExtendRecombinationStubAndAddThem()
-}
-
-case class RecombinationSetting[IN, OUT]()
-
 case class RecombinationCategoryContent(category: RecombinationCategory) {
-	private var _stubs = List.empty[RecombinationStub[_, _]]
+	private var _stubs = Set.empty[RecombinationStub[_, _]]
 
 	def addStub(s: RecombinationStub[_, _]): Unit = {
-		_stubs = s :: _stubs
+		_stubs += s
 	}
 
 	def stubs: List[RecombinationStub[_, _]] = _stubs.toList

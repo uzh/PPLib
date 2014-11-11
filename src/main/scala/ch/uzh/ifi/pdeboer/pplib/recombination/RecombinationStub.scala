@@ -9,7 +9,7 @@ import scala.reflect.runtime.{universe => ru}
  * Created by pdeboer on 09/10/14.
  */
 abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) {
-	def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
+	final def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
 
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
@@ -39,7 +39,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 
 	protected def recombinationCategoryNames: List[String] = Nil
 
-	def recombinationCategories = {
+	final def recombinationCategories = {
 		val names: List[String] =
 			if (recombinationCategoryNames == null)
 				Nil
@@ -52,7 +52,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	}
 
 
-	def isParameterTypeCorrect(key: String, value: Any): Boolean = {
+	final def isParameterTypeCorrect(key: String, value: Any): Boolean = {
 		val e = allParams.find(_.key.equals(key))
 		val ret = if (e.isDefined) {
 			val left = value.getClass
@@ -63,7 +63,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		ret
 	}
 
-	def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
+	final def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
 
 	def allParams: List[RecombinationParameter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters
@@ -110,6 +110,21 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	*/
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[RecombinationStub[_, _]]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: RecombinationStub[_, _] =>
+			(that canEqual this) &&
+				params == that.params &&
+				this.getClass == other.getClass
+		case _ => false
+	}
+
+	override def hashCode(): Int = {
+		val state = Seq(params)
+		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+	}
 }
 
 abstract class RecombinationStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends RecombinationStub[INPUT, OUTPUT](params) {
