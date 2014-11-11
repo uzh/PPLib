@@ -139,8 +139,8 @@ object RecombinationStubWithHCompPortalAccess {
 	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 
-class OnlineRecombination[I, O](val identifier: String) extends Iterable[RecombinationStub[I, O]] {
-	override def iterator: Iterator[RecombinationStub[I, O]] = ??? //TODO implement online recombination
+class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[RecombinationStub[I, O]] {
+	override def iterator: Iterator[RecombinationStub[I, O]] = RecombinationDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[RecombinationStub[I, O]]]
 }
 
 class RecombinationParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
