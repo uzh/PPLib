@@ -1,15 +1,16 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationProcess, RecombinationStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
  * Created by pdeboer on 03/11/14.
  */
-class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
+@RecombinationProcess("selectbest.statistical")
+class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.empty[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
 
-	import SelectBestAlternativeStatisticalReduction._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction._
 
 	protected val MONTECARLO_ITERATIONS: Int = 100000
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
@@ -48,17 +49,16 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any]) extend
 
 	override val recombinationCategoryNames: List[String] = List("selectbest.statistical")
 
-	override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = {
-		List(INSTRUCTIONS_PARAMETER)
-	}
+
+	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List(INSTRUCTIONS_PARAMETER)
 
 	override def optionalParameters: List[RecombinationParameter[_]] =
 		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
 }
 
 object SelectBestAlternativeStatisticalReduction {
-	val INSTRUCTIONS_PARAMETER = new RecombinationParameter[HCompInstructionsWithData]("question")
+	val INSTRUCTIONS_PARAMETER = new RecombinationParameter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the item that fits best"))))
 	val AUX_STRING_PARAMETER = new RecombinationParameter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new RecombinationParameter[String]("title", Some(List("SelectBestAlternative")))
+	val TITLE_PARAMETER = new RecombinationParameter[String]("title", Some(List("Select Best Alternative")))
 	val CONFIDENCE_PARAMETER = new RecombinationParameter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
 }

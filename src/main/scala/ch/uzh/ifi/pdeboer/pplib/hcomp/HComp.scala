@@ -39,7 +39,7 @@ object HComp {
 			case _ => false
 		}
 
-	private def autoloadConfiguredPortals() {
+	protected def autoloadConfiguredPortals() {
 		val config: Config = ConfigFactory.load()
 
 		if (configContainsKey(CrowdFlowerPortalAdapter.CONFIG_API_KEY))

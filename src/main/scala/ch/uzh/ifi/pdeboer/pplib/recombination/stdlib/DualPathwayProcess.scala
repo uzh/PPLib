@@ -10,7 +10,7 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-@RecombinationProcess("refine")
+@RecombinationProcess("refine.dualpathway")
 class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], List[String]](params) {
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess._
 

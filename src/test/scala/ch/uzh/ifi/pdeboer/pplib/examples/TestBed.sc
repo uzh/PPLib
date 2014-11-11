@@ -1,3 +1,3 @@
 import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationDB
 
-RecombinationDB.findClassesThatExtendRecombinationStubAndAddThem()
+RecombinationDB.findClassesInPackageWithAnnotationAndAddThem()

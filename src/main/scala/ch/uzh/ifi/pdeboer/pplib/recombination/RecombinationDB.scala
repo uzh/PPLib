@@ -1,12 +1,15 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
+import java.util
+
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
-import scala.collection.immutable.Iterable
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -54,28 +57,41 @@ object RecombinationDB {
 		}
 	}
 
-	def findClassesThatExtendRecombinationStubAndAddThem(): Unit = {
-		try {
-			val classLoadersList = List(ClasspathHelper.contextClassLoader(), ClasspathHelper.staticClassLoader())
+	def findClassesInPackageWithProcessAnnotation(packagePrefix: String = "ch.uzh.ifi.pdeboer.pplib.recombination.stdlib"): Set[Class[_]] = {
+		val classLoadersList = List(ClasspathHelper.contextClassLoader(),
+			ClasspathHelper.staticClassLoader())
 
-			val reflections = new Reflections(new ConfigurationBuilder()
-				.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false), new ResourcesScanner())
-				.setUrls(ClasspathHelper.forClassLoader(classLoadersList(0)))
-				.filterInputsBy(new FilterBuilder().include(
-				FilterBuilder.prefix(DualPathwayProcess.getClass.getPackage.getName))))
+		val reflections = new Reflections(new ConfigurationBuilder()
+			.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false), new ResourcesScanner())
+			.setUrls(ClasspathHelper.forClassLoader(classLoadersList(0)))
+			.filterInputsBy(new FilterBuilder().include(
+			FilterBuilder.prefix(packagePrefix))))
 
-			val target = reflections.getTypesAnnotatedWith(classOf[RecombinationProcess])
-			target.foreach(_.newInstance()) // recombination stub will automatically add itself to DB
-		}
-		catch {
-			case e: Exception => e.printStackTrace()
-		}
+		reflections.getTypesAnnotatedWith(classOf[RecombinationProcess]).toSet
 	}
 
-	findClassesThatExtendRecombinationStubAndAddThem()
+	protected def findClassesInPackageWithAnnotationAndAddThem() {
+		val annotatedClasses = findClassesInPackageWithProcessAnnotation()
+		initializeClassesAndAddToDB(annotatedClasses.asInstanceOf[Set[Class[RecombinationStub[_, _]]]])
+	}
+
+	def initializeClassesAndAddToDB(classes: Set[Class[RecombinationStub[_, _]]]) {
+		classes.foreach(t => {
+			try {
+				val constructor = t.getConstructor(classOf[Map[String, Any]])
+				constructor.newInstance(Map.empty[String, Any])
+			}
+			catch {
+				case e: Error => e.printStackTrace(System.err)
+			}
+		})
+	}
+
+	findClassesInPackageWithAnnotationAndAddThem()
 }
 
 case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) {}
+
 object RecombinationCategory {
 	def get[INPUT: ClassTag, OUTPUT: ClassTag](name: String) =
 		new RecombinationCategory(

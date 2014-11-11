@@ -1,7 +1,8 @@
-package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
+package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStubWithHCompPortalAccess
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
 import org.junit.{Assert, Test}
 
 /**

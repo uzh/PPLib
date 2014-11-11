@@ -1,5 +1,6 @@
-package ch.uzh.ifi.pdeboer.pplib.recombination
+package ch.uzh.ifi.pdeboer.pplib.recombination.recombinationdb
 
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationCategory, RecombinationDB, RecombinationProcess, RecombinationStub}
 import org.junit.{Assert, Before, Test}
 
 /**
@@ -62,6 +63,13 @@ class RecombinationDBTest {
 
 		Assert.assertEquals("we try to insert the same stub (in terms of parameterset) twice, so only 1 of them should prevail",
 			2, RecombinationDB.getCategory(needle, includeDescendants = true).length)
+	}
+
+	@Test
+	def testAnnotatedClassFinder: Unit = {
+		val c = RecombinationDB.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName)
+		Assert.assertEquals(Set(classOf[TestRecombinationStubParent2], classOf[TestRecombinationStubChild], classOf[TestRecombinationStubUnrelated]), c)
+		Assert.assertTrue(false)
 	}
 
 	@Before

@@ -7,6 +7,10 @@ import scala.reflect.runtime.{universe => ru}
 
 /**
  * Created by pdeboer on 09/10/14.
+ *
+ * Base class for Recombination. Things to keep in mind:
+ * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
+ * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
 abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) {
 	final def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
@@ -20,7 +24,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	def ensureExpectedParametersGiven(expected: List[RecombinationParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {
 			case Some(v) => isParameterTypeCorrect(k.key, v)
-			case None => throw new IllegalArgumentException("Parameter not defined or type wrong: " + k.key + ":" + k.clazz.getCanonicalName)
+			case None => throw new IllegalArgumentException("Parameter not defined: " + k.key + ":" + k.clazz.getCanonicalName)
 		})
 	}
 

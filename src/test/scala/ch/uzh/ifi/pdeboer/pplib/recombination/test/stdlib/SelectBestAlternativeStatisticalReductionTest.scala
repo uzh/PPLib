@@ -1,6 +1,7 @@
-package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
+package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithData}
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction
 import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationStubWithHCompPortalAccess, RecombinationStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 import org.junit.{Assert, Test}

@@ -1,11 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationProcess, RecombinationStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 31/10/14.
  */
+@RecombinationProcess("selectbest.fixworker")
 class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
@@ -29,10 +30,9 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 
 	override val recombinationCategoryNames: List[String] = List("selectbest.single")
 
-	override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = {
-		List(INSTRUCTIONS_PARAMETER,
-			WORKER_COUNT_PARAMETER)
-	}
+
+	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
+		List(INSTRUCTIONS_PARAMETER, WORKER_COUNT_PARAMETER)
 
 	override def optionalParameters: List[RecombinationParameter[_]] =
 		List(AUX_STRING_PARAMETER,
