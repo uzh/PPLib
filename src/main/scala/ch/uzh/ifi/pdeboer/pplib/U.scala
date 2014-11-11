@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib
 
+import com.typesafe.config.{Config, ConfigFactory}
+
 /**
  * Created by pdeboer on 15/10/14.
  */
@@ -17,6 +19,16 @@ object U {
 		} catch {
 			case e if n > 1 =>
 				retry(n - 1)(fn)
+		}
+	}
+
+	def getConfigString(name: String): Option[String] = {
+		val config: Config = ConfigFactory.load()
+		try {
+			Some(config.getString(name))
+		}
+		catch {
+			case _ => None
 		}
 	}
 }

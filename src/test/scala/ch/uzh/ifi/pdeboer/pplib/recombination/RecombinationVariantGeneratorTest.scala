@@ -23,7 +23,7 @@ class RecombinationVariantGeneratorTest {
 		)
 
 		val actualCombinations = gen.variants.map(r => {
-			val stub = r.config.asInstanceOf[Map[String, TestRecombinationStub]]
+			val stub = r.stubs.asInstanceOf[Map[String, TestRecombinationStub]]
 			List(stub("list1").id, stub("list2").id, stub("list3").id)
 		}).toList
 

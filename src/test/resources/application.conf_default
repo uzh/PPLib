@@ -2,4 +2,8 @@
   "crowdflower": {
     "apikey" : "YOURKEY"
   }
-}}
+},
+  "processes" : {
+    "auto_init_package" : "ch.uzh.ifi.pdeboer.pplib.test.stdlib2"
+  }
+}

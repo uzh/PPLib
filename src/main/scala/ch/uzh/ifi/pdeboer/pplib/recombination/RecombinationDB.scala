@@ -1,15 +1,11 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
-import java.util
-
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess
+import ch.uzh.ifi.pdeboer.pplib.U
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -57,7 +53,7 @@ object RecombinationDB {
 		}
 	}
 
-	def findClassesInPackageWithProcessAnnotation(packagePrefix: String = "ch.uzh.ifi.pdeboer.pplib.recombination.stdlib"): Set[Class[_]] = {
+	def findClassesInPackageWithProcessAnnotation(packagePrefix: String): Set[Class[_]] = {
 		val classLoadersList = List(ClasspathHelper.contextClassLoader(),
 			ClasspathHelper.staticClassLoader())
 
@@ -70,8 +66,8 @@ object RecombinationDB {
 		reflections.getTypesAnnotatedWith(classOf[RecombinationProcess]).toSet
 	}
 
-	protected def findClassesInPackageWithAnnotationAndAddThem() {
-		val annotatedClasses = findClassesInPackageWithProcessAnnotation()
+	protected def findClassesInPackageWithAnnotationAndAddThem(packagePrefix: String = "ch.uzh.ifi.pdeboer.pplib.recombination.stdlib") {
+		val annotatedClasses = findClassesInPackageWithProcessAnnotation(packagePrefix)
 		initializeClassesAndAddToDB(annotatedClasses.asInstanceOf[Set[Class[RecombinationStub[_, _]]]])
 	}
 
@@ -87,7 +83,15 @@ object RecombinationDB {
 		})
 	}
 
+	protected def autoloadPackagesFromConfigFile(): Unit = {
+		U.getConfigString("processes.auto_init_package") match {
+			case Some(targetPackage) => findClassesInPackageWithAnnotationAndAddThem(targetPackage)
+			case _ => {}
+		}
+	}
+
 	findClassesInPackageWithAnnotationAndAddThem()
+	autoloadPackagesFromConfigFile()
 }
 
 case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) {}
