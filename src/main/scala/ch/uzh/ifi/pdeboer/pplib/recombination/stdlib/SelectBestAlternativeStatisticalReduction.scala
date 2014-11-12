@@ -1,14 +1,14 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationProcess, RecombinationStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, RecombinationProcess, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
  * Created by pdeboer on 03/11/14.
  */
 @RecombinationProcess("selectbest.statistical")
-class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.empty[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
+class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction._
 
@@ -50,15 +50,15 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 	override val recombinationCategoryNames: List[String] = List("selectbest.statistical")
 
 
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List(INSTRUCTIONS_PARAMETER)
+	override def expectedParametersBeforeRun: List[ProcessParamter[_]] = List(INSTRUCTIONS_PARAMETER)
 
-	override def optionalParameters: List[RecombinationParameter[_]] =
+	override def optionalParameters: List[ProcessParamter[_]] =
 		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
 }
 
 object SelectBestAlternativeStatisticalReduction {
-	val INSTRUCTIONS_PARAMETER = new RecombinationParameter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the item that fits best"))))
-	val AUX_STRING_PARAMETER = new RecombinationParameter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new RecombinationParameter[String]("title", Some(List("Select Best Alternative")))
-	val CONFIDENCE_PARAMETER = new RecombinationParameter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
+	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the item that fits best"))))
+	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
+	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("Select Best Alternative")))
+	val CONFIDENCE_PARAMETER = new ProcessParamter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
 }

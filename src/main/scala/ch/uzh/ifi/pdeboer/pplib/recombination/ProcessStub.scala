@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
+import com.typesafe.scalalogging.{LazyLogging, Logger}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
@@ -12,16 +13,17 @@ import scala.reflect.runtime.{universe => ru}
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) {
+abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogging {
 	final def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
 
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
 
+		logger.info(s"running process ${getClass.getSimpleName}")
 		run(data)
 	}
 
-	def ensureExpectedParametersGiven(expected: List[RecombinationParameter[_]]): Unit = {
+	def ensureExpectedParametersGiven(expected: List[ProcessParamter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {
 			case Some(v) => isParameterTypeCorrect(k.key, v)
 			case None => throw new IllegalArgumentException("Parameter not defined: " + k.key + ":" + k.clazz.getCanonicalName)
@@ -35,11 +37,11 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	 * Expected parameters of type "Option" will default to NONE if checked against.
 	 * @return
 	 */
-	def expectedParametersOnConstruction: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
+	def expectedParametersOnConstruction: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
 
-	def expectedParametersBeforeRun: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
+	def expectedParametersBeforeRun: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
 
-	def optionalParameters: List[RecombinationParameter[_]] = List.empty[RecombinationParameter[_]]
+	def optionalParameters: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
 
 	protected def recombinationCategoryNames: List[String] = Nil
 
@@ -69,7 +71,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 
 	final def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
 
-	def allParams: List[RecombinationParameter[_]] = {
+	def allParams: List[ProcessParamter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters
 	}
 
@@ -79,7 +81,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		}
 	}
 
-	def getParam[T](param: RecombinationParameter[T], useDefaultValues: Boolean = true): Option[T] = {
+	def getParam[T](param: ProcessParamter[T], useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param.key) match {
 			case Some(p) => Some(p.asInstanceOf[T])
 			case _ => if (useDefaultValues) param.candidateDefinitions.getOrElse(Nil).headOption
@@ -87,7 +89,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		}
 	}
 
-	def getParamUnsafe[T](param: RecombinationParameter[T], useDefaultValues: Boolean = true): T =
+	def getParamUnsafe[T](param: ProcessParamter[T], useDefaultValues: Boolean = true): T =
 		getParam[T](param, useDefaultValues).get
 
 	def getParamByKey[T](param: String, useDefaultValues: Boolean = true): Option[T] = {
@@ -101,7 +103,7 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		}
 	}
 
-	def to[IN, OUT] = this.asInstanceOf[RecombinationStub[IN, OUT]]
+	def to[IN, OUT] = this.asInstanceOf[ProcessStub[IN, OUT]]
 
 	/*
 	assert(allParameterTypesCorrect,
@@ -115,10 +117,10 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
 
-	def canEqual(other: Any): Boolean = other.isInstanceOf[RecombinationStub[_, _]]
+	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 
 	override def equals(other: Any): Boolean = other match {
-		case that: RecombinationStub[_, _] =>
+		case that: ProcessStub[_, _] =>
 			(that canEqual this) &&
 				params == that.params &&
 				this.getClass == other.getClass
@@ -129,26 +131,35 @@ abstract class RecombinationStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: 
 		val state = Seq(params)
 		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 	}
+
+	override def toString(): String = s"${getClass.getSimpleName} ( ${params.toString()}} )"
 }
 
-abstract class RecombinationStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends RecombinationStub[INPUT, OUTPUT](params) {
+abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
 	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL))
 
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
+	override def expectedParametersBeforeRun: List[ProcessParamter[_]] = PORTAL :: super.expectedParametersBeforeRun
 
-	val PORTAL = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val PORTAL = new ProcessParamter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 
-object RecombinationStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+object ProcessStubWithHCompPortalAccess {
+	val PORTAL_PARAMETER = new ProcessParamter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 
-class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[RecombinationStub[I, O]] {
-	override def iterator: Iterator[RecombinationStub[I, O]] = RecombinationDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[RecombinationStub[I, O]]]
+class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {
+	override def iterator: Iterator[ProcessStub[I, O]] = RecombinationDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
 }
 
-class RecombinationParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
+class ProcessParamter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
 
 	def t = implicitly[ClassTag[T]]
+}
+
+// TODO doesnt work for some reason
+object RecombinationParameterConversion {
+	implicit def parameterToKey(params: Map[ProcessParamter[_], Any]): Map[String, Any] = params.map {
+		case (param, value) => param.key -> value
+	}.toMap
 }

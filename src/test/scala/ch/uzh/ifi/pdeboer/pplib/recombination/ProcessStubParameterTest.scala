@@ -5,17 +5,17 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 20/10/14.
  */
-class RecombinationStubParameterTest {
+class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test")), Map("test" -> "asdf"))
+		new TestRecombImplparams(chk = List(new ProcessParamter[String]("test")), Map("test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test2")), Map("test" -> "asdf"))
+			new TestRecombImplparams(chk = List(new ProcessParamter[String]("test2")), Map("test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
@@ -26,7 +26,7 @@ class RecombinationStubParameterTest {
 	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new RecombinationParameter[String]("test")), Map("test" -> List.empty[String]))
+			new TestRecombImplparams(chk = List(new ProcessParamter[String]("test")), Map("test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {
@@ -34,8 +34,8 @@ class RecombinationStubParameterTest {
 		}
 	}
 
-	private class TestRecombImplparams(chk: List[RecombinationParameter[_]], params: Map[String, AnyRef]) extends RecombinationStub[String, String](params = params) {
-		override def expectedParametersOnConstruction: List[RecombinationParameter[_]] = chk
+	private class TestRecombImplparams(chk: List[ProcessParamter[_]], params: Map[String, AnyRef]) extends ProcessStub[String, String](params = params) {
+		override def expectedParametersOnConstruction: List[ProcessParamter[_]] = chk
 
 		override def run(data: String): String = "test"
 	}

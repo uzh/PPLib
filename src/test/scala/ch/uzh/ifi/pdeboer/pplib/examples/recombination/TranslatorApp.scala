@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.translator
+package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
 import ch.uzh.ifi.pdeboer.pplib.recombination._
@@ -17,17 +17,17 @@ object TranslatorApp extends App {
 
 	val tp = new TranslationProcess(textToImprove)
 
-	//list type explicitly stated to speed up compilation. remove before production release
+	//list type explicitly stated to speed up compilation (type inferencer). remove before production release
 	val candidateProcessesParameterGenerators = Map(
 		tp.REWRITE_PART -> List[RecombinationStubParameterVariantGenerator[_]](
 			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
-				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)))), //usage of functional patterns
+				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)).toList)), //usage of functional patterns
 			new RecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
-					RecombinationDB.get[List[String], List[String]]("selectbest") //online recombination
+					RecombinationDB.get[List[String], String]("selectbest.") //online recombination
 				)
 		),
 		tp.SYNTAX_CHECK -> List[RecombinationStubParameterVariantGenerator[_]](
@@ -40,9 +40,9 @@ object TranslatorApp extends App {
 			))
 		))
 	val candidateProcesses = candidateProcessesParameterGenerators.map {
-		//asinstanceof here is only used to speed up compilation. remove before production release
+		//asinstanceof here is only used to speed up compilation (type inferencer). remove before production release
 		case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate())
-			.flatten.asInstanceOf[List[RecombinationStub[_, _]]])
+			.flatten.asInstanceOf[List[ProcessStub[_, _]]])
 	}
 	val candidateProcessCombinations = new RecombinationVariantGenerator(candidateProcesses).variants
 
@@ -50,13 +50,14 @@ object TranslatorApp extends App {
 		val timeBefore = System.currentTimeMillis()
 		RecombinationStats(
 			c,
-			tp.runRecombinedVariant(c),
+			"", //tp.runRecombinedVariant(c),
 			System.currentTimeMillis() - timeBefore,
 			c.totalCost
 		)
 	})
 	val fastestProcess = trials.minBy(_.processDuration).process
 	println(s"the fastest process was $fastestProcess")
+	println(s"we ran a total of ${trials.length} trials: ${trials.mkString("\n")}")
 }
 
 case class RecombinationStats(process: RecombinationVariant, result: String, processDuration: Long, processCost: Double)

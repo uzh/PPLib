@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStub
+import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import org.junit.{Assert, Test}
 
 /**
@@ -37,7 +37,7 @@ class FindFixVerifyDriverTest {
 
 	@Test
 	def testVerify: Unit = {
-		val verifyProcess: VerifyTestRecombinationStub = new VerifyTestRecombinationStub(Map.empty[String, AnyRef])
+		val verifyProcess: VerifyTestProcessStub = new VerifyTestProcessStub(Map.empty[String, AnyRef])
 		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, "findtest",
 			new HCompInstructionsWithData("fixtest"), verifyProcess = verifyProcess)
 
@@ -46,7 +46,7 @@ class FindFixVerifyDriverTest {
 		Assert.assertTrue(verifyProcess.wasCalled)
 	}
 
-	private class VerifyTestRecombinationStub(params: Map[String, AnyRef]) extends RecombinationStub[List[String], String](params) {
+	private class VerifyTestProcessStub(params: Map[String, AnyRef]) extends ProcessStub[List[String], String](params) {
 		var wasCalled: Boolean = false
 
 		override protected def run(data: List[String]): String = {

@@ -1,13 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationProcess, RecombinationStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, RecombinationProcess, ProcessStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 31/10/14.
  */
 @RecombinationProcess("selectbest.fixworker")
-class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends RecombinationStubWithHCompPortalAccess[List[String], String](params) {
+class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
 
@@ -31,17 +31,17 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 	override val recombinationCategoryNames: List[String] = List("selectbest.single")
 
 
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
+	override def expectedParametersBeforeRun: List[ProcessParamter[_]] =
 		List(INSTRUCTIONS_PARAMETER, WORKER_COUNT_PARAMETER)
 
-	override def optionalParameters: List[RecombinationParameter[_]] =
+	override def optionalParameters: List[ProcessParamter[_]] =
 		List(AUX_STRING_PARAMETER,
 			TITLE_PARAMETER)
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
-	val INSTRUCTIONS_PARAMETER = new RecombinationParameter[HCompInstructionsWithData]("question")
-	val AUX_STRING_PARAMETER = new RecombinationParameter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new RecombinationParameter[String]("title", Some(List("SelectBestAlternative")))
-	val WORKER_COUNT_PARAMETER = new RecombinationParameter[Int]("workerCount", Some(List(3, 5)))
+	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the option that fits best"))))
+	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
+	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("SelectBestAlternative")))
+	val WORKER_COUNT_PARAMETER = new ProcessParamter[Int]("workerCount", Some(List(3, 5)))
 }

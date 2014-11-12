@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStub
+import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 
 /**
  * Created by pdeboer on 04/11/14.

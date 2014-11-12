@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationStub
+import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
 
 import scala.collection.mutable
@@ -129,7 +129,7 @@ class FFVDefaultHCompDriver(
 							   val fixQuestion: HCompInstructionsWithData = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
 							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
-							   val verifyProcess: RecombinationStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS) extends FindFixVerifyDriver[String] {
+							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
 		verifyProcess.params += "portal" -> portal

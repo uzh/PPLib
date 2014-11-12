@@ -8,9 +8,9 @@ import org.junit.{Assert, Test}
 class RecombinationVariantGeneratorTest {
 	@Test
 	def testSimpleCombination(): Unit = {
-		val list1 = List(new TestRecombinationStub(1), new TestRecombinationStub(2))
-		val list2 = List(new TestRecombinationStub(3))
-		val list3 = List(new TestRecombinationStub(4), new TestRecombinationStub(5))
+		val list1 = List(new TestProcessStub(1), new TestProcessStub(2))
+		val list2 = List(new TestProcessStub(3))
+		val list3 = List(new TestProcessStub(4), new TestProcessStub(5))
 
 		val configMap = List(("list1", list1), ("list2", list2), ("list3", list3)).toMap
 
@@ -23,7 +23,7 @@ class RecombinationVariantGeneratorTest {
 		)
 
 		val actualCombinations = gen.variants.map(r => {
-			val stub = r.stubs.asInstanceOf[Map[String, TestRecombinationStub]]
+			val stub = r.stubs.asInstanceOf[Map[String, TestProcessStub]]
 			List(stub("list1").id, stub("list2").id, stub("list3").id)
 		}).toList
 
@@ -34,7 +34,7 @@ class RecombinationVariantGeneratorTest {
 		a.forall(b.contains(_)) && b.forall(a.contains(_))
 	}
 
-	private class TestRecombinationStub(val id: Int) extends RecombinationStub[Integer, Integer] {
+	private class TestProcessStub(val id: Int) extends ProcessStub[Integer, Integer] {
 		override def run(data: Integer): Integer = data.asInstanceOf[Integer]
 	}
 

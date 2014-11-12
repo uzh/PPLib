@@ -5,12 +5,12 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 21/10/14.
  */
-class RecombinationStubParameterGenerationTest {
+class ProcessStubParameterGenerationTest {
 
-	import RecombinationStubParameterGenerationTest._
+	import ProcessStubParameterGenerationTest._
 	@Test
 	def testParameterVariation(): Unit = {
-		val gen = new RecombinationStubParameterVariantGenerator[TestRecombinationStub]() {
+		val gen = new RecombinationStubParameterVariantGenerator[TestProcessStub]() {
 			def paramVals = parameterValues
 		}
 
@@ -48,25 +48,25 @@ class RecombinationStubParameterGenerationTest {
 
 	@Test
 	def testParameterVariationInstanciation(): Unit = {
-		val gen = new RecombinationStubParameterVariantGenerator[TestRecombinationStub](initWithDefaults = true)
+		val gen = new RecombinationStubParameterVariantGenerator[TestProcessStub](initWithDefaults = true)
 		val expectedParamVariations = gen.generateParameterVariations()
 		Assert.assertTrue(expectedParamVariations.length > 0)
 
 		val instanciatedVariants = gen.generateVariationsAndInstanciate()
 		Assert.assertEquals(expectedParamVariations.length, instanciatedVariants.length)
-		Assert.assertTrue("class correct", instanciatedVariants.forall(i => i.getClass == classOf[TestRecombinationStub]))
+		Assert.assertTrue("class correct", instanciatedVariants.forall(i => i.getClass == classOf[TestProcessStub]))
 	}
 }
 
-object RecombinationStubParameterGenerationTest {
+object ProcessStubParameterGenerationTest {
 	val DEFAULT_VALUES_PARAM1: List[String] = List("a", "s")
 	val DEFAULT_VALUES_PARAM2: List[Integer] = List(1, 2, 3)
 }
 
-class TestRecombinationStub(params: Map[String, AnyRef]) extends RecombinationStub[String, String](params) {
-	override def optionalParameters: List[RecombinationParameter[_]] = List(
-		new RecombinationParameter[String]("testparam1", Some(RecombinationStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
-		new RecombinationParameter[Integer]("testparam2", Some(RecombinationStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
+class TestProcessStub(params: Map[String, AnyRef]) extends ProcessStub[String, String](params) {
+	override def optionalParameters: List[ProcessParamter[_]] = List(
+		new ProcessParamter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
+		new ProcessParamter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
 	)
 
 	override def run(data: String): String = data + "1"

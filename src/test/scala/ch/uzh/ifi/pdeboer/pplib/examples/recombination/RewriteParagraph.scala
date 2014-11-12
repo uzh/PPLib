@@ -1,8 +1,8 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.translator
+package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationParameter, RecombinationStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStub}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -22,9 +22,9 @@ class FFVParagraphRewrite(params: Map[String, Any] = Map.empty[String, Any]) ext
 }
 
 //TODO implement me
-class NaiveRewriteSelectBest(params: Map[String, Any]) extends RecombinationStub[List[String], List[String]](params) {
+class NaiveRewriteSelectBest(params: Map[String, Any]) extends ProcessStub[List[String], List[String]](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.examples.translator.NaiveRewriteSelectBest._
+	import ch.uzh.ifi.pdeboer.pplib.examples.recombination.NaiveRewriteSelectBest._
 
 	override protected def run(data: List[String]): List[String] = {
 		data.map(r => proc(r.split("\\.").toList).mkString("."))
@@ -37,15 +37,15 @@ class NaiveRewriteSelectBest(params: Map[String, Any]) extends RecombinationStub
 		???
 	}
 
-	override def expectedParametersBeforeRun: List[RecombinationParameter[_]] =
+	override def expectedParametersBeforeRun: List[ProcessParamter[_]] =
 		List(PORTAL_PARAMETER)
 
-	override def optionalParameters: List[RecombinationParameter[_]] =
+	override def optionalParameters: List[ProcessParamter[_]] =
 		List(CROWD_WORKER_COUNT, QUESTION)
 }
 
 object NaiveRewriteSelectBest {
-	val PORTAL_PARAMETER = new RecombinationParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
-	val CROWD_WORKER_COUNT = new RecombinationParameter[Integer]("workerCount", Some(List(3)))
-	val QUESTION = new RecombinationParameter[String]("question", Some(List("Please rewrite this sentence to improve it.")))
+	val PORTAL_PARAMETER = new ProcessParamter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val CROWD_WORKER_COUNT = new ProcessParamter[Integer]("workerCount", Some(List(3)))
+	val QUESTION = new ProcessParamter[String]("question", Some(List("Please rewrite this sentence to improve it.")))
 }

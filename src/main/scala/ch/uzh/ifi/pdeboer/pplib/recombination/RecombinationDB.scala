@@ -20,7 +20,7 @@ object RecombinationDB {
 		processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 	}
 
-	def getCategory(category: RecombinationCategory, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
+	def getCategory(category: RecombinationCategory, includeDescendants: Boolean = false): List[ProcessStub[_, _]] = {
 		if (includeDescendants) {
 			val keys = processes.keySet.filter(k => {
 				//this probably wont work
@@ -36,16 +36,16 @@ object RecombinationDB {
 		}
 	}
 
-	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[RecombinationStub[_, _]] = {
+	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[ProcessStub[_, _]] = {
 		val category: RecombinationCategory = RecombinationCategory.get[IN, OUT](name)
 		getCategory(category, includeDescendants)
 	}
 
-	def put(stub: RecombinationStub[_, _]): Unit = {
+	def put(stub: ProcessStub[_, _]): Unit = {
 		stub.recombinationCategories.foreach(c => put(c, stub))
 	}
 
-	def put(category: RecombinationCategory, stub: RecombinationStub[_, _]): Unit = {
+	def put(category: RecombinationCategory, stub: ProcessStub[_, _]): Unit = {
 		this.synchronized {
 			val content = processes.getOrElse(category, RecombinationCategoryContent(category))
 			content.addStub(stub)
@@ -68,10 +68,10 @@ object RecombinationDB {
 
 	protected def findClassesInPackageWithAnnotationAndAddThem(packagePrefix: String = "ch.uzh.ifi.pdeboer.pplib.recombination.stdlib") {
 		val annotatedClasses = findClassesInPackageWithProcessAnnotation(packagePrefix)
-		initializeClassesAndAddToDB(annotatedClasses.asInstanceOf[Set[Class[RecombinationStub[_, _]]]])
+		initializeClassesAndAddToDB(annotatedClasses.asInstanceOf[Set[Class[ProcessStub[_, _]]]])
 	}
 
-	def initializeClassesAndAddToDB(classes: Set[Class[RecombinationStub[_, _]]]) {
+	def initializeClassesAndAddToDB(classes: Set[Class[ProcessStub[_, _]]]) {
 		classes.foreach(t => {
 			try {
 				val constructor = t.getConstructor(classOf[Map[String, Any]])
@@ -106,11 +106,11 @@ object RecombinationCategory {
 }
 
 case class RecombinationCategoryContent(category: RecombinationCategory) {
-	private var _stubs = Set.empty[RecombinationStub[_, _]]
+	private var _stubs = Set.empty[ProcessStub[_, _]]
 
-	def addStub(s: RecombinationStub[_, _]): Unit = {
+	def addStub(s: ProcessStub[_, _]): Unit = {
 		_stubs += s
 	}
 
-	def stubs: List[RecombinationStub[_, _]] = _stubs.toList
+	def stubs: List[ProcessStub[_, _]] = _stubs.toList
 }

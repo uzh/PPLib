@@ -8,11 +8,11 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationVariantGenerator(configs: Map[String, List[RecombinationStub[_, _]]]) {
+class RecombinationVariantGenerator(configs: Map[String, List[ProcessStub[_, _]]]) {
 	lazy val variants = {
-		val listOfTupleLists: List[List[(String, RecombinationStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
+		val listOfTupleLists: List[List[(String, ProcessStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			RecombinationVariant(k.asInstanceOf[List[(String, RecombinationStub[_, _])]].toMap)
+			RecombinationVariant(k.asInstanceOf[List[(String, ProcessStub[_, _])]].toMap)
 		})
 	}
 }
@@ -21,7 +21,7 @@ class RecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: 
 	//very ugly stuff //TODO check
 	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
 	private val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
-	val base = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[RecombinationStub[_, _]]
+	val base = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[ProcessStub[_, _]]
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
 
