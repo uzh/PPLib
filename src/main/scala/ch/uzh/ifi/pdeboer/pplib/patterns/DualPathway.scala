@@ -3,13 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.duration._
 
 /**
  * Created by pdeboer on 13/10/14.
  */
-class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
+class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogging {
 	lazy val data = {
 		runUntilConverged()
 		pathway1.elements.map(_.mostRecentCandidate).toList
@@ -19,6 +20,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 	protected var advancementAllowed = Map(pathway1 -> true, pathway2 -> true)
 
 	def runUntilConverged(): Unit = {
+		logger.info("running dual pathway until convergence")
 		while (
 			pathway1.mostRecentElementIdInPathway == -1 ||
 				pathway1.mostRecentElementIdInPathway != pathway2.mostRecentElementIdInPathway ||
@@ -31,6 +33,8 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) {
 	}
 
 	protected def step(pathway: DPPathway) = {
+		logger.info("executing dual-pathway step. current pathway state: " + pathway)
+
 		if (pathway1.elements.isEmpty) init()
 
 		val pathwayChunks = pathway.getNElements(chunkCountToInclude)
@@ -91,6 +95,8 @@ class DPPathway() {
 	def getNElements(n: Int) = _elements.take(n).toList
 
 	def elements = _elements
+
+	override def toString: String = _elements.mkString(",")
 }
 
 class DPPathwayChunk(initialChunk: DPChunk) {
@@ -106,6 +112,8 @@ class DPPathwayChunk(initialChunk: DPChunk) {
 	def mostRecentCandidate = candidates(0)
 
 	def allCandidates = candidates.toList
+
+	override def toString: String = mostRecentCandidate.toString
 }
 
 trait DPDriver {
@@ -122,6 +130,8 @@ trait DPDriver {
 
 case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") {
 	val created: Date = new Date()
+
+	override def toString: String = s"$data=$answer"
 }
 
 
