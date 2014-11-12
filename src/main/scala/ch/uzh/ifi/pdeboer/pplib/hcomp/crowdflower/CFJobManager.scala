@@ -29,19 +29,21 @@ class CFJobManager(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 						 query.rawQuery.title.take(100),
 						 query.rawQuery.question,
 						 paymentCents = properties.paymentCents), maxTries: Int = 100) = {
-		this.jobId = U.retry(2)(createJob(1 hour, parameters))
+		this.jobId = U.retry(3) {
+			createJob(1 hour, parameters)
+		}
 		addDataUnit("{}")
 		launch()
 
 		val timer = new GrowingTimer(start = 1 seconds, factor = 1.5, max = 1 minute)
 
 		var answer: Option[HCompAnswer] = None
-		U.retry(maxTries)({
+		U.retry(maxTries) {
 			timer.waitTime
 			answer = fetchResult()
 
 			if (answer.isEmpty) throw new Exception() //continue waiting
-		})
+		}
 
 		cachedResult = answer
 		answer
@@ -97,7 +99,9 @@ class CFJobManager(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 		else
 			request = request.setBody(s"channels[0]=on_demand&debit[units_count]=1")
 		try {
-			U.retry(3)(sendAndAwaitJson(request, 10 seconds))
+			U.retry(3) {
+				sendAndAwaitJson(request, 10 seconds)
+			}
 		} catch {
 			case e: TimeoutException =>
 				println(s"Timed out: ${request.toRequest.toString}")
@@ -124,7 +128,9 @@ class CFJobManager(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 		var units_request = unitsURL.POST.addQueryParameter("key", apiKey)
 		units_request = units_request.addHeader("Content-Type", "application/json")
 		units_request = units_request.setBody(jsonString)
-		U.retry(3)(sendAndAwaitJson(units_request, 10 seconds))
+		U.retry(3) {
+			sendAndAwaitJson(units_request, 10 seconds)
+		}
 	}
 }
 

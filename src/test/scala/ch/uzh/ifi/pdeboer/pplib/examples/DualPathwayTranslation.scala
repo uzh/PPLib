@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
+import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData}
 import ch.uzh.ifi.pdeboer.pplib.patterns.DPHCompDriverDefaultComparisonInstructionsConfig
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess
 
@@ -19,13 +20,15 @@ object DualPathwayTranslation extends App {
 
 	val paragraphs = textToImprove.split("\n").map(_.trim).toList
 
+	HComp.addPortal(new CrowdFlowerPortalAdapter("Fix-Up English Translation", sandbox = true))
+
 	val process = new DualPathwayProcess(Map(
 		QUESTION_PER_COMPARISON_TASK.key -> new DPHCompDriverDefaultComparisonInstructionsConfig(
 			"Comparison",
 			"Please compare the two columns below established by other crowd workers. Are they roughly equal? "),
 		QUESTION_PER_PROCESSING_TASK.key -> "Check the items below and make sure they are fixed correctly.",
 		QUESTION_OLD_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please ensure that the following element is spelled out correctly"),
-		QUESTION_NEW_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please write out the following sentence correctly")
+		QUESTION_NEW_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.")
 	))
 
 	val res = process.process(paragraphs)
