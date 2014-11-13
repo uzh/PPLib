@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithData}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithTuple}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction
 import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessStubWithHCompPortalAccess, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
@@ -21,7 +21,7 @@ class SelectBestAlternativeStatisticalReductionTest {
 		val subject = new SelectBestAlternativeStatisticalReductionTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData(""),
+				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
 			))
@@ -44,7 +44,7 @@ class SelectBestAlternativeStatisticalReductionTest {
 		val subject = new SelectBestAlternativeStatisticalReductionTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData(""),
+				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.95,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
 			))

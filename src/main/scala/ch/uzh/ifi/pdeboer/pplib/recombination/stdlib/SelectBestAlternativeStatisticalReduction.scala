@@ -57,7 +57,7 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 }
 
 object SelectBestAlternativeStatisticalReduction {
-	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the item that fits best"))))
+	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the item that fits best"))))
 	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
 	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("Select Best Alternative")))
 	val CONFIDENCE_PARAMETER = new ProcessParamter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))

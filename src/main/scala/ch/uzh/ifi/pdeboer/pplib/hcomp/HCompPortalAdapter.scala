@@ -13,7 +13,7 @@ import scala.concurrent.{Future, _}
 
 trait HCompPortalAdapter {
 
-	//TODO how can we make this one protected
+	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
@@ -71,7 +71,6 @@ trait HCompQuery {
 
 	def title: String
 
-
 	final val identifier: Int = HCompIDGen.next()
 }
 
@@ -83,16 +82,24 @@ trait HCompInstructions {
 	def toString: String
 }
 
-case class HCompInstructionsWithData(question: String) {
-	def getInstructions(data: String) = <div>
+case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "") {
+	def getInstructions(data1: String, data2: String = "") = <div>
 		<p>
-			{question}
+			{questionBeforeTuples}
 		</p>
 		<p>
 			<i>
-				{data}
+				{data1}
 			</i>
-		</p>
+		</p>{if (questionBetweenTuples != "") <p>
+			{questionBetweenTuples}
+		</p>}{if (data2 == "") <p>
+			<i>
+				{data2}
+			</i>
+		</p>}{if (questionAfterTuples != "") <p>
+			{questionAfterTuples}
+		</p>}
 	</div>.toString
 }
 
@@ -134,7 +141,8 @@ case class FreetextQuery(question: String, defaultAnswer: String = "", title: St
 	var valueIsRequired: Boolean = defaultAnswer.equals("")
 
 	def setRequired(required: Boolean) = {
-		valueIsRequired = required; this
+		valueIsRequired = required;
+		this
 	}
 }
 

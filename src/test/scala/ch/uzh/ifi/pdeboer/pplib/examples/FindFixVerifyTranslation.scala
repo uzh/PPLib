@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithData, HComp}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HComp}
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVPatch, FFVDefaultHCompDriver, FindFixVerifyExecutor}
 

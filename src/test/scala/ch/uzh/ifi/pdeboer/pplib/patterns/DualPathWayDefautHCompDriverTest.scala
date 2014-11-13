@@ -8,7 +8,7 @@ import org.junit.{Assert, Test}
  */
 class DualPathWayDefaultHCompDriverComparisonTest {
 	val portal = new MockHCompPortal()
-	val emptyQ: HCompInstructionsWithData = HCompInstructionsWithData("")
+	val emptyQ: HCompInstructionsWithTuple = HCompInstructionsWithTuple("")
 	val data: List[String] = List("a", "b", "c", "d")
 
 	@Test
@@ -67,7 +67,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 		createFilterRule("d", "e")
 	)
 	val data: List[String] = List("a", "b", "c", "d")
-	val emptyQ: HCompInstructionsWithData = HCompInstructionsWithData("")
+	val emptyQ: HCompInstructionsWithTuple = HCompInstructionsWithTuple("")
 
 	@Test
 	def testProcessingUnitAllCorrectInclNewItem(): Unit = {
@@ -78,7 +78,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 			Some(2)
 		)
 
-		Assert.assertEquals(List("b", "c", "d").toSet, ret.map(_.answer).toSet)
+		Assert.assertEquals(Set("b", "c", "d"), ret.map(_.answer).toSet)
 	}
 
 	@Test
@@ -117,7 +117,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 	def newDriver = new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "", new DPHCompDriverDefaultComparisonInstructionsConfig(""))
 
 	def createFilterRule(question: String, answer: String) = (q: HCompQuery) => {
-		if (q.question.equals(HCompInstructionsWithData("").getInstructions(question)))
+		if (q.question.equals(emptyQ.getInstructions(question, answer)) || q.question.equals(emptyQ.getInstructions(question)))
 			Some(FreetextAnswer(q.asInstanceOf[FreetextQuery], answer))
 		else None
 	}

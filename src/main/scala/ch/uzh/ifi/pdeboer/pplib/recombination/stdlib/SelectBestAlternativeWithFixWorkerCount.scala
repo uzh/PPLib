@@ -40,7 +40,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
-	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithData]("question", Some(List(HCompInstructionsWithData("Please select the option that fits best"))))
+	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
 	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
 	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("SelectBestAlternative")))
 	val WORKER_COUNT_PARAMETER = new ProcessParamter[Int]("workerCount", Some(List(3, 5)))

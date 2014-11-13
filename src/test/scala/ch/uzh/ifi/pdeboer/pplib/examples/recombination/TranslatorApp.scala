@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithData
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, SelectBestAlternativeStatisticalReduction}
 
@@ -22,7 +22,7 @@ object TranslatorApp extends App {
 		tp.REWRITE_PART -> List[RecombinationStubParameterVariantGenerator[_]](
 			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
-				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithData(h)).toList)), //usage of functional patterns
+				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithTuple(h)).toList)), //usage of functional patterns
 			new RecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))

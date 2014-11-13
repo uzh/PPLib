@@ -30,13 +30,15 @@ class MockHCompPortal extends HCompPortalAdapter {
 		filters ::= f
 	}
 
-	//TODO make protected
 	override def processQuery(query: HCompQuery, props: HCompQueryProperties = HCompQueryProperties()): Option[HCompAnswer] = {
 		query match {
 			case composite: CompositeQuery =>
 				Some(CompositeQueryAnswer(composite, composite.queries.map(q => (q, processQuery(q))).toMap))
 			case _ => {
-				filters.find(f => f(query).isDefined).get.apply(query)
+				filters.find(f => f(query).isDefined) match {
+					case Some(x) => x(query)
+					case None => throw new IllegalStateException("Unit tests wrong: could not find filter for mock query")
+				}
 			}
 		}
 	}

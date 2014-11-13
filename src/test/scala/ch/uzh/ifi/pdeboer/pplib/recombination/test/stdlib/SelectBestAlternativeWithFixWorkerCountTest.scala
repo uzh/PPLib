@@ -38,7 +38,7 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
 			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("")))
+				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)
@@ -76,7 +76,7 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
 			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 5,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithData("")))
+				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)

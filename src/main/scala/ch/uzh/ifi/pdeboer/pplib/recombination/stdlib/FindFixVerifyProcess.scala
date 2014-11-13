@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FindFixVerifyExecutor, FFVDefaultHCompDriver, FFVPatch}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess._
 import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationProcess, ProcessStubWithHCompPortalAccess, ProcessParamter, ProcessStub}
@@ -42,7 +42,7 @@ object FindFixVerifyProcess {
 	val FIND_QUESTION = new ProcessParamter[String]("findQuestion", Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION)))
 	val FIND_TITLE = new ProcessParamter[String]("findTitle", Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_TITLE)))
 	val FIX_TITLE = new ProcessParamter[String]("fixTitle", Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_TITLE)))
-	val FIX_QUESTION = new ProcessParamter[HCompInstructionsWithData]("fixQuestion", Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
+	val FIX_QUESTION = new ProcessParamter[HCompInstructionsWithTuple]("fixQuestion", Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
 	val VERIFY_PROCESS = new ProcessParamter[ProcessStub[List[String], String]]("verifyProcess", Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS)))
 
 	val PATCHES_COUNT_IN_FIND = new ProcessParamter[Integer]("patchesInFind", Some(List(10)))

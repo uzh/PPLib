@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithData, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationProcess, ProcessStubWithHCompPortalAccess, ProcessParamter, ProcessStub}
 import com.typesafe.scalalogging.Logger
@@ -47,8 +47,8 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object DualPathwayProcess {
-	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParamter[HCompInstructionsWithData]("question_old_el", Some(List(HCompInstructionsWithData("Is the following question answered correctly?"))))
-	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParamter[HCompInstructionsWithData]("question_new_el", Some(List(HCompInstructionsWithData("Please provide an answer to the following question"))))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParamter[HCompInstructionsWithTuple]("question_old_el", Some(List(HCompInstructionsWithTuple("Is the following question answered correctly?"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParamter[HCompInstructionsWithTuple]("question_new_el", Some(List(HCompInstructionsWithTuple("Please provide an answer to the following question"))))
 	val QUESTION_PER_PROCESSING_TASK = new ProcessParamter[String]("question_proc_task", Some(List("Please compare (and fix) the following elements")))
 	val QUESTION_PER_COMPARISON_TASK = new ProcessParamter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
 	val TIMEOUT = new ProcessParamter[Duration]("timeout", Some(List(2 days, 1 day)))
