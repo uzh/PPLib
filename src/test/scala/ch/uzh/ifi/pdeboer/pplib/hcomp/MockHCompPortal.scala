@@ -42,4 +42,6 @@ class MockHCompPortal extends HCompPortalAdapter {
 			}
 		}
 	}
+
+	override def cancelQuery(query: HCompQuery): Unit = {}
 }

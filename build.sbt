@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
 	"com.typesafe" % "config" % "1.2.1",
 	"org.reflections" % "reflections" % "0.9.9",
 	"com.novocode" % "junit-interface" % "0.8" % "test->default",
-	"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+	"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+	"org.slf4j" %% "slf4j-simple" % "1.6.2"
 )
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"

@@ -2,6 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import com.typesafe.scalalogging.LazyLogging
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, _}
@@ -11,7 +13,7 @@ import scala.concurrent.{Future, _}
  * Created by pdeboer on 10/10/14.
  */
 
-trait HCompPortalAdapter {
+trait HCompPortalAdapter extends LazyLogging {
 
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
@@ -19,12 +21,14 @@ trait HCompPortalAdapter {
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
+		logger.info(s"sending query $query with properties $properties")
 		val timeBefore = System.currentTimeMillis()
 		val answer = processQuery(query, properties)
-		val timeAfter = System.currentTimeMillis()
+		val durationMillis: Long = System.currentTimeMillis() - timeBefore
+		logger.info(s"got answer for query $query after $durationMillis ms. Answer = $answer")
 
 		//we risk the querylog to be incomplete if a query is being answered right now
-		queryLog = HCompQueryStats(query, answer, timeAfter - timeBefore, properties.paymentCents) :: queryLog
+		queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
 
 		answer
 	}
@@ -38,6 +42,8 @@ trait HCompPortalAdapter {
 	def getDefaultPortalKey: Symbol
 
 	def getQueries() = queryLog
+
+	def cancelQuery(query: HCompQuery): Unit
 }
 
 class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
@@ -56,6 +62,8 @@ class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extend
 		decoratedPortal.processQuery(query, properties)
 
 	override def getDefaultPortalKey: Symbol = decoratedPortal.getDefaultPortalKey
+
+	override def cancelQuery(query: HCompQuery): Unit = decoratedPortal.cancelQuery(query)
 }
 
 case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long, moneySpent: Double)
