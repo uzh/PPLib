@@ -14,18 +14,17 @@ import scala.concurrent.{Future, _}
  */
 
 trait HCompPortalAdapter extends LazyLogging {
-
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
-		logger.info(s"sending query $query with properties $properties")
+		logger.debug(s"sending query $query with properties $properties")
 		val timeBefore = System.currentTimeMillis()
 		val answer = processQuery(query, properties)
 		val durationMillis: Long = System.currentTimeMillis() - timeBefore
-		logger.info(s"got answer for query $query after $durationMillis ms. Answer = $answer")
+		logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
 
 		//we risk the querylog to be incomplete if a query is being answered right now
 		queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
@@ -76,9 +75,7 @@ private object HCompIDGen {
 
 trait HCompQuery {
 	def question: String
-
 	def title: String
-
 	final val identifier: Int = HCompIDGen.next()
 }
 
@@ -183,5 +180,7 @@ case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, 
 }
 
 case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer
+
+case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer
 
 case class HCompQueryProperties(paymentCents: Double = 1d)

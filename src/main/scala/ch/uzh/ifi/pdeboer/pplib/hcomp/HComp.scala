@@ -3,13 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 import ch.uzh.ifi.pdeboer.pplib.U
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 
 /**
  * Created by pdeboer on 10/10/14.
  */
-object HComp {
+object HComp extends LazyLogging {
 	private val portals = new mutable.HashMap[Symbol, HCompPortalAdapter]()
 
 	def addPortal(portal: HCompPortalAdapter) {
@@ -17,7 +18,7 @@ object HComp {
 	}
 
 	def addPortal(key: Symbol, portal: HCompPortalAdapter) {
-		println(s"adding portaladapter ${portal.getClass.getSimpleName} with key ${portal.getDefaultPortalKey}")
+		logger.info(s"adding portaladapter ${portal.getClass.getSimpleName} with key ${portal.getDefaultPortalKey}")
 		portals += (key -> portal)
 	}
 

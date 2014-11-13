@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
 
 import ch.uzh.ifi.pdeboer.pplib.U
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompJobCancelled, HCompAnswer, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.util.GrowingTimer
 import com.typesafe.scalalogging.LazyLogging
 import dispatch.Defaults._
@@ -65,6 +65,11 @@ class CFJobStatusManager(apiKey: String, jobId: Int) extends CFJobBase(apiKey) {
 class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryProperties, sandbox: Boolean = false) extends CFJobBase(apiKey) {
 	var jobId: Int = -1
 	var cachedResult: Option[HCompAnswer] = Option.empty[HCompAnswer]
+	private var scheduledForCancellation: Boolean = false
+
+	def cancel(): Unit = {
+		scheduledForCancellation = true
+	}
 
 	def performQuery(maxTries: Int = 1000000) = {
 		addDataUnit("{}")
@@ -75,12 +80,15 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 		var answer: Option[HCompAnswer] = None
 		U.retry(maxTries) {
 			timer.waitTime
+			//throw exceptions until maxtries exceeded. wow, this is super ugly
+			if (scheduledForCancellation) throw new Exception()
+
 			answer = fetchResult()
 
 			if (answer.isEmpty) throw new Exception() //continue waiting
 		}
 
-		cachedResult = answer
+		cachedResult = if (scheduledForCancellation) Some(HCompJobCancelled(query.rawQuery)) else answer
 		answer
 	}
 
@@ -124,7 +132,7 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 		var request = judgments_url.GET.addQueryParameter("key", apiKey)
 		val json_try = Try(sendAndAwaitJson(request, 30 seconds))
 		if (json_try.isFailure) {
-			println(s" $jobId : Timed out")
+			logger.error(s" $jobId : Timed out")
 			None
 		}
 		val json = json_try.get

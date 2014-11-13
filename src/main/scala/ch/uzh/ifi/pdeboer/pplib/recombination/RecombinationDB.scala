@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.U
+import com.typesafe.scalalogging.LazyLogging
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
@@ -13,7 +14,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 20/10/14.
  */
-object RecombinationDB {
+object RecombinationDB extends LazyLogging {
 	private var processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 
 	def reset(): Unit = {
@@ -78,7 +79,7 @@ object RecombinationDB {
 				constructor.newInstance(Map.empty[String, Any])
 			}
 			catch {
-				case e: Error => e.printStackTrace(System.err)
+				case e: Error => logger.error("could not add class", System.err)
 			}
 		})
 	}

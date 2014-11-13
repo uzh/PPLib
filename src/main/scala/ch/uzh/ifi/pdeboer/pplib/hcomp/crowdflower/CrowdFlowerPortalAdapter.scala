@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
  * Created by pdeboer on 10/10/14.
  */
 class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
-	private var jobIds = collection.mutable.HashMap.empty[Int, Int]
+	private var jobIds = collection.mutable.HashMap.empty[Int, CFJobCreator]
 
 	def this(applicationName: String, sandbox: Boolean) =
 		this(applicationName,
@@ -22,7 +22,8 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties) = {
 		val cfQuery: CFQuery = CFConversions.convertQueryToCFQuery(query)
 		val jobCreator = new CFJobCreator(apiKey, cfQuery, properties, sandbox)
-		jobIds += query.identifier -> jobCreator.createJob()
+		jobIds += query.identifier -> jobCreator
+		jobCreator.createJob()
 		val res = jobCreator.performQuery()
 		if (sandbox) cancelQuery(query) // in CF one needs to cancel the query afterwards
 		res
@@ -30,7 +31,9 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 
 
 	override def cancelQuery(query: HCompQuery): Unit = {
-		new CFJobStatusManager(apiKey, jobIds(query.identifier)).cancelQuery()
+		val manager: CFJobCreator = jobIds(query.identifier)
+		new CFJobStatusManager(apiKey, manager.jobId).cancelQuery()
+
 	}
 }
 
