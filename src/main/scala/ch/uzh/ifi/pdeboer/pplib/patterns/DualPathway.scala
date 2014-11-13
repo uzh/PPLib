@@ -152,7 +152,7 @@ class DualPathWayDefaultHCompDriver(
 	 * @return
 	 */
 	override def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk] = {
-		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement.getInstructions(c.data), c.answer, c)).toList
+		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement.getInstructions(c.answer), c.answer, c)).toList
 		val newQuery = if (newChunkElementId.isDefined) {
 			val c = DPChunk(newChunkElementId.get, indexMap(newChunkElementId.get))
 			Some(List(new DPFreetextQuery(questionPerNewProcessedElement.getInstructions(c.data), "", c)))

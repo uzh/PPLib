@@ -8,8 +8,18 @@ import org.junit.{Assert, Test}
  */
 class CFFreetextQueryTest {
 	@Test
-	def testXMLMarshalling(): Unit = {
+	def testXMLMarshallingDefaultAnswer(): Unit = {
 		val q = new CFFreetextQuery(FreetextQuery("mylabel", "default"), "mynam\"e")
-		Assert.assertEquals("<cml:textarea name=\"mynam&quot;e\" label=\"mylabel\" default=\"default\" class=\" \" instructions=\" \" validates=\"required\"/>", q.getCML())
+		Assert.assertEquals(
+			"<cml:textarea name=\"mynam&quot;e\" label=\"mylabel\" default=\"default\" class=\" \" instructions=\" \" validates=\"\"/>",
+			q.getCML())
+	}
+
+	@Test
+	def testXMLMarshallingNoDefaultAnswer(): Unit = {
+		val q = new CFFreetextQuery(FreetextQuery("mylabel"), "mynam\"e")
+		Assert.assertEquals(
+			"<cml:textarea name=\"mynam&quot;e\" label=\"mylabel\" default=\"\" class=\" \" instructions=\" \" validates=\"required\"/>",
+			q.getCML())
 	}
 }

@@ -7,7 +7,7 @@ import play.api.libs.json.{JsArray, JsValue}
  * Created by pdeboer on 14/10/14.
  */
 class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "field") extends CFQuery {
-	val xml = <cml:textarea name={name} label={rawQuery.question} default={rawQuery.defaultAnswer} class=" " instructions=" " validates="required"/>
+	val xml = <cml:textarea name={name} label={rawQuery.question} default={rawQuery.defaultAnswer} class=" " instructions=" " validates={if (rawQuery.valueIsRequired) "required" else ""}/>
 
 	override def getCML(): String = xml.toString()
 

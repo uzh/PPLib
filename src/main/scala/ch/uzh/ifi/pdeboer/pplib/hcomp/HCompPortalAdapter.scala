@@ -121,10 +121,21 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
+/**
+ * @param question
+ * @param defaultAnswer
+ * @param title
+ */
 case class FreetextQuery(question: String, defaultAnswer: String = "", title: String = "") extends HCompQuery {
 	def this(question: String, defaultAnswer: String) = this(question, defaultAnswer, question)
 
 	def this(question: String) = this(question, "", question)
+
+	var valueIsRequired: Boolean = defaultAnswer.equals("")
+
+	def setRequired(required: Boolean) = {
+		valueIsRequired = required; this
+	}
 }
 
 object FreetextQuery {

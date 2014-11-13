@@ -26,8 +26,8 @@ object DualPathwayTranslation extends App {
 		QUESTION_PER_COMPARISON_TASK.key -> new DPHCompDriverDefaultComparisonInstructionsConfig(
 			"Comparison",
 			"Please compare the two columns below established by other crowd workers. Are they roughly equal? "),
-		QUESTION_PER_PROCESSING_TASK.key -> "Check the items below and make sure they are fixed correctly.",
-		QUESTION_OLD_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please ensure that the following element is spelled out correctly"),
+		QUESTION_PER_PROCESSING_TASK.key -> "Check the paragraphs below and make sure they are grammatically correct",
+		QUESTION_OLD_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below."),
 		QUESTION_NEW_PROCESSED_ELEMENT.key -> HCompInstructionsWithData("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.")
 	))
 
