@@ -85,9 +85,12 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 	def testProcessingUnitErrorCorrectionInclNewItem(): Unit = {
 		val driver = newDriver
 
+		portal.filters ::= createFilterRule("b", "WRONG")
+		portal.filters ::= createFilterRule("a", "WRONG2")
+
 		val retFixedError = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(1, "b", "WRONG"), DPChunk(0, "a", "WRONG2")),
+				DPChunk(1, "b", "c", "WRONG"), DPChunk(0, "a", "b", "WRONG2")),
 			Some(2)
 		)
 		Assert.assertEquals(List("b", "c", "d").toSet, retFixedError.map(_.answer).toSet)
@@ -109,15 +112,15 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 
 		val retFixedError = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(1, "b", "WRONG"), DPChunk(0, "a", "WRONG2")))
+				DPChunk(1, data(1), "c", "WRONG"), DPChunk(0, data(0), "b", "WRONG2")))
 		Assert.assertEquals(List("b", "c").toSet, retFixedError.map(_.answer).toSet)
 	}
 
 
 	def newDriver = new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "", new DPHCompDriverDefaultComparisonInstructionsConfig(""))
 
-	def createFilterRule(question: String, answer: String) = (q: HCompQuery) => {
-		if (q.question.equals(emptyQ.getInstructions(question, answer)) || q.question.equals(emptyQ.getInstructions(question)))
+	def createFilterRule(question: String, answer: String, suggestedAnswer: String = "") = (q: HCompQuery) => {
+		if (q.question == emptyQ.getInstructions(question, answer) || q.question == emptyQ.getInstructions(question) || q.question == emptyQ.getInstructions(question, suggestedAnswer))
 			Some(FreetextAnswer(q.asInstanceOf[FreetextQuery], answer))
 		else None
 	}

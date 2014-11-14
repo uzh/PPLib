@@ -32,6 +32,7 @@ abstract class CFJobBase(apiKey: String) extends LazyLogging {
 		}
 		val response: String = data._3
 		val json: JsValue = Json.parse(response)
+		logger.debug(s"got data $json")
 		json
 	}
 }

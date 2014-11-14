@@ -98,7 +98,7 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 			</i>
 		</p>{if (questionBetweenTuples != "") <p>
 			{questionBetweenTuples}
-		</p>}{if (data2 == "") <p>
+		</p>}{if (data2 != "") <p>
 			<i>
 				{data2}
 			</i>

@@ -27,13 +27,15 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extend
 				advancementAllowed.values.exists(_ == false) ||
 				driver.elementIndexExists(pathway1.mostRecentElementIdInPathway + 1)
 		) {
+			logger.debug("executing step in pathway 1")
 			step(pathway1)
+			logger.debug("executing step in pathway 2")
 			step(pathway2)
 		}
 	}
 
 	protected def step(pathway: DPPathway) = {
-		logger.info("executing dual-pathway step. current pathway state: " + pathway)
+		logger.debug("executing dual-pathway step. current pathway state: " + pathway)
 
 		if (pathway1.elements.isEmpty) init()
 

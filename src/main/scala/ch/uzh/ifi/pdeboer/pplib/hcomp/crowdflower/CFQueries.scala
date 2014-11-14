@@ -14,8 +14,12 @@ class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "field") e
 	override def interpretResult(json: JsValue): Option[FreetextAnswer] = {
 		val result_field = json \\ name
 		if (result_field != Nil) {
-			val result = result_field.map(_.as[List[String]]).last.last
-			Some(FreetextAnswer(rawQuery, result))
+			if (result_field.mkString("") == "null" && !rawQuery.valueIsRequired) {
+				Some(FreetextAnswer(rawQuery, rawQuery.defaultAnswer))
+			} else {
+				val result = result_field.map(_.as[List[String]]).last.last
+				Some(FreetextAnswer(rawQuery, result))
+			}
 		} else None
 	}
 }
