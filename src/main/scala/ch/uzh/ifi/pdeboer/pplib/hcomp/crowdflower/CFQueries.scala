@@ -12,12 +12,12 @@ class CFFreetextQuery(val rawQuery: FreetextQuery, val name: String = "field") e
 	override def getCML(): String = xml.toString()
 
 	override def interpretResult(json: JsValue): Option[FreetextAnswer] = {
-		val result_field = json \\ name
-		if (result_field != Nil) {
-			if (result_field.mkString("") == "null" && !rawQuery.valueIsRequired) {
+		val resultField = json \\ name
+		if (resultField != Nil) {
+			if (resultField.mkString("") == "[null]" && !rawQuery.valueIsRequired) {
 				Some(FreetextAnswer(rawQuery, rawQuery.defaultAnswer))
 			} else {
-				val result = result_field.map(_.as[List[String]]).last.last
+				val result = resultField.map(_.as[List[String]]).last.last
 				Some(FreetextAnswer(rawQuery, result))
 			}
 		} else None

@@ -121,9 +121,17 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 				throw new StatusCode(data._1)
 			}
 			val response: String = data._3
-			val json: JsValue = Json.parse(response)
-			jobId = (json \ "id").as[Int]
-			jobId
+			try {
+				val json: JsValue = Json.parse(response)
+				jobId = (json \ "id").as[Int]
+				jobId
+			}
+			catch {
+				case e: Error => {
+					logger.error("could not start job. May try again", e)
+					throw new IllegalStateException("could not start job", e)
+				}
+			}
 		}
 	}
 
