@@ -47,22 +47,31 @@ trait HCompPortalAdapter extends LazyLogging {
 
 class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
+	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
 			spentCents += properties.paymentCents
+			spentPerQuery += query.identifier -> properties.paymentCents
 		}
 		decoratedPortal.sendQuery(query, properties)
 	}
 
 	def cost = spentCents
 
+	def costPerQuery = spentPerQuery.toMap
+
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] =
 		decoratedPortal.processQuery(query, properties)
 
 	override def getDefaultPortalKey: Symbol = decoratedPortal.getDefaultPortalKey
 
-	override def cancelQuery(query: HCompQuery): Unit = decoratedPortal.cancelQuery(query)
+	override def cancelQuery(query: HCompQuery): Unit = {
+		decoratedPortal.cancelQuery(query)
+		decoratedPortal.synchronized {
+			spentCents -= spentPerQuery(query.identifier)
+		}
+	}
 }
 
 case class HCompQueryStats(query: HCompQuery, answer: Option[HCompAnswer], timeMillis: Long, moneySpent: Double)
