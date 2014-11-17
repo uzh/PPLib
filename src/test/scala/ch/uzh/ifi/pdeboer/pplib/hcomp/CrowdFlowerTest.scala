@@ -80,7 +80,7 @@ class CrowdFlowerTest {
 
 		Await.result(query, 1 day)
 		query onSuccess {
-			case answer => println(answer.getOrElse("nope").toString)
+			case answer => println("bla" + answer.getOrElse("nope").toString)
 		}
 		Assert.assertTrue(true)
 	}

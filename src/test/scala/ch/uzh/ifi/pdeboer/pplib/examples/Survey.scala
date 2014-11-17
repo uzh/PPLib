@@ -9,7 +9,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 object Survey extends App {
 	HComp.addPortal(new CrowdFlowerPortalAdapter("Survey", sandbox = true))
 
-	private val participantCount: Int = 2
+	private val participantCount: Int = 1
 
 	val submissions = (1 to participantCount).par.map(n => {
 		val participantName = FreetextQuery("What's your name?")

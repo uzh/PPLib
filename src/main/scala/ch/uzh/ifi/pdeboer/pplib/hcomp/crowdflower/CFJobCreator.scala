@@ -1,9 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompJobCancelled, HCompAnswer, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.util.{U, GrowingTimer}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompJobCancelled, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.util._
 import com.typesafe.scalalogging.LazyLogging
-import dispatch.Defaults._
 import dispatch._
 import play.api.libs.json.{JsValue, Json}
 
@@ -11,48 +10,39 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.Try
 
+class CFURLBuilder(restMethod: String) extends URLBuilder("https", "api.crowdflower.com", 443, "/v1/" + restMethod)
+
 abstract class CFJobBase(apiKey: String) extends LazyLogging {
-	protected val apiURL = host("api.crowdflower.com").secure / "v1"
-	protected val jobResourceJSONUrl = apiURL / "jobs.json"
+	protected val jobResourceJSONUrl = new CFURLBuilder("jobs.json")
 
-	protected def sendAndAwaitJson(request: Req, timeout: Duration) = {
-		val result = Http(request).map { response =>
-			response.getStatusCode match {
-				case code if code / 100 == 4 || code / 100 == 2 || code == 302 => (code, true, response.getResponseBody)
-				case code => (code, false, new OkFunctionHandler(as.String).onCompleted(response))
-			}
+	protected def sendAndAwaitJson(request: RESTClient, timeout: Duration) = {
+		val body = Await.result(request.responseBody, timeout)
+		val statusCode: Int = body.statusCode
+		if (!body.isOk) {
+			val error = new IllegalStateException(s"got NON-OK status return code: $statusCode with body ${body.body}")
+			logger.error("err", error)
+			throw error
 		}
-		val data = Await.result(result, timeout)
 
-		if (!data._2) {
-			logger.info("couldnt finish job. problem: " + data._3) //output exact answer of server
-			throw new StatusCode(data._1)
-		}
-		val response: String = data._3
-		val json: JsValue = Json.parse(response)
+		val json: JsValue = Json.parse(body.body)
 		logger.debug(s"got data $json")
 		json
 	}
 }
 
 class CFJobStatusManager(apiKey: String, jobId: Int) extends CFJobBase(apiKey) {
-	def cancelQuery(maxTries: Int = 3, timeout: Duration = 30 seconds): Unit = {
+	def cancelQuery(maxTries: Int = 3): Unit = {
 		logger.info(s"$jobId : cancelling task")
 		val cancelURL = jobIdResourceURL / "cancel"
-		var request = cancelURL.PUT.addQueryParameter("key", apiKey)
-		request = request.addHeader("Content-Type", "application/x-www-form-urlencoded")
+		val request = new PUT(cancelURL.addQueryParameter("key", apiKey) + "")
+		request.headers += "Content-Type" -> "application/x-www-form-urlencoded"
 
-		try {
-			U.retry(maxTries) {
-				sendAndAwaitJson(request, timeout)
-			}
-		} catch {
-			case e: TimeoutException =>
-				logger.error(s"Timed out: ${request.toRequest.toString}")
+		U.retry(maxTries) {
+			sendAndAwaitJson(request, 30 seconds)
 		}
 	}
 
-	def jobIdResourceURL = apiURL / "jobs" / jobId
+	def jobIdResourceURL = new CFURLBuilder("jobs") / s"$jobId"
 }
 
 /**
@@ -103,30 +93,25 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 					  paymentCents = properties.paymentCents), timeout: Duration = 10 minutes): Int = {
 
 		U.retry(3) {
-			var req: Req = jobResourceJSONUrl.POST.addQueryParameter("key", apiKey)
-			req = req.addParameter("job[cml]", query.getCML())
+			val req = new POST(jobResourceJSONUrl.addQueryParameter("key", apiKey).toString)
+			parameters.apply(req)
+			req.parameters += ("job[cml]" -> query.getCML())
 
-			val result = Http(parameters.fill(req)).map { response =>
-				response.getStatusCode match {
-					case code if code / 100 == 4 || code / 100 == 2 => (code, true, response.getResponseBody)
-					case code => (code, false, new OkFunctionHandler(as.String).onCompleted(response))
-				}
-			}
-			val data = Await.result(result, timeout)
+			val data = Await.result(req.responseBody, timeout)
 
-			if (!data._2) {
-				logger.info("couldnt create job. problem: " + data._3) //output exact answer of server
-				throw new StatusCode(data._1)
+			if (!data.isOk) {
+				val exc = new IllegalStateException(s"couldnt create job. statuscode was ${data.statusCode} problem: ${data.body}") //output exact answer of server
+				logger.error("", exc)
+				throw exc
 			}
-			val response: String = data._3
 			try {
-				val json: JsValue = Json.parse(response)
+				val json: JsValue = Json.parse(data.body)
 				jobId = (json \ "id").as[Int]
 				jobId
 			}
 			catch {
 				case e: Throwable => {
-					logger.error(s"could not start job. May try again. Full JSON: $response", e)
+					logger.error("could not start job. May try again. Full JSON: " + data.body, e)
 					throw new IllegalStateException("could not start job", e)
 				}
 			}
@@ -135,8 +120,8 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 
 	private def fetchResult(): Option[HCompAnswer] = {
 		logger.info(s" $jobId : Fetching result for ${query.rawQuery.title}")
-		val judgments_url = jobIdResourceURL / "judgments.json"
-		var request = judgments_url.GET.addQueryParameter("key", apiKey)
+		val judgmentsURL = jobIdResourceURL / "judgments.json"
+		val request = new GET(judgmentsURL.addQueryParameter("key", apiKey).toString)
 		val json_try = Try(sendAndAwaitJson(request, 30 seconds))
 		if (json_try.isFailure) {
 			logger.error(s" $jobId : Timed out")
@@ -148,33 +133,31 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 
 	private def launch() {
 		logger.info(s"$jobId : launching task '${query.rawQuery.title}'")
-		val order_url = jobIdResourceURL / "orders.json"
-		var request = order_url.POST.addQueryParameter("key", apiKey)
-		request = request.addHeader("Content-Type", "application/x-www-form-urlencoded")
-		if (sandbox)
-			request = request.setBody(s"channels[0]=cf_internal&debit[units_count]=1")
+		val orderURL = jobIdResourceURL / "orders.json"
+		val request = new POST(orderURL.addQueryParameter("key", apiKey) + "")
+		val params = if (sandbox)
+			Map("channels[0]" -> "cf_internal", "debit[units_count]" -> "1")
 		else
-			request = request.setBody(s"channels[0]=on_demand&debit[units_count]=1")
+			Map("channels[0]" -> "on_demand", "debit[units_count]" -> "1")
 
-		try {
-			U.retry(3) {
-				sendAndAwaitJson(request, 30 seconds)
-			}
-		} catch {
-			case e: Exception =>
-				logger.error(s"Timed out: ${request.toRequest.toString}")
+		params.foreach {
+			case (key, value) => request.parameters += key -> value
+		}
+
+		U.retry(3) {
+			sendAndAwaitJson(request, 30 seconds)
 		}
 	}
 
-	def jobIdResourceURL = apiURL / "jobs" / jobId
+	def jobIdResourceURL = new CFURLBuilder("jobs") / s"$jobId"
 
 	private def addDataUnit(jsonString: String) = {
 		val unitsURL = jobIdResourceURL / "upload.json"
-		var units_request = unitsURL.POST.addQueryParameter("key", apiKey)
-		units_request = units_request.addHeader("Content-Type", "application/json")
-		units_request = units_request.setBody(jsonString)
+		val request = new POST(unitsURL.addQueryParameter("key", apiKey) + "")
+		request.headers += "Content-Type" -> "application/json"
+		request.bodyString = jsonString
 		U.retry(3) {
-			sendAndAwaitJson(units_request, 30 seconds)
+			sendAndAwaitJson(request, 30 seconds)
 		}
 	}
 }
@@ -183,13 +166,12 @@ class CFQueryParameterSet(
 							 title: String, instructions: String, judgementsPerUnit: Int = 1, unitsPerJudgement: Int = 1,
 							 paymentCents: Double = 1d, autoOrder: Boolean = true) {
 
-	def fill(request: Req): Req = {
-		var ret = request.addQueryParameter("job[title]", title)
-		ret = ret.addQueryParameter("job[instructions]", instructions)
-		ret = ret.addQueryParameter("job[judgments_per_unit]", judgementsPerUnit + "")
-		ret = ret.addQueryParameter("job[units_per_assignment]", unitsPerJudgement + "")
-		ret = ret.addQueryParameter("job[payment_cents]", paymentCents + "")
-		ret = ret.addQueryParameter("job[auto_order]", autoOrder + "")
-		ret
+	def apply(request: RESTMethodWithBody) {
+		request.parameters += "job[title]" -> title
+		request.parameters += "job[instructions]" -> instructions
+		request.parameters += "job[judgments_per_unit]" -> judgementsPerUnit.toString
+		request.parameters += "job[units_per_assignment]" -> unitsPerJudgement.toString
+		request.parameters += "job[payment_cents]" -> paymentCents.toString
+		request.parameters += "job[auto_order]" -> autoOrder.toString
 	}
 }
