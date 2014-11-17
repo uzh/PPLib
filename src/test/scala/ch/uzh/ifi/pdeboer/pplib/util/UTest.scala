@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
-import ch.uzh.ifi.pdeboer.pplib.U
 import org.junit.{Assert, Test}
 
 /**

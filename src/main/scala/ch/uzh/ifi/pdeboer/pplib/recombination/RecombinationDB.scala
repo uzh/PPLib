@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.U
+import ch.uzh.ifi.pdeboer.pplib.util.U
 import com.typesafe.scalalogging.LazyLogging
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}

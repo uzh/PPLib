@@ -1,9 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
-
-import ch.uzh.ifi.pdeboer.pplib.U
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompJobCancelled, HCompAnswer, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.util.GrowingTimer
+import ch.uzh.ifi.pdeboer.pplib.util.{U, GrowingTimer}
 import com.typesafe.scalalogging.LazyLogging
 import dispatch.Defaults._
 import dispatch._
@@ -106,7 +104,7 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 
 		U.retry(3) {
 			var req: Req = jobResourceJSONUrl.POST.addQueryParameter("key", apiKey)
-			req = req.addQueryParameter("job[cml]", query.getCML())
+			req = req.addParameter("job[cml]", query.getCML())
 
 			val result = Http(parameters.fill(req)).map { response =>
 				response.getStatusCode match {
@@ -127,8 +125,8 @@ class CFJobCreator(apiKey: String, query: CFQuery, properties: HCompQueryPropert
 				jobId
 			}
 			catch {
-				case e: Error => {
-					logger.error("could not start job. May try again", e)
+				case e: Throwable => {
+					logger.error(s"could not start job. May try again. Full JSON: $response", e)
 					throw new IllegalStateException("could not start job", e)
 				}
 			}
@@ -185,7 +183,7 @@ class CFQueryParameterSet(
 							 title: String, instructions: String, judgementsPerUnit: Int = 1, unitsPerJudgement: Int = 1,
 							 paymentCents: Double = 1d, autoOrder: Boolean = true) {
 
-	def fill(request: Req) = {
+	def fill(request: Req): Req = {
 		var ret = request.addQueryParameter("job[title]", title)
 		ret = ret.addQueryParameter("job[instructions]", instructions)
 		ret = ret.addQueryParameter("job[judgments_per_unit]", judgementsPerUnit + "")

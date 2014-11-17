@@ -27,9 +27,9 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extend
 				advancementAllowed.values.exists(_ == false) ||
 				driver.elementIndexExists(pathway1.mostRecentElementIdInPathway + 1)
 		) {
-			logger.debug("executing step in pathway 1")
+			logger.info("executing step in pathway 1")
 			step(pathway1)
-			logger.debug("executing step in pathway 2")
+			logger.info("executing step in pathway 2")
 			step(pathway2)
 		}
 	}

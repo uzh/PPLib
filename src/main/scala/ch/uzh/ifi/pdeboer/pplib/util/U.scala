@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib
+package ch.uzh.ifi.pdeboer.pplib.util
 
 import com.typesafe.config.{Config, ConfigFactory}
 

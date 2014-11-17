@@ -33,7 +33,6 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 	override def cancelQuery(query: HCompQuery): Unit = {
 		val manager: CFJobCreator = jobIds(query.identifier)
 		new CFJobStatusManager(apiKey, manager.jobId).cancelQuery()
-
 	}
 }
 

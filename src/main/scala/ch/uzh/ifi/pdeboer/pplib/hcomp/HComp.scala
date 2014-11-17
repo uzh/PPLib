@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp
 
-import ch.uzh.ifi.pdeboer.pplib.U
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.util.U
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
