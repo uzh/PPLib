@@ -25,7 +25,8 @@ object DualPathwayTranslation extends App {
 	val process = new DualPathwayProcess(Map(
 		QUESTION_PER_COMPARISON_TASK.key -> new DPHCompDriverDefaultComparisonInstructionsConfig(
 			"Comparison",
-			"Please compare the two columns below established by other crowd workers. Are they roughly equal? "),
+			"Please compare the two columns below established by other crowd workers. Are they roughly equal? ",
+			questionTitle = "Original Text"),
 		QUESTION_PER_PROCESSING_TASK.key -> "Check the paragraphs below and make sure they are grammatically correct",
 		QUESTION_OLD_PROCESSED_ELEMENT.key -> HCompInstructionsWithTuple("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.", "Other Crowd workers corrected the text above and turned it into the text below. Please add any corrections you'd like to make"),
 		QUESTION_NEW_PROCESSED_ELEMENT.key -> HCompInstructionsWithTuple("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.")

@@ -176,7 +176,7 @@ class DualPathWayDefaultHCompDriver(
 		val POSITIVE_ANSWER: String = "Yes"
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
-				List(POSITIVE_ANSWER, "No"), 1, 1),
+				List(POSITIVE_ANSWER, "No"), 1, 1, title = questionPerComparisonTask.title),
 			maxWaitTime = timeout)
 		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == POSITIVE_ANSWER
 	}
@@ -187,27 +187,29 @@ class DualPathWayDefaultHCompDriver(
 
 }
 
-class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String = "Comparison",
-													   val preText: String = "Please compare both pathways and answer if the answers are equal or not",
-													   val questionTitle: String = "Question",
-													   val leftTitle: String = "Pathway 1",
-													   val rightTitle: String = "Pathway 2") {
+class DPHCompDriverDefaultComparisonInstructionsConfig(
+														  val title: String = "Comparison",
+														  val preText: String = "Please compare both pathways and answer if the answers are equal or not",
+														  val postText: String = "",
+														  val questionTitle: String = "Question",
+														  val leftTitle: String = "Solution 1",
+														  val rightTitle: String = "Solution 2") {
 	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = <div>
 		<h1>
 			{title}
 		</h1>{preText}<table>
 			<tr>
-				<td>
+				<th>
 					{questionTitle}
-				</td>
-				<td>
+				</th>
+				<th style="padding-left:20px;">
 					{leftTitle}
-				</td>
-				<td>
+				</th>
+				<th>
 					{rightTitle}
-				</td>
+				</th>
 			</tr>{left.zip(right).map(lr => {
-				<tr>
+				<tr style="margin-top:10px;">
 					<td>
 						{lr._1.data}
 					</td>
@@ -220,5 +222,6 @@ class DPHCompDriverDefaultComparisonInstructionsConfig(val title: String = "Comp
 				</tr>
 			})}
 		</table>
+
 	</div>.toString()
 }
