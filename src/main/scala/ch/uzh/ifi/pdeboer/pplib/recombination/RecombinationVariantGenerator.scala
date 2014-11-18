@@ -30,7 +30,7 @@ trait RecombinationStubParameterVariantGenerator[T] {
 		this
 	}
 
-	def addParameterVariations(paramKey: String, values: List[Any]) = {
+	def addParameterVariations(paramKey: String, values: Iterable[Any]) = {
 		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[Any])
 		values.foreach(k => {
 			if (base.isParameterTypeCorrect(paramKey, k))

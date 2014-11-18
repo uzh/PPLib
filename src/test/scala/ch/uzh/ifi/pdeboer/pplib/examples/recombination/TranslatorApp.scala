@@ -27,7 +27,7 @@ object TranslatorApp extends App {
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
-					RecombinationDB.get[List[String], String]("select.") //online recombination
+					RecombinationDB.get[List[String], String]("select.", distinctProcesses = true) //online recombination
 				)
 		),
 		tp.SYNTAX_CHECK -> List[RecombinationStubParameterVariantGenerator[_]](

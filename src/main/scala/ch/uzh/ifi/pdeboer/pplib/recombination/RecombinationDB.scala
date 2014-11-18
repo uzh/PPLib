@@ -21,7 +21,7 @@ object RecombinationDB extends LazyLogging {
 		processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 	}
 
-	def getCategory(category: RecombinationCategory, includeDescendants: Boolean = false): List[ProcessStub[_, _]] = {
+	def getCategory(category: RecombinationCategory, includeDescendants: Boolean = false, distinctProcesses: Boolean = false): Set[ProcessStub[_, _]] = {
 		if (includeDescendants) {
 			val keys = processes.keySet.filter(k => {
 				//this probably wont work
@@ -30,16 +30,23 @@ object RecombinationDB extends LazyLogging {
 					k.path.startsWith(category.path)
 			})
 
-			keys.map(k => processes(k).stubs).flatten.toList
+			val instanciatedCandidates = keys.map(k => processes(k).stubs).flatten.toSet
+			if (distinctProcesses) {
+				//instanciatedCandidates.map(c => c.getClass.getCanonicalName -> c).toMap.values.toSet. Error?
+				var ret = mutable.HashMap.empty[String, ProcessStub[_, _]]
+				instanciatedCandidates.foreach(c => ret += c.getClass.getCanonicalName -> c)
+				ret.values.toSet
+			}
+			else instanciatedCandidates
 		} else {
 			val pointSearchOption = processes.get(category)
-			if (pointSearchOption.isDefined) pointSearchOption.get.stubs.toList else Nil
+			if (pointSearchOption.isDefined) pointSearchOption.get.stubs else Set.empty[ProcessStub[_, _]]
 		}
 	}
 
-	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false): List[ProcessStub[_, _]] = {
+	def get[IN: ClassTag, OUT: ClassTag](name: String, includeDescendants: Boolean = false, distinctProcesses: Boolean = false): Set[ProcessStub[_, _]] = {
 		val category: RecombinationCategory = RecombinationCategory.get[IN, OUT](name)
-		getCategory(category, includeDescendants)
+		getCategory(category, includeDescendants, distinctProcesses)
 	}
 
 	def put(stub: ProcessStub[_, _]): Unit = {
@@ -113,5 +120,5 @@ case class RecombinationCategoryContent(category: RecombinationCategory) {
 		_stubs += s
 	}
 
-	def stubs: List[ProcessStub[_, _]] = _stubs.toList
+	def stubs: Set[ProcessStub[_, _]] = _stubs
 }

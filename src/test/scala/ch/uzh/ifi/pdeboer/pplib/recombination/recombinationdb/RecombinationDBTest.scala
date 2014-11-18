@@ -15,7 +15,7 @@ class RecombinationDBTest {
 			stub //should be added on instance-creation
 		)
 
-		Assert.assertTrue(RecombinationDB.getCategory(category, includeDescendants = false)(0) == stub)
+		Assert.assertTrue(RecombinationDB.getCategory(category, includeDescendants = false).head == stub)
 	}
 
 	@Test
@@ -39,9 +39,9 @@ class RecombinationDBTest {
 			stub //should be added on instance-creation
 		)
 
-		val search: List[ProcessStub[_, _]] = RecombinationDB.getCategory(category, includeDescendants = false)
-		Assert.assertTrue(search(0) == stub)
-		Assert.assertEquals(1, search.length)
+		val search = RecombinationDB.getCategory(category, includeDescendants = false)
+		Assert.assertTrue(search.head == stub)
+		Assert.assertEquals(1, search.size)
 	}
 
 	@Test
@@ -50,8 +50,8 @@ class RecombinationDBTest {
 		List(new TestProcessStubParent(), new TestProcessStubParent2(),
 			new TestProcessStubChild(), new TestProcessStubUnrelated()).foreach(s => RecombinationDB.put(s))
 
-		val search: List[ProcessStub[_, _]] = RecombinationDB.getCategory(needle, includeDescendants = true)
-		Assert.assertEquals(3, search.length)
+		val search = RecombinationDB.getCategory(needle, includeDescendants = true)
+		Assert.assertEquals(3, search.size)
 	}
 
 	@Test
@@ -62,7 +62,17 @@ class RecombinationDBTest {
 		).foreach(c => RecombinationDB.put(c))
 
 		Assert.assertEquals("we try to insert the same stub (in terms of parameterset) twice, so only 1 of them should prevail",
-			2, RecombinationDB.getCategory(needle, includeDescendants = true).length)
+			2, RecombinationDB.getCategory(needle, includeDescendants = true).size)
+	}
+
+	@Test
+	def testRetrieveDistinctClass: Unit = {
+		val needle = RecombinationCategory.get[String, B]("test.")
+		List(new TestProcessStubChild(Map("test" -> "a")), new TestProcessStubChild(Map("test" -> "b"))
+		).foreach(c => RecombinationDB.put(c))
+
+		Assert.assertEquals("retrieving with distinct enabled. Only 1 class should be found",
+			1, RecombinationDB.getCategory(needle, includeDescendants = true, distinctProcesses = true).size)
 	}
 
 	@Test
