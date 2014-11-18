@@ -2,6 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.examples
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubWithHCompPortalAccess
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SimpleWriteProcess
 
 /**
  * Created by pdeboer on 30/10/14.
@@ -23,7 +25,7 @@ object Survey extends App {
 				participantName,
 				participantContinent,
 				participantAge
-			), "Please answer the following questions about you")).get.asInstanceOf[CompositeQueryAnswer]
+			), "Please answer the following questions about you")).get.as[CompositeQueryAnswer]
 
 		SurveyResult(
 			name = result.get[FreetextAnswer](participantName).answer,

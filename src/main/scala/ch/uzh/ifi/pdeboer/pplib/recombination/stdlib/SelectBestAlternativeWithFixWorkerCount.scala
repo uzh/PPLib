@@ -6,7 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, RecombinationPro
 /**
  * Created by pdeboer on 31/10/14.
  */
-@RecombinationProcess("selectbest.fixworker")
+@RecombinationProcess("select.contest")
 class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._

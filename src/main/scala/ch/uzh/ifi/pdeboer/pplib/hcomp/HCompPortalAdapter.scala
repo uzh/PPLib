@@ -32,7 +32,7 @@ trait HCompPortalAdapter extends LazyLogging {
 		answer
 	}
 
-	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days) = {
+	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days): Option[HCompAnswer] = {
 		val future = sendQuery(query)
 		Await.result(future, maxWaitTime)
 		future.value.get.get
@@ -90,10 +90,8 @@ trait HCompQuery {
 
 trait HCompAnswer {
 	def query: HCompQuery
-}
 
-trait HCompInstructions {
-	def toString: String
+	def as[T]: T = this.asInstanceOf[T]
 }
 
 case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "") {
@@ -115,10 +113,6 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 			{questionAfterTuples}
 		</p>}
 	</div>.toString
-}
-
-object HCompConversions {
-	implicit def hcompInstrToString(instr: HCompInstructions): String = instr.toString
 }
 
 case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery {
