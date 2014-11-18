@@ -20,10 +20,10 @@ object TranslatorApp extends App {
 	//list type explicitly stated to speed up compilation (type inferencer). remove before production release
 	val candidateProcessesParameterGenerators = Map(
 		tp.REWRITE_PART -> List[RecombinationStubParameterVariantGenerator[_]](
-			new RecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
+			new TypedRecombinationStubParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
 				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithTuple(h)).toList)), //usage of functional patterns
-			new RecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
+			new TypedRecombinationStubParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
 				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
@@ -31,7 +31,7 @@ object TranslatorApp extends App {
 				)
 		),
 		tp.SYNTAX_CHECK -> List[RecombinationStubParameterVariantGenerator[_]](
-			new RecombinationStubParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
+			new TypedRecombinationStubParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
 				new SelectBestAlternativeStatisticalReduction(Map(

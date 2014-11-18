@@ -17,11 +17,11 @@ class RecombinationVariantGenerator(configs: Map[String, List[ProcessStub[_, _]]
 	}
 }
 
-class RecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) {
-	//very ugly stuff //TODO check
-	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
-	private val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
-	val base = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[ProcessStub[_, _]]
+trait RecombinationStubParameterVariantGenerator[T] {
+	protected def targetConstructor: Constructor[_]
+
+	protected def base: ProcessStub[_, _]
+
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
 
@@ -52,7 +52,21 @@ class RecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: 
 		generateParameterVariations()
 			.map(params => targetConstructor.newInstance(params))
 			.asInstanceOf[List[T]]
+}
 
+class InstanciatedRecombinationStubParameterVariantGenerator[T: ClassTag](_base: T, initWithDefaults: Boolean = false) extends RecombinationStubParameterVariantGenerator[T] {
+	override protected def base: ProcessStub[_, _] = _base.asInstanceOf[ProcessStub[_, _]]
+
+	override protected def targetConstructor: Constructor[_] = base.getClass.getConstructor(classOf[Map[String, Any]])
+
+	if (initWithDefaults) initAllParamsWithCandidates()
+}
+
+class TypedRecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends RecombinationStubParameterVariantGenerator[T] {
+	//very ugly stuff //TODO check
+	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
+	protected val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
+	protected val base: ProcessStub[_, _] = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[ProcessStub[_, _]]
 
 	if (initWithDefaults) initAllParamsWithCandidates()
 }

@@ -6,11 +6,10 @@ import org.junit.{Assert, Test}
  * Created by pdeboer on 21/10/14.
  */
 class ProcessStubParameterGenerationTest {
-
 	import ProcessStubParameterGenerationTest._
 	@Test
 	def testParameterVariation(): Unit = {
-		val gen = new RecombinationStubParameterVariantGenerator[TestProcessStub]() {
+		val gen = new TypedRecombinationStubParameterVariantGenerator[TestProcessStub]() {
 			def paramVals = parameterValues
 		}
 
@@ -47,8 +46,19 @@ class ProcessStubParameterGenerationTest {
 	}
 
 	@Test
+	def testInstanciatedParamVariation(): Unit = {
+		val gen = new InstanciatedRecombinationStubParameterVariantGenerator(new TestProcessStub())
+		val expectedParamVariations = gen.generateParameterVariations()
+		Assert.assertTrue(expectedParamVariations.length > 0)
+
+		val instanciatedVariants = gen.generateVariationsAndInstanciate()
+		Assert.assertEquals(expectedParamVariations.length, instanciatedVariants.length)
+		Assert.assertTrue("class correct", instanciatedVariants.forall(i => i.getClass == classOf[TestProcessStub]))
+	}
+
+	@Test
 	def testParameterVariationInstanciation(): Unit = {
-		val gen = new RecombinationStubParameterVariantGenerator[TestProcessStub](initWithDefaults = true)
+		val gen = new TypedRecombinationStubParameterVariantGenerator[TestProcessStub](initWithDefaults = true)
 		val expectedParamVariations = gen.generateParameterVariations()
 		Assert.assertTrue(expectedParamVariations.length > 0)
 
@@ -63,7 +73,7 @@ object ProcessStubParameterGenerationTest {
 	val DEFAULT_VALUES_PARAM2: List[Integer] = List(1, 2, 3)
 }
 
-class TestProcessStub(params: Map[String, AnyRef]) extends ProcessStub[String, String](params) {
+class TestProcessStub(params: Map[String, AnyRef] = Map.empty[String, AnyRef]) extends ProcessStub[String, String](params) {
 	override def optionalParameters: List[ProcessParamter[_]] = List(
 		new ProcessParamter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
 		new ProcessParamter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
