@@ -1,3 +1,5 @@
+import com.github.retronym.SbtOneJar._
+
 name := "PPLib"
 
 version := "1.0"
@@ -13,9 +15,11 @@ libraryDependencies ++= Seq(
 	"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
 	"org.slf4j" % "slf4j-log4j12" % "1.7.5",
 	"org.apache.commons" % "commons-vfs2" % "2.0",
-	//"com.stackmob" % "newman_2.10" % "1.3.5" exclude("org.scala-lang", "scala-compiler"),
 	"org.apache.httpcomponents" % "httpclient" % "4.3.5"
 )
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
+oneJarSettings
+
+//mainClass in oneJar := Some("ch.uzh.ifi.pdeboer.pplib.Survey")
