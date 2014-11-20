@@ -31,4 +31,6 @@ object U {
 			case _ => None
 		}
 	}
+
+	def removeWhitespaces(str: String) = str.replaceAll("\\s*", "")
 }

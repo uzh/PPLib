@@ -99,7 +99,8 @@ sealed trait MTQuery {
 
 	def xml: String = defaultXML()
 
-	def getRelevantAnswerFromResponseXML(response: NodeSeq) = (response \\ "Answer").filter(e => (e \ "QuestionIdentifier").text == id)
+	def getRelevantAnswerFromResponseXML(response: NodeSeq) =
+		(response \\ "Answer").filter(e => (e \ "QuestionIdentifier").text == id)
 
 	def elementXML: NodeSeq
 
