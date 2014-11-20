@@ -63,9 +63,9 @@ object TranslatorApp extends App {
 case class RecombinationStats(process: RecombinationVariant, result: String, processDuration: Long, processCost: Double)
 
 class TranslationProcess(val textToImprove: String) extends Recombinable[String] {
-	override def runRecombinedVariant(config: RecombinationVariant): String = {
-		val sentenceRewriter = config[List[String], List[String]](REWRITE_PART)
-		val syntaxChecker = config[String, String](SYNTAX_CHECK)
+	override def runRecombinedVariant(recombinedProcesses: RecombinationVariant): String = {
+		val sentenceRewriter = recombinedProcesses[List[String], List[String]](REWRITE_PART)
+		val syntaxChecker = recombinedProcesses[String, String](SYNTAX_CHECK)
 
 		val paragraphs = textToImprove.split("\n").map(_.trim).toList
 
