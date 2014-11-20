@@ -4,12 +4,16 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import com.amazonaws.mturk.service.axis.RequesterService
 import com.amazonaws.mturk.util.ClientConfig
 
+import scala.collection.mutable
+
 /**
  * Created by pdeboer on 19/11/14.
  */
 class MechanicalTurkPortalAdapter(accessKey: String, secretKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
+
+	var map = mutable.HashMap.empty[Int, MTurkManager]
 
 	val service: RequesterService = new RequesterService(new ClientConfig() {
 		setAccessKeyId(accessKey)
@@ -20,10 +24,15 @@ class MechanicalTurkPortalAdapter(accessKey: String, secretKey: String, sandbox:
 	})
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
-		new MTurkManager(service).sendQueryAndWaitForResponse(query, properties)
+		val manager: MTurkManager = new MTurkManager(service, query, properties)
+		map += query.identifier -> manager
+		manager.createHIT()
+		manager.waitForResponse()
 	}
 
-	override def getDefaultPortalKey: Symbol = ???
+	override def getDefaultPortalKey: Symbol = 'MTurk
 
-	override def cancelQuery(query: HCompQuery): Unit = ???
+	override def cancelQuery(query: HCompQuery): Unit = {
+		map(query.identifier).cancelHIT()
+	}
 }
