@@ -115,7 +115,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		}")
 	*/
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
-	recombinationCategories.foreach(c => RecombinationDB.put(c, this))
+	recombinationCategories.foreach(c => ProcessDB.put(c, this))
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 
@@ -148,7 +148,7 @@ object ProcessStubWithHCompPortalAccess {
 }
 
 class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {
-	override def iterator: Iterator[ProcessStub[I, O]] = RecombinationDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
+	override def iterator: Iterator[ProcessStub[I, O]] = ProcessDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
 }
 
 class ProcessParamter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {

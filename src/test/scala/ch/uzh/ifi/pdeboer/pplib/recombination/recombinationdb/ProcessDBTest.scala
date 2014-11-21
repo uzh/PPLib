@@ -1,45 +1,45 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.recombinationdb
 
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationCategory, RecombinationDB, RecombinationProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationCategory, ProcessDB, RecombinationProcess, ProcessStub}
 import org.junit.{Assert, Before, Test}
 
 /**
  * Created by pdeboer on 10/11/14.
  */
-class RecombinationDBTest {
+class ProcessDBTest {
 	@Test
 	def testGetSameClass: Unit = {
 		val category: RecombinationCategory = RecombinationCategory.get[String, A]("test.bla")
 		val stub: TestProcessStubParent = new TestProcessStubParent()
-		RecombinationDB.put(
+		ProcessDB.put(
 			stub //should be added on instance-creation
 		)
 
-		Assert.assertTrue(RecombinationDB.getCategory(category, includeDescendants = false).head == stub)
+		Assert.assertTrue(ProcessDB.getCategory(category, includeDescendants = false).head == stub)
 	}
 
 	@Test
 	def testGetSameClassWrongType: Unit = {
 		val category: RecombinationCategory = RecombinationCategory.get[String, String]("test.bla")
 		val stub: TestProcessStubParent = new TestProcessStubParent()
-		RecombinationDB.put(
+		ProcessDB.put(
 			stub
 		)
 
 		Assert.assertEquals("should not find any results",
 			0,
-			RecombinationDB.getCategory(category, includeDescendants = false).size)
+			ProcessDB.getCategory(category, includeDescendants = false).size)
 	}
 
 	@Test
 	def testGetSameClassAnnotation: Unit = {
 		val category: RecombinationCategory = RecombinationCategory.get[String, A]("test.bla2")
 		val stub = new TestProcessStubParent2()
-		RecombinationDB.put(
+		ProcessDB.put(
 			stub //should be added on instance-creation
 		)
 
-		val search = RecombinationDB.getCategory(category, includeDescendants = false)
+		val search = ProcessDB.getCategory(category, includeDescendants = false)
 		Assert.assertTrue(search.head == stub)
 		Assert.assertEquals(1, search.size)
 	}
@@ -48,9 +48,9 @@ class RecombinationDBTest {
 	def testChildClassRetrieving: Unit = {
 		val needle: RecombinationCategory = RecombinationCategory.get[String, A]("test.")
 		List(new TestProcessStubParent(), new TestProcessStubParent2(),
-			new TestProcessStubChild(), new TestProcessStubUnrelated()).foreach(s => RecombinationDB.put(s))
+			new TestProcessStubChild(), new TestProcessStubUnrelated()).foreach(s => ProcessDB.put(s))
 
-		val search = RecombinationDB.getCategory(needle, includeDescendants = true)
+		val search = ProcessDB.getCategory(needle, includeDescendants = true)
 		Assert.assertEquals(3, search.size)
 	}
 
@@ -59,31 +59,31 @@ class RecombinationDBTest {
 		val needle = RecombinationCategory.get[String, B]("test.")
 		List(new TestProcessStubChild(Map("test" -> "a")), new TestProcessStubChild(Map("test" -> "a")),
 			new TestProcessStubChild(Map("test" -> "b"))
-		).foreach(c => RecombinationDB.put(c))
+		).foreach(c => ProcessDB.put(c))
 
 		Assert.assertEquals("we try to insert the same stub (in terms of parameterset) twice, so only 1 of them should prevail",
-			2, RecombinationDB.getCategory(needle, includeDescendants = true).size)
+			2, ProcessDB.getCategory(needle, includeDescendants = true).size)
 	}
 
 	@Test
 	def testRetrieveDistinctClass: Unit = {
 		val needle = RecombinationCategory.get[String, B]("test.")
 		List(new TestProcessStubChild(Map("test" -> "a")), new TestProcessStubChild(Map("test" -> "b"))
-		).foreach(c => RecombinationDB.put(c))
+		).foreach(c => ProcessDB.put(c))
 
 		Assert.assertEquals("retrieving with distinct enabled. Only 1 class should be found",
-			1, RecombinationDB.getCategory(needle, includeDescendants = true, distinctProcesses = true).size)
+			1, ProcessDB.getCategory(needle, includeDescendants = true, distinctProcesses = true).size)
 	}
 
 	@Test
 	def testAnnotatedClassFinder: Unit = {
-		val c = RecombinationDB.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName)
+		val c = ProcessDB.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName)
 		Assert.assertEquals(Set(classOf[TestProcessStubParent2], classOf[TestProcessStubChild], classOf[TestProcessStubUnrelated]), c)
 	}
 
 	@Before
 	def setUp: Unit = {
-		RecombinationDB.reset()
+		ProcessDB.reset()
 	}
 
 	private class A(val a: String = "")

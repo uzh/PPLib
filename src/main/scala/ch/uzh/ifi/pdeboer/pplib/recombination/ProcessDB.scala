@@ -14,7 +14,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 20/10/14.
  */
-object RecombinationDB extends LazyLogging {
+object ProcessDB extends LazyLogging {
 	private var processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 
 	def reset(): Unit = {

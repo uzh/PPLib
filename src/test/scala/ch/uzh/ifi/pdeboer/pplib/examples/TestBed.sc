@@ -1,3 +1,3 @@
-import ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationDB
+import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessDB
 
-RecombinationDB.findClassesInPackageWithAnnotationAndAddThem()
+ProcessDB.findClassesInPackageWithAnnotationAndAddThem()

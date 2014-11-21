@@ -7,7 +7,7 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 20/11/14.
  */
-class MTQueryTest {
+class MTQueryParsingTest {
 	@Test
 	def testFreetextQueryXML(): Unit = {
 		val q = FreetextQuery("question", defaultAnswer = "default", title = "title")
