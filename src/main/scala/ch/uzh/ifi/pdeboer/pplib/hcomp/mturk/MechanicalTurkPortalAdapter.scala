@@ -36,3 +36,9 @@ class MechanicalTurkPortalAdapter(accessKey: String, secretKey: String, sandbox:
 		map(query.identifier).cancelHIT()
 	}
 }
+
+object MechanicalTurkPortalAdapter {
+	val CONFIG_ACCESS_ID_KEY = "hcomp.mturk.accessKeyID"
+	val CONFIG_SECRET_ACCESS_KEY = "hcomp.mturk.secretAccessKey"
+	val PORTAL_KEY = 'mechanicalTurk
+}
