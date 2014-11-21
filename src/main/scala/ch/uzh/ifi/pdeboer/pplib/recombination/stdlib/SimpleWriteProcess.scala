@@ -1,12 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStubWithHCompPortalAccess, RecombinationProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStubWithHCompPortalAccess, PPLibProcess, ProcessStub}
 
 /**
  * Created by pdeboer on 04/11/14.
  */
-@RecombinationProcess("collect.writings")
+@PPLibProcess("collect.writings")
 class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[Map[String, String]]](params) {
 
 	import SimpleWriteProcess._

@@ -61,21 +61,10 @@ object ProcessDB extends LazyLogging {
 		}
 	}
 
-	def findClassesInPackageWithProcessAnnotation(packagePrefix: String): Set[Class[_]] = {
-		val classLoadersList = List(ClasspathHelper.contextClassLoader(),
-			ClasspathHelper.staticClassLoader())
 
-		val reflections = new Reflections(new ConfigurationBuilder()
-			.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false), new ResourcesScanner())
-			.setUrls(ClasspathHelper.forClassLoader(classLoadersList(0)))
-			.filterInputsBy(new FilterBuilder().include(
-			FilterBuilder.prefix(packagePrefix))))
-
-		reflections.getTypesAnnotatedWith(classOf[RecombinationProcess]).toSet
-	}
 
 	protected def findClassesInPackageWithAnnotationAndAddThem(packagePrefix: String = "ch.uzh.ifi.pdeboer.pplib.recombination.stdlib") {
-		val annotatedClasses = findClassesInPackageWithProcessAnnotation(packagePrefix)
+		val annotatedClasses = U.findClassesInPackageWithProcessAnnotation(packagePrefix, classOf[PPLibProcess])
 		initializeClassesAndAddToDB(annotatedClasses.asInstanceOf[Set[Class[ProcessStub[_, _]]]])
 	}
 

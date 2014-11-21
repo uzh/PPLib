@@ -202,6 +202,7 @@ trait HCompPortalBuilder {
 			case (parameter, configPath) =>
 				U.getConfigString(configPath) match {
 					case Some(configValue) => setParameter(parameter, configValue)
+					case _ => {}
 				}
 		}
 	}

@@ -10,6 +10,7 @@ import scala.collection.mutable
 /**
  * Created by pdeboer on 19/11/14.
  */
+@HCompPortal(builder = classOf[MechanicalTurkPortalBuilder], autoInit = true)
 class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogging {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"

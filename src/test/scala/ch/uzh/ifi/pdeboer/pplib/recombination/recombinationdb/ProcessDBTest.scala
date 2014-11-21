@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.recombinationdb
 
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationCategory, ProcessDB, RecombinationProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationCategory, ProcessDB, PPLibProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Before, Test}
 
 /**
@@ -77,7 +78,7 @@ class ProcessDBTest {
 
 	@Test
 	def testAnnotatedClassFinder: Unit = {
-		val c = ProcessDB.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName)
+		val c = U.findClassesInPackageWithProcessAnnotation(this.getClass.getPackage.getName, classOf[PPLibProcess])
 		Assert.assertEquals(Set(classOf[TestProcessStubParent2], classOf[TestProcessStubChild], classOf[TestProcessStubUnrelated]), c)
 	}
 
@@ -100,14 +101,14 @@ class ProcessDBTest {
 		override protected def recombinationCategoryNames: List[String] = List("test.bla")
 	}
 
-	@RecombinationProcess("test.bla2")
+	@PPLibProcess("test.bla2")
 	private class TestProcessStubParent2(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[String, A](params) {
 		override protected def run(data: String): A = {
 			new A(data)
 		}
 	}
 
-	@RecombinationProcess("test.bla3")
+	@PPLibProcess("test.bla3")
 	private class TestProcessStubChild(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[String, B](params) {
 		override protected def run(data: String): B = {
 			new B(data)
@@ -115,7 +116,7 @@ class ProcessDBTest {
 	}
 
 
-	@RecombinationProcess("test.bla4")
+	@PPLibProcess("test.bla4")
 	private class TestProcessStubUnrelated(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[String, C](params) {
 		override protected def run(data: String): C = {
 			new C(data)

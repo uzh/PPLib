@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationProcess, ProcessStubWithHCompPortalAccess, ProcessParamter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{PPLibProcess, ProcessStubWithHCompPortalAccess, ProcessParamter, ProcessStub}
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.duration.{Duration, _}
@@ -11,7 +11,7 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-@RecombinationProcess("refine.dualpathway")
+@PPLibProcess("refine.dualpathway")
 class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess._
 

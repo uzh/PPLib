@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.util.U
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
@@ -32,16 +33,29 @@ object HComp extends LazyLogging {
 	def mechanicalTurk: MechanicalTurkPortalAdapter = portals.get(MechanicalTurkPortalAdapter.PORTAL_KEY).get.asInstanceOf[MechanicalTurkPortalAdapter]
 
 	protected def autoloadConfiguredPortals() {
-		//TODO introduce annotation to auto-init portals themselves
-		if (U.getConfigString(CrowdFlowerPortalAdapter.CONFIG_API_KEY).isDefined)
-			addPortal(CrowdFlowerPortalAdapter.PORTAL_KEY, new CrowdFlowerPortalAdapter("PPLib @ CrowdFlower"))
+		val config = ConfigFactory.load()
 
-		if (U.getConfigString(MechanicalTurkPortalAdapter.CONFIG_ACCESS_ID_KEY).isDefined)
-			addPortal(MechanicalTurkPortalAdapter.PORTAL_KEY, new MechanicalTurkPortalAdapter(
-				U.getConfigString(MechanicalTurkPortalAdapter.CONFIG_ACCESS_ID_KEY).get,
-				U.getConfigString(MechanicalTurkPortalAdapter.CONFIG_SECRET_ACCESS_KEY).get
-			))
+		val classes = U.findClassesInPackageWithProcessAnnotation("ch.uzh.ifi.pdeboer.pplib.hcomp", classOf[HCompPortal])
+			.asInstanceOf[Set[Class[HCompPortalAdapter]]]
+		val annotations = classes.map(_.getAnnotation(classOf[HCompPortal])).filter(_.autoInit)
+		val builders = annotations.map(_.builder().newInstance())
+		builders.foreach(b => {
+			try {
+				b.loadConfig(config)
+				val portal: HCompPortalAdapter = b.build
+				addPortal(portal.getDefaultPortalKey, portal)
+			}
+			catch {
+				case e: Throwable => logger.error(s"could not load portal for builder $b", e)
+			}
+		})
+
 	}
 
-	autoloadConfiguredPortals()
+	try {
+		autoloadConfiguredPortals()
+	}
+	catch {
+		case e: Throwable => logger.error("could not auto-initialize portals due to an error", e)
+	}
 }

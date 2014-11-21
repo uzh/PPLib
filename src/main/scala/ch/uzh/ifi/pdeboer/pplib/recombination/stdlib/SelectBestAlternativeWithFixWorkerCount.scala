@@ -1,12 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, RecombinationProcess, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, PPLibProcess, ProcessStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 31/10/14.
  */
-@RecombinationProcess("select.contest")
+@PPLibProcess("select.contest")
 class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._

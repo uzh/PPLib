@@ -51,8 +51,8 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 				Nil
 			else recombinationCategoryNames
 		val annotation =
-			if (this.getClass.isAnnotationPresent(classOf[RecombinationProcess]))
-				this.getClass.getAnnotation(classOf[RecombinationProcess]).value()
+			if (this.getClass.isAnnotationPresent(classOf[PPLibProcess]))
+				this.getClass.getAnnotation(classOf[PPLibProcess]).value()
 			else ""
 		(annotation :: names).map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
 	}
@@ -105,15 +105,6 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	def to[IN, OUT] = this.asInstanceOf[ProcessStub[IN, OUT]]
 
-	/*
-	assert(allParameterTypesCorrect,
-		s"some parameter types were not correct: ${
-			allParams
-				.filter(p => params.contains(p.key))
-				.filterNot(p => isParameterTypeCorrect(p.key, params(p.key)))
-				.map(p => s"${p.key} is ${params(p.key).getClass.getCanonicalName}, should be ${p.clazz.getCanonicalName}").mkString(", ")
-		}")
-	*/
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	recombinationCategories.foreach(c => ProcessDB.put(c, this))
 

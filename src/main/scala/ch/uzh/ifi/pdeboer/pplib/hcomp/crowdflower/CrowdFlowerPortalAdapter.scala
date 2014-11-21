@@ -6,6 +6,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 /**
  * Created by pdeboer on 10/10/14.
  */
+@HCompPortal(builder = classOf[CrowdFlowerPortalBuilder], autoInit = true)
 class CrowdFlowerPortalAdapter(val applicationName: String, val apiKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
 	private var jobIds = collection.mutable.HashMap.empty[Int, CFJobCreator]
 
@@ -56,7 +57,7 @@ class CrowdFlowerPortalBuilder extends HCompPortalBuilder {
 
 	override def build: HCompPortalAdapter = new CrowdFlowerPortalAdapter(
 		params.getOrElse(APPLICATION_NAME, "PPLib Application"),
-		params(SANDBOX), params.getOrElse(SANDBOX, "false") == "true"
+		params(API_KEY), params.getOrElse(SANDBOX, "false") == "true"
 	)
 
 	override def expectedParameters: List[String] = List(API_KEY)
