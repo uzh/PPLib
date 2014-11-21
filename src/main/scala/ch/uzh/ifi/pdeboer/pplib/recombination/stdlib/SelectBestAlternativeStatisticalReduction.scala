@@ -7,7 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 /**
  * Created by pdeboer on 03/11/14.
  */
-@PPLibProcess("select.statistical")
+@PPLibProcess("decide.consensus.statistical")
 class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction._

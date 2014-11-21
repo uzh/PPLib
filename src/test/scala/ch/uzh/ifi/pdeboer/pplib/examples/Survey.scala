@@ -9,10 +9,6 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SimpleWriteProcess
  * Created by pdeboer on 30/10/14.
  */
 object Survey extends App {
-	//HComp.addPortal(new CrowdFlowerPortalAdapter("Survey", sandbox = true))
-
-	HComp.allDefinedPortals
-
 	private val participantCount: Int = 2
 
 	val submissions = (1 to participantCount).par.map(n => {

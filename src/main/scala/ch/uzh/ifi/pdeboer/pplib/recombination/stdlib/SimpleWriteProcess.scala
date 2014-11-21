@@ -6,7 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStubWithH
 /**
  * Created by pdeboer on 04/11/14.
  */
-@PPLibProcess("collect.writings")
+@PPLibProcess("create.collection.text")
 class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[Map[String, String]]](params) {
 
 	import SimpleWriteProcess._

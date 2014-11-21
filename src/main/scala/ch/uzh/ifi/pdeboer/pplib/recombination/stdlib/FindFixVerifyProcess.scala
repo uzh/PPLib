@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 /**
  * Created by pdeboer on 04/11/14.
  */
-@PPLibProcess("refine.findfixverify")
+@PPLibProcess("create.refine.findfixverify")
 class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 	override protected def run(data: List[String]): List[String] = {
 		val driver = new FFVDefaultHCompDriver(

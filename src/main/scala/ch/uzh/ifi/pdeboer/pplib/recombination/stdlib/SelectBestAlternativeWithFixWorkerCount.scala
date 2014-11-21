@@ -6,7 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, PPLibProcess, Pr
 /**
  * Created by pdeboer on 31/10/14.
  */
-@PPLibProcess("select.contest")
+@PPLibProcess("decide.vote.fix")
 class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
