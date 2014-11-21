@@ -1,12 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 /**
  * Created by pdeboer on 10/10/14.
  */
-class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
+class CrowdFlowerPortalAdapter(val applicationName: String, val apiKey: String, sandbox: Boolean = false) extends HCompPortalAdapter {
 	private var jobIds = collection.mutable.HashMap.empty[Int, CFJobCreator]
 
 	def this(applicationName: String, sandbox: Boolean) =
@@ -35,8 +35,29 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 		new CFJobStatusManager(apiKey, manager.jobId).cancelQuery()
 	}
 }
-
 object CrowdFlowerPortalAdapter {
 	val CONFIG_API_KEY = "hcomp.crowdflower.apikey"
+	val CONFIG_APPLICATION_NAME = "hcomp.crowdflower.applicationName"
+	val CONFIG_SANDBOX = "hcomp.crowdflower.sandbox"
+
 	val PORTAL_KEY = "crowdFlower"
+}
+
+class CrowdFlowerPortalBuilder extends HCompPortalBuilder {
+	val API_KEY: String = "apiKey"
+	val APPLICATION_NAME: String = "appName"
+	val SANDBOX: String = "sandbox"
+
+	val parameterToConfigPath = Map(
+		API_KEY -> CrowdFlowerPortalAdapter.CONFIG_API_KEY,
+		APPLICATION_NAME -> CrowdFlowerPortalAdapter.CONFIG_APPLICATION_NAME,
+		SANDBOX -> CrowdFlowerPortalAdapter.CONFIG_SANDBOX
+	)
+
+	override def build: HCompPortalAdapter = new CrowdFlowerPortalAdapter(
+		params.getOrElse(APPLICATION_NAME, "PPLib Application"),
+		params(SANDBOX), params.getOrElse(SANDBOX, "false") == "true"
+	)
+
+	override def expectedParameters: List[String] = List(API_KEY)
 }

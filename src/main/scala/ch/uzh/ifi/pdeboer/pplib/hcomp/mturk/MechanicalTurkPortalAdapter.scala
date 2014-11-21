@@ -10,7 +10,7 @@ import scala.collection.mutable
 /**
  * Created by pdeboer on 19/11/14.
  */
-class MechanicalTurkPortalAdapter(accessKey: String, secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogging {
+class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogging {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
@@ -42,5 +42,26 @@ class MechanicalTurkPortalAdapter(accessKey: String, secretKey: String, sandbox:
 object MechanicalTurkPortalAdapter {
 	val CONFIG_ACCESS_ID_KEY = "hcomp.mturk.accessKeyID"
 	val CONFIG_SECRET_ACCESS_KEY = "hcomp.mturk.secretAccessKey"
+	val CONFIG_SANDBOX_KEY = "hcomp.mturk.sandbox"
 	val PORTAL_KEY = "mechanicalTurk"
+}
+
+class MechanicalTurkPortalBuilder extends HCompPortalBuilder {
+	val ACCESS_ID_KEY: String = "accessIdKey"
+	val SECRET_ACCESS_KEY: String = "secretAccessKey"
+	val SANDBOX: String = "sandbox"
+
+	val parameterToConfigPath = Map(
+		ACCESS_ID_KEY -> MechanicalTurkPortalAdapter.CONFIG_ACCESS_ID_KEY,
+		SECRET_ACCESS_KEY -> MechanicalTurkPortalAdapter.CONFIG_SECRET_ACCESS_KEY,
+		SANDBOX -> MechanicalTurkPortalAdapter.CONFIG_SANDBOX_KEY
+	)
+
+	override def build: HCompPortalAdapter = new MechanicalTurkPortalAdapter(
+		params(ACCESS_ID_KEY),
+		params(SECRET_ACCESS_KEY),
+		params.getOrElse(SANDBOX, "false") == "true"
+	)
+
+	override def expectedParameters: List[String] = List(ACCESS_ID_KEY, SECRET_ACCESS_KEY)
 }

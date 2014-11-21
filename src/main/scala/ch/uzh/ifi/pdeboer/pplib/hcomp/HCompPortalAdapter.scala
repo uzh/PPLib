@@ -2,6 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import ch.uzh.ifi.pdeboer.pplib.util.U
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -84,7 +86,9 @@ private object HCompIDGen {
 
 trait HCompQuery {
 	def question: String
+
 	def title: String
+
 	final val identifier: Int = HCompIDGen.next()
 }
 
@@ -189,3 +193,26 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer
 
 case class HCompQueryProperties(paymentCents: Double = 1d)
+
+trait HCompPortalBuilder {
+	private var _params = collection.mutable.HashMap.empty[String, String]
+
+	def loadConfig(config: Config): Unit = {
+		parameterToConfigPath.foreach {
+			case (parameter, configPath) =>
+				U.getConfigString(configPath) match {
+					case Some(configValue) => setParameter(parameter, configValue)
+				}
+		}
+	}
+
+	def build: HCompPortalAdapter
+
+	def params: Map[String, String] = _params.toMap
+
+	def expectedParameters: List[String]
+
+	def parameterToConfigPath: Map[String, String]
+
+	def setParameter(param: String, value: String): Unit = _params += param -> value
+}
