@@ -38,7 +38,7 @@ trait HCompPortalAdapter extends LazyLogging {
 		future.value.get.get
 	}
 
-	def getDefaultPortalKey: Symbol
+	def getDefaultPortalKey: String
 
 	def getQueries() = queryLog
 
@@ -64,7 +64,7 @@ class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extend
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] =
 		decoratedPortal.processQuery(query, properties)
 
-	override def getDefaultPortalKey: Symbol = decoratedPortal.getDefaultPortalKey
+	override def getDefaultPortalKey: String = decoratedPortal.getDefaultPortalKey
 
 	override def cancelQuery(query: HCompQuery): Unit = {
 		decoratedPortal.cancelQuery(query)

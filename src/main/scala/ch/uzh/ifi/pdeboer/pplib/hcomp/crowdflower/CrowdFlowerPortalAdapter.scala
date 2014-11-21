@@ -16,7 +16,7 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 
 	def this(applicationName: String) = this(applicationName, false)
 
-	override def getDefaultPortalKey: Symbol = CrowdFlowerPortalAdapter.PORTAL_KEY
+	override def getDefaultPortalKey: String = CrowdFlowerPortalAdapter.PORTAL_KEY
 
 	//TODO make this protected
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties) = {
@@ -38,5 +38,5 @@ class CrowdFlowerPortalAdapter(applicationName: String, apiKey: String, sandbox:
 
 object CrowdFlowerPortalAdapter {
 	val CONFIG_API_KEY = "hcomp.crowdflower.apikey"
-	val PORTAL_KEY = 'crowdFlower
+	val PORTAL_KEY = "crowdFlower"
 }

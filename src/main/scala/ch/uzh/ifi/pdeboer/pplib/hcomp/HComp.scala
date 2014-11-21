@@ -11,20 +11,20 @@ import scala.collection.mutable
  * Created by pdeboer on 10/10/14.
  */
 object HComp extends LazyLogging {
-	private val portals = new mutable.HashMap[Symbol, HCompPortalAdapter]()
+	private val portals = new mutable.HashMap[String, HCompPortalAdapter]()
 
 	def addPortal(portal: HCompPortalAdapter) {
 		addPortal(portal.getDefaultPortalKey, portal)
 	}
 
-	def addPortal(key: Symbol, portal: HCompPortalAdapter) {
+	def addPortal(key: String, portal: HCompPortalAdapter) {
 		logger.info(s"adding portaladapter ${portal.getClass.getSimpleName} with key ${portal.getDefaultPortalKey}")
 		portals += (key -> portal)
 	}
 
 	def allDefinedPortals = portals.values.filter(_ != null).toList
 
-	def apply(key: Symbol) = portals(key)
+	def apply(key: String) = portals(key)
 
 	//convenience methods, may be removed at a later stage
 	def crowdFlower: CrowdFlowerPortalAdapter = portals.get(CrowdFlowerPortalAdapter.PORTAL_KEY).get.asInstanceOf[CrowdFlowerPortalAdapter]

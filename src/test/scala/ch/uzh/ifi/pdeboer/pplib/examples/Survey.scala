@@ -20,7 +20,7 @@ object Survey extends App {
 			maxNumberOfResults = 1)
 		val participantAge = FreetextQuery("How old are you?")
 
-		val result = HComp('crowdFlower).sendQueryAndAwaitResult(
+		val result = HComp("crowdFlower").sendQueryAndAwaitResult(
 			CompositeQuery(List(
 				participantName,
 				participantContinent,

@@ -25,7 +25,7 @@ object FindFixVerifyTranslation extends App {
 	val ffv = new FindFixVerifyExecutor[String](
 		new FFVDefaultHCompDriver(
 			patches.zipWithIndex.map(p => FFVPatch[String](p._1, p._2)),
-			HComp('crowdFlower)
+			HComp("crowdFlower")
 		), findersCount = 1, minFindersCountThatNeedToAgreeForFix = 1, fixersPerPatch = 1)
 
 	println("ended :" + ffv.bestPatches.map(_.patch).mkString("."))
