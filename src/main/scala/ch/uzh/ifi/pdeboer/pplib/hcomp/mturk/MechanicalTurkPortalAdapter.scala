@@ -1,8 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import com.amazonaws.mturk.service.axis.RequesterService
-import com.amazonaws.mturk.util.ClientConfig
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
@@ -17,13 +15,8 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	var map = mutable.HashMap.empty[Int, MTurkManager]
 
-	val service: RequesterService = new RequesterService(new ClientConfig() {
-		setAccessKeyId(accessKey)
-		setSecretAccessKey(secretKey)
-		setServiceURL(serviceURL)
-		setRetryAttempts(10)
-		setRetryDelayMillis(1000)
-	})
+	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
+
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		logger.info("executing query " + query)

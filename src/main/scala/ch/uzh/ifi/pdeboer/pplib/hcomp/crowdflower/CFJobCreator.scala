@@ -3,7 +3,6 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompJobCancelled, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.util._
 import com.typesafe.scalalogging.LazyLogging
-import dispatch._
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent._
