@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, PPLibProcess, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, PPLibProcess, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
@@ -50,15 +50,15 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 	override val recombinationCategoryNames: List[String] = List("selectbest.statistical")
 
 
-	override def expectedParametersBeforeRun: List[ProcessParamter[_]] = List(INSTRUCTIONS_PARAMETER)
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(INSTRUCTIONS_PARAMETER)
 
-	override def optionalParameters: List[ProcessParamter[_]] =
+	override def optionalParameters: List[ProcessParameter[_]] =
 		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
 }
 
 object SelectBestAlternativeStatisticalReduction {
-	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the item that fits best"))))
-	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("Select Best Alternative")))
-	val CONFIDENCE_PARAMETER = new ProcessParamter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
+	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the item that fits best"))))
+	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", Some(List("")))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", Some(List("Select Best Alternative")))
+	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
 }

@@ -8,14 +8,14 @@ import org.junit.{Assert, Test}
 class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(chk = List(new ProcessParamter[String]("test")), Map("test" -> "asdf"))
+		new TestRecombImplparams(chk = List(new ProcessParameter[String]("test")), Map("test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParamter[String]("test2")), Map("test" -> "asdf"))
+			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test2")), Map("test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
@@ -26,7 +26,7 @@ class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParamter[String]("test")), Map("test" -> List.empty[String]))
+			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test")), Map("test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {
@@ -34,8 +34,8 @@ class ProcessStubParameterTest {
 		}
 	}
 
-	private class TestRecombImplparams(chk: List[ProcessParamter[_]], params: Map[String, AnyRef]) extends ProcessStub[String, String](params = params) {
-		override def expectedParametersOnConstruction: List[ProcessParamter[_]] = chk
+	private class TestRecombImplparams(chk: List[ProcessParameter[_]], params: Map[String, AnyRef]) extends ProcessStub[String, String](params = params) {
+		override def expectedParametersOnConstruction: List[ProcessParameter[_]] = chk
 
 		override def run(data: String): String = "test"
 	}

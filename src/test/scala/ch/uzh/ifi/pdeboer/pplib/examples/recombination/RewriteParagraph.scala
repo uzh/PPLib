@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStub}
 
 /**
  * Created by pdeboer on 04/11/14.

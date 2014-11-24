@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, PPLibProcess, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, PPLibProcess, ProcessStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 31/10/14.
@@ -31,17 +31,17 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 	override val recombinationCategoryNames: List[String] = List("selectbest.single")
 
 
-	override def expectedParametersBeforeRun: List[ProcessParamter[_]] =
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =
 		List(INSTRUCTIONS_PARAMETER, WORKER_COUNT_PARAMETER)
 
-	override def optionalParameters: List[ProcessParamter[_]] =
+	override def optionalParameters: List[ProcessParameter[_]] =
 		List(AUX_STRING_PARAMETER,
 			TITLE_PARAMETER)
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
-	val INSTRUCTIONS_PARAMETER = new ProcessParamter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
-	val AUX_STRING_PARAMETER = new ProcessParamter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new ProcessParamter[String]("title", Some(List("SelectBestAlternative")))
-	val WORKER_COUNT_PARAMETER = new ProcessParamter[Int]("workerCount", Some(List(3, 5)))
+	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
+	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", Some(List("")))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", Some(List("SelectBestAlternative")))
+	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", Some(List(3, 5)))
 }

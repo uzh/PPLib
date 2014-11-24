@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParamter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStub}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -17,16 +17,16 @@ class FFVSyntaxChecker(params: Map[String, Any] = Map.empty[String, Any]) extend
 		ffvProcess.process(input).mkString(getParamUnsafe(SPLIT_IMPLODER))
 	}
 
-	override def expectedParametersBeforeRun: List[ProcessParamter[_]] =
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =
 		ffvProcess.expectedParametersBeforeRun
 
-	override def optionalParameters: List[ProcessParamter[_]] =
+	override def optionalParameters: List[ProcessParameter[_]] =
 		ffvProcess.optionalParameters ::: List(SPLIT_EXPLODER, SPLIT_IMPLODER)
 
 }
 
 object FFVSyntaxChecker {
-	val SPLIT_EXPLODER = new ProcessParamter[String]("splitExploder", Some(List("\\.")))
-	val SPLIT_IMPLODER = new ProcessParamter[String]("splitImploder", Some(List(".")))
+	val SPLIT_EXPLODER = new ProcessParameter[String]("splitExploder", Some(List("\\.")))
+	val SPLIT_IMPLODER = new ProcessParameter[String]("splitImploder", Some(List(".")))
 
 }

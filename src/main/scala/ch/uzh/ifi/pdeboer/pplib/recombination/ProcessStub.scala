@@ -23,7 +23,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		run(data)
 	}
 
-	def ensureExpectedParametersGiven(expected: List[ProcessParamter[_]]): Unit = {
+	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {
 			case Some(v) => isParameterTypeCorrect(k.key, v)
 			case None => throw new IllegalArgumentException("Parameter not defined: " + k.key + ":" + k.clazz.getCanonicalName)
@@ -37,11 +37,11 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 	 * Expected parameters of type "Option" will default to NONE if checked against.
 	 * @return
 	 */
-	def expectedParametersOnConstruction: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
+	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
-	def expectedParametersBeforeRun: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
+	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
-	def optionalParameters: List[ProcessParamter[_]] = List.empty[ProcessParamter[_]]
+	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
 	protected def recombinationCategoryNames: List[String] = Nil
 
@@ -71,7 +71,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	final def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
 
-	def allParams: List[ProcessParamter[_]] = {
+	def allParams: List[ProcessParameter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters
 	}
 
@@ -81,7 +81,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		}
 	}
 
-	def getParam[T](param: ProcessParamter[T], useDefaultValues: Boolean = true): Option[T] = {
+	def getParam[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param.key) match {
 			case Some(p) => Some(p.asInstanceOf[T])
 			case _ => if (useDefaultValues) param.candidateDefinitions.getOrElse(Nil).headOption
@@ -89,7 +89,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		}
 	}
 
-	def getParamUnsafe[T](param: ProcessParamter[T], useDefaultValues: Boolean = true): T =
+	def getParamUnsafe[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): T =
 		getParam[T](param, useDefaultValues).get
 
 	def getParamByKey[T](param: String, useDefaultValues: Boolean = true): Option[T] = {
@@ -129,20 +129,20 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
 	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL))
 
-	override def expectedParametersBeforeRun: List[ProcessParamter[_]] = PORTAL :: super.expectedParametersBeforeRun
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
 
-	val PORTAL = new ProcessParamter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val PORTAL = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 
 object ProcessStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new ProcessParamter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 }
 
 class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {
 	override def iterator: Iterator[ProcessStub[I, O]] = ProcessDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
 }
 
-class ProcessParamter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
+class ProcessParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
 
 	def t = implicitly[ClassTag[T]]
@@ -150,7 +150,7 @@ class ProcessParamter[T: ClassTag](val key: String, val candidateDefinitions: Op
 
 // TODO doesnt work for some reason
 object RecombinationParameterConversion {
-	implicit def parameterToKey(params: Map[ProcessParamter[_], Any]): Map[String, Any] = params.map {
+	implicit def parameterToKey(params: Map[ProcessParameter[_], Any]): Map[String, Any] = params.map {
 		case (param, value) => param.key -> value
 	}.toMap
 }

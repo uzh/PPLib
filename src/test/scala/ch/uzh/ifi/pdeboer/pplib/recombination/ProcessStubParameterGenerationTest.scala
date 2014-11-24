@@ -74,9 +74,9 @@ object ProcessStubParameterGenerationTest {
 }
 
 class TestProcessStub(params: Map[String, AnyRef] = Map.empty[String, AnyRef]) extends ProcessStub[String, String](params) {
-	override def optionalParameters: List[ProcessParamter[_]] = List(
-		new ProcessParamter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
-		new ProcessParamter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
+	override def optionalParameters: List[ProcessParameter[_]] = List(
+		new ProcessParameter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
+		new ProcessParameter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
 	)
 
 	override def run(data: String): String = data + "1"
