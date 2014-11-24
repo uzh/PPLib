@@ -20,12 +20,12 @@ import scala.xml.{Node, NodeSeq, XML}
  *
  */
 
-case class CreatedHIT(xml: Node) {
+private[mturk] case class CreatedHIT(xml: Node) {
 	val HITId = MTurkUtil.oneText(xml \ "HITId")
 	val HITTypeId = MTurkUtil.oneText(xml \ "HITTypeId")
 }
 
-case class HIT(xml: Node) {
+private[mturk] case class HIT(xml: Node) {
 	val HITId: String = MTurkUtil.oneText(xml \ "HITId")
 	val HITTypeId = MTurkUtil.oneText(xml \ "HITTypeId")
 	val CreationTime = MTurkUtil.oneDateTime(xml \ "CreationTime")
@@ -42,13 +42,13 @@ case class HIT(xml: Node) {
 	val RequesterAnnotation = MTurkUtil.oneTextOption(xml \ "RequesterAnnotation")
 }
 
-object AssignmentStatus {
+private[mturk] object AssignmentStatus {
 	val Submitted = "Submitted"
 	val Approved = "Approved"
 	val Rejected = "Rejected"
 }
 
-case class Assignment(hit: String, xml: Node) {
+private[mturk] case class Assignment(hit: String, xml: Node) {
 	val AssignmentId = MTurkUtil.oneText(xml \ "AssignmentId")
 	val WorkerId = MTurkUtil.oneText(xml \ "WorkerId")
 	val HITId = hit
@@ -74,11 +74,11 @@ case class Assignment(hit: String, xml: Node) {
 	val isRejected = this.assignmentStatus == AssignmentStatus.Rejected
 }
 
-sealed class Question(val xml: Node)
+private[mturk] sealed class Question(val xml: Node)
 
-object Question {
+private[mturk] object Question {
 
-	case class ExternalQuestion(ExternalURL: String, FrameHeight: Int)
+	private[mturk] case class ExternalQuestion(ExternalURL: String, FrameHeight: Int)
 		extends Question(
 			<ExternalQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
 				<ExternalURL>
@@ -91,13 +91,13 @@ object Question {
 
 }
 
-case class Price(val Amount: String, val CurrencyCode: String = "USD")
+private[mturk] case class Price(val Amount: String, val CurrencyCode: String = "USD")
 
 
 /**
  * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
  */
-case class QualificationRequirement(
+private[mturk] case class QualificationRequirement(
 									   QualificationTypeId: String,
 									   Comparator: String,
 									   RequiredToPreview: Boolean = false,
@@ -125,12 +125,12 @@ case class QualificationRequirement(
 /**
  * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
  */
-object QualificationRequirement {
+private[mturk] object QualificationRequirement {
 
 	/**
 	 * Names of different Comparators used to specify QualificationRequirements.
 	 */
-	object Comparator {
+	private[mturk] object Comparator {
 		val LessThan = "LessThan"
 		val LessThanOrEqualTo = "LessThanOrEqualTo"
 		val GreaterThan = "GreaterThan"
@@ -145,7 +145,7 @@ object QualificationRequirement {
 	 * assignments the Worker has accepted. The value is an integer between
 	 * 0 and 100.
 	 */
-	object Worker_PercentAssignmentsSubmitted
+	private[mturk] object Worker_PercentAssignmentsSubmitted
 		extends IntegerValueFactory("00000000000000000000")
 
 	/**
@@ -153,7 +153,7 @@ object QualificationRequirement {
 	 * deadline to elapse), over all assignments the Worker has accepted. The
 	 * value is an integer between 0 and 100.
 	 */
-	object Worker_PercentAssignmentsAbandoned
+	private[mturk] object Worker_PercentAssignmentsAbandoned
 		extends IntegerValueFactory("00000000000000000070")
 
 	/**
@@ -161,7 +161,7 @@ object QualificationRequirement {
 	 * assignments the Worker has accepted. The value is an integer between
 	 * 0 and 100.
 	 */
-	object Worker_PercentAssignmentsReturned
+	private[mturk] object Worker_PercentAssignmentsReturned
 		extends IntegerValueFactory("000000000000000000E0")
 
 	/**
@@ -169,7 +169,7 @@ object QualificationRequirement {
 	 * subsequently approved by the Requester, over all assignments the Worker
 	 * has submitted. The value is an integer between 0 and 100.
 	 */
-	object Worker_PercentAssignmentsApproved
+	private[mturk] object Worker_PercentAssignmentsApproved
 		extends IntegerValueFactory("000000000000000000L0")
 
 	/**
@@ -177,14 +177,14 @@ object QualificationRequirement {
 	 * subsequently rejected by the Requester, over all assignments the Worker
 	 * has submitted. The value is an integer between 0 and 100.
 	 */
-	object Worker_PercentAssignmentsRejected
+	private[mturk] object Worker_PercentAssignmentsRejected
 		extends IntegerValueFactory("000000000000000000S0")
 
 	/**
 	 * Specifies the total number of HITs submitted by a Worker that have been
 	 * approved. The value is an integer greater than or equal to 0.
 	 */
-	object Worker_NumberHITsApproved
+	private[mturk] object Worker_NumberHITsApproved
 		extends IntegerValueFactory("00000000000000000040")
 
 	/**
@@ -192,13 +192,13 @@ object QualificationRequirement {
 	 * to work on potentially offensive content. The value type is boolean,
 	 * 1 (required), 0 (not required, the default)
 	 */
-	object Worker_Adult
+	private[mturk] object Worker_Adult
 		extends IntegerValueFactory("00000000000000000060")
 
 	/**
 	 * The location of the Worker, as specified in the Worker's mailing address.
 	 */
-	object Worker_Locale
+	private[mturk] object Worker_Locale
 		extends Factory[String]("00000000000000000071", "LocaleValue.Country")
 
 	/**
@@ -207,7 +207,7 @@ object QualificationRequirement {
 	 *
 	 * Provides "exists", "===" and "!==" syntax for invoking comparators.
 	 */
-	abstract class Factory[VALUE](QualificationTypeId: String, valueName: String) {
+	private[mturk] abstract class Factory[VALUE](QualificationTypeId: String, valueName: String) {
 		def exists = QualificationRequirement(this.QualificationTypeId, Comparator.Exists)
 
 		def ===(value: VALUE) = this.comparing(Comparator.EqualTo, value)
@@ -227,7 +227,7 @@ object QualificationRequirement {
 	 * Provides "exists", "===", "!==", "<", "<=", ">" and ">=" syntax for
 	 * invoking comparators.
 	 */
-	abstract class IntegerValueFactory(QualificationTypeId: String)
+	private[mturk] abstract class IntegerValueFactory(QualificationTypeId: String)
 		extends Factory[Int](QualificationTypeId, "IntegerValue") {
 		def <(value: Int) = this.comparing(Comparator.LessThan, value)
 
@@ -240,13 +240,13 @@ object QualificationRequirement {
 
 }
 
-class Server(val url: String)
+private[mturk] class Server(val url: String)
 
-case object MTurkServer extends Server("https://mechanicalturk.amazonaws.com/?")
+private[mturk] case object MTurkServer extends Server("https://mechanicalturk.amazonaws.com/?")
 
-case object MTurkSandboxServer extends Server("http://mechanicalturk.sandbox.amazonaws.com/?")
+private[mturk] case object MTurkSandboxServer extends Server("http://mechanicalturk.sandbox.amazonaws.com/?")
 
-object MTurkService {
+private[mturk] object MTurkService {
 
 	def apply(accessKey: String, secretKey: String, server: Server): MTurkService = {
 		new MTurkService(accessKey, secretKey, server)
@@ -284,7 +284,7 @@ object MTurkService {
 	}
 }
 
-class MTurkService(
+private[mturk] class MTurkService(
 					  accessKey: String,
 					  secretKey: String,
 					  val server: Server) {
