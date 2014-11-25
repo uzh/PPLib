@@ -36,6 +36,7 @@ trait HCompPortalAdapter extends LazyLogging {
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days): Option[HCompAnswer] = {
 		val future = sendQuery(query)
+		logger.info("query sent, waiting for result")
 		Await.result(future, maxWaitTime)
 		future.value.get.get
 	}

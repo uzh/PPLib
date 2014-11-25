@@ -9,6 +9,7 @@ sealed trait MTQuery {
 	def id: String = "query" + rawQuery.identifier
 
 	def defaultXML(title: String = rawQuery.title, question: String = rawQuery.question, injectedXML: Node = elementXML, valueIsRequired: Boolean = true) =
+		<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
 		<Question>
 			<QuestionIdentifier>
 				{id}
@@ -16,18 +17,19 @@ sealed trait MTQuery {
 			<DisplayName>
 				{title}
 			</DisplayName>
-			<isRequired>
+			<IsRequired>
 				{valueIsRequired}
-			</isRequired>
+			</IsRequired>
 			<QuestionContent>
 				<FormattedContent>
-					{question}
+					{scala.xml.PCData(question)}
 				</FormattedContent>
 			</QuestionContent>
 			<AnswerSpecification>
 				{injectedXML}
 			</AnswerSpecification>
-		</Question>.theSeq(0)
+		</Question>
+		</QuestionForm>.theSeq(0)
 
 	def xml = defaultXML()
 
