@@ -1,5 +1,3 @@
-import com.github.retronym.SbtOneJar._
-
 organization := "pdeboer"
 
 name := "PPLib"
@@ -22,6 +20,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
-oneJarSettings
 
-//mainClass in oneJar := Some("ch.uzh.ifi.pdeboer.pplib.Survey")
+//mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.Survey")
+
+// To Skip Tests:
+//test in assembly := {}
