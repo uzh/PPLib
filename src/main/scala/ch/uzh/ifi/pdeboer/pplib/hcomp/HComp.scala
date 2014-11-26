@@ -47,7 +47,7 @@ object HComp extends LazyLogging {
 			}
 			catch {
 				case e: Throwable => {
-					val errorMessage: String = s"Skipped automatic initialization of $b due to missing / invalid configuration."
+					val errorMessage: String = s"Skipped automatic initialization of ${b.getClass.getSimpleName} due to missing / invalid configuration."
 					logger.error(errorMessage)
 					logger.debug(errorMessage, e)
 				}
