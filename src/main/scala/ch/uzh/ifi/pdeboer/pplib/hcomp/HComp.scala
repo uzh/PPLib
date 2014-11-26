@@ -46,7 +46,11 @@ object HComp extends LazyLogging {
 				addPortal(portal.getDefaultPortalKey, portal)
 			}
 			catch {
-				case e: Throwable => logger.error(s"could not load portal for builder $b", e)
+				case e: Throwable => {
+					val errorMessage: String = s"Skipped automatic initialization of $b due to missing / invalid configuration."
+					logger.error(errorMessage)
+					logger.debug(errorMessage, e)
+				}
 			}
 		})
 
