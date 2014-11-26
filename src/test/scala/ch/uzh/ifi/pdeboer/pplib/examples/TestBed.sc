@@ -1,3 +1,3 @@
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessDB
+val a = "".toInt
 
-ProcessDB.findClassesInPackageWithAnnotationAndAddThem()
+println("asdf:" + a)

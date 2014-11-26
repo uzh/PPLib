@@ -3,14 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
-import scala.xml.{Elem, Node, NodeSeq}
+import scala.xml._
 
 sealed trait MTQuery {
 	def id: String = "query" + rawQuery.identifier
 
-	def xml = <QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+	def xml = scala.xml.Utility.trim(<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
 		{questionXML}
-	</QuestionForm>.theSeq(0)
+	</QuestionForm>).theSeq(0)
 
 	def questionXML: NodeSeq
 
@@ -94,7 +94,11 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 	}
 
 	override def interpret(xml: NodeSeq): HCompAnswer = {
-		val selected = (getRelevantAnswerFromResponseXML(xml) \\ "SelectionIdentifier").map(i => i.text.split("_")(1).toInt).toSet
+		val selected = (getRelevantAnswerFromResponseXML(xml) \\ "SelectionIdentifier").map(i => {
+			val selectionId: String = i.text.split("_")(1)
+			val cleanedSelectionId: String = selectionId.replaceAll("[^0-9]", "")
+			if (cleanedSelectionId == "") -1 else cleanedSelectionId.toInt
+		}).toSet
 		MultipleChoiceAnswer(rawQuery, rawQuery.options.zipWithIndex.map(o => o._1 -> selected.contains(o._2)).toMap)
 	}
 

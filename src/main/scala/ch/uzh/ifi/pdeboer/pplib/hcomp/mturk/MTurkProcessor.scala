@@ -57,8 +57,13 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	}
 
 	def handleAssignmentResult(a: Assignment): Some[HCompAnswer] = {
-		//We approve all assignments by default. Don't like rejections
-		service.ApproveAssignment(a)
+		try {
+			//We approve all assignments by default. Don't like rejections
+			service.ApproveAssignment(a)
+		}
+		catch {
+			case e: Exception => logger.error("could not approve assignment", e)
+		}
 
 		val xml = a.AnswerXML
 		Some(MTQuery.convert(query).interpret(xml))
