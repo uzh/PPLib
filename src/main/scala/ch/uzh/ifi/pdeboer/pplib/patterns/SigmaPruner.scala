@@ -17,5 +17,6 @@ class SigmaPruner(val numSigmas: Int, val data: List[Double]) {
 	lazy val minAllowedValue: Double = mean - distance
 	lazy val maxAllowedValue: Double = mean + distance
 
-	lazy val dataWithinRange: List[Double] = data.filter(v => v >= minAllowedValue && v <= maxAllowedValue)
+	lazy val dataWithinRange: List[Double] =
+		data.filter(v => v >= minAllowedValue && v <= maxAllowedValue)
 }

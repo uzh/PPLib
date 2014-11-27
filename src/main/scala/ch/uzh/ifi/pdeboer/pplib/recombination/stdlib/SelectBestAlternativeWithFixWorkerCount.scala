@@ -13,7 +13,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.U
  * Created by pdeboer on 31/10/14.
  */
 @PPLibProcess("decide.vote.fix")
-class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
 
