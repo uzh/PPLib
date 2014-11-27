@@ -91,7 +91,7 @@ object ProcessDB extends LazyLogging {
 	autoloadPackagesFromConfigFile()
 }
 
-case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) {}
+case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String)
 
 object RecombinationCategory {
 	def get[INPUT: ClassTag, OUTPUT: ClassTag](name: String) =
