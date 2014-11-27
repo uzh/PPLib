@@ -9,11 +9,15 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{FilterBuilder, ConfigurationBuilder, ClasspathHelper}
 import scala.collection.JavaConversions._
 import scala.annotation.Annotation
+import scala.collection.parallel.ForkJoinTasks
+import scala.concurrent.forkjoin.ForkJoinPool
 
 /**
  * Created by pdeboer on 15/10/14.
  */
 object U {
+	val hugeForkJoinPool = new ForkJoinPool(1000)
+
 	/**
 	 * Method used to retry some code that may fail n times.
 	 * @param n  how often to retry
@@ -52,6 +56,5 @@ object U {
 
 		reflections.getTypesAnnotatedWith(anno).toSet
 	}
-
 	def removeWhitespaces(str: String) = str.replaceAll("\\s*", "")
 }

@@ -17,6 +17,7 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 
 	override protected def run(data: List[String]): String = {
 		do {
+			//TODO refactor for parallelism
 			val choice = castVote(data)
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
 		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2)

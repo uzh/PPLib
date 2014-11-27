@@ -13,7 +13,7 @@ class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 
 	override protected def run(data: List[String]): List[Map[String, String]] = {
 		val questionPerCriterion = getParamUnsafe(QUESTION_PER_CRITERION)
-		(1 to getParamUnsafe(STORIES_PER_CRITERION)).map(i => {
+		getCrowdWorkers(getParamUnsafe(STORIES_PER_CRITERION)).map(i => {
 			val queries = data.map(d => FreetextQuery(questionPerCriterion.getInstructions(d)) -> d).toMap
 
 			val results = portal.sendQueryAndAwaitResult(

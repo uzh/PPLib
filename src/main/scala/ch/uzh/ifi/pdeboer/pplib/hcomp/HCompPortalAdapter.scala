@@ -9,6 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, _}
+import scala.xml.NodeSeq
 
 
 /**
@@ -100,15 +101,16 @@ trait HCompAnswer {
 }
 
 case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "") {
-	def getInstructions(data1: String, data2: String = "") = <div>
-		<p>
-			{questionBeforeTuples}
-		</p>
-		<p>
-			<i>
-				{data1}
-			</i>
-		</p>{if (questionBetweenTuples != "") <p>
+	def getInstructions(data1: String, data2: String = "") =
+		NodeSeq.fromSeq(<placeholder>
+			<p>
+				{questionBeforeTuples}
+			</p>
+			<p>
+				<i>
+					{data1}
+				</i>
+			</p>{if (questionBetweenTuples != "") <p>
 			{questionBetweenTuples}
 		</p>}{if (data2 != "") <p>
 			<i>
@@ -117,7 +119,8 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 		</p>}{if (questionAfterTuples != "") <p>
 			{questionAfterTuples}
 		</p>}
-	</div>.toString
+		</placeholder>
+			.child).toString
 }
 
 case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery {

@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.recombination.ParSeqToAssignPool._
 import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
 
@@ -13,7 +14,8 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 							   val maxPatchesCountInFind: Int = 10,
 							   val findersCount: Int = 3,
 							   val minFindersCountThatNeedToAgreeForFix: Int = 2,
-							   val fixersPerPatch: Int = 3) {
+							   val fixersPerPatch: Int = 3,
+							   val parallelWorkers: Boolean = true) {
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
 
@@ -48,8 +50,10 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 	}
 
 	protected def getAlternativesForPatchesToFix(toFix: List[FFVPatch[T]]): List[FFVPatch[T]] = {
-		(1 to fixersPerPatch).par.map(i => toFix.par.map(p => driver.fix(p))).flatten.toList
+		getRange(fixersPerPatch).map(i => toFix.par.map(p => driver.fix(p))).flatten.toList
 	}
+
+	private def getRange(to: Int) = if (parallelWorkers) (1 to to).view.par.assignWorkerPool() else (1 to to).view
 
 	protected def getPatchesToFix() = {
 		var findSteps = new mutable.HashMap[Int, List[FFVPatchContainer[T]]]()
@@ -59,7 +63,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 			findSteps += k -> list
 		})
 
-		val selectedElementsInFind = (1 to findersCount).par.map(l => findSteps.par.map(p => driver.find(p._2.map(_.original)))).flatten.flatten
+		val selectedElementsInFind = getRange(findersCount).map(l => findSteps.par.map(p => driver.find(p._2.map(_.original)))).flatten.flatten
 		selectedElementsInFind.foreach(e => {
 			val container = allPatches.get(e.patchIndex).get //should exist except if driver messes with index. out of scope for us
 			container.finders += 1
@@ -107,7 +111,7 @@ trait FindFixVerifyDriver[T] {
 case class FFVPatch[T](patch: T, patchIndex: Int)
 
 object FFVDefaultHCompDriver {
-	val DEFAULT_FIND_QUESTION = "Please mark sentences you think are erroneous and should be improved"
+	val DEFAULT_FIND_QUESTION = "Please select sentences you think are erroneous and should be improved"
 	val DEFAULT_FIND_TITLE = "Find erroneous sentences"
 
 	val DEFAULT_FIX_QUESTION = HCompInstructionsWithTuple("Other crowd workers have agreed on this sentence being erroneous. Please fix it")

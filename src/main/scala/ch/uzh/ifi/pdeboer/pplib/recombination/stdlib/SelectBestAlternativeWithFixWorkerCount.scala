@@ -3,6 +3,12 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, PPLibProcess, ProcessStubWithHCompPortalAccess}
 
+import scala.collection.generic.GenericTraversableTemplate
+import scala.collection.{GenTraversable, GenIterable, GenSeq}
+import scala.collection.parallel.ParSeq
+import scala.collection.parallel.immutable.ParRange
+import ch.uzh.ifi.pdeboer.pplib.util.U
+
 /**
  * Created by pdeboer on 31/10/14.
  */
@@ -17,7 +23,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any]) extends 
 		val title = getParamUnsafe(TITLE_PARAMETER)
 		val workerCount = getParamUnsafe(WORKER_COUNT_PARAMETER)
 
-		val answers = (1 to workerCount).map(e =>
+		val answers = getCrowdWorkers(workerCount).map(w =>
 			portal.sendQueryAndAwaitResult(
 				MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title))
 			match {

@@ -131,7 +131,9 @@ class FindFixVerifyTest extends LazyLogging {
 													 maxPatchesCountInFind: Int = 10,
 													 findersCount: Int = 3,
 													 minFindersCountThatNeedToAgreeForFix: Int = 2,
-													 fixersPerPatch: Int = 3) extends FindFixVerifyExecutor[String](driver, maxPatchesCountInFind, findersCount, minFindersCountThatNeedToAgreeForFix, fixersPerPatch) {
+													 fixersPerPatch: Int = 3) extends FindFixVerifyExecutor[String](driver, maxPatchesCountInFind, findersCount, minFindersCountThatNeedToAgreeForFix, fixersPerPatch, parallelWorkers = false) {
+
+
 		def allPatchesVal = allPatches
 
 		override def getBestPatchesFromAllPatchesVAR(): List[FFVPatch[String]] = super.getBestPatchesFromAllPatchesVAR()

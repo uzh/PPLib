@@ -1,8 +1,10 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CrowdWorker, CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 
+import scala.collection.parallel.ParIterable
+import scala.collection.{CustomParallelizable, GenSeq}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
@@ -127,15 +129,26 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
-	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL))
 
-	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = PORTAL :: super.expectedParametersBeforeRun
+	import ProcessStubWithHCompPortalAccess._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.ParSeqToAssignPool._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.ParallelCollectionWithWorkerConnection
 
-	val PORTAL = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL_PARAMETER))
+
+	//TODO test if this actually works and doesnt destroy parallelism
+	def getCrowdWorkers(workerCount: Int) = (if (getParamUnsafe(PARALLEL_EXECUTION_PARAMETER)) {
+		(1 to workerCount).view.par.assignWorkerPool()
+	} else (1 to workerCount).view).map(i => new CrowdWorker(i + ""))
+
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = PORTAL_PARAMETER :: super.expectedParametersBeforeRun
+
+	override def optionalParameters: List[ProcessParameter[_]] = PARALLEL_EXECUTION_PARAMETER :: super.optionalParameters
 }
 
 object ProcessStubWithHCompPortalAccess {
 	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
 }
 
 class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HComp}
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVPatch, FFVDefaultHCompDriver, FindFixVerifyExecutor}
@@ -20,12 +21,12 @@ object FindFixVerifyTranslation extends App {
 
 	val patches = textToImprove.split("\\.").map(_.trim).toList
 
-	HComp.addPortal(new CrowdFlowerPortalAdapter("Fix-Up English Translation", sandbox = true))
+	//HComp.addPortal(new CrowdFlowerPortalAdapter("Fix-Up English Translation", sandbox = true))
 
 	val ffv = new FindFixVerifyExecutor[String](
 		new FFVDefaultHCompDriver(
-			patches.zipWithIndex.map(p => FFVPatch[String](p._1, p._2)),
-			HComp("crowdFlower")
+			patches.zipWithIndex.map(p => FFVPatch[String](p._1.replaceAll("\n", ""), p._2)),
+			HComp(MechanicalTurkPortalAdapter.PORTAL_KEY)
 		), findersCount = 1, minFindersCountThatNeedToAgreeForFix = 1, fixersPerPatch = 1)
 
 	println("ended :" + ffv.bestPatches.map(_.patch).mkString("."))
