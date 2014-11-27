@@ -77,7 +77,7 @@ class CFCompositeQuery(val rawQuery: CompositeQuery) extends CFQuery {
 object CFConversions {
 	def convertQueryToCFQuery(q: HCompQuery, fieldName: String = "field"): CFQuery = q match {
 		case q: FreetextQuery => new CFFreetextQuery(q, fieldName)
-		case q: MultipleChoiceQuery => if (q.maxNumberOfResults == 1) new CFSingleChoiceQuery(q, fieldName) else new CFMultipleChoiceQuery(q, fieldName)
+		case q: MultipleChoiceQuery => if (q.maxNumberOfResults == 1 && q.minNumberOfResults == 1) new CFSingleChoiceQuery(q, fieldName) else new CFMultipleChoiceQuery(q, fieldName)
 		case q: CompositeQuery => new CFCompositeQuery(q)
 	}
 }

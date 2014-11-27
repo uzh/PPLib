@@ -25,7 +25,12 @@ trait HCompPortalAdapter extends LazyLogging {
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
 		logger.debug(s"sending query $query with properties $properties")
 		val timeBefore = System.currentTimeMillis()
-		val answer = processQuery(query, properties)
+
+		val answer = query.answerTrivialCases match {
+			case Some(x) => Some(x)
+			case None => processQuery(query, properties)
+		}
+
 		val durationMillis: Long = System.currentTimeMillis() - timeBefore
 		logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
 
@@ -92,6 +97,8 @@ trait HCompQuery {
 	def title: String
 
 	final val identifier: Int = HCompIDGen.next()
+
+	def answerTrivialCases: Option[HCompAnswer] = None
 }
 
 trait HCompAnswer {
@@ -173,9 +180,15 @@ case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAns
 }
 
 case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery {
+	assert(maxNumberOfResults < 1 || maxNumberOfResults >= minNumberOfResults)
+
 	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, 1, question)
 
 	def maxSelections = if (maxNumberOfResults < 1) options.length else maxNumberOfResults
+
+	override def answerTrivialCases: Option[HCompAnswer] =
+		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options(0) -> true)))
+		else None
 }
 
 object MultipleChoiceQuery {

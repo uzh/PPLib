@@ -76,7 +76,7 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 				{rawQuery.maxSelections}
 			</MaxSelectionCount>
 			<StyleSuggestion>
-				{if (rawQuery.maxSelections == 1) "radiobutton" else "checkbox"}
+				{if (rawQuery.maxSelections == 1 && rawQuery.minNumberOfResults == 1) "radiobutton" else "checkbox"}
 			</StyleSuggestion>
 			<Selections>
 				{rawQuery.options.zipWithIndex.map(o => {
