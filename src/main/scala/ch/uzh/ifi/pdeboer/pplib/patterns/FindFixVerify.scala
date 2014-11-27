@@ -1,11 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.ParSeqToAssignPool._
 import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
+import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
+import scala.collection.parallel.ForkJoinTaskSupport
 
 /**
  * Created by pdeboer on 21/10/14.
@@ -53,7 +54,11 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 		getRange(fixersPerPatch).map(i => toFix.par.map(p => driver.fix(p))).flatten.toList
 	}
 
-	private def getRange(to: Int) = if (parallelWorkers) (1 to to).view.par.assignWorkerPool() else (1 to to).view
+	private def getRange(to: Int) = if (parallelWorkers) {
+		val par = (1 to to).view.par
+		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
+		par
+	} else (1 to to).view
 
 	protected def getPatchesToFix() = {
 		var findSteps = new mutable.HashMap[Int, List[FFVPatchContainer[T]]]()

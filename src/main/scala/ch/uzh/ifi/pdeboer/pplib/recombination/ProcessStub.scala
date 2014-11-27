@@ -1,10 +1,10 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CrowdWorker, CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
-import com.typesafe.scalalogging.{LazyLogging, Logger}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, CrowdWorker, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.util.U
+import com.typesafe.scalalogging.LazyLogging
 
-import scala.collection.parallel.ParIterable
-import scala.collection.{CustomParallelizable, GenSeq}
+import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
@@ -130,15 +130,15 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
 
-	import ProcessStubWithHCompPortalAccess._
-	import ch.uzh.ifi.pdeboer.pplib.recombination.ParSeqToAssignPool._
-	import ch.uzh.ifi.pdeboer.pplib.recombination.ParallelCollectionWithWorkerConnection
+	import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubWithHCompPortalAccess._
 
 	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL_PARAMETER))
 
 	//TODO test if this actually works and doesnt destroy parallelism
 	def getCrowdWorkers(workerCount: Int) = (if (getParamUnsafe(PARALLEL_EXECUTION_PARAMETER)) {
-		(1 to workerCount).view.par.assignWorkerPool()
+		val par: ParSeq[Int] = (1 to workerCount).view.par
+		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
+		par
 	} else (1 to workerCount).view).map(i => new CrowdWorker(i + ""))
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = PORTAL_PARAMETER :: super.expectedParametersBeforeRun
