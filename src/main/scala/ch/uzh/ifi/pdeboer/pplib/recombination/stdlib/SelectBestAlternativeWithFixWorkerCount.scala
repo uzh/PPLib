@@ -25,13 +25,17 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 
 		val answers = getCrowdWorkers(workerCount).map(w =>
 			portal.sendQueryAndAwaitResult(
-				MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title))
+				createMultipleChoiceQuestion(alternatives, instructions, auxString, title))
 			match {
 				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 				case _ => throw new IllegalStateException("didnt get any response") //TODO change me
 			}).toList
 
 		answers.groupBy(s => s).maxBy(s => s._2.size)._1
+	}
+
+	def createMultipleChoiceQuestion(alternatives: List[String], instructions: HCompInstructionsWithTuple, auxString: String, title: String): MultipleChoiceQuery = {
+		MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title)
 	}
 
 	override val processCategoryNames: List[String] = List("selectbest.single")

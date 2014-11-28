@@ -116,10 +116,10 @@ trait FindFixVerifyDriver[T] {
 case class FFVPatch[T](patch: T, patchIndex: Int)
 
 object FFVDefaultHCompDriver {
-	val DEFAULT_FIND_QUESTION = "Please select sentences you think are erroneous and should be improved"
+	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved")
 	val DEFAULT_FIND_TITLE = "Find erroneous sentences"
 
-	val DEFAULT_FIX_QUESTION = HCompInstructionsWithTuple("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
+	val DEFAULT_FIX_QUESTION = new FFVFixQuestion("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
 	val DEFAULT_FIX_TITLE = "Please fix these sentences"
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
@@ -131,11 +131,21 @@ object FFVDefaultHCompDriver {
 	))
 }
 
+class FFVFindQuestion(val question: String) {
+	def fullQuestion(allPatches: List[FFVPatch[String]]) = question
+}
+
+class FFVFixQuestion(val question: String) {
+	def fullQuestion(patch: FFVPatch[String], allPatches: List[FFVPatch[String]]) =
+		HCompInstructionsWithTuple(question).getInstructions(patch.patch)
+}
+
+
 class FFVDefaultHCompDriver(
 							   val orderedPatches: List[FFVPatch[String]],
 							   val portal: HCompPortalAdapter,
-							   val findQuestion: String = FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION,
-							   val fixQuestion: HCompInstructionsWithTuple = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
+							   val findQuestion: FFVFindQuestion = FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION,
+							   val fixQuestion: FFVFixQuestion = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
 							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
 							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS) extends FindFixVerifyDriver[String] {
@@ -144,27 +154,31 @@ class FFVDefaultHCompDriver(
 		verifyProcess.params += "portal" -> portal
 	}
 
-	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
-		val result = verifyProcess.process(alternatives.map(_.patch))
-
-		FFVPatch[String](result, patch.patchIndex)
-	}
-
-	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
-		val res = portal.sendQueryAndAwaitResult(
-			FreetextQuery(fixQuestion.getInstructions(patch.patch), "", fixTitle)
-		).get.asInstanceOf[FreetextAnswer]
-
-		FFVPatch[String](res.answer, patch.patchIndex)
-	}
-
 	override def find(patches: List[FFVPatch[String]]): List[FFVPatch[String]] = {
 		val res = portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(findQuestion, patches.map(_.patch), -1, 1, findTitle))
+			MultipleChoiceQuery(
+				findQuestion.fullQuestion(orderedPatches),
+				patches.map(_.patch),
+				-1, 1, findTitle))
 			.get.asInstanceOf[MultipleChoiceAnswer]
 
 		res.selectedAnswers.map(a => {
 			patches.find(_.patch.equals(a)).get
 		})
+	}
+
+	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
+		val res = portal.sendQueryAndAwaitResult(
+			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle)
+		).get.asInstanceOf[FreetextAnswer]
+
+		FFVPatch[String](res.answer, patch.patchIndex)
+	}
+
+
+	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
+		val result = verifyProcess.process(alternatives.map(_.patch))
+
+		FFVPatch[String](result, patch.patchIndex)
 	}
 }

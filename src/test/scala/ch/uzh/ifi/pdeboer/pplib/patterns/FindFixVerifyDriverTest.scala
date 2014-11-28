@@ -13,8 +13,7 @@ class FindFixVerifyDriverTest {
 
 	@Test
 	def testFind(): Unit = {
-		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, "findtest",
-			new HCompInstructionsWithTuple("fixtest"))
+		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"))
 
 		val expectedFinds: Set[String] = Set("a", "b")
 		portal.createMultipleChoiceFilterRule("findtest", expectedFinds)
@@ -25,8 +24,7 @@ class FindFixVerifyDriverTest {
 
 	@Test
 	def testFix: Unit = {
-		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, "findtest",
-			new HCompInstructionsWithTuple("fixtest"))
+		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"))
 
 		val expectedResult = "b"
 		portal.createFreeTextFilterRule("fixtest", expectedResult)
@@ -38,8 +36,7 @@ class FindFixVerifyDriverTest {
 	@Test
 	def testVerify: Unit = {
 		val verifyProcess: VerifyTestProcessStub = new VerifyTestProcessStub(Map.empty[String, AnyRef])
-		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, "findtest",
-			new HCompInstructionsWithTuple("fixtest"), verifyProcess = verifyProcess)
+		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"), verifyProcess = verifyProcess)
 
 		val res = driver.verify(orderedPatches(0), orderedPatches)
 		Assert.assertEquals("a", res.patch)

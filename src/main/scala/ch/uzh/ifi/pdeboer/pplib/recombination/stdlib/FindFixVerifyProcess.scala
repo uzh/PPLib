@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
-import ch.uzh.ifi.pdeboer.pplib.patterns.{FindFixVerifyExecutor, FFVDefaultHCompDriver, FFVPatch}
+import ch.uzh.ifi.pdeboer.pplib.patterns._
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess._
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 
@@ -39,10 +39,10 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 object FindFixVerifyProcess {
 	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(2 days)))
-	val FIND_QUESTION = new ProcessParameter[String]("findQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION)))
+	val FIND_QUESTION = new ProcessParameter[FFVFindQuestion]("findQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION)))
 	val FIND_TITLE = new ProcessParameter[String]("findTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_TITLE)))
 	val FIX_TITLE = new ProcessParameter[String]("fixTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_TITLE)))
-	val FIX_QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("fixQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
+	val FIX_QUESTION = new ProcessParameter[FFVFixQuestion]("fixQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
 	val VERIFY_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("verifyProcess", ProcessParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS)))
 
 	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Integer]("patchesInFind", OtherParam(), Some(List(10)))
