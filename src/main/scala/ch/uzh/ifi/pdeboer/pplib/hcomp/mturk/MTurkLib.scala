@@ -54,8 +54,8 @@ private[mturk] case class Assignment(hit: String, xml: Node) {
 	val HITId = hit
 	val assignmentStatus = MTurkUtil.oneText(xml \ "AssignmentStatus")
 	val AnswerXML = XML.loadString(MTurkUtil.oneText(xml \ "Answer"))
-	val AcceptTime = MTurkUtil.oneDateTimeOption(xml \ "AcceptTime")
-	val SubmitTime = MTurkUtil.oneDateTimeOption(xml \ "SubmitTime")
+	val AcceptTime: Option[DateTime] = MTurkUtil.oneDateTimeOption(xml \ "AcceptTime")
+	val SubmitTime: Option[DateTime] = MTurkUtil.oneDateTimeOption(xml \ "SubmitTime")
 	val ApprovalTime = MTurkUtil.oneDateTimeOption(xml \ "ApprovalTime")
 	val RejectionTime = MTurkUtil.oneDateTimeOption(xml \ "RejectionTime")
 

@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
+import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -24,15 +25,22 @@ trait HCompPortalAdapter extends LazyLogging {
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
 		logger.debug(s"sending query $query with properties $properties")
-		val timeBefore = System.currentTimeMillis()
+		val timeBefore = new DateTime()
 
 		val answer = query.answerTrivialCases match {
 			case Some(x) => Some(x)
 			case None => processQuery(query, properties)
 		}
-
-		val durationMillis: Long = System.currentTimeMillis() - timeBefore
+		val timeAfter = new DateTime()
+		val durationMillis = timeAfter.getMillis - timeBefore.getMillis
 		logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
+
+		answer match {
+			case Some(x: HCompAnswer) => {
+				x.postTime = timeBefore
+				x.receivedTime = timeAfter
+			}
+		}
 
 		//we risk the querylog to be incomplete if a query is being answered right now
 		queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
@@ -105,6 +113,11 @@ trait HCompAnswer {
 	def query: HCompQuery
 
 	def as[T]: T = this.asInstanceOf[T]
+
+	var postTime: DateTime = null
+	var acceptTime: Option[DateTime] = None
+	var submitTime: Option[DateTime] = None
+	var receivedTime: DateTime = null
 }
 
 case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "") {

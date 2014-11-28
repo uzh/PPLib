@@ -14,7 +14,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	var hit = ""
 	var cancelled: Boolean = false
 
-	def waitForResponse(): Option[HCompAnswer] = {
+	def waitForResponse() = {
 		val timer = new GrowingTimer(1 second, 1.1, 30 seconds)
 		U.retry(100000) {
 			//at least 27h
@@ -66,7 +66,10 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		}
 
 		val xml = a.AnswerXML
-		Some(MTQuery.convert(query).interpret(xml))
+		val answer: HCompAnswer = MTQuery.convert(query).interpret(xml)
+		answer.acceptTime = a.AcceptTime
+		answer.submitTime = a.SubmitTime
+		Some(answer)
 	}
 
 	def hitXML(question: NodeSeq) =
