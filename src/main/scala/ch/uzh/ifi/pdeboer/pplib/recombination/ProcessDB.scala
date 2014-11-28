@@ -50,7 +50,7 @@ object ProcessDB extends LazyLogging {
 	}
 
 	def put(stub: ProcessStub[_, _]): Unit = {
-		stub.recombinationCategories.foreach(c => put(c, stub))
+		stub.processCategories.foreach(c => put(c, stub))
 	}
 
 	def put(category: RecombinationCategory, stub: ProcessStub[_, _]): Unit = {

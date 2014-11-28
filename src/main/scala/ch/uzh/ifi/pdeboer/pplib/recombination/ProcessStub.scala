@@ -16,13 +16,25 @@ import scala.reflect.runtime.{universe => ru}
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
 abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogging {
-	final def types: (ClassTag[INPUT], ClassTag[OUTPUT]) = (implicitly[ClassTag[INPUT]], implicitly[ClassTag[OUTPUT]])
+
+	import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub._
+
+	protected var _results = collection.mutable.HashMap.empty[INPUT, OUTPUT]
+
+	def results: Map[INPUT, OUTPUT] = _results.toMap
+
+	lazy val inputType = implicitly[ClassTag[INPUT]]
+	lazy val outputType = implicitly[ClassTag[OUTPUT]]
 
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
 
 		logger.info(s"running process ${getClass.getSimpleName}")
-		run(data)
+		val result: OUTPUT = run(data)
+
+		if (getParamUnsafe(STORE_EXECUTION_RESULTS)) _results += data -> result
+
+		result
 	}
 
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
@@ -45,13 +57,13 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
-	protected def recombinationCategoryNames: List[String] = Nil
+	protected def processCategoryNames: List[String] = Nil
 
-	final def recombinationCategories = {
+	final def processCategories = {
 		val names: List[String] =
-			if (recombinationCategoryNames == null)
+			if (processCategoryNames == null)
 				Nil
-			else recombinationCategoryNames
+			else processCategoryNames
 		val annotation =
 			if (this.getClass.isAnnotationPresent(classOf[PPLibProcess]))
 				this.getClass.getAnnotation(classOf[PPLibProcess]).value()
@@ -107,8 +119,45 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	def to[IN, OUT] = this.asInstanceOf[ProcessStub[IN, OUT]]
 
+	def xml = <Process>
+		<Class>
+			{getClass.getName}
+		</Class>
+		<Input>
+			{inputType.runtimeClass.getCanonicalName}
+		</Input>
+		<Output>
+			{outputType.runtimeClass.getCanonicalName}
+		</Output>
+		<Categories>
+			{processCategories.map(c => {
+			<Category>
+				{c.path}
+			</Category>
+		})}
+		</Categories>
+		<Parameters>
+			{allParams.map(p => {
+			<Parameter>
+				<Name>
+					{p.key}
+				</Name>
+				<Category>
+					{p.parameterCategory}
+				</Category>
+				<Value>
+					{getParamUnsafe(p, useDefaultValues = true)}
+				</Value>
+				<IsSpecified>
+					{params.contains(p.key)}
+				</IsSpecified>
+			</Parameter>
+		})}
+		</Parameters>
+	</Process>
+
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
-	recombinationCategories.foreach(c => ProcessDB.put(c, this))
+	processCategories.foreach(c => ProcessDB.put(c, this))
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 
@@ -126,6 +175,10 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 	}
 
 	override def toString(): String = s"${getClass.getSimpleName} ( ${params.toString()}} )"
+}
+
+object ProcessStub {
+	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", OtherParam(), Some(List(true)))
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {

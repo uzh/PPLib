@@ -34,7 +34,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 		answers.groupBy(s => s).maxBy(s => s._2.size)._1
 	}
 
-	override val recombinationCategoryNames: List[String] = List("selectbest.single")
+	override val processCategoryNames: List[String] = List("selectbest.single")
 
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =

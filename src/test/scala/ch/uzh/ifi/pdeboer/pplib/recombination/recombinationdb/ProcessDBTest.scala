@@ -98,7 +98,7 @@ class ProcessDBTest {
 			new A(data)
 		}
 
-		override protected def recombinationCategoryNames: List[String] = List("test.bla")
+		override protected def processCategoryNames: List[String] = List("test.bla")
 	}
 
 	@PPLibProcess("test.bla2")

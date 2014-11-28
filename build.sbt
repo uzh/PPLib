@@ -15,9 +15,11 @@ libraryDependencies ++= Seq(
 	"org.slf4j" % "slf4j-log4j12" % "1.7.5",
 	"org.apache.commons" % "commons-vfs2" % "2.0",
 	"org.apache.httpcomponents" % "httpclient" % "4.3.5",
-	"org.scala-lang.modules" %% "scala-xml" % "1.0.2"
+	"org.scala-lang.modules" %% "scala-xml" % "1.0.2",
+	"net.sf.opencsv" % "open-csv" % "2.3"
 )
 
+/*
 libraryDependencies ++= Seq(
 	// other dependencies here
 	"org.scalanlp" %% "breeze" % "0.10",
@@ -25,6 +27,7 @@ libraryDependencies ++= Seq(
 	// native libraries greatly improve performance, but increase jar sizes.
 	"org.scalanlp" %% "breeze-natives" % "0.10"
 )
+*/
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 

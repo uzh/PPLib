@@ -48,7 +48,7 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 
 	protected def confidence = getParamUnsafe(CONFIDENCE_PARAMETER)
 
-	override val recombinationCategoryNames: List[String] = List("selectbest.statistical")
+	override val processCategoryNames: List[String] = List("selectbest.statistical")
 
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(INSTRUCTIONS_PARAMETER)
