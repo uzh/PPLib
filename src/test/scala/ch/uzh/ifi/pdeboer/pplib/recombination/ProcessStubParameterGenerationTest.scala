@@ -6,7 +6,10 @@ import org.junit.{Assert, Test}
  * Created by pdeboer on 21/10/14.
  */
 class ProcessStubParameterGenerationTest {
-	import ProcessStubParameterGenerationTest._
+
+	import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubParameterGenerationTest._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.TestProcessStub._
+
 	@Test
 	def testParameterVariation(): Unit = {
 		val gen = new TypedRecombinationStubParameterVariantGenerator[TestProcessStub]() {
@@ -15,8 +18,8 @@ class ProcessStubParameterGenerationTest {
 
 		gen.initAllParamsWithCandidates()
 
-		Assert.assertEquals(DEFAULT_VALUES_PARAM1.toSet, gen.paramVals("testparam1").toSet.asInstanceOf[Set[String]])
-		Assert.assertEquals(DEFAULT_VALUES_PARAM2.toSet, gen.paramVals("testparam2").toSet.asInstanceOf[Set[String]])
+		Assert.assertEquals(DEFAULT_VALUES_PARAM1.toSet, gen.paramVals(TEST_PARAM1.key).toSet.asInstanceOf[Set[String]])
+		Assert.assertEquals(DEFAULT_VALUES_PARAM2.toSet, gen.paramVals(TEST_PARAM2.key).toSet.asInstanceOf[Set[String]])
 
 		/*
 		//TODO type checking functionality doesnt work
@@ -30,8 +33,8 @@ class ProcessStubParameterGenerationTest {
 		}
 		*/
 
-		gen.addParameterVariations("testparam1", List("d"))
-		Assert.assertEquals(("d" :: DEFAULT_VALUES_PARAM1).toSet, gen.paramVals("testparam1").toSet.asInstanceOf[Set[String]])
+		gen.addParameterVariations(TEST_PARAM1.key, List("d"))
+		Assert.assertEquals(("d" :: DEFAULT_VALUES_PARAM1).toSet, gen.paramVals(TEST_PARAM1.key).toSet.asInstanceOf[Set[String]])
 
 		val variations = gen.generateParameterVariations()
 
@@ -41,7 +44,7 @@ class ProcessStubParameterGenerationTest {
 			("d", DEFAULT_VALUES_PARAM2)
 		)
 
-		Assert.assertTrue(expectedVariations.forall(v => v._2.forall(p => variations.exists(k => k("testparam1") == v._1 && k("testparam2") == p))))
+		Assert.assertTrue(expectedVariations.forall(v => v._2.forall(p => variations.exists(k => k(TEST_PARAM1.key) == v._1 && k(TEST_PARAM2.key) == p))))
 		Assert.assertTrue(variations.size == 9)
 	}
 
@@ -73,11 +76,16 @@ object ProcessStubParameterGenerationTest {
 	val DEFAULT_VALUES_PARAM2: List[Integer] = List(1, 2, 3)
 }
 
+object TestProcessStub {
+	val TEST_PARAM1 = new ProcessParameter[String]("testparam1", OtherParam(), Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1))
+	val TEST_PARAM2 = new ProcessParameter[Integer]("testparam2", OtherParam(), Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
+}
+
 class TestProcessStub(params: Map[String, AnyRef] = Map.empty[String, AnyRef]) extends ProcessStub[String, String](params) {
-	override def optionalParameters: List[ProcessParameter[_]] = List(
-		new ProcessParameter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1)),
-		new ProcessParameter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
-	)
+
+	import ch.uzh.ifi.pdeboer.pplib.recombination.TestProcessStub._
+
+	override def optionalParameters: List[ProcessParameter[_]] = List(TEST_PARAM1, TEST_PARAM2)
 
 	override def run(data: String): String = data + "1"
 }

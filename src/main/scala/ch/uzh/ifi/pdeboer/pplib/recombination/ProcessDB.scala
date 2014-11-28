@@ -111,3 +111,7 @@ case class RecombinationCategoryContent(category: RecombinationCategory) {
 
 	def stubs: Set[ProcessStub[_, _]] = _stubs
 }
+
+class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {
+	override def iterator: Iterator[ProcessStub[I, O]] = ProcessDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
+}

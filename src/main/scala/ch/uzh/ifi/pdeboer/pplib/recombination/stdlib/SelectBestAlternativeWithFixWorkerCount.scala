@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, PPLibProcess, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.recombination._
 
 import scala.collection.generic.GenericTraversableTemplate
 import scala.collection.{GenTraversable, GenIterable, GenSeq}
@@ -46,8 +46,8 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
-	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
-	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", Some(List("")))
-	val TITLE_PARAMETER = new ProcessParameter[String]("title", Some(List("SelectBestAlternative")))
-	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", Some(List(3, 5)))
+	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
+	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("SelectBestAlternative")))
+	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3, 5)))
 }

@@ -147,23 +147,7 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 }
 
 object ProcessStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
-	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
+	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", PortalParam(), Some(HComp.allDefinedPortals))
+	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", OtherParam(), Some(List(true)))
 }
 
-class OnlineRecombination[I: ClassTag, O: ClassTag](val path: String, includeChildren: Boolean = false) extends Iterable[ProcessStub[I, O]] {
-	override def iterator: Iterator[ProcessStub[I, O]] = ProcessDB.get[I, O](path, includeChildren).iterator.asInstanceOf[Iterator[ProcessStub[I, O]]]
-}
-
-class ProcessParameter[T: ClassTag](val key: String, val candidateDefinitions: Option[Iterable[T]] = None) {
-	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
-
-	def t = implicitly[ClassTag[T]]
-}
-
-// TODO doesnt work for some reason
-object RecombinationParameterConversion {
-	implicit def parameterToKey(params: Map[ProcessParameter[_], Any]): Map[String, Any] = params.map {
-		case (param, value) => param.key -> value
-	}.toMap
-}

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStubWithHCompPortalAccess, PPLibProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination._
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -30,7 +30,7 @@ class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object SimpleWriteProcess {
-	val QUESTION_PER_CRITERION = new ProcessParameter[HCompInstructionsWithTuple]("question_criterion", Some(List(HCompInstructionsWithTuple("Please answer the following question"))))
-	val INSTRUCTIONS = new ProcessParameter[String]("instructions", Some(List("Please answer the following questions truthfully")))
-	val STORIES_PER_CRITERION = new ProcessParameter[Int]("stories_count", Some(List(3, 5)))
+	val QUESTION_PER_CRITERION = new ProcessParameter[HCompInstructionsWithTuple]("criterion", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please answer the following question"))))
+	val INSTRUCTIONS = new ProcessParameter[String]("instructions", QuestionParam(), Some(List("Please answer the following questions truthfully")))
+	val STORIES_PER_CRITERION = new ProcessParameter[Int]("stories_count", OtherParam(), Some(List(3, 5)))
 }

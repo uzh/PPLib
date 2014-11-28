@@ -8,14 +8,14 @@ import org.junit.{Assert, Test}
 class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(chk = List(new ProcessParameter[String]("test")), Map("test" -> "asdf"))
+		new TestRecombImplparams(chk = List(new ProcessParameter[String]("test", OtherParam())), Map(OtherParam() + "_test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test2")), Map("test" -> "asdf"))
+			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test2", OtherParam())), Map(OtherParam() + "_test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
@@ -26,7 +26,7 @@ class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test")), Map("test" -> List.empty[String]))
+			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test", OtherParam())), Map(OtherParam() + "_test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {

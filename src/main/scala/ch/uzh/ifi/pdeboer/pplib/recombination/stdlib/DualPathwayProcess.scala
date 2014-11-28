@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{PPLibProcess, ProcessStubWithHCompPortalAccess, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.recombination._
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.duration.{Duration, _}
@@ -47,10 +47,10 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object DualPathwayProcess {
-	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("question_old_el", Some(List(HCompInstructionsWithTuple("Is the following question answered correctly?"))))
-	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("question_new_el", Some(List(HCompInstructionsWithTuple("Please provide an answer to the following question"))))
-	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("question_proc_task", Some(List("Please compare (and fix) the following elements")))
-	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
-	val TIMEOUT = new ProcessParameter[Duration]("timeout", Some(List(2 days, 1 day)))
-	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Integer]("chunk_count", Some(List(2)))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("_old_el", QuestionParam(), Some(List(HCompInstructionsWithTuple("Is the following question answered correctly?"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("_new_el", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please provide an answer to the following question"))))
+	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", QuestionParam(), Some(List("Please compare (and fix) the following elements")))
+	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", QuestionParam(), Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
+	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(2 days, 1 day)))
+	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Integer]("chunk_count", OtherParam(), Some(List(2)))
 }

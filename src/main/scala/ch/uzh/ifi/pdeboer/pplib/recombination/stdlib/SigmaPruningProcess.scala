@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.patterns.SigmaPruner
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessStub, ProcessParameter, ProcessStubWithHCompPortalAccess, PPLibProcess}
+import ch.uzh.ifi.pdeboer.pplib.recombination._
 
 /**
  * Created by pdeboer on 27/11/14.
@@ -21,5 +21,5 @@ class SigmaPruningProcess(params: Map[String, Any]) extends ProcessStub[List[Dou
 }
 
 object SigmaPruningProcess {
-	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", Some(List(3)))
+	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", OtherParam(), Some(List(3)))
 }
