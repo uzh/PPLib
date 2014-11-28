@@ -4,7 +4,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
  * Created by pdeboer on 27/11/14.
  * Only makes sense if data is normally distributed.
  */
-class SigmaPruner(val numSigmas: Int, val data: List[Double]) {
+class SigmaPruner(data: List[Double], numSigmas: Int = 3) {
 	assert(numSigmas >= 0)
 
 	lazy val sum: Double = data.reduce(_ + _)
