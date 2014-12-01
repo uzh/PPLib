@@ -124,12 +124,12 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		<Class>
 			{getClass.getName}
 		</Class>
-		<Input>
+		<InputClass>
 			{inputType.runtimeClass.getCanonicalName}
-		</Input>
-		<Output>
+		</InputClass>
+		<OutputClass>
 			{outputType.runtimeClass.getCanonicalName}
-		</Output>
+		</OutputClass>
 		<Categories>
 			{processCategories.map(c => {
 			<Category>

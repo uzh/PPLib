@@ -71,15 +71,20 @@ class RecombinationVariantXMLExporter(val variant: RecombinationVariant, val pro
 }
 
 abstract class ProcessResultXMLExporter[T: ClassTag] {
+	def exactMatchOfClass: Boolean
+
 	//only exact matches allowed
-	def isApplicableTo(t: Class[_]) = implicitly[ClassTag[T]].runtimeClass == t
+	def isApplicableTo(t: Class[_]) = {
+		val clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
+		if (exactMatchOfClass) clazz == t else t.isAssignableFrom(clazz)
+	}
 
 	def interpret(data: T): NodeSeq
 
 	def interpretUnsafe(data: Any) = interpret(data.asInstanceOf[T])
 }
 
-class ListExporter extends ProcessResultXMLExporter[List[_]] {
+class ListExporter(val exactMatchOfClass: Boolean = false) extends ProcessResultXMLExporter[List[_]] {
 	def itemExport(data: List[_]) = data.map(d => <Item>
 		{d}
 	</Item>)
@@ -89,13 +94,13 @@ class ListExporter extends ProcessResultXMLExporter[List[_]] {
 	</List>
 }
 
-class SetExporter extends ProcessResultXMLExporter[Set[_]] {
+class SetExporter(val exactMatchOfClass: Boolean = false) extends ProcessResultXMLExporter[Set[_]] {
 	override def interpret(data: Set[_]): NodeSeq = <Set>
-		{new ListExporter().itemExport(data.toList)}
+		{new ListExporter(exactMatchOfClass).itemExport(data.toList)}
 	</Set>
 }
 
-class MapExporter extends ProcessResultXMLExporter[Map[_, _]] {
+class MapExporter(val exactMatchOfClass: Boolean = false) extends ProcessResultXMLExporter[Map[_, _]] {
 	override def interpret(data: Map[_, _]): NodeSeq = <Map>
 		{data.map(d => {
 			<Item>

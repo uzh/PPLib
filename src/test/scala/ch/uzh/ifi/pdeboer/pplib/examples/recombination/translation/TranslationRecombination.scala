@@ -16,7 +16,8 @@ object TranslationRecombination {
 			REWRITE -> List(
 				new TypedParameterVariantGenerator[FindFixVerifyProcess](),
 				new TypedParameterVariantGenerator[DualPathwayProcess](),
-				new TypedParameterVariantGenerator[IterativeRefinementProcess]()
+				new TypedParameterVariantGenerator[IterativeRefinementProcess](),
+				new TypedParameterVariantGenerator[ContestWithSigmaPruning]()
 			),
 			IMPROVE_LANGUAGE_QUALITY -> List(
 				new TypedParameterVariantGenerator[FindFixVerifyProcess]()
@@ -26,7 +27,7 @@ object TranslationRecombination {
 					SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key ->
 						HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the paragraph below. Please select the one you think works best considering paragraph transitions, consistency of wording and simplicity of the sentence"))
 				)))
-					.addVariation(VERIFY_PROCESS_CONTEXT_FLATTENER, List(Some(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER)))
+					.addVariation(VERIFY_PROCESS_CONTEXT_PARAMETER, List(Some(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER)))
 					.addVariation(VERIFY_PROCESS_CONTEXT_FLATTENER, List((l: List[FFVPatch[String]]) => l.mkString("\\n")))
 			),
 			CHECK_SYNTAX -> List(
@@ -37,7 +38,7 @@ object TranslationRecombination {
 					SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key ->
 						HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the paragraph below. Please select the one that works best considering interpuctuation (commas, points) and spelling mistakes"))
 				)))
-					.addVariation(VERIFY_PROCESS_CONTEXT_FLATTENER, List(Some(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER)))
+					.addVariation(VERIFY_PROCESS_CONTEXT_PARAMETER, List(Some(SelectBestAlternativeWithFixWorkerCount.AUX_STRING_PARAMETER)))
 					.addVariation(VERIFY_PROCESS_CONTEXT_FLATTENER, List((l: List[FFVPatch[String]]) => l.mkString("\\n")))
 			)
 		)
@@ -46,6 +47,6 @@ object TranslationRecombination {
 			case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten.asInstanceOf[List[ProcessStub[_, _]]])
 		}
 
-		val variants = new RecombinationVariantGenerator(candidateProcesses).variants
+		new RecombinationVariantGenerator(candidateProcesses).variants
 	}
 }

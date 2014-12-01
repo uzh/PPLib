@@ -34,7 +34,9 @@ trait ParameterVariantGenerator[T] {
 		values.foreach(k => {
 			if (base.isParameterTypeCorrect(paramKey, k))
 				cur += k
-			else throw new IllegalArgumentException("Parameter type incorrect for " + paramKey)
+			else {
+				throw new IllegalArgumentException("Parameter type incorrect for " + paramKey)
+			}
 		})
 		parameterValues += (paramKey -> cur)
 		this

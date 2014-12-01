@@ -8,7 +8,6 @@ import ch.uzh.ifi.pdeboer.pplib.recombination._
  */
 @PPLibProcess("create.collection.text")
 class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[Map[String, String]]](params) {
-
 	import SimpleWriteProcess._
 
 	override protected def run(data: List[String]): List[Map[String, String]] = {

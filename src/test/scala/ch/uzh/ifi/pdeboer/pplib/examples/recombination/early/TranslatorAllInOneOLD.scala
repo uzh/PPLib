@@ -7,7 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFi
 /**
  * Created by pdeboer on 04/11/14.
  */
-object TranslatorApp extends App {
+object TranslatorAllInOneOLD extends App {
 	//src: google translate of http://www.heise.de/newsticker/meldung/China-testet-erfolgreich-zweite-Mondsonde-2440834.html
 	private val textToImprove: String =
 		"""China has for the first time sent a probe to the moon and back to Earth. The return capsule landed after a circumlunar flight of the orbiter on Saturday morning in Mongolia. Eight days took the 840,000 km long journey. It was the world's first mission of its kind since almost 40 years, state media reported.
