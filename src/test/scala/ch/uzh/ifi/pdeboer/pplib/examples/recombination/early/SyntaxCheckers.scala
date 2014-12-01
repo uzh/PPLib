@@ -13,8 +13,8 @@ class FFVSyntaxChecker(params: Map[String, Any] = Map.empty[String, Any]) extend
 	lazy val ffvProcess = new FindFixVerifyProcess(params)
 
 	override protected def run(data: String): String = {
-		val input = data.split(getParamUnsafe(SPLIT_EXPLODER)).toList
-		ffvProcess.process(input).mkString(getParamUnsafe(SPLIT_IMPLODER))
+		val input = data.split(getParam(SPLIT_EXPLODER)).toList
+		ffvProcess.process(input).mkString(getParam(SPLIT_IMPLODER))
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =

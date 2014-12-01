@@ -32,7 +32,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		logger.info(s"running process ${getClass.getSimpleName}")
 		val result: OUTPUT = run(data)
 
-		if (getParamUnsafe(STORE_EXECUTION_RESULTS)) _results += data -> result
+		if (getParam(STORE_EXECUTION_RESULTS)) _results += data -> result
 
 		result
 	}
@@ -95,7 +95,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		}
 	}
 
-	def getParam[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): Option[T] = {
+	def getParamOption[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param.key) match {
 			case Some(p) => Some(p.asInstanceOf[T])
 			case _ => if (useDefaultValues) param.candidateDefinitions.getOrElse(Nil).headOption
@@ -103,8 +103,8 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		}
 	}
 
-	def getParamUnsafe[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): T =
-		getParam[T](param, useDefaultValues).get
+	def getParam[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): T =
+		getParamOption[T](param, useDefaultValues).get
 
 	def getParamByKey[T](param: String, useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param) match {
@@ -146,7 +146,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 					{p.parameterCategory}
 				</Category>
 				<Value>
-					{getParamUnsafe(p, useDefaultValues = true)}
+					{getParam(p, useDefaultValues = true)}
 				</Value>
 				<IsSpecified>
 					{params.contains(p.key)}
@@ -185,10 +185,10 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubWithHCompPortalAccess._
 
-	lazy val portal = new CostCountingEnabledHCompPortal(getParamUnsafe(PORTAL_PARAMETER))
+	lazy val portal = new CostCountingEnabledHCompPortal(getParam(PORTAL_PARAMETER))
 
 	//TODO test if this actually works and doesnt destroy parallelism
-	def getCrowdWorkers(workerCount: Int) = (if (getParamUnsafe(PARALLEL_EXECUTION_PARAMETER)) {
+	def getCrowdWorkers(workerCount: Int) = (if (getParam(PARALLEL_EXECUTION_PARAMETER)) {
 		val par: ParSeq[Int] = (1 to workerCount).view.par
 		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
 		par

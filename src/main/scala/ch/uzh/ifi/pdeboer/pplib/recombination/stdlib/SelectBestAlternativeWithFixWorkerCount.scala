@@ -12,10 +12,10 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
 
 	override def run(alternatives: List[String]): String = {
-		val instructions = getParamUnsafe(INSTRUCTIONS_PARAMETER)
-		val auxString = getParamUnsafe(AUX_STRING_PARAMETER)
-		val title = getParamUnsafe(TITLE_PARAMETER)
-		val workerCount = getParamUnsafe(WORKER_COUNT_PARAMETER)
+		val instructions = getParam(INSTRUCTIONS_PARAMETER)
+		val auxString = getParam(AUX_STRING_PARAMETER)
+		val title = getParam(TITLE_PARAMETER)
+		val workerCount = getParam(WORKER_COUNT_PARAMETER)
 
 		val answers = getCrowdWorkers(workerCount).map(w =>
 			portal.sendQueryAndAwaitResult(

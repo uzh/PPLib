@@ -21,12 +21,12 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 	 * @return
 	 */
 	override protected def run(data: List[String]): List[String] = {
-		val questionOldProcessedElement = getParamUnsafe(QUESTION_OLD_PROCESSED_ELEMENT)
-		val questionNewProcessedElement = getParamUnsafe(QUESTION_NEW_PROCESSED_ELEMENT)
-		val questionPerProcessingTask = getParamUnsafe(QUESTION_PER_PROCESSING_TASK)
-		val questionPerComparisonTask = getParamUnsafe(QUESTION_PER_COMPARISON_TASK)
-		val timeout = getParamUnsafe(TIMEOUT)
-		val chunkCount = getParamUnsafe(CHUNK_COUNT_TO_INCLUDE)
+		val questionOldProcessedElement = getParam(QUESTION_OLD_PROCESSED_ELEMENT)
+		val questionNewProcessedElement = getParam(QUESTION_NEW_PROCESSED_ELEMENT)
+		val questionPerProcessingTask = getParam(QUESTION_PER_PROCESSING_TASK)
+		val questionPerComparisonTask = getParam(QUESTION_PER_COMPARISON_TASK)
+		val timeout = getParam(TIMEOUT)
+		val chunkCount = getParam(CHUNK_COUNT_TO_INCLUDE)
 
 		val driver = new DualPathWayDefaultHCompDriver(data, portal, questionOldProcessedElement,
 			questionNewProcessedElement, questionPerProcessingTask, questionPerComparisonTask, timeout)

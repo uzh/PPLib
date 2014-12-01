@@ -16,9 +16,9 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 
 	override protected def run(data: List[String]): List[String] = {
 		data.map(d => {
-			val driver = new IRDefaultHCompDriver(portal, getParamUnsafe(TITLE_FOR_REFINEMENT),
-				getParamUnsafe(QUESTION_FOR_REFINEMENT), getParamUnsafe(VOTING_PROCESS))
-			val exec = new IterativeRefinementExecutor(d, driver, getParamUnsafe(ITERATION_COUNT))
+			val driver = new IRDefaultHCompDriver(portal, getParam(TITLE_FOR_REFINEMENT),
+				getParam(QUESTION_FOR_REFINEMENT), getParam(VOTING_PROCESS))
+			val exec = new IterativeRefinementExecutor(d, driver, getParam(ITERATION_COUNT))
 			exec.refinedText
 		})
 	}

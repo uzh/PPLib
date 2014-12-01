@@ -15,13 +15,13 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 	override protected def run(data: List[String]): List[String] = {
 		val driver = new FFVDefaultHCompDriver(
 			data.zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
-			portal, getParamUnsafe(FIND_QUESTION), getParamUnsafe(FIX_QUESTION),
-			getParamUnsafe(FIND_TITLE), getParamUnsafe(FIX_TITLE), getParamUnsafe(VERIFY_PROCESS)
+			portal, getParam(FIND_QUESTION), getParam(FIX_QUESTION),
+			getParam(FIND_TITLE), getParam(FIX_TITLE), getParam(VERIFY_PROCESS)
 		)
 
 		val exec = new FindFixVerifyExecutor(
-			driver, getParamUnsafe(PATCHES_COUNT_IN_FIND), getParamUnsafe(FINDERS_COUNT),
-			getParamUnsafe(MIN_FINDERS_TO_AGREE_FOR_FIX), getParamUnsafe(FIXERS_PER_PATCH)
+			driver, getParam(PATCHES_COUNT_IN_FIND), getParam(FINDERS_COUNT),
+			getParam(MIN_FINDERS_TO_AGREE_FOR_FIX), getParam(FIXERS_PER_PATCH)
 		)
 
 		exec.bestPatches.map(_.patch)
