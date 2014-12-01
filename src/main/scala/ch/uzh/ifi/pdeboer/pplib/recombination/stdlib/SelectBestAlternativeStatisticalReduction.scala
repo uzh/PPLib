@@ -34,9 +34,9 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 	}
 
 	def castVote(alternatives: List[String]) = {
-		val instructions = getParam(INSTRUCTIONS_PARAMETER)
-		val auxString = getParam(AUX_STRING_PARAMETER)
-		val title = getParam(TITLE_PARAMETER)
+		val instructions = INSTRUCTIONS_PARAMETER.get
+		val auxString = AUX_STRING_PARAMETER.get
+		val title = TITLE_PARAMETER.get
 
 		portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title),
@@ -48,7 +48,7 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 		}
 	}
 
-	protected def confidence = getParam(CONFIDENCE_PARAMETER)
+	protected def confidence = CONFIDENCE_PARAMETER.get
 
 	override val processCategoryNames: List[String] = List("selectbest.statistical")
 

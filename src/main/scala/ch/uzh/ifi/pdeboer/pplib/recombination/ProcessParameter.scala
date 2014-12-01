@@ -11,6 +11,8 @@ class ProcessParameter[T: ClassTag](keyPostfix: String, val parameterCategory: P
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
 
 	def t = implicitly[ClassTag[T]]
+
+	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
 }
 
 class ProcessParameterCategory(val parameterPrefix: String) {

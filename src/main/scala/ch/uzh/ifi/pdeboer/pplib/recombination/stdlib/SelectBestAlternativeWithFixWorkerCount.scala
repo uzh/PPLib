@@ -12,14 +12,9 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
 
 	override def run(alternatives: List[String]): String = {
-		val instructions = getParam(INSTRUCTIONS_PARAMETER)
-		val auxString = getParam(AUX_STRING_PARAMETER)
-		val title = getParam(TITLE_PARAMETER)
-		val workerCount = getParam(WORKER_COUNT_PARAMETER)
-
-		val answers = getCrowdWorkers(workerCount).map(w =>
+		val answers = getCrowdWorkers(WORKER_COUNT_PARAMETER.get).map(w =>
 			portal.sendQueryAndAwaitResult(
-				createMultipleChoiceQuestion(alternatives, instructions, auxString, title),
+				createMultipleChoiceQuestion(alternatives, INSTRUCTIONS_PARAMETER.get, AUX_STRING_PARAMETER.get, TITLE_PARAMETER.get),
 				HCompQueryProperties(paymentCents = 4)
 			) match {
 				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer

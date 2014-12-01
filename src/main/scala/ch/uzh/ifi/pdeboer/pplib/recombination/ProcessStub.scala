@@ -16,8 +16,9 @@ import scala.reflect.runtime.{universe => ru}
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
 abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogging {
-
 	import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub._
+
+	implicit val processStub = this
 
 	protected var _results = collection.mutable.HashMap.empty[INPUT, OUTPUT]
 

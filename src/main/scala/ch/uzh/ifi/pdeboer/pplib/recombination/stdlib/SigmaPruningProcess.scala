@@ -13,7 +13,7 @@ class SigmaPruningProcess(params: Map[String, Any]) extends ProcessStub[List[Dou
 	import SigmaPruningProcess._
 
 	override protected def run(data: List[Double]): List[Double] = {
-		val pruner = new SigmaPruner(data, getParam(NUM_SIGMAS))
+		val pruner = new SigmaPruner(data, NUM_SIGMAS.get)
 		pruner.dataWithinRange
 	}
 
