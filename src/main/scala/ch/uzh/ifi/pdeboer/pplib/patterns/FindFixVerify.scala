@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
@@ -129,6 +129,9 @@ object FFVDefaultHCompDriver {
 		SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
 		SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3
 	))
+
+	val DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER: Option[ProcessParameter[String]] = None
+	val DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER: (List[FFVPatch[String]] => String) = _.mkString(".")
 }
 
 class FFVFindQuestion(val question: String) {
@@ -140,6 +143,14 @@ class FFVFixQuestion(val question: String) {
 		HCompInstructionsWithTuple(question).getInstructions(patch.patch)
 }
 
+class FFVFixQuestionInclOtherPatches(val questionBeforePatch: String, val questionAfterPatch: String = "",
+									 val questionAfterList: String = "",
+									 val allDataDisplayFunction: (List[FFVPatch[String]] => String) = l => l.mkString(".")) extends FFVFixQuestion(questionBeforePatch) {
+	override def fullQuestion(patch: FFVPatch[String], allPatches: List[FFVPatch[String]]): String =
+		HCompInstructionsWithTuple(questionBeforePatch, questionBetweenTuples = questionAfterPatch, questionAfterTuples = questionAfterList)
+			.getInstructions(patch.patch, allDataDisplayFunction(allPatches))
+}
+
 
 class FFVDefaultHCompDriver(
 							   val orderedPatches: List[FFVPatch[String]],
@@ -148,7 +159,9 @@ class FFVDefaultHCompDriver(
 							   val fixQuestion: FFVFixQuestion = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
 							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
-							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS) extends FindFixVerifyDriver[String] {
+							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
+							   val verifyProcessContextParameter: Option[ProcessParameter[String]] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER,
+							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
 		verifyProcess.params += "portal" -> portal
@@ -177,6 +190,9 @@ class FFVDefaultHCompDriver(
 
 
 	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
+		if (verifyProcessContextParameter.isDefined)
+			verifyProcess.params += verifyProcessContextParameter.get.key -> verifyProcessContextFlattener(orderedPatches)
+
 		val result = verifyProcess.process(alternatives.map(_.patch))
 
 		FFVPatch[String](result, patch.patchIndex)

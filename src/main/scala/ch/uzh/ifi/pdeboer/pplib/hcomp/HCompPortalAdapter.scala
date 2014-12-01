@@ -120,7 +120,7 @@ trait HCompAnswer {
 	var receivedTime: DateTime = null
 }
 
-case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "") {
+case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) {
 	def getInstructions(data1: String, data2: String = "") =
 		NodeSeq.fromSeq(<placeholder>
 			<p>
@@ -132,7 +132,7 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 				</i>
 			</p>{if (questionBetweenTuples != "") <p>
 			{questionBetweenTuples}
-		</p>}{if (data2 != "") <p>
+			</p>}{if (data2 != "" && enableSecondDataFieldIfAvailable) <p>
 			<i>
 				{data2}
 			</i>

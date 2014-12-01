@@ -35,6 +35,6 @@ case class PortalParam() extends ProcessParameterCategory("portal")
 
 case class QuestionParam() extends ProcessParameterCategory("question")
 
-case class ProcessParam() extends ProcessParameterCategory("process")
+case class WorkflowParam() extends ProcessParameterCategory("process")
 
 case class OtherParam() extends ProcessParameterCategory("other")

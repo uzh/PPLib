@@ -1,12 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination
 
 import scala.reflect.ClassTag
-import scala.xml.NodeSeq
+import scala.xml.{XML, NodeSeq}
 
 /**
  * Created by pdeboer on 09/10/14.
  */
-case class RecombinationVariant(stubs: Map[String, ProcessStub[_, _]]) {
+class RecombinationVariant(val stubs: Map[String, ProcessStub[_, _]]) {
 	var name: Option[String] = None
 
 	def apply[IN, OUT](key: String, data: IN) = getProcess(key).process(data)

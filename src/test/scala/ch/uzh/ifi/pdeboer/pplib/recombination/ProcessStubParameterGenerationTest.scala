@@ -12,7 +12,7 @@ class ProcessStubParameterGenerationTest {
 
 	@Test
 	def testParameterVariation(): Unit = {
-		val gen = new TypedRecombinationStubParameterVariantGenerator[TestProcessStub]() {
+		val gen = new TypedParameterVariantGenerator[TestProcessStub]() {
 			def paramVals = parameterValues
 		}
 
@@ -50,7 +50,7 @@ class ProcessStubParameterGenerationTest {
 
 	@Test
 	def testInstanciatedParamVariation(): Unit = {
-		val gen = new InstanciatedRecombinationStubParameterVariantGenerator(new TestProcessStub())
+		val gen = new InstanciatedParameterVariantGenerator(new TestProcessStub())
 		val expectedParamVariations = gen.generateParameterVariations()
 		Assert.assertTrue(expectedParamVariations.length > 0)
 
@@ -61,7 +61,7 @@ class ProcessStubParameterGenerationTest {
 
 	@Test
 	def testParameterVariationInstanciation(): Unit = {
-		val gen = new TypedRecombinationStubParameterVariantGenerator[TestProcessStub](initWithDefaults = true)
+		val gen = new TypedParameterVariantGenerator[TestProcessStub](initWithDefaults = true)
 		val expectedParamVariations = gen.generateParameterVariations()
 		Assert.assertTrue(expectedParamVariations.length > 0)
 

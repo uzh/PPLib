@@ -10,7 +10,7 @@ import ch.uzh.ifi.pdeboer.pplib.recombination._
  * Created by pdeboer on 30/11/14.
  */
 @PPLibProcess("create.refine.iterativerefinement")
-class IterativeRefinementProcess extends ProcessStubWithHCompPortalAccess[List[String], List[String]] {
+class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.IterativeRefinementProcess._
 
@@ -29,6 +29,6 @@ class IterativeRefinementProcess extends ProcessStubWithHCompPortalAccess[List[S
 object IterativeRefinementProcess {
 	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", QuestionParam(), Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
 	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTuple]("questionForRefeinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
-	val VOTING_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("votingProcess", ProcessParam(), Some(List(DEFAULT_VOTING_PROCESS)))
+	val VOTING_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
 	val ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
 }

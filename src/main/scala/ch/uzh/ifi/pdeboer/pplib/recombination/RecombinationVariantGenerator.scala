@@ -12,16 +12,15 @@ class RecombinationVariantGenerator(configs: Map[String, List[ProcessStub[_, _]]
 	lazy val variants = {
 		val listOfTupleLists: List[List[(String, ProcessStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			RecombinationVariant(k.asInstanceOf[List[(String, ProcessStub[_, _])]].toMap)
+			new RecombinationVariant(k.asInstanceOf[List[(String, ProcessStub[_, _])]].toMap)
 		})
 	}
 }
 
-trait RecombinationStubParameterVariantGenerator[T] {
+trait ParameterVariantGenerator[T] {
 	protected def targetConstructor: Constructor[_]
 
 	protected def base: ProcessStub[_, _]
-
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
 
@@ -41,6 +40,9 @@ trait RecombinationStubParameterVariantGenerator[T] {
 		this
 	}
 
+	def addVariation(param: ProcessParameter[_], values: Iterable[Any]) =
+		addParameterVariations(param.key, values)
+
 	def generateParameterVariations(): List[Map[String, Any]] = {
 		val listOfTupleLists = parameterValues.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
@@ -54,7 +56,7 @@ trait RecombinationStubParameterVariantGenerator[T] {
 			.asInstanceOf[List[T]]
 }
 
-class InstanciatedRecombinationStubParameterVariantGenerator[T: ClassTag](_base: T, initWithDefaults: Boolean = false) extends RecombinationStubParameterVariantGenerator[T] {
+class InstanciatedParameterVariantGenerator[T: ClassTag](_base: T, initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
 	override protected def base: ProcessStub[_, _] = _base.asInstanceOf[ProcessStub[_, _]]
 
 	override protected def targetConstructor: Constructor[_] = base.getClass.getConstructor(classOf[Map[String, Any]])
@@ -62,7 +64,7 @@ class InstanciatedRecombinationStubParameterVariantGenerator[T: ClassTag](_base:
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
 
-class TypedRecombinationStubParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends RecombinationStubParameterVariantGenerator[T] {
+class TypedParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
 	//very ugly stuff //TODO check
 	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
 	protected val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
