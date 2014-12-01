@@ -2,17 +2,17 @@ package ch.uzh.ifi.pdeboer.pplib.examples.recombination.translation
 
 import ch.uzh.ifi.pdeboer.pplib.examples.recombination.translation.TranslationProcess._
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
-import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVFixQuestion, FFVPatch, FFVFindQuestion, FFVFixQuestionInclOtherPatches}
-import ch.uzh.ifi.pdeboer.pplib.recombination.{stdlib, TypedParameterVariantGenerator}
+import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVFindQuestion, FFVFixQuestion, FFVFixQuestionInclOtherPatches, FFVPatch}
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess._
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib._
+import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessStub, RecombinationVariantGenerator, TypedParameterVariantGenerator}
 
 /**
  * Created by pdeboer on 28/11/14.
  */
 object TranslationRecombination {
 	def recombinations = {
-		val candidateProcesses = Map(
+		val candidateProcessParameters = Map(
 			REWRITE -> List(
 				new TypedParameterVariantGenerator[FindFixVerifyProcess](),
 				new TypedParameterVariantGenerator[DualPathwayProcess](),
@@ -41,5 +41,11 @@ object TranslationRecombination {
 					.addVariation(VERIFY_PROCESS_CONTEXT_FLATTENER, List((l: List[FFVPatch[String]]) => l.mkString("\\n")))
 			)
 		)
+
+		val candidateProcesses = candidateProcessParameters.map {
+			case (key, generators) => (key, generators.map(_.generateVariationsAndInstanciate()).flatten.asInstanceOf[List[ProcessStub[_, _]]])
+		}
+
+		val variants = new RecombinationVariantGenerator(candidateProcesses).variants
 	}
 }

@@ -39,8 +39,10 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 		val title = getParamUnsafe(TITLE_PARAMETER)
 
 		portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title))
-		match {
+			MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title),
+			HCompQueryProperties(paymentCents = 4)
+
+		) match {
 			case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 			case _ => throw new IllegalStateException("didnt get any response") //TODO change me
 		}

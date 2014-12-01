@@ -10,7 +10,7 @@ import org.junit.Test
 class MTSandboxTest {
 	//@Test
 	def testSendTextBox: Unit = {
-		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(FreetextQuery("what's your name? <b>nothing much</b>"), HCompQueryProperties(5d))
+		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(FreetextQuery("what's your name? <b>nothing much</b>"), HCompQueryProperties(5))
 		val answer = r.get.as[FreetextAnswer]
 		println(answer.answer)
 	}

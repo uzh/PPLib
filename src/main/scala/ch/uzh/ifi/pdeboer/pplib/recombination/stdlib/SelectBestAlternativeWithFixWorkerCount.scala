@@ -3,12 +3,6 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 
-import scala.collection.generic.GenericTraversableTemplate
-import scala.collection.{GenTraversable, GenIterable, GenSeq}
-import scala.collection.parallel.ParSeq
-import scala.collection.parallel.immutable.ParRange
-import ch.uzh.ifi.pdeboer.pplib.util.U
-
 /**
  * Created by pdeboer on 31/10/14.
  */
@@ -25,8 +19,9 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 
 		val answers = getCrowdWorkers(workerCount).map(w =>
 			portal.sendQueryAndAwaitResult(
-				createMultipleChoiceQuestion(alternatives, instructions, auxString, title))
-			match {
+				createMultipleChoiceQuestion(alternatives, instructions, auxString, title),
+				HCompQueryProperties(paymentCents = 4)
+			) match {
 				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 				case _ => throw new IllegalStateException("didnt get any response") //TODO change me
 			}).toList
@@ -50,8 +45,8 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 }
 
 object SelectBestAlternativeWithFixWorkerCount {
-	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
+	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the sentence that fits best"))))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
-	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("SelectBestAlternative")))
-	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3, 5)))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
+	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))
 }

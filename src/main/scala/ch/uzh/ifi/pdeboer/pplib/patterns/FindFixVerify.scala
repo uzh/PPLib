@@ -167,12 +167,14 @@ class FFVDefaultHCompDriver(
 		verifyProcess.params += "portal" -> portal
 	}
 
+	//payments taken from http://eprints.soton.ac.uk/372107/1/aaai15-budgetfix.pdf
+
 	override def find(patches: List[FFVPatch[String]]): List[FFVPatch[String]] = {
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(
 				findQuestion.fullQuestion(orderedPatches),
 				patches.map(_.patch),
-				-1, 1, findTitle))
+				-1, 1, findTitle), HCompQueryProperties(6))
 			.get.asInstanceOf[MultipleChoiceAnswer]
 
 		res.selectedAnswers.map(a => {
@@ -182,7 +184,8 @@ class FFVDefaultHCompDriver(
 
 	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
 		val res = portal.sendQueryAndAwaitResult(
-			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle)
+			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle),
+			HCompQueryProperties(8)
 		).get.asInstanceOf[FreetextAnswer]
 
 		FFVPatch[String](res.answer, patch.patchIndex)

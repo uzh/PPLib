@@ -118,6 +118,8 @@ trait HCompAnswer {
 	var acceptTime: Option[DateTime] = None
 	var submitTime: Option[DateTime] = None
 	var receivedTime: DateTime = null
+
+	def processingTimeMillis: Long = submitTime.getOrElse(receivedTime).getMillis - acceptTime.getOrElse(postTime).getMillis
 }
 
 case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) {
@@ -222,7 +224,7 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer
 
-case class HCompQueryProperties(paymentCents: Double = 1d)
+case class HCompQueryProperties(paymentCents: Int = 1)
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]
