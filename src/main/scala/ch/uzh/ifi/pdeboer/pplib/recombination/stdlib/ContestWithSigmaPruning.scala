@@ -12,9 +12,10 @@ import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithSigmaPruning._
 class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 	override protected def run(data: List[String]): List[String] = {
 		data.map(line => {
-			val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w =>
-				portal.sendQueryAndAwaitResult(FreetextQuery(QUESTION_PER_LINE.get.getInstructions(line))).get.asInstanceOf[FreetextAnswer]
-			)
+			val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
+				val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
+				portal.sendQueryAndAwaitResult(FreetextQuery(questionPerLine.getInstructions(line))).get.asInstanceOf[FreetextAnswer]
+			})
 
 			val pruner = new SigmaPruner(
 				answers.map(_.processingTimeMillis.toDouble).toList,
