@@ -20,7 +20,7 @@ sealed trait MTQuery {
 				{id}
 			</QuestionIdentifier>
 			<DisplayName>
-				{title}
+				{title.take(120)}
 			</DisplayName>
 			<IsRequired>
 				{valueIsRequired}

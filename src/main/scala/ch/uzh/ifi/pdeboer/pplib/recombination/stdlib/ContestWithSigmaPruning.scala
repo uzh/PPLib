@@ -14,7 +14,8 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 		data.map(line => {
 			val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
-				portal.sendQueryAndAwaitResult(FreetextQuery(questionPerLine.getInstructions(line))).get.asInstanceOf[FreetextAnswer]
+				portal.sendQueryAndAwaitResult(FreetextQuery(
+					questionPerLine.getInstructions(line))).get.asInstanceOf[FreetextAnswer]
 			})
 
 			val pruner = new SigmaPruner(
