@@ -57,7 +57,9 @@ class DualPathWayDefaultHCompDriverComparisonTest {
 		Assert.assertFalse(ret)
 	}
 
-	def newDriver(text: String) = new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "", new DPHCompDriverDefaultComparisonInstructionsConfig(text))
+	def newDriver(text: String) =
+		new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "",
+			new DPHCompDriverDefaultComparisonInstructionsConfig(text, positiveAnswerForComparison = "Yes", negativeAnswerForComparison = "No"))
 }
 
 class DualPathWayDefaultHCompDriverProcessingTest {
@@ -117,7 +119,8 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 	}
 
 
-	def newDriver = new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "", new DPHCompDriverDefaultComparisonInstructionsConfig(""))
+	def newDriver = new DualPathWayDefaultHCompDriver(data, portal, emptyQ, emptyQ, "",
+		new DPHCompDriverDefaultComparisonInstructionsConfig("", positiveAnswerForComparison = "Yes", negativeAnswerForComparison = "No"))
 
 	def createFilterRule(question: String, answer: String, suggestedAnswer: String = "") = (q: HCompQuery) => {
 		if (q.question == emptyQ.getInstructions(question, answer) || q.question == emptyQ.getInstructions(question) || q.question == emptyQ.getInstructions(question, suggestedAnswer))

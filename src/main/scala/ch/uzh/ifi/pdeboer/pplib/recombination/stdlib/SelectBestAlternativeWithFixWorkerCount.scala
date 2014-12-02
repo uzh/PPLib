@@ -15,7 +15,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 		val answers = getCrowdWorkers(WORKER_COUNT_PARAMETER.get).map(w =>
 			portal.sendQueryAndAwaitResult(
 				createMultipleChoiceQuestion(alternatives, INSTRUCTIONS_PARAMETER.get, AUX_STRING_PARAMETER.get, TITLE_PARAMETER.get),
-				HCompQueryProperties(paymentCents = 4)
+				HCompQueryProperties(paymentCents = 3)
 			) match {
 				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 				case _ => throw new IllegalStateException("didnt get any response") //TODO change me

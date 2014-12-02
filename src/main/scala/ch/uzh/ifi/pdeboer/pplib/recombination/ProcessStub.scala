@@ -195,9 +195,7 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 		par
 	} else (1 to workerCount).view).map(i => new CrowdWorker(i + ""))
 
-	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = PORTAL_PARAMETER :: super.expectedParametersBeforeRun
-
-	override def optionalParameters: List[ProcessParameter[_]] = PARALLEL_EXECUTION_PARAMETER :: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.optionalParameters
 }
 
 object ProcessStubWithHCompPortalAccess {

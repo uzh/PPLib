@@ -82,7 +82,7 @@ class RecombinationVariantXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> process))
 
 		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
-		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationVariantXMLExporterTest$TestProcess</Class><Input>scala.collection.immutable.List</Input><Output>java.lang.String</Output><Categories><Category></Category></Categories><Parameters></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
+		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.recombination.RecombinationVariantXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Categories><Category></Category></Categories><Parameters></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
 

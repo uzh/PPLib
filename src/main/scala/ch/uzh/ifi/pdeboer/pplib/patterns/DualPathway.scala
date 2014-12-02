@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.duration._
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 13/10/14.
@@ -157,11 +158,12 @@ class DualPathWayDefaultHCompDriver(
 		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement.getInstructions(c.data, c.answer), c.answer, c)).toList
 		val newQuery = if (newChunkElementId.isDefined) {
 			val c = DPChunk(newChunkElementId.get, indexMap(newChunkElementId.get))
-			Some(List(new DPFreetextQuery(questionPerNewProcessedElement.getInstructions(c.data), "", c)))
+			Some(List(new DPFreetextQuery(
+				questionPerNewProcessedElement.getInstructions(c.data), "", c)))
 		} else None
 
 		val composite = CompositeQuery(newQuery.getOrElse(Nil) ::: previousQueries, questionPerProcessingTask)
-		val res = portal.sendQueryAndAwaitResult(composite, maxWaitTime = timeout)
+		val res = portal.sendQueryAndAwaitResult(composite, maxWaitTime = timeout, properties = HCompQueryProperties(6))
 
 		val answer = res.get.asInstanceOf[CompositeQueryAnswer]
 		answer.answers.map(t => {
@@ -173,12 +175,13 @@ class DualPathWayDefaultHCompDriver(
 
 	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
 		//TODO currently issues single request. We might want to allow for other mechanisms of consent
-		val POSITIVE_ANSWER: String = "Yes"
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
-				List(POSITIVE_ANSWER, "No"), 1, 1, title = questionPerComparisonTask.title),
-			maxWaitTime = timeout)
-		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == POSITIVE_ANSWER
+				List(questionPerComparisonTask.positiveAnswerForComparison, questionPerComparisonTask.negativeAnswerForComparison), 1, 1, title = questionPerComparisonTask.title),
+			maxWaitTime = timeout,
+			properties = HCompQueryProperties(2)
+		)
+		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == questionPerComparisonTask.positiveAnswerForComparison
 	}
 
 	override def elementIndexExists(index: Int): Boolean = indexMap.contains(index)
@@ -189,12 +192,14 @@ class DualPathWayDefaultHCompDriver(
 
 class DPHCompDriverDefaultComparisonInstructionsConfig(
 														  val title: String = "Comparison",
-														  val preText: String = "Please compare both pathways and answer if the answers are equal or not",
+														  val preText: String = "Please compare both solutions and check if they are equal or not",
 														  val postText: String = "",
 														  val questionTitle: String = "Question",
 														  val leftTitle: String = "Solution 1",
-														  val rightTitle: String = "Solution 2") {
-	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = <div>
+														  val rightTitle: String = "Solution 2",
+														  val positiveAnswerForComparison: String = "Yes, they are equal",
+														  val negativeAnswerForComparison: String = "No, they are NOT equal") {
+	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = NodeSeq.fromSeq(<div>
 		<h1>
 			{title}
 		</h1>{preText}<table>
@@ -202,14 +207,14 @@ class DPHCompDriverDefaultComparisonInstructionsConfig(
 				<th>
 					{questionTitle}
 				</th>
-				<th style="padding-left:20px;">
+				<th>
 					{leftTitle}
 				</th>
 				<th>
 					{rightTitle}
 				</th>
 			</tr>{left.zip(right).map(lr => {
-				<tr style="margin-top:10px;">
+				<tr>
 					<td>
 						{lr._1.data}
 					</td>
@@ -222,6 +227,5 @@ class DPHCompDriverDefaultComparisonInstructionsConfig(
 				</tr>
 			})}
 		</table>
-
-	</div>.toString()
+	</div>.child).toString
 }

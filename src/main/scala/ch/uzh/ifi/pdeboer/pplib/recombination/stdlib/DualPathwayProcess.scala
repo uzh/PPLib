@@ -28,15 +28,12 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 		exec.data.map(_.answer)
 	}
 
-	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =
-		List(QUESTION_OLD_PROCESSED_ELEMENT,
+	override def optionalParameters: List[ProcessParameter[_]] =
+		List(TIMEOUT,
+			CHUNK_COUNT_TO_INCLUDE, QUESTION_OLD_PROCESSED_ELEMENT,
 			QUESTION_NEW_PROCESSED_ELEMENT,
 			QUESTION_PER_PROCESSING_TASK,
 			QUESTION_PER_COMPARISON_TASK)
-
-	override def optionalParameters: List[ProcessParameter[_]] =
-		List(TIMEOUT,
-			CHUNK_COUNT_TO_INCLUDE)
 }
 
 object DualPathwayProcess {

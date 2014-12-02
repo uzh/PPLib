@@ -2,7 +2,7 @@
 
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
@@ -47,7 +47,7 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 
 	override def refine(originalTextToRefine: String, currentRefinementState: String): String = {
 		val q = FreetextQuery(questionForRefinement.getInstructions(originalTextToRefine), currentRefinementState, titleForRefinementQuestion)
-		val answer = portal.sendQueryAndAwaitResult(q).get.asInstanceOf[FreetextAnswer]
+		val answer = portal.sendQueryAndAwaitResult(q, properties = HCompQueryProperties(5)).get.asInstanceOf[FreetextAnswer]
 		answer.answer
 	}
 

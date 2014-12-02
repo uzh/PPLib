@@ -31,7 +31,8 @@ class TranslationProcess(val textToImprove: String) extends Recombinable[String]
 		val improvedParagraphs = processes.languageQuality.process(rewrittenParagraphs)
 		val syntaxImprovedParagraphs = processes.syntaxCheck.process(improvedParagraphs)
 
-		syntaxImprovedParagraphs.mkString("\n")
+		val res = syntaxImprovedParagraphs.mkString("\n")
+		res
 	}
 
 	override def allRecombinationKeys: List[String] = List(REWRITE, IMPROVE_LANGUAGE_QUALITY, CHECK_SYNTAX)
