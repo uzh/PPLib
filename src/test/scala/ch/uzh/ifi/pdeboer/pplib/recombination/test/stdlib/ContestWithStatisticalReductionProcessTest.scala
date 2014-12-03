@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithTuple}
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithStatisticalReductionProcess
 import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessStubWithHCompPortalAccess, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 import org.junit.{Assert, Test}
@@ -11,20 +11,20 @@ import scala.util.Random
 /**
  * Created by pdeboer on 03/11/14.
  */
-class SelectBestAlternativeStatisticalReductionTest {
+class ContestWithStatisticalReductionProcessTest {
 	@Test
 	def TestConfidence90Correct(): Unit = {
 		// if 11 responses have been received for a question with 5 choices, only 6 must agree to achieve a 90% confidence
 		val data: List[String] = List("1", "2", "3", "4", "5")
 		val dataMasterPlanWithVotes = (data zip List(1, 0, 1, 1, 2)).toMap
 
-		val subject = new SelectBestAlternativeStatisticalReductionTestMasterPlan(
+		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
-				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9,
+				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
+				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
-				SelectBestAlternativeStatisticalReduction.SHUFFLE_CHOICES.key -> false
+				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
 
 			))
 
@@ -43,13 +43,13 @@ class SelectBestAlternativeStatisticalReductionTest {
 		val data: List[String] = List("1", "2", "3", "4", "5")
 		val dataMasterPlanWithVotes = (data zip List(1, 0, 1, 1, 2)).toMap
 
-		val subject = new SelectBestAlternativeStatisticalReductionTestMasterPlan(
+		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
-				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.95,
+				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
+				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.95,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
-				SelectBestAlternativeStatisticalReduction.SHUFFLE_CHOICES.key -> false
+				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
 			))
 
 		Assert.assertEquals("2", subject.process(data))
@@ -61,7 +61,7 @@ class SelectBestAlternativeStatisticalReductionTest {
 		Assert.assertEquals(12, subject.votesCastPub.values.sum)
 	}
 
-	private class SelectBestAlternativeStatisticalReductionTestMasterPlan(val masterPlan: Map[String, Int], params: Map[String, Any]) extends SelectBestAlternativeStatisticalReduction(params) {
+	private class ContestWithStatisticalReductionProcessTestMasterPlan(val masterPlan: Map[String, Int], params: Map[String, Any]) extends ContestWithStatisticalReductionProcess(params) {
 		var votesToCast = scala.collection.mutable.HashMap.empty[String, Int]
 		masterPlan.foreach(e => votesToCast += (e._1 -> e._2))
 

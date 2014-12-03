@@ -13,9 +13,9 @@ import scala.util.Random
  * Created by pdeboer on 03/11/14.
  */
 @PPLibProcess("decide.consensus.statistical")
-class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeStatisticalReduction._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithStatisticalReductionProcess._
 
 	protected val MONTECARLO_ITERATIONS: Int = 100000
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
@@ -66,7 +66,7 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER)
 }
 
-object SelectBestAlternativeStatisticalReduction {
+object ContestWithStatisticalReductionProcess {
 	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the item that fits best"))))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))

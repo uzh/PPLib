@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.recombination._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, SelectBestAlternativeStatisticalReduction}
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, ContestWithStatisticalReductionProcess}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -34,8 +34,8 @@ object TranslatorAllInOneOLD extends App {
 			new TypedParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))
 				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key, List(
-				new SelectBestAlternativeStatisticalReduction(Map(
-					SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9 //inject processes to processes
+				new ContestWithStatisticalReductionProcess(Map(
+					ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9 //inject processes to processes
 				))
 			))
 		))
