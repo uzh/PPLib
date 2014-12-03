@@ -17,9 +17,6 @@ class FFVSyntaxChecker(params: Map[String, Any] = Map.empty[String, Any]) extend
 		ffvProcess.process(input).mkString(getParam(SPLIT_IMPLODER))
 	}
 
-	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =
-		ffvProcess.expectedParametersBeforeRun
-
 	override def optionalParameters: List[ProcessParameter[_]] =
 		ffvProcess.optionalParameters ::: List(SPLIT_EXPLODER, SPLIT_IMPLODER)
 

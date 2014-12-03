@@ -22,10 +22,9 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 	override protected def run(data: List[String]): String = {
 		do {
-			//TODO refactor for parallelism
 			val choice = castVote(data)
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
-		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2)
+		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
 		itemWithMostVotes._1
 	}
@@ -63,7 +62,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER)
+		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES)
 }
 
 object ContestWithStatisticalReductionProcess {
@@ -71,5 +70,6 @@ object ContestWithStatisticalReductionProcess {
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select Best Alternative")))
+	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(30)))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
 }
