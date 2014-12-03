@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.duration._
+import scala.util.Random
 import scala.xml.NodeSeq
 
 /**
@@ -174,10 +175,13 @@ class DualPathWayDefaultHCompDriver(
 	}
 
 	override def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean = {
+		val alternatives: List[String] = List(questionPerComparisonTask.positiveAnswerForComparison, questionPerComparisonTask.negativeAnswerForComparison)
+		val choices = if (questionPerComparisonTask.shuffleChoices) Random.shuffle(alternatives) else alternatives
+
 		//TODO currently issues single request. We might want to allow for other mechanisms of consent
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
-				List(questionPerComparisonTask.positiveAnswerForComparison, questionPerComparisonTask.negativeAnswerForComparison), 1, 1, title = questionPerComparisonTask.title),
+				choices, 1, 1, title = questionPerComparisonTask.title),
 			maxWaitTime = timeout,
 			properties = HCompQueryProperties(2)
 		)
@@ -198,7 +202,8 @@ class DPHCompDriverDefaultComparisonInstructionsConfig(
 														  val leftTitle: String = "Solution 1",
 														  val rightTitle: String = "Solution 2",
 														  val positiveAnswerForComparison: String = "Yes, they are equal",
-														  val negativeAnswerForComparison: String = "No, they are NOT equal") {
+														  val negativeAnswerForComparison: String = "No, they are NOT equal",
+														  val shuffleChoices: Boolean = true) {
 	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = NodeSeq.fromSeq(<div>
 		<h1>
 			{title}
