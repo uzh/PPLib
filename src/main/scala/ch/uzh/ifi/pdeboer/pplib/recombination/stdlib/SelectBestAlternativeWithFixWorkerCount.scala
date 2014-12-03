@@ -28,7 +28,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 
 	def createMultipleChoiceQuestion(alternatives: List[String], instructions: HCompInstructionsWithTuple, auxString: String, title: String): MultipleChoiceQuery = {
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		MultipleChoiceQuery(instructions.getInstructions(auxString), choices, 1, 1, title)
+		new MultipleChoiceQuery(instructions.getInstructions(auxString), choices, 1, 1, title)
 	}
 
 	override val processCategoryNames: List[String] = List("selectbest.single")
