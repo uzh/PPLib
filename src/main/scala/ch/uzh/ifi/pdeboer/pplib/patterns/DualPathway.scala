@@ -196,7 +196,7 @@ class DualPathWayDefaultHCompDriver(
 
 class DPHCompDriverDefaultComparisonInstructionsConfig(
 														  val title: String = "Comparison",
-														  val preText: String = "Please compare both solutions and check if they are equal or not",
+														  val preText: String = "Please compare both solutions and check if they are equal or not. (They don't need to have the exact same characters; much rather they should be equal in quality)",
 														  val postText: String = "",
 														  val questionTitle: String = "Question",
 														  val leftTitle: String = "Solution 1",

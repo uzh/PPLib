@@ -126,9 +126,9 @@ object FFVDefaultHCompDriver {
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
 	val DEFAULT_VERIFY_PROCESS = new SelectBestAlternativeWithFixWorkerCount(Map(
-		SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
-		SelectBestAlternativeWithFixWorkerCount.TITLE_PARAMETER.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
-		SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3
+		SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
+		SelectBestAlternativeWithFixWorkerCount.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
+		SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 3
 	))
 
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER: Option[ProcessParameter[String]] = None

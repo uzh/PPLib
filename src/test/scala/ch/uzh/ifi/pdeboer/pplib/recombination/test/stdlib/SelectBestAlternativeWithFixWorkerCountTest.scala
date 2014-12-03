@@ -36,10 +36,10 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		portal.filters ::= f
 
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
-			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 3,
+			Map(SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 3,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple("")))
+				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)
@@ -75,10 +75,10 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		portal.filters ::= f
 
 		val subject = new SelectBestAlternativeWithFixWorkerCount(
-			Map(SelectBestAlternativeWithFixWorkerCount.WORKER_COUNT_PARAMETER.key -> 5,
+			Map(SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 5,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple("")))
+				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)
