@@ -7,6 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
 import scala.collection.parallel.ForkJoinTaskSupport
+import scala.util.Random
 
 /**
  * Created by pdeboer on 21/10/14.
@@ -161,7 +162,9 @@ class FFVDefaultHCompDriver(
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
 							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
 							   val verifyProcessContextParameter: Option[ProcessParameter[String]] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER,
-							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER) extends FindFixVerifyDriver[String] {
+							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER,
+							   val shuffleMultipleChoiceQueries: Boolean = true
+							   ) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
 		verifyProcess.params += "portal" -> portal
@@ -170,11 +173,12 @@ class FFVDefaultHCompDriver(
 	//payments taken from http://eprints.soton.ac.uk/372107/1/aaai15-budgetfix.pdf
 
 	override def find(patches: List[FFVPatch[String]]): List[FFVPatch[String]] = {
+		val choices = if (shuffleMultipleChoiceQueries) Random.shuffle(orderedPatches) else orderedPatches
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(
-				findQuestion.fullQuestion(orderedPatches),
+				findQuestion.fullQuestion(choices),
 				patches.map(_.patch),
-				-1, 1, findTitle), HCompQueryProperties(6))
+				-1, 1, findTitle), HCompQueryProperties(3))
 			.get.asInstanceOf[MultipleChoiceAnswer]
 
 		res.selectedAnswers.map(a => {
@@ -185,7 +189,7 @@ class FFVDefaultHCompDriver(
 	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
 		val res = portal.sendQueryAndAwaitResult(
 			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle),
-			HCompQueryProperties(8)
+			HCompQueryProperties(6)
 		).get.asInstanceOf[FreetextAnswer]
 
 		FFVPatch[String](res.answer, patch.patchIndex)

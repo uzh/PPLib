@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination.translation
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
+import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.recombination.{RecombinationVariant, RecombinationVariantXMLExporter}
 
 import scala.xml.XML
@@ -8,6 +10,8 @@ import scala.xml.XML
  * Created by pdeboer on 01/12/14.
  */
 object TranslationApp extends App {
+	HComp(MechanicalTurkPortalAdapter.PORTAL_KEY).setBudget(Some(100))
+
 	val recombinations: List[RecombinationVariant] = TranslationRecombination.recombinations
 	private val textToImprove: String =
 		"""China has for the first time sent a probe to the moon and back to Earth. The return capsule landed after a circumlunar flight of the orbiter on Saturday morning in Mongolia. Eight days took the 840,000 km long journey. It was the world's first mission of its kind since almost 40 years, state media reported.
@@ -29,4 +33,5 @@ object TranslationApp extends App {
 	</ProcessData>
 
 	XML.save("variations.xml", xml)
+	println("finished " + xml)
 }

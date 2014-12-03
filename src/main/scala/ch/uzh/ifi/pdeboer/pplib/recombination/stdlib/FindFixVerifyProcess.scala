@@ -16,7 +16,9 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 		val driver = new FFVDefaultHCompDriver(
 			data.zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
 			portal, FIND_QUESTION.get, FIX_QUESTION.get,
-			FIND_TITLE.get, FIX_TITLE.get, VERIFY_PROCESS.get
+			FIND_TITLE.get, FIX_TITLE.get, VERIFY_PROCESS.get,
+			VERIFY_PROCESS_CONTEXT_PARAMETER.get, VERIFY_PROCESS_CONTEXT_FLATTENER.get,
+			SHUFFLE_CHOICES.get
 		)
 
 		val exec = new FindFixVerifyExecutor(
@@ -33,7 +35,7 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 		FIND_TITLE, FIX_TITLE,
 
 		PATCHES_COUNT_IN_FIND, FINDERS_COUNT,
-		MIN_FINDERS_TO_AGREE_FOR_FIX, FIXERS_PER_PATCH,
+		MIN_FINDERS_TO_AGREE_FOR_FIX, FIXERS_PER_PATCH, SHUFFLE_CHOICES,
 
 		VERIFY_PROCESS_CONTEXT_PARAMETER, VERIFY_PROCESS_CONTEXT_FLATTENER
 	)
@@ -50,7 +52,8 @@ object FindFixVerifyProcess {
 	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Integer]("patchesInFind", OtherParam(), Some(List(10)))
 	val FINDERS_COUNT = new ProcessParameter[Integer]("findersCount", WorkerCountParam(), Some(List(3)))
 	val MIN_FINDERS_TO_AGREE_FOR_FIX = new ProcessParameter[Integer]("minFindersToAgree", OtherParam(), Some(List(2)))
-	val FIXERS_PER_PATCH = new ProcessParameter[Integer]("fixersPerPatch", WorkerCountParam(), Some(List(3)))
+	val FIXERS_PER_PATCH = new ProcessParameter[Integer]("fixersPerPatch", WorkerCountParam(), Some(List(3))) $
+	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 
 	val VERIFY_PROCESS_CONTEXT_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER)))
 	val VERIFY_PROCESS_CONTEXT_FLATTENER = new ProcessParameter[(List[FFVPatch[String]] => String)]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER)))
