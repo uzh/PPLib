@@ -23,7 +23,9 @@ class SelectBestAlternativeStatisticalReductionTest {
 			Map(
 				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.9,
-				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
+				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
+				SelectBestAlternativeStatisticalReduction.SHUFFLE_CHOICES.key -> false
+
 			))
 
 		Assert.assertEquals("2", subject.process(data))
@@ -46,7 +48,8 @@ class SelectBestAlternativeStatisticalReductionTest {
 			Map(
 				SelectBestAlternativeStatisticalReduction.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
 				SelectBestAlternativeStatisticalReduction.CONFIDENCE_PARAMETER.key -> 0.95,
-				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal()
+				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
+				SelectBestAlternativeStatisticalReduction.SHUFFLE_CHOICES.key -> false
 			))
 
 		Assert.assertEquals("2", subject.process(data))

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple}
 import ch.uzh.ifi.pdeboer.pplib.patterns.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithSigmaPruning._
@@ -15,7 +15,7 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 			val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
 				portal.sendQueryAndAwaitResult(FreetextQuery(
-					questionPerLine.getInstructions(line))).get.asInstanceOf[FreetextAnswer]
+					questionPerLine.getInstructions(line)), HCompQueryProperties(4)).get.asInstanceOf[FreetextAnswer]
 			})
 
 			val pruner = new SigmaPruner(

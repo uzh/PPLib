@@ -18,38 +18,58 @@ import scala.xml.NodeSeq
  */
 
 trait HCompPortalAdapter extends LazyLogging {
+	private var _budget: Option[Int] = None
+
+	def setBudget(budget: Option[Int]): Unit =
+		synchronized {
+			_budget = budget
+		}
+
+	def budget = _budget
+
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
-		logger.debug(s"sending query $query with properties $properties")
-		val timeBefore = new DateTime()
-
-		val answer = query.answerTrivialCases match {
-			case Some(x) => Some(x)
-			case None => processQuery(query, properties)
+		val budgetAfterQuery = budget match {
+			case Some(x) => Some(x - properties.paymentCents)
+			case None => None
 		}
-		val timeAfter = new DateTime()
-		val durationMillis = timeAfter.getMillis - timeBefore.getMillis
-		logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
-
-		answer match {
-			case Some(x: HCompAnswer) => {
-				x.postTime = timeBefore
-				x.receivedTime = timeAfter
+		if (budgetAfterQuery.isDefined && budgetAfterQuery.get < 0)
+			None
+		else {
+			synchronized {
+				_budget = budgetAfterQuery
 			}
+			logger.debug(s"sending query $query with properties $properties")
+			val timeBefore = new DateTime()
+
+			val answer = query.answerTrivialCases match {
+				case Some(x) => Some(x)
+				case None => processQuery(query, properties)
+			}
+			val timeAfter = new DateTime()
+			val durationMillis = timeAfter.getMillis - timeBefore.getMillis
+			logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
+
+			answer match {
+				case Some(x: HCompAnswer) => {
+					x.postTime = timeBefore
+					x.receivedTime = timeAfter
+				}
+			}
+
+			//we risk the querylog to be incomplete if a query is being answered right now
+			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
+
+			answer
 		}
-
-		//we risk the querylog to be incomplete if a query is being answered right now
-		queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
-
-		answer
 	}
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days): Option[HCompAnswer] = {
-		val future = sendQuery(query)
+		val future = sendQuery(query, properties)
 		logger.info("query sent, waiting for result")
 		Await.result(future, maxWaitTime)
 		future.value.get.get
@@ -133,14 +153,14 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 					{data1}
 				</i>
 			</p>{if (questionBetweenTuples != "") <p>
-			{questionBetweenTuples}
+				{questionBetweenTuples}
 			</p>}{if (data2 != "" && enableSecondDataFieldIfAvailable) <p>
-			<i>
-				{data2}
-			</i>
-		</p>}{if (questionAfterTuples != "") <p>
-			{questionAfterTuples}
-		</p>}
+				<i>
+					{data2}
+				</i>
+			</p>}{if (questionAfterTuples != "") <p>
+				{questionAfterTuples}
+			</p>}
 		</placeholder>
 			.child).toString
 }

@@ -1,8 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 
+import java.util
+
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
+
+import scala.reflect.internal.util.Collections
+import scala.util.Random
 
 /**
  * Created by pdeboer on 03/11/14.
@@ -33,14 +38,18 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 		MonteCarlo.minAgreementRequired(data.size, votesCast.values.sum, confidence, MONTECARLO_ITERATIONS)
 	}
 
-	def castVote(alternatives: List[String]) = {
+	def castVote(choices: List[String]) = {
 		val instructions = INSTRUCTIONS_PARAMETER.get
 		val auxString = AUX_STRING_PARAMETER.get
 		val title = TITLE_PARAMETER.get
+		val alternatives = if (SHUFFLE_CHOICES.get) Random.shuffle(choices) else choices
+
 
 		portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title),
-			HCompQueryProperties(paymentCents = 4)
+			MultipleChoiceQuery(
+				instructions.getInstructions(auxString),
+				alternatives, 1, 1, title),
+			HCompQueryProperties(paymentCents = 3)
 
 		) match {
 			case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
@@ -53,14 +62,13 @@ class SelectBestAlternativeStatisticalReduction(params: Map[String, Any] = Map.e
 	override val processCategoryNames: List[String] = List("selectbest.statistical")
 
 
-	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(INSTRUCTIONS_PARAMETER)
-
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER)
+		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER)
 }
 
 object SelectBestAlternativeStatisticalReduction {
 	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the item that fits best"))))
+	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select Best Alternative")))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
