@@ -2,13 +2,13 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubWithHCompPortalAccess
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess
 import org.junit.{Assert, Test}
 
 /**
  * Created by pdeboer on 03/11/14.
  */
-class SelectBestAlternativeWithFixWorkerCountTest {
+class ContestWithFixWorkerCountProcessTest {
 	@Test
 	def testWorkerCountAgreement3: Unit = {
 		val portal = new MockHCompPortal
@@ -35,11 +35,11 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		}
 		portal.filters ::= f
 
-		val subject = new SelectBestAlternativeWithFixWorkerCount(
-			Map(SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 3,
+		val subject = new ContestWithFixWorkerCountProcess(
+			Map(ContestWithFixWorkerCountProcess.WORKER.key -> 3,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
+				ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)
@@ -74,11 +74,11 @@ class SelectBestAlternativeWithFixWorkerCountTest {
 		}
 		portal.filters ::= f
 
-		val subject = new SelectBestAlternativeWithFixWorkerCount(
-			Map(SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 5,
+		val subject = new ContestWithFixWorkerCountProcess(
+			Map(ContestWithFixWorkerCountProcess.WORKER.key -> 5,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
-				SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
+				ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
 
 		val res = subject.run(data)
 		Assert.assertEquals(data(0), res)

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
@@ -125,10 +125,10 @@ object FFVDefaultHCompDriver {
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
-	val DEFAULT_VERIFY_PROCESS = new SelectBestAlternativeWithFixWorkerCount(Map(
-		SelectBestAlternativeWithFixWorkerCount.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
-		SelectBestAlternativeWithFixWorkerCount.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
-		SelectBestAlternativeWithFixWorkerCount.WORKER.key -> 3
+	val DEFAULT_VERIFY_PROCESS = new ContestWithFixWorkerCountProcess(Map(
+		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
+		ContestWithFixWorkerCountProcess.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
+		ContestWithFixWorkerCountProcess.WORKER.key -> 3
 	))
 
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER: Option[ProcessParameter[String]] = None

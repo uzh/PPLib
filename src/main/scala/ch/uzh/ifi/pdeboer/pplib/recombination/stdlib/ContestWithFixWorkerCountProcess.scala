@@ -9,9 +9,9 @@ import scala.util.Random
  * Created by pdeboer on 31/10/14.
  */
 @PPLibProcess("decide.vote.fix")
-class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess._
 
 	override def run(alternatives: List[String]): String = {
 		val answers = getCrowdWorkers(WORKER.get).map(w =>
@@ -36,7 +36,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 			TITLE, INSTRUCTIONS, WORKER)
 }
 
-object SelectBestAlternativeWithFixWorkerCount {
+object ContestWithFixWorkerCountProcess {
 	val INSTRUCTIONS = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the sentence that fits best"))))
 	val AUX_STRING = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))

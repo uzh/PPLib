@@ -4,8 +4,8 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SelectBestAlternativeWithFixWorkerCount._
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess
+import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess._
 import IterativeRefinementExecutor._
 import IRDefaultHCompDriver._
 
@@ -62,7 +62,7 @@ object IRDefaultHCompDriver {
 	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTuple("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
-	val DEFAULT_VOTING_PROCESS = new SelectBestAlternativeWithFixWorkerCount(Map(
+	val DEFAULT_VOTING_PROCESS = new ContestWithFixWorkerCountProcess(Map(
 		INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
 		TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
 		WORKER.key -> DEFAULT_WORKER_COUNT_FOR_VOTING
