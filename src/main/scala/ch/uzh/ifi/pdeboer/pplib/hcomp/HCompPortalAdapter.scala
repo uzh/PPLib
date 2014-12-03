@@ -37,13 +37,14 @@ trait HCompPortalAdapter extends LazyLogging {
 			case Some(x) => Some(x - properties.paymentCents)
 			case None => None
 		}
-		if (budgetAfterQuery.isDefined && budgetAfterQuery.get < 0)
+		if (budgetAfterQuery.isDefined && budgetAfterQuery.get < 0) {
+			logger.error("rejected query due to insufficient funds in budget")
 			None
-		else {
+		} else {
 			synchronized {
 				_budget = budgetAfterQuery
 			}
-			logger.debug(s"sending query $query with properties $properties")
+			logger.debug(s"sending query $query with properties $properties . Budget after query $budget")
 			val timeBefore = new DateTime()
 
 			val answer = query.answerTrivialCases match {

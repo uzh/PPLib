@@ -27,6 +27,8 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 				procTime >= pruner.minAllowedValue && procTime <= pruner.maxAllowedValue
 			})
 
+			logger.info(s"pruned ${answers.size - answersWithinSigmas.size} answers")
+
 			getParam(SELECTION_PROCESS).process(answersWithinSigmas.map(_.answer).toList)
 		})
 	}
