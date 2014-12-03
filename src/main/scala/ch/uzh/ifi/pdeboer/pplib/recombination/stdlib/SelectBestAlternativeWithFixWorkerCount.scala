@@ -3,6 +3,8 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.recombination._
 
+import scala.util.Random
+
 /**
  * Created by pdeboer on 31/10/14.
  */
@@ -25,7 +27,8 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[String], instructions: HCompInstructionsWithTuple, auxString: String, title: String): MultipleChoiceQuery = {
-		MultipleChoiceQuery(instructions.getInstructions(auxString), alternatives, 1, 1, title)
+		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
+		MultipleChoiceQuery(instructions.getInstructions(auxString), choices, 1, 1, title)
 	}
 
 	override val processCategoryNames: List[String] = List("selectbest.single")
@@ -42,6 +45,7 @@ class SelectBestAlternativeWithFixWorkerCount(params: Map[String, Any] = Map.emp
 object SelectBestAlternativeWithFixWorkerCount {
 	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the sentence that fits best"))))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
+	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
 	val WORKER_COUNT_PARAMETER = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))
 }
