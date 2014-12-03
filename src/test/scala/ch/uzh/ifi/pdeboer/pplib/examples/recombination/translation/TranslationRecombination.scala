@@ -14,15 +14,15 @@ object TranslationRecombination {
 	def recombinations = {
 		val candidateProcessParameters = Map(
 			REWRITE -> List(
-				new TypedParameterVariantGenerator[FindFixVerifyProcess]()
-				/*
+				//new TypedParameterVariantGenerator[FindFixVerifyProcess]()
+
 					new TypedParameterVariantGenerator[DualPathwayProcess]()
 						.addVariation(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT, List(HCompInstructionsWithTuple("Please fix any problems you see in the sentence below")))
-						.addVariation(DualPathwayProcess.QUESTION_OLD_PROCESSED_ELEMENT, List(HCompInstructionsWithTuple("Please check if the sentence below is fixed correctly. If it's not, please fix it yourself", questionBetweenTuples = "Candidate answer"))),
-					new TypedParameterVariantGenerator[IterativeRefinementProcess](),
-
-				new TypedParameterVariantGenerator[ContestWithSigmaPruning]()
-	*/
+						.addVariation(DualPathwayProcess.QUESTION_OLD_PROCESSED_ELEMENT, List(HCompInstructionsWithTuple("Please check if the sentence below is fixed correctly. If it's not, please fix it yourself", questionBetweenTuples = "Candidate answer")))
+				/*
+									new TypedParameterVariantGenerator[IterativeRefinementProcess]()
+								new TypedParameterVariantGenerator[ContestWithSigmaPruning]()
+					*/
 			),
 			IMPROVE_LANGUAGE_QUALITY -> List(
 				new TypedParameterVariantGenerator[FindFixVerifyProcess]()

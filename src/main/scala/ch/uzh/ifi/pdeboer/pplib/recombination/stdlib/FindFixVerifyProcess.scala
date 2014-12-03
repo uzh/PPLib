@@ -52,7 +52,7 @@ object FindFixVerifyProcess {
 	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Integer]("patchesInFind", OtherParam(), Some(List(10)))
 	val FINDERS_COUNT = new ProcessParameter[Integer]("findersCount", WorkerCountParam(), Some(List(3)))
 	val MIN_FINDERS_TO_AGREE_FOR_FIX = new ProcessParameter[Integer]("minFindersToAgree", OtherParam(), Some(List(2)))
-	val FIXERS_PER_PATCH = new ProcessParameter[Integer]("fixersPerPatch", WorkerCountParam(), Some(List(3))) $
+	val FIXERS_PER_PATCH = new ProcessParameter[Integer]("fixersPerPatch", WorkerCountParam(), Some(List(3)))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 
 	val VERIFY_PROCESS_CONTEXT_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER)))
