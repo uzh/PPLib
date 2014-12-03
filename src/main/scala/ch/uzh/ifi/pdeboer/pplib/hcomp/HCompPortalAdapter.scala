@@ -32,7 +32,9 @@ trait HCompPortalAdapter extends LazyLogging {
 
 	private var queryLog = List.empty[HCompQueryStats]
 
-	def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
+	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
+		val properties = if (details.paymentCents < 1) HCompQueryProperties(query.suggestedPaymentCents) else details
+		
 		val budgetAfterQuery = budget match {
 			case Some(x) => Some(x - properties.paymentCents)
 			case None => None
@@ -51,6 +53,7 @@ trait HCompPortalAdapter extends LazyLogging {
 				case Some(x) => Some(x)
 				case None => processQuery(query, properties)
 			}
+
 			val timeAfter = new DateTime()
 			val durationMillis = timeAfter.getMillis - timeBefore.getMillis
 			logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
@@ -62,7 +65,6 @@ trait HCompPortalAdapter extends LazyLogging {
 				}
 			}
 
-			//we risk the querylog to be incomplete if a query is being answered right now
 			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
 
 			answer
@@ -125,6 +127,8 @@ trait HCompQuery {
 
 	def title: String
 
+	def suggestedPaymentCents: Int
+
 	final val identifier: Int = HCompIDGen.next()
 
 	def answerTrivialCases: Option[HCompAnswer] = None
@@ -168,6 +172,8 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 
 case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery {
 	def this(queries: List[HCompQuery], question: String) = this(queries, question, question)
+
+	override def suggestedPaymentCents: Int = queries.map(_.suggestedPaymentCents).sum
 }
 
 object CompositeQuery {
@@ -203,6 +209,8 @@ case class FreetextQuery(question: String, defaultAnswer: String = "", title: St
 		valueIsRequired = required;
 		this
 	}
+
+	override def suggestedPaymentCents: Int = 6
 }
 
 object FreetextQuery {
@@ -225,6 +233,8 @@ case class MultipleChoiceQuery(question: String, options: List[String], maxNumbe
 	override def answerTrivialCases: Option[HCompAnswer] =
 		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options(0) -> true)))
 		else None
+
+	override def suggestedPaymentCents: Int = 3
 }
 
 object MultipleChoiceQuery {
@@ -245,7 +255,7 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer
 
-case class HCompQueryProperties(paymentCents: Int = 1)
+case class HCompQueryProperties(paymentCents: Int = 0)
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]
