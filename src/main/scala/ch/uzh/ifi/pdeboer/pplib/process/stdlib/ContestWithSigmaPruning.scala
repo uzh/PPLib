@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.patterns.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithSigmaPruning._
@@ -32,6 +32,8 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 			getParam(SELECTION_PROCESS).process(answersWithinSigmas.map(_.answer).toList)
 		})
 	}
+
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PER_LINE, SELECTION_PROCESS, NUM_SIGMAS, ANSWERS_TO_COLLECT_PER_LINE)
 }
 
 object ContestWithSigmaPruning {
