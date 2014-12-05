@@ -1,17 +1,14 @@
 package ch.uzh.ifi.pdeboer.pplib.recombination.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.CollectPruneDecideProcess
 import org.junit.{Assert, Test}
-
-import scala.reflect.ClassTag
 
 /**
  * Created by pdeboer on 05/12/14.
  */
 class CollectPruneDecideProcessTest {
 
-	import CollectPruneDecideProcess._
+	import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.CollectPruneDecideProcess._
 
 	@Test
 	def testEachProcessIsCalled: Unit = {
@@ -35,14 +32,5 @@ class CollectPruneDecideProcessTest {
 	def pruneProcess = new SignalingProcess[List[String], List[String]](List("b"))
 
 	def decideProcess = new SignalingProcess[List[String], String]("b")
-
-	class SignalingProcess[IN: ClassTag, OUT: ClassTag](out: OUT) extends ProcessStub[IN, OUT]() {
-		var called: Boolean = false
-
-		override protected def run(data: IN): OUT = {
-			called = true
-			out
-		}
-	}
 
 }
