@@ -3,13 +3,13 @@ package ch.uzh.ifi.pdeboer.pplib.recombination.entities
 /**
  * Created by pdeboer on 05/12/14.
  */
-class Patch[T](val payload: T) {
+class Patch(val payload: Any) {
 	override def toString = payload.toString
 
-	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch[_]]
+	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch]
 
 	override def equals(other: Any): Boolean = other match {
-		case that: Patch[_] =>
+		case that: Patch =>
 			(that canEqual this) &&
 				payload == that.payload
 		case _ => false
@@ -21,6 +21,6 @@ class Patch[T](val payload: T) {
 	}
 }
 
-class StringPatch[T](stringValue: String, payload: T) extends Patch[T](payload) {
+class StringPatch(stringValue: String, payload: Any) extends Patch(payload) {
 	override def toString = stringValue
 }

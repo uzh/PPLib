@@ -9,9 +9,12 @@ import scala.util.Random
 /**
  * Created by pdeboer on 05/12/14.
  */
-class NaiveFinder[T](data: List[Patch[T]], question: HCompInstructionsWithTuple, title: String, findersPerItem: Int, shuffle: Boolean, portal: HCompPortalAdapter, maxItemsPerFind: Int = 5, parallelTaskSupport: Option[TaskSupport] = None) {
+class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
+				  title: String, findersPerItem: Int, shuffle: Boolean,
+				  portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
+				  parallelTaskSupport: Option[TaskSupport] = None) {
 
-	protected class PatchContainer(val patch: Patch[T], var displays: Int = 0, var selects: Int = 0)
+	protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0)
 
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 

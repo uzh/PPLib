@@ -33,9 +33,9 @@ class NaiveFinderTest {
 		Assert.assertEquals(Map(new Patch("a") -> 0, new Patch("b") -> 2, new Patch("c") -> 0), finder.result)
 	}
 
-	private class NaiveFinderPublic[T](data: List[Patch[T]], question: HCompInstructionsWithTuple, title: String, findersPerItem: Int, shuffle: Boolean, portal: HCompPortalAdapter, maxItemsPerFind: Int = 5, parallelTaskSupport: Option[TaskSupport] = None)
-		extends NaiveFinder[T](data, question, title, findersPerItem, shuffle, portal, maxItemsPerFind, parallelTaskSupport) {
-		def iterations: List[List[Patch[T]]] = selectionIterations.map(_.map(_.patch))
+	private class NaiveFinderPublic(data: List[Patch], question: HCompInstructionsWithTuple, title: String, findersPerItem: Int, shuffle: Boolean, portal: HCompPortalAdapter, maxItemsPerFind: Int = 5, parallelTaskSupport: Option[TaskSupport] = None)
+		extends NaiveFinder(data, question, title, findersPerItem, shuffle, portal, maxItemsPerFind, parallelTaskSupport) {
+		def iterations: List[List[Patch]] = selectionIterations.map(_.map(_.patch))
 	}
 
 }
