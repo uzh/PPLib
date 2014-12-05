@@ -18,7 +18,7 @@ class HCompPortalBudget {
 	def testBudgetingWithBudget: Unit = {
 		val p = new MyTestPortal
 		p.setBudget(Some(10)) //10 cents in total
-		Assert.assertEquals(Some(a), p.sendQueryAndAwaitResult(q))
+		Assert.assertEquals(Some(a), p.sendQueryAndAwaitResult(q, HCompQueryProperties(1)))
 		Assert.assertEquals(9, p.budget.get)
 
 		Assert.assertEquals(Some(a), p.sendQueryAndAwaitResult(q, HCompQueryProperties(paymentCents = 9)))
