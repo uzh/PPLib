@@ -26,7 +26,7 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 			QUESTION_NEW_PROCESSED_ELEMENT.get, QUESTION_PER_PROCESSING_TASK.get, QUESTION_PER_COMPARISON_TASK.get, TIMEOUT.get)
 
 		val exec = new DualPathwayExecutor(driver, CHUNK_COUNT_TO_INCLUDE.get)
-		exec.data.map(_.answer)
+		exec.result.map(_.answer)
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] =

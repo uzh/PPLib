@@ -1,1 +1,1 @@
-"asdf".take(2)
+List("a", "b").zipWithIndex

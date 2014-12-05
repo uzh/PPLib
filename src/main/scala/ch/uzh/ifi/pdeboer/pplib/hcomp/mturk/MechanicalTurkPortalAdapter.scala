@@ -19,7 +19,6 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
-		logger.info("executing query " + query)
 		val manager: MTurkManager = new MTurkManager(service, query, properties)
 		map += query.identifier -> manager
 		manager.createHIT()

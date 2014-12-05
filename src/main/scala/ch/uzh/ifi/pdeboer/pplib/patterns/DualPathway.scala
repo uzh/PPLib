@@ -13,7 +13,7 @@ import scala.xml.NodeSeq
  * Created by pdeboer on 13/10/14.
  */
 class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogging {
-	lazy val data = {
+	lazy val result = {
 		runUntilConverged()
 		pathway1.elements.map(_.mostRecentCandidate).toList
 	}
@@ -109,7 +109,8 @@ class DPPathwayChunk(initialChunk: DPChunk) {
 	addMostRecentCandidate(initialChunk)
 
 	def addMostRecentCandidate(chunk: DPChunk): Unit = {
-		if (!candidates.forall(_.elementIndex == chunk.elementIndex)) throw new IllegalArgumentException("indices unaligned")
+		if (!candidates.forall(_.elementIndex == chunk.elementIndex))
+			throw new IllegalArgumentException("indices unaligned")
 		candidates = chunk :: candidates
 	}
 
@@ -148,7 +149,7 @@ class DualPathWayDefaultHCompDriver(
 									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
 									   val timeout: Duration = 2 days) extends DPDriver {
 
-	lazy val indexMap = data.zipWithIndex.map(d => (d._2, d._1)).toMap
+	lazy val indexMap: Map[Int, String] = data.zipWithIndex.map(d => (d._2.toInt, d._1)).toMap
 
 	/**
 	 * return newest chunk first
@@ -163,8 +164,10 @@ class DualPathWayDefaultHCompDriver(
 				questionPerNewProcessedElement.getInstructions(c.data), "", c)))
 		} else None
 
-		val composite = CompositeQuery(newQuery.getOrElse(Nil) ::: previousQueries, questionPerProcessingTask)
-		val res = portal.sendQueryAndAwaitResult(composite, maxWaitTime = timeout, properties = HCompQueryProperties(6))
+		val composite = CompositeQuery(
+			newQuery.getOrElse(Nil) ::: previousQueries, questionPerProcessingTask, questionPerProcessingTask)
+		val res = portal.sendQueryAndAwaitResult(
+			composite, maxWaitTime = timeout, properties = HCompQueryProperties(6))
 
 		val answer = res.get.asInstanceOf[CompositeQueryAnswer]
 		answer.answers.map(t => {
