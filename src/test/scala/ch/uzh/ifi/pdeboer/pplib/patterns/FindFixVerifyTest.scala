@@ -13,7 +13,7 @@ class FindFixVerifyTest extends LazyLogging {
 	def testFFVDetailed(): Unit = {
 		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
 
-		val toFix = exec.getPatchesToFix()
+		val toFix = exec.findPatches()
 		Assert.assertEquals("finds errorous", badPatches.map(_.original).toSet, toFix.toSet)
 
 		val fixes = exec.getAlternativesForPatchesToFix(toFix)
@@ -140,7 +140,7 @@ class FindFixVerifyTest extends LazyLogging {
 
 		override def getAlternativesForPatchesToFix(toFix: List[FFVPatch[String]]): List[FFVPatch[String]] = super.getAlternativesForPatchesToFix(toFix)
 
-		override def getPatchesToFix(): List[FFVPatch[String]] = super.getPatchesToFix()
+		override def findPatches(): List[FFVPatch[String]] = super.findPatches()
 
 		override def addFixesAsAlternativesToAllPatches(fixes: List[FFVPatch[String]]): Unit = super.addFixesAsAlternativesToAllPatches(fixes)
 

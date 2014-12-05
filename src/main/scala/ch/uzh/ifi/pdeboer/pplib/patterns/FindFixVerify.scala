@@ -28,7 +28,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 
 	def runUntilConverged(): Unit = {
 		ran = true
-		val toFix = getPatchesToFix()
+		val toFix = findPatches()
 		val fixes = getAlternativesForPatchesToFix(toFix)
 		addFixesAsAlternativesToAllPatches(fixes)
 
@@ -61,7 +61,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 		par
 	} else (1 to to).view
 
-	protected def getPatchesToFix() = {
+	protected def findPatches() = {
 		var findSteps = new mutable.HashMap[Int, List[FFVPatchContainer[T]]]()
 		allPatches.zipWithIndex.foreach(p => {
 			val k: Int = p._2 / maxPatchesCountInFind
@@ -75,7 +75,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 			container.finders += 1
 		})
 
-		allPatches.filter(_._2.finders >= findersCount).map(_._2.original).toList
+		allPatches.filter(_._2.finders >= minFindersCountThatNeedToAgreeForFix).map(_._2.original).toList
 	}
 
 	protected class FFVPatchContainer[E](val original: FFVPatch[E],

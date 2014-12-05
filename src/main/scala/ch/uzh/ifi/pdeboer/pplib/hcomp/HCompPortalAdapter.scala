@@ -80,7 +80,7 @@ trait HCompPortalAdapter extends LazyLogging {
 
 	def getDefaultPortalKey: String
 
-	def getQueries() = queryLog
+	def queries = queryLog
 
 	def cancelQuery(query: HCompQuery): Unit
 }
