@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 /**
  * Created by pdeboer on 09/10/14.

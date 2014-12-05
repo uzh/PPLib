@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.recombination._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{DualPathwayProcess, FindFixVerifyProcess, ContestWithStatisticalReductionProcess}
 
 /**

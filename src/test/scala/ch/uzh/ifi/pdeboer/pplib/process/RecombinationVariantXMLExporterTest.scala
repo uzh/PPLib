@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationVariantXMLExporter, RecombinationVariant}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
 

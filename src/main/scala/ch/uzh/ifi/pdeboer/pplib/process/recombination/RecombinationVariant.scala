@@ -1,7 +1,9 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.recombination
+
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, ProcessStubWithHCompPortalAccess}
 
 import scala.reflect.ClassTag
-import scala.xml.{XML, NodeSeq}
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 09/10/14.

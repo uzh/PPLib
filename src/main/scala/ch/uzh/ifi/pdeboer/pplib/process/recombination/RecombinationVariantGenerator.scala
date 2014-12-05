@@ -1,6 +1,8 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import java.lang.reflect.Constructor
+
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub}
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

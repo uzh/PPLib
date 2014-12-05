@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.RecombinationVariantGenerator
 import org.junit.{Assert, Test}
 
 /**
