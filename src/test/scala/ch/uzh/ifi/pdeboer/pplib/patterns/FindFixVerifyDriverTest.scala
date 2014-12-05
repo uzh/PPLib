@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
 import org.junit.{Assert, Test}
 
 /**

@@ -3,9 +3,9 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStub
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess._
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
 import IterativeRefinementExecutor._
 import IRDefaultHCompDriver._
 

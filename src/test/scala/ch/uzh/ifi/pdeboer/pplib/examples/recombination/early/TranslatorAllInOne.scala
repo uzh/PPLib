@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
-import ch.uzh.ifi.pdeboer.pplib.recombination._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.{DualPathwayProcess, FindFixVerifyProcess, ContestWithStatisticalReductionProcess}
+import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{DualPathwayProcess, FindFixVerifyProcess, ContestWithStatisticalReductionProcess}
 
 /**
  * Created by pdeboer on 04/11/14.

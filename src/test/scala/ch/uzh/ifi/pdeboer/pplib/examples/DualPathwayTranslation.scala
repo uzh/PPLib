@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple}
 import ch.uzh.ifi.pdeboer.pplib.patterns.DPHCompDriverDefaultComparisonInstructionsConfig
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.DualPathwayProcess
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
 
 /**
  * Created by pdeboer on 12/11/14.

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.FindFixVerifyProcess
-import ch.uzh.ifi.pdeboer.pplib.recombination.{OtherParam, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess
+import ch.uzh.ifi.pdeboer.pplib.process.{OtherParam, ProcessParameter, ProcessStub}
 
 /**
  * Created by pdeboer on 04/11/14.

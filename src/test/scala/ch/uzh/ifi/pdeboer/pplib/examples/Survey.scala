@@ -2,8 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.examples
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.recombination.ProcessStubWithHCompPortalAccess
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.SimpleWriteProcess
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SimpleWriteProcess
 
 /**
  * Created by pdeboer on 30/10/14.

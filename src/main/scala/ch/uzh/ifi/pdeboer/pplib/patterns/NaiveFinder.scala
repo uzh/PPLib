@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
 import scala.collection.parallel.TaskSupport
 import scala.util.Random

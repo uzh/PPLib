@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.recombination.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.recombination.{ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
