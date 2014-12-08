@@ -120,7 +120,7 @@ private object HCompIDGen {
 	def next() = current.incrementAndGet()
 }
 
-trait HCompQuery {
+trait HCompQuery extends Serializable {
 	def question: String
 
 	def title: String
@@ -132,7 +132,7 @@ trait HCompQuery {
 	def answerTrivialCases: Option[HCompAnswer] = None
 }
 
-trait HCompAnswer {
+trait HCompAnswer extends Serializable {
 	def query: HCompQuery
 
 	def as[T]: T = this.asInstanceOf[T]
@@ -145,7 +145,7 @@ trait HCompAnswer {
 	def processingTimeMillis: Long = submitTime.getOrElse(receivedTime).getMillis - acceptTime.getOrElse(postTime).getMillis
 }
 
-case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) {
+case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
 	def getInstructions(data1: String, data2: String = "") =
 		NodeSeq.fromSeq(<placeholder>
 			<p>
@@ -168,7 +168,7 @@ case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetw
 			.child).toString
 }
 
-case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery {
+case class CompositeQuery(queries: List[HCompQuery], question: String = "", title: String = "") extends HCompQuery with Serializable {
 	def this(queries: List[HCompQuery], question: String) = this(queries, question, question)
 
 	override def suggestedPaymentCents: Int = queries.map(_.suggestedPaymentCents).sum
@@ -178,7 +178,7 @@ object CompositeQuery {
 	def apply(queries: List[HCompQuery], question: String): CompositeQuery = apply(queries, question, question)
 }
 
-case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer {
+case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, Option[HCompAnswer]]) extends HCompAnswer with Serializable {
 	def get[T](query: HCompQuery): T = answers(query).get.asInstanceOf[T]
 
 	def getByTitle[T](title: String): Option[T] = {
@@ -196,7 +196,7 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
  * @param defaultAnswer
  * @param title
  */
-case class FreetextQuery(question: String, defaultAnswer: String = "", title: String = "") extends HCompQuery {
+case class FreetextQuery(question: String, defaultAnswer: String = "", title: String = "") extends HCompQuery with Serializable {
 	def this(question: String, defaultAnswer: String) = this(question, defaultAnswer, question)
 
 	def this(question: String) = this(question, "", question)
@@ -217,11 +217,11 @@ object FreetextQuery {
 	def apply(question: String): FreetextQuery = apply(question, "", question)
 }
 
-case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer {
+case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer with Serializable {
 	override def toString() = answer
 }
 
-case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery {
+case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery with Serializable {
 	assert(maxNumberOfResults < 1 || maxNumberOfResults >= minNumberOfResults)
 
 	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, 1, question)
@@ -239,7 +239,7 @@ object MultipleChoiceQuery {
 	def apply(question: String, options: List[String], maxNumberOfResults: Int): MultipleChoiceQuery = apply(question, options, maxNumberOfResults, title = question)
 }
 
-case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer {
+case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer with Serializable {
 	def selectedAnswers: List[String] = answer.collect({
 		case x if x._2 => x._1
 	}).toList
@@ -249,11 +249,11 @@ case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, 
 	override def toString() = selectedAnswers.mkString(", ")
 }
 
-case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer
+case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer with Serializable
 
-case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer
+case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
 
-case class HCompQueryProperties(paymentCents: Int = 0)
+case class HCompQueryProperties(paymentCents: Int = 0) extends Serializable
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]

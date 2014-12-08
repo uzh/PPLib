@@ -11,25 +11,33 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithSigmaPruning._
 @PPLibProcess("create.refine.contestwithsixsigma")
 class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 	override protected def run(data: List[String]): List[String] = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+
 		data.map(line => {
-			val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
-				val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
-				portal.sendQueryAndAwaitResult(FreetextQuery(
-					questionPerLine.getInstructions(line)), HCompQueryProperties(4)).get.asInstanceOf[FreetextAnswer]
-			})
+			val answerTextsWithinSigmas = memoizer.mem("answer_line_" + line) {
+				val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
+					val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
+					portal.sendQueryAndAwaitResult(FreetextQuery(
+						questionPerLine.getInstructions(line)), HCompQueryProperties(4)).get.asInstanceOf[FreetextAnswer]
+				})
 
-			val pruner = new SigmaPruner(
-				answers.map(_.processingTimeMillis.toDouble).toList,
-				NUM_SIGMAS.get)
+				val pruner = new SigmaPruner(
+					answers.map(_.processingTimeMillis.toDouble).toList,
+					NUM_SIGMAS.get)
 
-			val answersWithinSigmas = answers.filter(a => {
-				val procTime: Double = a.processingTimeMillis.toDouble
-				procTime >= pruner.minAllowedValue && procTime <= pruner.maxAllowedValue
-			})
+				val answersWithinSigmas = answers.filter(a => {
+					val procTime: Double = a.processingTimeMillis.toDouble
+					procTime >= pruner.minAllowedValue && procTime <= pruner.maxAllowedValue
+				})
 
-			logger.info(s"pruned ${answers.size - answersWithinSigmas.size} answers")
+				logger.info(s"pruned ${answers.size - answersWithinSigmas.size} answers")
 
-			getParam(SELECTION_PROCESS).process(answersWithinSigmas.map(_.answer).toList)
+				answersWithinSigmas.map(_.answer).toList
+			}
+
+			val selectionProcess: ProcessStub[List[String], String] = SELECTION_PROCESS.get
+			selectionProcess.params += ProcessStub.MEMOIZER_NAME.key -> processMemoizer.map(_.name + "_selection")
+			selectionProcess.process(answerTextsWithinSigmas.toList)
 		})
 	}
 

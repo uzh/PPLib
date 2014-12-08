@@ -20,7 +20,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	implicit val processStub = this
 
-	val processMemoizer = MEMOIZER_NAME.get match {
+	lazy val processMemoizer = MEMOIZER_NAME.get match {
 		case Some(x: String) => Some(new FileProcessMemoizer(this, x))
 		case _ => None
 	}
