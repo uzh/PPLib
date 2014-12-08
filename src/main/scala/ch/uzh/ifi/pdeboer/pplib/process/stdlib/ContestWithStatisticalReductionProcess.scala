@@ -18,8 +18,11 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
 
 	override protected def run(data: List[String]): String = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		var iteration: Int = 0
 		do {
-			val choice = castVote(data)
+			iteration += 1
+			val choice = memoizer.mem("it" + iteration)(castVote(data))
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
 		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
