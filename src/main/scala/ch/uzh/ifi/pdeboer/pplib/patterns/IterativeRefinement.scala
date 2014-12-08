@@ -5,26 +5,29 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
 
 /**
  * Created by pdeboer on 30/11/14.
  */
-class IterativeRefinementExecutor(val textToRefine: String, val driver: IterativeRefinementDriver[String], val numIterations: Int = DEFAULT_ITERATION_COUNT) {
+class IterativeRefinementExecutor(val textToRefine: String,
+								  val driver: IterativeRefinementDriver[String],
+								  val numIterations: Int = DEFAULT_ITERATION_COUNT,
+								  val memoizer: ProcessMemoizer = new NoProcessMemoizer()) {
 	assert(numIterations > 0)
 
 	var currentState: String = textToRefine
 
-	def step(): Unit = {
-		val newState = driver.refine(textToRefine, currentState)
-		currentState = driver.selectBestRefinement(List(currentState, newState))
+	def step(stepNumber: Int): Unit = {
+		val newState = memoizer.mem("refinement" + stepNumber)(driver.refine(textToRefine, currentState))
+		currentState = memoizer.mem("bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
 	}
 
 	lazy val refinedText: String = {
 		for (i <- 1 to numIterations) {
-			step()
+			step(i)
 		}
 		currentState
 	}

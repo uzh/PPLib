@@ -15,10 +15,12 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess._
 
 	override protected def run(data: List[String]): List[String] = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+
 		data.map(d => {
 			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get,
 				QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS.get)
-			val exec = new IterativeRefinementExecutor(d, driver, ITERATION_COUNT.get)
+			val exec = new IterativeRefinementExecutor(d, driver, ITERATION_COUNT.get, memoizer)
 			exec.refinedText
 		})
 	}
