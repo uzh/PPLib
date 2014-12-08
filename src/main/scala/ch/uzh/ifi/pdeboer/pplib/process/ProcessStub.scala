@@ -20,6 +20,11 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	implicit val processStub = this
 
+	val processMemoizer = MEMOIZER_NAME.get match {
+		case Some(x: String) => Some(new FileProcessMemoizer(this, x))
+		case _ => None
+	}
+
 	protected var _results = collection.mutable.HashMap.empty[INPUT, OUTPUT]
 
 	def results: Map[INPUT, OUTPUT] = _results.toMap
@@ -30,7 +35,9 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
 
-		logger.info(s"running process ${getClass.getSimpleName}")
+		logger.info(s"running process ${
+			getClass.getSimpleName
+		}")
 		val result: OUTPUT = run(data)
 
 		if (getParam(STORE_EXECUTION_RESULTS)) _results += data -> result
@@ -56,7 +63,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
-	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+	def optionalParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
 
 	protected def processCategoryNames: List[String] = Nil
 
@@ -175,15 +182,19 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 	}
 
-	override def toString(): String = s"${getClass.getSimpleName} ( ${params.toString()}} )"
+	override def toString(): String = s"${
+		getClass.getSimpleName
+	} ( ${
+		params.toString()
+	}} )"
 }
 
 object ProcessStub {
 	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", OtherParam(), Some(List(true)))
+	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", OtherParam(), Some(List(None)))
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
-
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
 
 	lazy val portal = new CostCountingEnabledHCompPortal(getParam(PORTAL_PARAMETER))
