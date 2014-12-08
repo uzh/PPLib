@@ -10,9 +10,9 @@ import scala.util.Random
  * Created by pdeboer on 28/11/14.
  */
 @PPLibProcess("decide.vote.beatbyk")
-class BeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BeatByKVotingProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	protected var votes = mutable.HashMap.empty[String, Int]
 
@@ -49,7 +49,7 @@ class BeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS, K)
 }
 
-object BeatByKVotingProcess {
+object ContestWithBeatByKVotingProcess {
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
 	val INSTRUCTIONS = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the option that fits best"))))
 	val AUX_STRING = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))

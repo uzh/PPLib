@@ -1,18 +1,18 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BeatByKVotingProcess
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess$
 import org.junit.{Assert, Test}
 
 /**
  * Created by pdeboer on 03/12/14.
  */
-class BeatByKVotingProcessTest {
+class ContestWithBeatByKVotingProcessTest {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BeatByKVotingProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	@Test
 	def testBestAndSecondBest: Unit = {
-		val p = new MiniBeatByKVotingProcess()
+		val p = new MiniContestWithBeatByKVotingProcess()
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
 		Assert.assertEquals((("b", 2), ("a", 1)), p.bestAndSecondBest)
@@ -20,7 +20,7 @@ class BeatByKVotingProcessTest {
 
 	@Test
 	def testDelta: Unit = {
-		val p = new MiniBeatByKVotingProcess()
+		val p = new MiniContestWithBeatByKVotingProcess()
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
 		Assert.assertEquals(1, p.delta)
@@ -31,7 +31,7 @@ class BeatByKVotingProcessTest {
 
 	@Test
 	def testKDiff: Unit = {
-		val p = new MiniBeatByKVotingProcess(Map(K.key -> 3))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3))
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
 		Assert.assertTrue(p.shouldStartAnotherIteration)
@@ -45,7 +45,7 @@ class BeatByKVotingProcessTest {
 
 	@Test
 	def testMaxIterationsExceeded: Unit = {
-		val p = new MiniBeatByKVotingProcess(Map(K.key -> 3, MAX_VOTES.key -> 10))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, MAX_VOTES.key -> 10))
 		p.setVotes(Map("a" -> 4, "b" -> 2))
 		Assert.assertTrue(p.shouldStartAnotherIteration)
 
@@ -56,7 +56,7 @@ class BeatByKVotingProcessTest {
 		Assert.assertFalse(p.shouldStartAnotherIteration)
 	}
 
-	private class MiniBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends BeatByKVotingProcess(params) {
+	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ContestWithBeatByKVotingProcess(params) {
 		def setVotes(v: Map[String, Int]): Unit = {
 			votes = votes ++ v
 		}
