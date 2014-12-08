@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
@@ -17,22 +17,25 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 							   val findersCount: Int = 3,
 							   val minFindersCountThatNeedToAgreeForFix: Int = 2,
 							   val fixersPerPatch: Int = 3,
-							   val parallelWorkers: Boolean = true) {
+							   val parallelWorkers: Boolean = true,
+							   val memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
-
 		allPatches.toArray.map(p => p._2.best.getOrElse(p._2.original)).sortBy(_.patchIndex).toList
 	}
 	protected val allPatches = driver.orderedPatches.map(p => p.patchIndex -> new FFVPatchContainer[T](p)).toMap
-	private var ran: Boolean = false
+	protected var ran: Boolean = false
 
 	def runUntilConverged(): Unit = {
 		ran = true
-		val toFix = findPatches()
-		val fixes = getAlternativesForPatchesToFix(toFix)
-		addFixesAsAlternativesToAllPatches(fixes)
+		val toFix = memoizer.mem("toFix")(findPatches())
+		val fixes = memoizer.mem("fixes")(getAlternativesForPatchesToFix(toFix))
+		val fixesAdded = memoizer.mem("fixesAdded") {
+			addFixesAsAlternativesToAllPatches(fixes)
+			""
+		}
 
-		val bestPatchesFound = getBestPatchesFromAllPatchesVAR()
+		val bestPatchesFound = memoizer.mem("bestPatchesFound")(getBestPatchesFromAllPatchesVAR())
 		saveBestPatchesToAllPatches(bestPatchesFound)
 	}
 
@@ -81,7 +84,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 	protected class FFVPatchContainer[E](val original: FFVPatch[E],
 										 var finders: Int = 0,
 										 var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
-										 var best: Option[FFVPatch[E]] = None)
+										 var best: Option[FFVPatch[E]] = None) extends Serializable
 
 }
 
@@ -114,7 +117,7 @@ trait FindFixVerifyDriver[T] {
 	def verify(patch: FFVPatch[T], alternatives: List[FFVPatch[T]]): FFVPatch[T]
 }
 
-case class FFVPatch[T](patch: T, patchIndex: Int)
+case class FFVPatch[T](patch: T, patchIndex: Int) extends Serializable
 
 object FFVDefaultHCompDriver {
 	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved")

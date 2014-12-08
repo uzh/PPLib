@@ -14,7 +14,7 @@ class FindFixVerifyTest extends LazyLogger {
 		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData
 
 		val toFix = exec.findPatches()
-		Assert.assertEquals("finds errorous", badPatches.map(_.original).toSet, toFix.toSet)
+		Assert.assertEquals("finds erroneous", badPatches.map(_.original).toSet, toFix.toSet)
 
 		val fixes = exec.getAlternativesForPatchesToFix(toFix)
 		Assert.assertEquals("fixes erroneous", badPatches.map(_.alternatives).flatten.sortBy(_.patch), fixes.sortBy(_.patch))

@@ -5,57 +5,31 @@ import java.io._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
-/**
- * Created by pdeboer on 05/12/14.
- */
-class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, val eraseExisting: Boolean = false) extends LazyLogger with Serializable {
-	val defaultPath = "state/"
-	val defaultSuffix = ".state"
+trait ProcessMemoizer extends Serializable {
+	def processStub: ProcessStub[_, _]
+
+	def name: String
+
+	def overwriteExistingData: Boolean
 
 	protected var snapshotList = List.empty[ProcessSnapshot]
 
-	val file = new File(defaultPath + name + defaultSuffix)
-	if (eraseExisting) file.delete()
-	if (file.exists()) load() else new File(defaultPath).mkdirs()
-
-	private class SnapshotContainer(val snapshots: List[ProcessSnapshot]) extends Serializable
-
-	def flush(): Boolean = {
-		synchronized {
-			try {
-				val foos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))
-				foos.writeObject(new SnapshotContainer(snapshotList))
-				foos.close()
-				true
-			}
-			catch {
-				case e: Exception => {
-					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
-					false
-				}
-			}
-		}
+	def addIncrementalSnapshot(name: String): ProcessSnapshot = {
+		val s = addSnapshot(name)
+		val olderElements: Map[String, Serializable] = if (latest.isDefined) latest.get.elements else Map()
+		olderElements.foreach(e => s.addElement(e._1, e._2))
+		s
 	}
 
-	/**
-	 * do not execute during runtime
-	 * @return
-	 */
-	protected def load(): Boolean = {
-		synchronized {
-			try {
-				val fis = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))
-				val container = fis.readObject().asInstanceOf[SnapshotContainer]
-				snapshotList = container.snapshots
-				fis.close()
-				true
-			}
-			catch {
-				case e: Exception => {
-					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
-					false
-				}
-			}
+	def mem[T <: Serializable](name: String)(fn: => T): T = {
+		if (!latest.isDefined && latest.get.elements.contains(name))
+			latest.get.elements(name).asInstanceOf[T]
+		else {
+			val ret = fn
+			addIncrementalSnapshot(name)
+				.addElement(name, ret)
+				.release()
+			ret
 		}
 	}
 
@@ -70,6 +44,10 @@ class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, 
 	def snapshots = snapshotList
 
 	def latest = snapshotList.find(_.isFinal)
+
+	def flush(): Boolean
+
+	def load(): Boolean
 
 	trait ProcessSnapshot extends Serializable {
 		val dateCreated: DateTime = DateTime.now()
@@ -125,4 +103,67 @@ class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, 
 		}
 	}
 
+}
+
+class NoProcessMemoizer(val processStub: ProcessStub[_, _] = null, val name: String = "", val overwriteExistingData: Boolean = false) extends ProcessMemoizer {
+	override def flush(): Boolean = true
+
+	override def load(): Boolean = true
+
+	override def mem[T <: Serializable](name: String)(fn: => T): T = {
+		fn
+	}
+}
+
+/**
+ * Created by pdeboer on 05/12/14.
+ */
+class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, val overwriteExistingData: Boolean = false) extends ProcessMemoizer with LazyLogger {
+	val defaultPath = "state/"
+	val defaultSuffix = ".state"
+
+	val file = new File(defaultPath + name + defaultSuffix)
+	if (overwriteExistingData) file.delete()
+	if (file.exists()) load() else new File(defaultPath).mkdirs()
+
+	private class SnapshotContainer(val snapshots: List[ProcessSnapshot]) extends Serializable
+
+	override def flush(): Boolean = {
+		synchronized {
+			try {
+				val foos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))
+				foos.writeObject(new SnapshotContainer(snapshotList))
+				foos.close()
+				true
+			}
+			catch {
+				case e: Exception => {
+					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
+					false
+				}
+			}
+		}
+	}
+
+	/**
+	 * do not execute during runtime
+	 * @return
+	 */
+	override def load(): Boolean = {
+		synchronized {
+			try {
+				val fis = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))
+				val container = fis.readObject().asInstanceOf[SnapshotContainer]
+				snapshotList = container.snapshots
+				fis.close()
+				true
+			}
+			catch {
+				case e: Exception => {
+					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
+					false
+				}
+			}
+		}
+	}
 }
