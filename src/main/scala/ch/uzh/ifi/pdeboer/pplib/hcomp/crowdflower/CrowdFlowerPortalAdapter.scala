@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 
 /**
  * Created by pdeboer on 10/10/14.

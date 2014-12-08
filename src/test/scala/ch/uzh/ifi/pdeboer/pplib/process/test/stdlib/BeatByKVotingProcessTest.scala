@@ -8,7 +8,7 @@ import org.junit.{Assert, Test}
  */
 class BeatByKVotingProcessTest {
 
-	import BeatByKVotingProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BeatByKVotingProcess._
 
 	@Test
 	def testBestAndSecondBest: Unit = {

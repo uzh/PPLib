@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectPruneDecideProcess._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SelectPruneProcess
 import org.junit.{Assert, Test}
 

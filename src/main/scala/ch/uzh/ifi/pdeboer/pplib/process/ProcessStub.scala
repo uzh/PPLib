@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, CrowdWorker, HComp, HCompPortalAdapter}
-import ch.uzh.ifi.pdeboer.pplib.util.U
-import com.typesafe.scalalogging.LazyLogging
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 
 import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
 import scala.reflect.ClassTag
@@ -15,7 +14,7 @@ import scala.reflect.runtime.{universe => ru}
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogging with Serializable {
+abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogger with Serializable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
 
@@ -61,7 +60,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	protected def processCategoryNames: List[String] = Nil
 
-	final def processCategories = {
+	final def processCategories: List[RecombinationCategory] = {
 		val names: List[String] =
 			if (processCategoryNames == null)
 				Nil

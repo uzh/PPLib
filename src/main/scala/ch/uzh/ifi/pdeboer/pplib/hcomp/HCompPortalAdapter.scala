@@ -2,9 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import ch.uzh.ifi.pdeboer.pplib.util.U
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
-import com.typesafe.scalalogging.LazyLogging
 import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,7 +16,7 @@ import scala.xml.NodeSeq
  * Created by pdeboer on 10/10/14.
  */
 
-trait HCompPortalAdapter extends LazyLogging {
+trait HCompPortalAdapter extends LazyLogger {
 	private var _budget: Option[Int] = None
 
 	def setBudget(budget: Option[Int]): Unit =
@@ -71,7 +70,7 @@ trait HCompPortalAdapter extends LazyLogging {
 		}
 	}
 
-	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 2 days): Option[HCompAnswer] = {
+	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
 		val future = sendQuery(query, properties)
 		Await.result(future, maxWaitTime)
 		future.value.get.get

@@ -1,9 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
-import ch.uzh.ifi.pdeboer.pplib.patterns.{IterativeRefinementExecutor, IRDefaultHCompDriver}
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
+import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
 
 /**

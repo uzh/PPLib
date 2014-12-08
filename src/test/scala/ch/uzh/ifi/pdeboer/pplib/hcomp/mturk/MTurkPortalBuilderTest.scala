@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
-import com.typesafe.config.{Config, ConfigFactory}
 import org.junit.{Assert, Test}
 
 /**

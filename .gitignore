@@ -33,3 +33,5 @@ projectFilesBackup
 .idea
 src/test/resources/application.conf
 /build.sbt~
+
+state

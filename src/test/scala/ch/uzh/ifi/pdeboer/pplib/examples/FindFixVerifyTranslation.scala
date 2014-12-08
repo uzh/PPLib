@@ -1,9 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
 import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HComp}
-import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVPatch, FFVDefaultHCompDriver, FindFixVerifyExecutor}
+import ch.uzh.ifi.pdeboer.pplib.patterns.{FFVDefaultHCompDriver, FFVPatch, FindFixVerifyExecutor}
 
 /**
  * Created by pdeboer on 30/10/14.

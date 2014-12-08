@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, U}
-import com.typesafe.scalalogging.LazyLogging
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, GrowingTimer, U}
 
 import scala.concurrent.duration._
 import scala.xml.NodeSeq
@@ -10,7 +9,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 19/11/14.
  */
-class MTurkManager(val service: MTurkService, val query: HCompQuery, val properties: HCompQueryProperties) extends LazyLogging {
+class MTurkManager(val service: MTurkService, val query: HCompQuery, val properties: HCompQueryProperties) extends LazyLogger {
 	var hit = ""
 	var cancelled: Boolean = false
 

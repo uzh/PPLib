@@ -10,7 +10,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
  */
 object DualPathwayTranslation extends App {
 
-	import DualPathwayProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess._
 
 	private val textToImprove: String =
 		"""China has for the first time sent a probe to the moon and back to Earth. The return capsule landed after a circumlunar flight of the orbiter on Saturday morning in Mongolia. Eight days took the 840,000 km long journey. It was the world's first mission of its kind since almost 40 years, state media reported.

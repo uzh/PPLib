@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.patterns.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
 
@@ -10,7 +9,7 @@ import ch.uzh.ifi.pdeboer.pplib.process._
 @PPLibProcess("decide")
 class SigmaPruningProcess(params: Map[String, Any]) extends ProcessStub[List[Double], List[Double]](params) {
 
-	import SigmaPruningProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SigmaPruningProcess._
 
 	override protected def run(data: List[Double]): List[Double] = {
 		val pruner = new SigmaPruner(data, NUM_SIGMAS.get)

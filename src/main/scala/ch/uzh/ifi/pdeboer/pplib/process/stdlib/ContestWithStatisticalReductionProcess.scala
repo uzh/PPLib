@@ -1,12 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import java.util
-
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
-import scala.reflect.internal.util.Collections
 import scala.util.Random
 
 /**

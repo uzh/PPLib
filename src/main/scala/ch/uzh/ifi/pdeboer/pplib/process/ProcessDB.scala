@@ -1,12 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
-import ch.uzh.ifi.pdeboer.pplib.util.U
-import com.typesafe.scalalogging.LazyLogging
-import org.reflections.Reflections
-import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
-import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -14,7 +9,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 20/10/14.
  */
-object ProcessDB extends LazyLogging {
+object ProcessDB extends LazyLogger {
 	private var processes = mutable.HashMap.empty[RecombinationCategory, RecombinationCategoryContent]
 
 	def reset(): Unit = {
@@ -90,7 +85,7 @@ object ProcessDB extends LazyLogging {
 	autoloadPackagesFromConfigFile()
 }
 
-case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String)
+case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) extends Serializable
 
 object RecombinationCategory {
 	def get[INPUT: ClassTag, OUTPUT: ClassTag](name: String) =

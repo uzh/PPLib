@@ -6,6 +6,8 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.4"
 
+fork := true
+
 libraryDependencies ++= Seq(
 	"junit" % "junit" % "4.8.1" % "test",
 	"com.typesafe" % "config" % "1.2.1",

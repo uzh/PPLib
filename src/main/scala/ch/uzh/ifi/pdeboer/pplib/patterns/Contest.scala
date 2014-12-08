@@ -57,7 +57,7 @@ class DefaultContestHCompDriver(
 								   val alternatives: List[String],
 								   hcompPortal: HCompPortalAdapter,
 								   val question: String = "Please select the best element from this list",
-								   val maxWait: Duration = 2 days) extends ContestDriver[String] {
+								   val maxWait: Duration = 14 days) extends ContestDriver[String] {
 	override def castSingleVote(options: List[String]): String = {
 		hcompPortal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(question, options, 1, 1),

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import com.typesafe.scalalogging.LazyLogging
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.junit.{Assert, Test}
 
 import scala.util.Random
@@ -8,7 +8,7 @@ import scala.util.Random
 /**
  * Created by pdeboer on 22/10/14.
  */
-class FindFixVerifyTest extends LazyLogging {
+class FindFixVerifyTest extends LazyLogger {
 	@Test
 	def testFFVDetailed(): Unit = {
 		val (badPatches: List[FFVTestDriverBadPatch], exec: FindFixVerifyTestVisibilityBreaker) = prepareData

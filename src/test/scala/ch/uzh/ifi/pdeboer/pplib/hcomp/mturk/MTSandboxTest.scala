@@ -2,7 +2,6 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.examples.SurveyResult
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import org.junit.Test
 
 /**
  * Created by pdeboer on 21/11/14.

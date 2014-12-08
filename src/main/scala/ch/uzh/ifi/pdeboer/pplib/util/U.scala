@@ -2,14 +2,12 @@ package ch.uzh.ifi.pdeboer.pplib.util
 
 import java.lang.annotation
 
-import ch.uzh.ifi.pdeboer.pplib.process.PPLibProcess
 import com.typesafe.config.{Config, ConfigFactory}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
-import org.reflections.util.{FilterBuilder, ConfigurationBuilder, ClasspathHelper}
+import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
+
 import scala.collection.JavaConversions._
-import scala.annotation.Annotation
-import scala.collection.parallel.ForkJoinTasks
 import scala.concurrent.forkjoin.ForkJoinPool
 
 /**

@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import com.typesafe.scalalogging.LazyLogging
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.concurrent.duration._
 import scala.util.Random
@@ -12,7 +12,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 13/10/14.
  */
-class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogging {
+class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger {
 	lazy val result = {
 		runUntilConverged()
 		pathway1.elements.map(_.mostRecentCandidate).toList
@@ -147,7 +147,7 @@ class DualPathWayDefaultHCompDriver(
 									   val questionPerNewProcessedElement: HCompInstructionsWithTuple,
 									   val questionPerProcessingTask: String,
 									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
-									   val timeout: Duration = 2 days) extends DPDriver {
+									   val timeout: Duration = 14 days) extends DPDriver {
 
 	lazy val indexMap: Map[Int, String] = data.zipWithIndex.map(d => (d._2.toInt, d._1)).toMap
 

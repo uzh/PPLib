@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombinationdb
 
-import ch.uzh.ifi.pdeboer.pplib.process.{RecombinationCategory, ProcessDB, PPLibProcess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.{PPLibProcess, ProcessDB, ProcessStub, RecombinationCategory}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Before, Test}
 

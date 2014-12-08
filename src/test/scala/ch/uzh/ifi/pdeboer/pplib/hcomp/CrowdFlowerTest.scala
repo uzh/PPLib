@@ -1,13 +1,11 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
-import com.typesafe.config.ConfigFactory
-import org.junit.{Test, Assert}
+import org.junit.Assert
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent._
 
 
 /**

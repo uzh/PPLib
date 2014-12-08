@@ -1,9 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompInstructionsWithTuple, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.patterns._
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess._
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess._
 
 import scala.concurrent.duration._
 
@@ -42,7 +41,7 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 }
 
 object FindFixVerifyProcess {
-	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(2 days)))
+	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(14 days)))
 	val FIND_QUESTION = new ProcessParameter[FFVFindQuestion]("findQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_QUESTION)))
 	val FIND_TITLE = new ProcessParameter[String]("findTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_TITLE)))
 	val FIX_TITLE = new ProcessParameter[String]("fixTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_TITLE)))

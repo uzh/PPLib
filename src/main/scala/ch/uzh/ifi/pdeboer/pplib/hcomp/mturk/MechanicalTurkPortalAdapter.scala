@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import com.typesafe.scalalogging.LazyLogging
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.collection.mutable
 
@@ -9,7 +9,7 @@ import scala.collection.mutable
  * Created by pdeboer on 19/11/14.
  */
 @HCompPortal(builder = classOf[MechanicalTurkPortalBuilder], autoInit = true)
-class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogging {
+class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogger {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 

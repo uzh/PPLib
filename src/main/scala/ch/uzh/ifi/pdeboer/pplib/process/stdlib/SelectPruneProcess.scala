@@ -1,13 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.{WorkflowParam, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub, WorkflowParam}
 
 /**
  * Created by pdeboer on 05/12/14.
  */
 class SelectPruneProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[List[String], List[String]](params) {
 
-	import SelectPruneProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SelectPruneProcess._
 
 	override protected def run(data: List[String]): List[String] = {
 		val selections = SELECT.get.process(data)

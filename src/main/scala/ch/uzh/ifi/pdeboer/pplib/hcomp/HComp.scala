@@ -2,16 +2,15 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.util.U
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 
 /**
  * Created by pdeboer on 10/10/14.
  */
-object HComp extends LazyLogging {
+object HComp extends LazyLogger {
 	private val portals = new mutable.HashMap[String, HCompPortalAdapter]()
 
 	def addPortal(portal: HCompPortalAdapter) {

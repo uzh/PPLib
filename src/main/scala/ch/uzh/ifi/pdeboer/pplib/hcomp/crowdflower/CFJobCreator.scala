@@ -2,7 +2,6 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompJobCancelled, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.util._
-import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent._
@@ -11,7 +10,7 @@ import scala.util.Try
 
 class CFURLBuilder(restMethod: String) extends URLBuilder("https", "api.crowdflower.com", 443, "/v1/" + restMethod)
 
-abstract class CFJobBase(apiKey: String) extends LazyLogging {
+abstract class CFJobBase(apiKey: String) extends LazyLogger {
 	protected val jobResourceJSONUrl = new CFURLBuilder("jobs.json")
 
 	protected def sendAndAwaitJson(request: RESTClient, timeout: Duration) = {
