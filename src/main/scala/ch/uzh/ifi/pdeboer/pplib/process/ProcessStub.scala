@@ -35,9 +35,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
 
-		logger.info(s"running process ${
-			getClass.getSimpleName
-		}")
+		logger.info(s"running process ${getClass.getSimpleName}")
 		val result: OUTPUT = run(data)
 
 		if (getParam(STORE_EXECUTION_RESULTS)) _results += data -> result
@@ -63,7 +61,9 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 
 	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
-	def optionalParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
+	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
 
 	protected def processCategoryNames: List[String] = Nil
 
@@ -94,7 +94,7 @@ abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[St
 	final def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
 
 	def allParams: List[ProcessParameter[_]] = {
-		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters
+		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters ::: defaultParameters
 	}
 
 	def allParameterTypesCorrect: Boolean = {
@@ -208,7 +208,7 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 
 	def isParallel = PARALLEL_EXECUTION_PARAMETER.get
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.optionalParameters
+	override def defaultParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.defaultParameters
 }
 
 object ProcessStubWithHCompPortalAccess {

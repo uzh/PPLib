@@ -62,7 +62,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES)
+		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES) ::: super.optionalParameters
 }
 
 object ContestWithStatisticalReductionProcess {

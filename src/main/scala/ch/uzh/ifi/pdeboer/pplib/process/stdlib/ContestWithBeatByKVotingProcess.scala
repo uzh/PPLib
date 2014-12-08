@@ -46,7 +46,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		new MultipleChoiceQuery(INSTRUCTIONS.get.getInstructions(AUX_STRING.get), choices, 1, 1, TITLE.get)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS, K)
+	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS, K) ::: super.optionalParameters
 }
 
 object ContestWithBeatByKVotingProcess {

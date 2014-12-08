@@ -19,7 +19,7 @@ class CollectPruneDecideProcess(params: Map[String, Any] = Map.empty) extends Pr
 		List(COLLECT, DECIDE).asInstanceOf[List[ProcessParameter[_]]]
 
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(PRUNE)
+	override def optionalParameters: List[ProcessParameter[_]] = List(PRUNE) ::: super.optionalParameters
 
 	override protected def processCategoryNames: List[String] = List("create.refine.collectprunedecide")
 }

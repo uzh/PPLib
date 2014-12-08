@@ -33,7 +33,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(AUX_STRING,
-			TITLE, INSTRUCTIONS, WORKER)
+			TITLE, INSTRUCTIONS, WORKER) ::: super.optionalParameters
 }
 
 object ContestWithFixWorkerCountProcess {
