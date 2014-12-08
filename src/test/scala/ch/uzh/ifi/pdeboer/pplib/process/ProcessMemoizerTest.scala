@@ -31,6 +31,44 @@ class ProcessMemoizerTest {
 	}
 
 	@Test
+	def testMem: Unit = {
+		val process = new IterativeRefinementProcess()
+		val memoizer = new FileProcessMemoizer(process, "asdf22", true)
+		var counter: Int = 0
+		val t = memoizer.mem("test") {
+			counter += 1
+			"asdf"
+		}
+		Assert.assertEquals(1, counter)
+		val t2 = memoizer.mem("test") {
+			counter += 1
+			"asdf2"
+		}
+		Assert.assertEquals(1, counter)
+		Assert.assertEquals("asdf", t2)
+	}
+
+	@Test
+	def testMemStoreLoad: Unit = {
+		val process = new IterativeRefinementProcess()
+		val memoizer = new FileProcessMemoizer(process, "asdf22", true)
+		var counter: Int = 0
+		val t = memoizer.mem("test") {
+			counter += 1
+			"asdf"
+		}
+
+		val mem2 = new FileProcessMemoizer(process, "asdf22", false)
+		val t2 = mem2.mem("test") {
+			counter += 1
+			"asdf2"
+		}
+
+		Assert.assertEquals(1, counter)
+		Assert.assertEquals("asdf", t2)
+	}
+
+	@Test
 	def testMemoizerException: Unit = {
 		val process = new IterativeRefinementProcess()
 		val mem = new FileProcessMemoizer(process, "asdf", true)

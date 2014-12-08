@@ -22,7 +22,7 @@ trait ProcessMemoizer extends Serializable {
 	}
 
 	def mem[T <: Serializable](name: String)(fn: => T): T = {
-		if (!latest.isDefined && latest.get.elements.contains(name))
+		if (latest.isDefined && latest.get.elements.contains(name))
 			latest.get.elements(name).asInstanceOf[T]
 		else {
 			val ret = fn
