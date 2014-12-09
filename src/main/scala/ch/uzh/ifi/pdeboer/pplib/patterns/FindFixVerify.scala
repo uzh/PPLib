@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.patterns.FindFixVerifyExecutor.FFVPatchContainer
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.util.U
@@ -24,11 +25,11 @@ class FindFixVerifyExecutor[T](
 	@transient var driver = _driver
 	@transient var memoizer = _memoizer
 
+	protected val allPatches = driver.orderedPatches.map(p => p.patchIndex -> new FFVPatchContainer[T](p)).toMap
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
 		allPatches.toArray.map(p => p._2.best.getOrElse(p._2.original)).sortBy(_.patchIndex).toList
 	}
-	protected val allPatches = driver.orderedPatches.map(p => p.patchIndex -> new FFVPatchContainer[T](p)).toMap
 	protected var ran: Boolean = false
 
 	def runUntilConverged(): Unit = {
@@ -85,14 +86,17 @@ class FindFixVerifyExecutor[T](
 
 		allPatches.filter(_._2.finders >= minFindersCountThatNeedToAgreeForFix).map(_._2.original).toList
 	}
-
-	@SerialVersionUID(1l) protected class FFVPatchContainer[E](val original: FFVPatch[E],
-															   var finders: Int = 0,
-															   var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
-															   var best: Option[FFVPatch[E]] = None) extends Serializable
-
 }
 
+object FindFixVerifyExecutor {
+
+	@SerialVersionUID(1l)
+	protected class FFVPatchContainer[E](val original: FFVPatch[E],
+										 var finders: Int = 0,
+										 var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
+										 var best: Option[FFVPatch[E]] = None) extends Serializable
+
+}
 trait FindFixVerifyDriver[T] {
 	def orderedPatches: List[FFVPatch[T]]
 
