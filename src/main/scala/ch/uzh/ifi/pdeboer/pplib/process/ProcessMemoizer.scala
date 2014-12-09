@@ -142,7 +142,7 @@ class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, 
 			}
 			catch {
 				case e: Exception => {
-					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
+					logger.error(s"could not save process memoizer $name for ${processStub.getClass.getSimpleName}", e)
 					false
 				}
 			}
