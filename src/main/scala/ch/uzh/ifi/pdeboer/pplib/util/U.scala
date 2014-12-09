@@ -14,7 +14,8 @@ import scala.concurrent.forkjoin.ForkJoinPool
  * Created by pdeboer on 15/10/14.
  */
 object U {
-	val hugeForkJoinPool = new ForkJoinPool(1000)
+	val hugeForkJoinPool = new ForkJoinPool(10000)
+	val tinyForkJoinPool = new ForkJoinPool(1)
 
 	/**
 	 * Method used to retry some code that may fail n times.
