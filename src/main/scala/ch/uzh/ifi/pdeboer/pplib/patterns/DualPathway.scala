@@ -12,6 +12,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 13/10/14.
  */
+@SerialVersionUID(1l)
 class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger with Serializable {
 	lazy val result = {
 		runUntilConverged()
@@ -86,6 +87,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extend
 	}
 }
 
+@SerialVersionUID(1l)
 class DPPathway extends Serializable {
 	private var _elements: List[DPPathwayChunk] = List.empty
 
@@ -104,6 +106,7 @@ class DPPathway extends Serializable {
 	override def toString: String = _elements.mkString(",")
 }
 
+@SerialVersionUID(1l)
 class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 	private var candidates: List[DPChunk] = List.empty[DPChunk]
 
@@ -122,7 +125,7 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 	override def toString: String = mostRecentCandidate.toString
 }
 
-trait DPDriver extends Serializable {
+@SerialVersionUID(1l) trait DPDriver extends Serializable {
 	def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk]
 
 	def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean
@@ -134,14 +137,14 @@ trait DPDriver extends Serializable {
 	}
 }
 
-case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") extends Serializable {
+@SerialVersionUID(1l) case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") extends Serializable {
 	val created: Date = new Date()
 
 	override def toString: String = s"$data=$answer"
 }
 
 
-class DualPathWayDefaultHCompDriver(
+@SerialVersionUID(1l) class DualPathWayDefaultHCompDriver(
 									   val data: List[String],
 									   val portal: HCompPortalAdapter,
 									   val questionPerOldProcessedElement: HCompInstructionsWithTuple,

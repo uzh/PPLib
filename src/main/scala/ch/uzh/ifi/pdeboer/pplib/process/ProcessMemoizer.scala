@@ -5,7 +5,7 @@ import java.io._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
-trait ProcessMemoizer extends Serializable {
+@SerialVersionUID(1l) trait ProcessMemoizer extends Serializable {
 	def processStub: ProcessStub[_, _]
 
 	def name: String
@@ -49,7 +49,7 @@ trait ProcessMemoizer extends Serializable {
 
 	def load(): Boolean
 
-	trait ProcessSnapshot extends Serializable {
+	@SerialVersionUID(1l) trait ProcessSnapshot extends Serializable {
 		val dateCreated: DateTime = DateTime.now()
 		protected var content = collection.mutable.HashMap.empty[String, Serializable]
 

@@ -85,7 +85,7 @@ object ProcessDB extends LazyLogger {
 	autoloadPackagesFromConfigFile()
 }
 
-case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) extends Serializable
+@SerialVersionUID(1l) case class RecombinationCategory(inputType: Class[_], outputType: Class[_], path: String) extends Serializable
 
 object RecombinationCategory {
 	def get[INPUT: ClassTag, OUTPUT: ClassTag](name: String) =

@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 28/11/14.
  */
-class ProcessParameter[T: ClassTag](keyPostfix: String, val parameterCategory: ProcessParameterCategory = OtherParam(), val candidateDefinitions: Option[Iterable[T]] = None) extends Serializable {
+@SerialVersionUID(1l) class ProcessParameter[T: ClassTag](keyPostfix: String, val parameterCategory: ProcessParameterCategory = OtherParam(), val candidateDefinitions: Option[Iterable[T]] = None) extends Serializable {
 	def key = parameterCategory + "_" + keyPostfix
 
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
@@ -15,7 +15,7 @@ class ProcessParameter[T: ClassTag](keyPostfix: String, val parameterCategory: P
 	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
 }
 
-class ProcessParameterCategory(val parameterPrefix: String) extends Serializable {
+@SerialVersionUID(1l) class ProcessParameterCategory(val parameterPrefix: String) extends Serializable {
 	ProcessParameterCategory.add(this)
 
 	override def toString = parameterPrefix

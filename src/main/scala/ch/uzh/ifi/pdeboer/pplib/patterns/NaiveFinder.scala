@@ -18,7 +18,7 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 				  memoizer: ProcessMemoizer = new NoProcessMemoizer()
 					 ) {
 
-	protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
+	@SerialVersionUID(1l) protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
 
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 

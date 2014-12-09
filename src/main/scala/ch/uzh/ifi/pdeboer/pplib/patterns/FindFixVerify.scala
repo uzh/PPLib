@@ -12,7 +12,7 @@ import scala.util.Random
 /**
  * Created by pdeboer on 21/10/14.
  */
-class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
+@SerialVersionUID(1l) class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 							   val maxPatchesCountInFind: Int = 10,
 							   val findersCount: Int = 3,
 							   val minFindersCountThatNeedToAgreeForFix: Int = 2,
@@ -81,7 +81,7 @@ class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
 		allPatches.filter(_._2.finders >= minFindersCountThatNeedToAgreeForFix).map(_._2.original).toList
 	}
 
-	protected class FFVPatchContainer[E](val original: FFVPatch[E],
+	@SerialVersionUID(1l) protected class FFVPatchContainer[E](val original: FFVPatch[E],
 										 var finders: Int = 0,
 										 var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
 										 var best: Option[FFVPatch[E]] = None) extends Serializable
@@ -117,7 +117,7 @@ trait FindFixVerifyDriver[T] {
 	def verify(patch: FFVPatch[T], alternatives: List[FFVPatch[T]]): FFVPatch[T]
 }
 
-case class FFVPatch[T](patch: T, patchIndex: Int) extends Serializable
+@SerialVersionUID(1l) case class FFVPatch[T](patch: T, patchIndex: Int) extends Serializable
 
 object FFVDefaultHCompDriver {
 	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved")
