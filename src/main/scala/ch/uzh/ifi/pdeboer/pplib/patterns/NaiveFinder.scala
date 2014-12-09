@@ -2,8 +2,10 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
+import ch.uzh.ifi.pdeboer.pplib.util.U
 
-import scala.collection.parallel.TaskSupport
+import scala.collection.parallel.ForkJoinTaskSupport
 import scala.collection.parallel.immutable.ParSet
 import scala.util.Random
 
@@ -13,7 +15,8 @@ import scala.util.Random
 class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 				  title: String, findersPerItem: Int, shuffle: Boolean,
 				  portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-				  parallelTaskSupport: Option[TaskSupport] = None) {
+				  memoizer: ProcessMemoizer = new NoProcessMemoizer()
+					 ) {
 
 	protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0)
 
@@ -55,8 +58,8 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 
 	protected lazy val selectedContainers: ParSet[PatchContainer] = {
 		val it = selectionIterations.par
-		it.tasksupport = parallelTaskSupport.get
-		it.map(i => iteration(i)).flatten.toSet
+		it.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
+		it.map(i => memoizer.mem("iteration" + i)(iteration(i))).flatten.toSet
 	}
 
 	def result = data.map(d => d -> 0).toMap ++ selectedContainers.map(p => (p.patch, p.selects)).toMap

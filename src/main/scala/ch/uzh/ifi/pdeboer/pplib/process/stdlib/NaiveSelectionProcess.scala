@@ -5,18 +5,15 @@ import ch.uzh.ifi.pdeboer.pplib.patterns.NaiveFinder
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
-import ch.uzh.ifi.pdeboer.pplib.util.U
-
-import scala.collection.parallel.ForkJoinTaskSupport
 
 /**
  * Created by pdeboer on 05/12/14.
  */
 class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
 	override protected def run(data: List[Patch]): List[Patch] = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		val finder = new NaiveFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
-			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get,
-			if (isParallel) Some(new ForkJoinTaskSupport(U.hugeForkJoinPool)) else None)
+			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
 		finder.selected.map(s => (1 to s._2).map(p => s._1)).flatten.toList
 	}
