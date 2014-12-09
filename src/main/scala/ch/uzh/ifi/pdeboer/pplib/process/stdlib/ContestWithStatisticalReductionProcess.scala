@@ -22,7 +22,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		var iteration: Int = 0
 		do {
 			iteration += 1
-			val choice = memoizer.mem("it" + iteration)(castVote(data))
+			val choice: String = memoizer.mem("it" + iteration)(castVote(data))
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
 		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
