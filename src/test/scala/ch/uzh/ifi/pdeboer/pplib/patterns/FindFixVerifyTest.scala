@@ -82,7 +82,7 @@ class FindFixVerifyTest extends LazyLogger {
 		var remainingAlternatives: List[FFVPatch[String]] = alternatives
 	}
 
-	private class FFVTestDriver(val orderedPatches: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], numberOfPatchesReturnedInFind: Int = 3) extends FindFixVerifyDriver[String] {
+	class FFVTestDriver(val orderedPatches: List[FFVPatch[String]], badPatches: List[FFVTestDriverBadPatch], numberOfPatchesReturnedInFind: Int = 3) extends FindFixVerifyDriver[String] {
 		/**
 		 * all alternatives collected for a single patch in the previous step are evaluated here
 		 * and a best version is selected. Consider banning people who participated in the "Fix"-step
