@@ -200,7 +200,6 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 
 	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)
 
-	//TODO test if this actually works and doesnt destroy parallelism
 	def getCrowdWorkers(workerCount: Int) = {
 		val par = (1 to workerCount).view.par
 		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)

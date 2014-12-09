@@ -23,11 +23,13 @@ class ContestWithFixWorkerCountProcessTest {
 		val f = (q: HCompQuery) => {
 			q match {
 				case mq: MultipleChoiceQuery => {
-					val target = votes.filter(_._2 > 0).toList.head._1
-					votes += target -> (votes(target) - 1)
-					Some(MultipleChoiceAnswer(mq, data.map(d => {
-						(d, d.equals(target))
-					}).toMap))
+					portal.synchronized {
+						val target = votes.filter(_._2 > 0).toList.head._1
+						votes += target -> (votes(target) - 1)
+						Some(MultipleChoiceAnswer(mq, data.map(d => {
+							(d, d.equals(target))
+						}).toMap))
+					}
 				}
 				case _ => None
 			}
@@ -62,11 +64,13 @@ class ContestWithFixWorkerCountProcessTest {
 		val f = (q: HCompQuery) => {
 			q match {
 				case mq: MultipleChoiceQuery => {
-					val target = votes.filter(_._2 > 0).toList.head._1
-					votes += target -> (votes(target) - 1)
-					Some(MultipleChoiceAnswer(mq, data.map(d => {
-						(d, d.equals(target))
-					}).toMap))
+					portal.synchronized {
+						val target = votes.filter(_._2 > 0).toList.head._1
+						votes += target -> (votes(target) - 1)
+						Some(MultipleChoiceAnswer(mq, data.map(d => {
+							(d, d.equals(target))
+						}).toMap))
+					}
 				}
 				case _ => None
 			}
