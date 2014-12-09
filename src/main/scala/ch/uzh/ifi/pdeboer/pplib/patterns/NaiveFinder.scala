@@ -18,7 +18,7 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 				  memoizer: ProcessMemoizer = new NoProcessMemoizer()
 					 ) {
 
-	protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0)
+	protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
 
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 
@@ -34,7 +34,9 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 
 		while (patches.map(_.displays).sum < patches.size * findersPerItem) {
 			val patches = getPatches(maxItemsPerFind)
-			patches.foreach(p => p.displays += 1)
+			patches.synchronized {
+				patches.foreach(p => p.displays += 1)
+			}
 			iterations ::= patches
 		}
 
@@ -43,7 +45,9 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 
 	protected def iteration(items: List[PatchContainer]): List[PatchContainer] = {
 		val selected = askCrowdWorkers(items)
-		selected.foreach(s => s.selects += 1)
+		patches.synchronized {
+			selected.foreach(s => s.selects += 1)
+		}
 		selected
 	}
 
@@ -64,5 +68,5 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 
 	def result = data.map(d => d -> 0).toMap ++ selectedContainers.map(p => (p.patch, p.selects)).toMap
 
-	def selected = result.filter(v => v._2 > 0).toMap
+	def selectionsPerPatch: Map[Patch, Int] = result.filter(v => v._2 > 0).toMap
 }

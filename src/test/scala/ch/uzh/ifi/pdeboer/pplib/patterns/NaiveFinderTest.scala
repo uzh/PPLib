@@ -27,8 +27,8 @@ class NaiveFinderTest {
 		val finder = new NaiveFinderPublic(data, HCompInstructionsWithTuple("bla"), "title", 2,
 			shuffle = false, portal, maxItemsPerFind = 3)
 
-		Assert.assertEquals(1, finder.selected.size)
-		Assert.assertEquals(2, finder.selected(new Patch("b")))
+		Assert.assertEquals(1, finder.selectionsPerPatch.size)
+		Assert.assertEquals(2, finder.selectionsPerPatch(new Patch("b")))
 		Assert.assertEquals(Map(new Patch("a") -> 0, new Patch("b") -> 2, new Patch("c") -> 0), finder.result)
 	}
 
