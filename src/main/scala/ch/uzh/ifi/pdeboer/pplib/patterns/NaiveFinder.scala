@@ -14,8 +14,8 @@ import scala.util.Random
  */
 class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 				  title: String, findersPerItem: Int, shuffle: Boolean,
-				  @transient portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-				  @transient memoizer: ProcessMemoizer = new NoProcessMemoizer()
+				  @transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
+				  @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer()
 					 ) {
 
 	@SerialVersionUID(1l) protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable

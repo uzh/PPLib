@@ -166,6 +166,8 @@ import scala.reflect.runtime.{universe => ru}
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	processCategories.foreach(c => ProcessDB.put(c, this))
+	assert(allParams.map(_.key).toSet.size
+		== allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 

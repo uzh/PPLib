@@ -61,5 +61,5 @@ object FindFixVerifyProcess {
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 
 	val VERIFY_PROCESS_CONTEXT_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER)))
-	val VERIFY_PROCESS_CONTEXT_FLATTENER = new ProcessParameter[(List[FFVPatch[String]] => String)]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER)))
+	val VERIFY_PROCESS_CONTEXT_FLATTENER = new ProcessParameter[(List[FFVPatch[String]] => String)]("verifyProcessContextFlattener", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER)))
 }
