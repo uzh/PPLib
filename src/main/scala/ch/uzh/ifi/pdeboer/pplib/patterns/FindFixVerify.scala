@@ -12,7 +12,8 @@ import scala.util.Random
 /**
  * Created by pdeboer on 21/10/14.
  */
-@SerialVersionUID(1l) class FindFixVerifyExecutor[T](
+@SerialVersionUID(1l)
+class FindFixVerifyExecutor[T](
 														_driver: FindFixVerifyDriver[T],
 														val maxPatchesCountInFind: Int = 10,
 														val findersCount: Int = 3,
