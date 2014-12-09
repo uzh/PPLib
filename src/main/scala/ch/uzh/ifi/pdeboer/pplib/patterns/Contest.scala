@@ -8,7 +8,7 @@ import scala.util.Random
 /**
  * Created by pdeboer on 24/10/14.
  */
-class ContestExecutor[T](val driver: ContestDriver[T], val showsPerElement: Int = 3, val maxElementsPerGo: Int = 100) {
+class ContestExecutor[T](val driver: ContestDriver[T], val showsPerElement: Int = 3, val maxElementsPerGo: Int = 100) extends Serializable {
 	lazy val winner: T = {
 		do {
 			step()

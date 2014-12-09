@@ -195,7 +195,6 @@ object ProcessStub {
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
-
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
 
 	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)

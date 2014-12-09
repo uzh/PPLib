@@ -21,10 +21,11 @@ import org.joda.time.DateTime
 		s
 	}
 
-	def mem[T <: Serializable](name: String)(fn: => T): T = {
-		if (latest.isDefined && latest.get.elements.contains(name))
-			latest.get.elements(name).asInstanceOf[T]
-		else {
+	def memWithReinitialization[T <: Serializable](name: String)(fn: => T)(reInitialization: T => T): T = {
+		if (latest.isDefined && latest.get.elements.contains(name)) {
+			val cacheHit = latest.get.elements(name).asInstanceOf[T]
+			reInitialization(cacheHit)
+		} else {
 			val ret = fn
 			addIncrementalSnapshot(name)
 				.addElement(name, ret)
@@ -32,6 +33,9 @@ import org.joda.time.DateTime
 			ret
 		}
 	}
+
+	def mem[T <: Serializable](name: String)(fn: => T): T =
+		memWithReinitialization(name)(fn)(t => t)
 
 	def addSnapshot(name: String): ProcessSnapshot = {
 		val r = new ProcessSnapshotImpl(name)
@@ -110,7 +114,7 @@ class NoProcessMemoizer(val processStub: ProcessStub[_, _] = null, val name: Str
 
 	override def load(): Boolean = true
 
-	override def mem[T <: Serializable](name: String)(fn: => T): T = {
+	override def memWithReinitialization[T <: Serializable](name: String)(fn: => T)(reInitialization: T => T): T = {
 		fn
 	}
 }

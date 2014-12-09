@@ -12,13 +12,13 @@ import scala.util.Random
 /**
  * Created by pdeboer on 21/10/14.
  */
-@SerialVersionUID(1l) class FindFixVerifyExecutor[T](driver: FindFixVerifyDriver[T],
+@SerialVersionUID(1l) class FindFixVerifyExecutor[T](@transient var driver: FindFixVerifyDriver[T],
 							   val maxPatchesCountInFind: Int = 10,
 							   val findersCount: Int = 3,
 							   val minFindersCountThatNeedToAgreeForFix: Int = 2,
 							   val fixersPerPatch: Int = 3,
 							   val parallelWorkers: Boolean = true,
-							   val memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
+							   @transient var memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
 		allPatches.toArray.map(p => p._2.best.getOrElse(p._2.original)).sortBy(_.patchIndex).toList

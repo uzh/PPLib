@@ -13,7 +13,7 @@ import scala.xml.NodeSeq
  * Created by pdeboer on 13/10/14.
  */
 @SerialVersionUID(1l)
-class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger with Serializable {
+class DualPathwayExecutor(@transient var driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger with Serializable {
 	lazy val result = {
 		runUntilConverged()
 		pathway1.elements.map(_.mostRecentCandidate).toList

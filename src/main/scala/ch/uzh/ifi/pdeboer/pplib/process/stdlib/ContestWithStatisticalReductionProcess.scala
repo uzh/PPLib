@@ -37,7 +37,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		MonteCarlo.minAgreementRequired(data.size, votesCast.values.sum, confidence, MONTECARLO_ITERATIONS)
 	}
 
-	def castVote(choices: List[String]) = {
+	def castVote(choices: List[String]): String = {
 		val instructions = INSTRUCTIONS_PARAMETER.get
 		val auxString = AUX_STRING_PARAMETER.get
 		val title = TITLE_PARAMETER.get

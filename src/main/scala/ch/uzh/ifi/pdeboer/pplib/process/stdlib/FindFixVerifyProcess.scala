@@ -21,11 +21,15 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 		)
 
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
-		val exec = memoizer.mem("ffvexec")(new FindFixVerifyExecutor(
+		val exec = memoizer.memWithReinitialization("ffvexec")(new FindFixVerifyExecutor(
 			driver, PATCHES_COUNT_IN_FIND.get, FINDERS_COUNT.get,
 			MIN_FINDERS_TO_AGREE_FOR_FIX.get, FIXERS_PER_PATCH.get,
 			memoizer = memoizer
-		))
+		))(exec => {
+			exec.driver = driver
+			exec.memoizer = memoizer
+			exec
+		})
 
 		exec.bestPatches.map(_.patch)
 	}
