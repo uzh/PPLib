@@ -15,7 +15,7 @@ class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends Proces
 		val finder = new NaiveFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
-		finder.selected.map(s => (1 to s._2).map(p => s._1)).flatten.toList
+		finder.selectionsPerPatch.map(s => (1 to s._2).map(p => s._1)).flatten.toList
 	}
 }
 

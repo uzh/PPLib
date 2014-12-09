@@ -21,10 +21,12 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 	 * @return
 	 */
 	override protected def run(data: List[String]): List[String] = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+
 		val driver = new DualPathWayDefaultHCompDriver(data, portal, QUESTION_OLD_PROCESSED_ELEMENT.get,
 			QUESTION_NEW_PROCESSED_ELEMENT.get, QUESTION_PER_PROCESSING_TASK.get, QUESTION_PER_COMPARISON_TASK.get, TIMEOUT.get)
 
-		val exec = new DualPathwayExecutor(driver, CHUNK_COUNT_TO_INCLUDE.get)
+		val exec = memoizer.mem("exec")(new DualPathwayExecutor(driver, CHUNK_COUNT_TO_INCLUDE.get))
 		exec.result.map(_.answer)
 	}
 

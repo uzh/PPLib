@@ -12,7 +12,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 13/10/14.
  */
-class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger {
+class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extends LazyLogger with Serializable {
 	lazy val result = {
 		runUntilConverged()
 		pathway1.elements.map(_.mostRecentCandidate).toList
@@ -23,6 +23,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extend
 
 	def runUntilConverged(): Unit = {
 		logger.info("running dual pathway until convergence")
+		var iteration = 0
 		while (
 			pathway1.mostRecentElementIdInPathway == -1 ||
 				pathway1.mostRecentElementIdInPathway != pathway2.mostRecentElementIdInPathway ||
@@ -85,7 +86,7 @@ class DualPathwayExecutor(driver: DPDriver, chunkCountToInclude: Int = 2) extend
 	}
 }
 
-class DPPathway() {
+class DPPathway extends Serializable {
 	private var _elements: List[DPPathwayChunk] = List.empty
 
 	def addElement(elem: DPPathwayChunk): Unit = {
@@ -103,7 +104,7 @@ class DPPathway() {
 	override def toString: String = _elements.mkString(",")
 }
 
-class DPPathwayChunk(initialChunk: DPChunk) {
+class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 	private var candidates: List[DPChunk] = List.empty[DPChunk]
 
 	addMostRecentCandidate(initialChunk)
@@ -121,7 +122,7 @@ class DPPathwayChunk(initialChunk: DPChunk) {
 	override def toString: String = mostRecentCandidate.toString
 }
 
-trait DPDriver {
+trait DPDriver extends Serializable {
 	def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk]
 
 	def comparePathwaysAndDecideWhetherToAdvance(pathway1: List[DPChunk], pathway2: List[DPChunk]): Boolean
@@ -133,7 +134,7 @@ trait DPDriver {
 	}
 }
 
-case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") {
+case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") extends Serializable {
 	val created: Date = new Date()
 
 	override def toString: String = s"$data=$answer"
@@ -147,7 +148,7 @@ class DualPathWayDefaultHCompDriver(
 									   val questionPerNewProcessedElement: HCompInstructionsWithTuple,
 									   val questionPerProcessingTask: String,
 									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
-									   val timeout: Duration = 14 days) extends DPDriver {
+									   val timeout: Duration = 14 days) extends DPDriver with Serializable {
 
 	lazy val indexMap: Map[Int, String] = data.zipWithIndex.map(d => (d._2.toInt, d._1)).toMap
 
