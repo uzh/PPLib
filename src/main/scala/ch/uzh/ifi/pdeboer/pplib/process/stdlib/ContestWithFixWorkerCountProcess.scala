@@ -14,14 +14,17 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
 
 	override def run(alternatives: List[String]): String = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+
 		val answers = getCrowdWorkers(WORKER.get).map(w =>
-			portal.sendQueryAndAwaitResult(
-				createMultipleChoiceQuestion(alternatives, INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
-				HCompQueryProperties(paymentCents = 3)
-			) match {
-				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
-				case _ => throw new IllegalStateException("didnt get any response") //TODO change me
-			}).toList
+			memoizer.mem("it" + w)(
+				portal.sendQueryAndAwaitResult(
+					createMultipleChoiceQuestion(alternatives, INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
+					HCompQueryProperties(paymentCents = 3)
+				) match {
+					case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
+					case _ => throw new IllegalStateException("didnt get any response") //TODO change me
+				})).toList
 
 		answers.groupBy(s => s).maxBy(s => s._2.size)._1
 	}

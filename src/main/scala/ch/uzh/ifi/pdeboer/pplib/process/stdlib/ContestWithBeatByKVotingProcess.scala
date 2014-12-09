@@ -17,14 +17,19 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	protected var votes = mutable.HashMap.empty[String, Int]
 
 	override protected def run(data: List[String]): String = {
+		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		var globalIteration: Int = 0
+
 		do {
 			getCrowdWorkers(delta).foreach(w => {
-				val answer = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
-					HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+				val answer = memoizer.mem("it" + w + "global" + globalIteration)(
+					portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
+						HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
 				synchronized {
 					votes += answer -> votes.getOrElse(answer, 0)
 				}
 			})
+			globalIteration += 1
 		} while (shouldStartAnotherIteration)
 
 		bestAndSecondBest._1._1
