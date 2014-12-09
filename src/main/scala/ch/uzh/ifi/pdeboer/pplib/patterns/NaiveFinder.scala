@@ -4,6 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
 import scala.collection.parallel.TaskSupport
+import scala.collection.parallel.immutable.ParSet
 import scala.util.Random
 
 /**
@@ -52,12 +53,9 @@ class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 		})
 	}
 
-	protected lazy val selectedContainers = {
-		val it = if (parallelTaskSupport.isDefined) {
-			val it = selectionIterations.par
-			it.tasksupport = parallelTaskSupport.get
-			it
-		} else selectionIterations
+	protected lazy val selectedContainers: ParSet[PatchContainer] = {
+		val it = selectionIterations.par
+		it.tasksupport = parallelTaskSupport.get
 		it.map(i => iteration(i)).flatten.toSet
 	}
 
