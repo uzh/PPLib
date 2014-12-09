@@ -12,13 +12,17 @@ import scala.util.Random
 /**
  * Created by pdeboer on 21/10/14.
  */
-@SerialVersionUID(1l) class FindFixVerifyExecutor[T](@transient var driver: FindFixVerifyDriver[T],
-							   val maxPatchesCountInFind: Int = 10,
-							   val findersCount: Int = 3,
-							   val minFindersCountThatNeedToAgreeForFix: Int = 2,
-							   val fixersPerPatch: Int = 3,
-							   val parallelWorkers: Boolean = true,
-							   @transient var memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
+@SerialVersionUID(1l) class FindFixVerifyExecutor[T](
+														_driver: FindFixVerifyDriver[T],
+														val maxPatchesCountInFind: Int = 10,
+														val findersCount: Int = 3,
+														val minFindersCountThatNeedToAgreeForFix: Int = 2,
+														val fixersPerPatch: Int = 3,
+														val parallelWorkers: Boolean = true,
+														_memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
+	@transient var driver = _driver
+	@transient var memoizer = _memoizer
+
 	lazy val bestPatches = {
 		if (!ran) runUntilConverged()
 		allPatches.toArray.map(p => p._2.best.getOrElse(p._2.original)).sortBy(_.patchIndex).toList
@@ -82,9 +86,9 @@ import scala.util.Random
 	}
 
 	@SerialVersionUID(1l) protected class FFVPatchContainer[E](val original: FFVPatch[E],
-										 var finders: Int = 0,
-										 var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
-										 var best: Option[FFVPatch[E]] = None) extends Serializable
+															   var finders: Int = 0,
+															   var alternatives: collection.mutable.ListBuffer[FFVPatch[E]] = new collection.mutable.ListBuffer[FFVPatch[E]](),
+															   var best: Option[FFVPatch[E]] = None) extends Serializable
 
 }
 
@@ -138,11 +142,11 @@ object FFVDefaultHCompDriver {
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER: (List[FFVPatch[String]] => String) = _.mkString(".")
 }
 
-class FFVFindQuestion(val question: String) {
+class FFVFindQuestion(val question: String) extends Serializable {
 	def fullQuestion(allPatches: List[FFVPatch[String]]) = question
 }
 
-class FFVFixQuestion(val question: String) {
+class FFVFixQuestion(val question: String) extends Serializable {
 	def fullQuestion(patch: FFVPatch[String], allPatches: List[FFVPatch[String]]) =
 		HCompInstructionsWithTuple(question).getInstructions(patch.patch)
 }
