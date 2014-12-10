@@ -8,6 +8,7 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
+import scala.collection.parallel.{ParSeq, ForkJoinTaskSupport}
 import scala.concurrent.forkjoin.ForkJoinPool
 
 /**
@@ -16,6 +17,12 @@ import scala.concurrent.forkjoin.ForkJoinPool
 object U {
 	val hugeForkJoinPool = new ForkJoinPool(10000)
 	val tinyForkJoinPool = new ForkJoinPool(1)
+
+	def parallelify[T](seq: Seq[T]): ParSeq[T] = {
+		val par = seq.par
+		par.tasksupport = new ForkJoinTaskSupport(hugeForkJoinPool)
+		par
+	}
 
 	/**
 	 * Method used to retry some code that may fail n times.

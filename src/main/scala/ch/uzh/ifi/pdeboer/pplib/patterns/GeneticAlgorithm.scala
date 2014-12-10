@@ -3,14 +3,15 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, StringPatch}
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
+import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.util.Random
 
 /**
  * Created by pdeboer on 10/12/14.
  */
-class GeneticAlgorithmExecutor(@transient val driver: GeneticAlgorithmDriver,
-							   @transient val terminationCriterion: GeneticAlgorithmTerminator,
+class GeneticAlgorithmExecutor(@transient var driver: GeneticAlgorithmDriver,
+							   @transient var terminationCriterion: GeneticAlgorithmTerminator,
 							   val elitism: Double = 0.1,
 							   val recombinationFraction: Double = 0.8,
 							   val mutationFraction: Double = 0.1,
@@ -30,11 +31,11 @@ class GeneticAlgorithmExecutor(@transient val driver: GeneticAlgorithmDriver,
 	def evolve: GAPopulation = {
 		val (elites: List[Patch], otherChromosomes: List[Patch]) = splitEliteAndNonElite(latestChromosomes)
 
-		val newChromosomes = otherChromosomes.map(c => processPatch(c))
+		val newChromosomes = U.parallelify(otherChromosomes).map(c => processPatch(c)).toList
 
 		val allNewChromosomes = elites ::: newChromosomes
 		val newPopulation = new GAPopulation(
-			allNewChromosomes.map(c => new GAChromosome(c, driver.fitness(c))))
+			U.parallelify(allNewChromosomes).map(c => new GAChromosome(c, driver.fitness(c))).toList)
 
 		newPopulation
 	}
@@ -86,14 +87,17 @@ class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTe
 }
 
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
+								  val data: Patch,
+								  val populationSize: Int = 10,
 								  val combineQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them, taking the best out of both. First paragraph: ", "Second paragraph:"),
 								  val combineTitle: String = "Please combine the following two paragraphs",
 								  val mutateQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph"),
 								  val mutateTitle: String = "Please refine the following paragraph",
 								  val ratingTitle: String = "Please rate the following paragraph",
-								  val ratingQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes"),
-								  val data: List[Patch]) extends GeneticAlgorithmDriver {
-	override def initialPopulation: GAPopulation = populationFromPatchList(data)
+								  val ratingQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes")
+									 ) extends GeneticAlgorithmDriver {
+	override def initialPopulation: GAPopulation = populationFromPatchList(
+		U.parallelify(1 to populationSize).map(d => mutate(data)).toList)
 
 	override def combine(patch1: Patch, patch2: Patch): Patch =
 		new StringPatch(portal.sendQueryAndAwaitResult(
@@ -102,7 +106,7 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 
 
 	override def mutate(patch: Patch): Patch = new StringPatch(portal.sendQueryAndAwaitResult(
-		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", combineTitle)).get
+		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", mutateTitle)).get
 		.asInstanceOf[FreetextAnswer].answer)
 
 	override def fitness(patch: Patch): Double = {
