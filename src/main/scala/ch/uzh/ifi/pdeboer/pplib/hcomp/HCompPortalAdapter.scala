@@ -213,7 +213,7 @@ case class FreetextQuery(question: String, defaultAnswer: String = "", title: St
 		this
 	}
 
-	override def suggestedPaymentCents: Int = 6
+	override def suggestedPaymentCents: Int = 8
 }
 
 object FreetextQuery {
@@ -239,7 +239,7 @@ case class MultipleChoiceQuery(question: String, options: List[String], maxNumbe
 		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options(0) -> true)))
 		else None
 
-	override def suggestedPaymentCents: Int = 3
+	override def suggestedPaymentCents: Int = 4
 }
 
 object MultipleChoiceQuery {

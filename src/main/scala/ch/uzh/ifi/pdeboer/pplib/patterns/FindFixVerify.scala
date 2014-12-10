@@ -33,7 +33,6 @@ class FindFixVerifyExecutor[T](
 	protected var ran: Boolean = false
 
 	def runUntilConverged(): Unit = {
-		ran = true
 		val toFix = memoizer.mem("toFix")(findPatches())
 		val fixes = memoizer.mem("fixes")(getAlternativesForPatchesToFix(toFix))
 		val fixesAdded = memoizer.mem("fixesAdded") {
@@ -43,6 +42,7 @@ class FindFixVerifyExecutor[T](
 
 		val bestPatchesFound = memoizer.mem("bestPatchesFound")(getBestPatchesFromAllPatchesVAR())
 		saveBestPatchesToAllPatches(bestPatchesFound)
+		ran = true
 	}
 
 	protected def saveBestPatchesToAllPatches(bestPatchesFound: List[FFVPatch[T]]) {
