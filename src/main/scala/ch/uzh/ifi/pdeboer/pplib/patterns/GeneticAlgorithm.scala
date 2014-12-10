@@ -106,7 +106,7 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 		.asInstanceOf[FreetextAnswer].answer)
 
 	override def fitness(patch: Patch): Double = {
-		val options = List("Very good", "good", "bad", "very bad")
+		val options = List("Very good", "good", "bad", "very bad").reverse
 		val answer = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(ratingQuestion.getInstructions(patch + ""), options, 1, 1, ratingTitle)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
 		val index = options.indexOf(answer) + 1d
