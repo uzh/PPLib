@@ -21,7 +21,7 @@ import scala.reflect.runtime.{universe => ru}
 	implicit val processStub = this
 
 	lazy val processMemoizer = MEMOIZER_NAME.get match {
-		case Some(x: String) => Some(new FileProcessMemoizer(this, x))
+		case Some(x: String) => Some(new FileProcessMemoizer(x))
 		case _ => None
 	}
 

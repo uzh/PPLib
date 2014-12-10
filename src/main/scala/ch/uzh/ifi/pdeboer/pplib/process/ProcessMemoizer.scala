@@ -6,8 +6,6 @@ import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
 @SerialVersionUID(1l) trait ProcessMemoizer extends Serializable {
-	def processStub: ProcessStub[_, _]
-
 	def name: String
 
 	def overwriteExistingData: Boolean
@@ -109,7 +107,7 @@ import org.joda.time.DateTime
 
 }
 
-class NoProcessMemoizer(val processStub: ProcessStub[_, _] = null, val name: String = "", val overwriteExistingData: Boolean = false) extends ProcessMemoizer {
+class NoProcessMemoizer(val name: String = "", val overwriteExistingData: Boolean = false) extends ProcessMemoizer {
 	override def flush(): Boolean = true
 
 	override def load(): Boolean = true
@@ -122,7 +120,7 @@ class NoProcessMemoizer(val processStub: ProcessStub[_, _] = null, val name: Str
 /**
  * Created by pdeboer on 05/12/14.
  */
-class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, val overwriteExistingData: Boolean = false) extends ProcessMemoizer with LazyLogger {
+class FileProcessMemoizer(val name: String, val overwriteExistingData: Boolean = false) extends ProcessMemoizer with LazyLogger {
 	val defaultPath = "state/"
 	val defaultSuffix = ".state"
 
@@ -142,7 +140,7 @@ class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, 
 			}
 			catch {
 				case e: Exception => {
-					logger.error(s"could not save process memoizer $name for ${processStub.getClass.getSimpleName}", e)
+					logger.error(s"could not save process memoizer $name", e)
 					false
 				}
 			}
@@ -164,7 +162,7 @@ class FileProcessMemoizer(val processStub: ProcessStub[_, _], val name: String, 
 			}
 			catch {
 				case e: Exception => {
-					logger.error(s"could not load process memoizer $name for ${processStub.getClass.getSimpleName}", e)
+					logger.error(s"could not load process memoizer $name", e)
 					false
 				}
 			}
