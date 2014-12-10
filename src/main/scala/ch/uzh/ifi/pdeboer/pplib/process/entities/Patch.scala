@@ -3,14 +3,11 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 /**
  * Created by pdeboer on 05/12/14.
  */
-class Patch(val payload: Any) {
+class Patch(val payload: Serializable) extends Serializable {
 	override def toString = payload.toString
-
-	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch]
 
 	override def equals(other: Any): Boolean = other match {
 		case that: Patch =>
-			(that canEqual this) &&
 				payload == that.payload
 		case _ => false
 	}
@@ -21,6 +18,8 @@ class Patch(val payload: Any) {
 	}
 }
 
-class StringPatch(stringValue: String, payload: Any) extends Patch(payload) {
-	override def toString = stringValue
+case class StringWrapper(str: String) extends Serializable {
+	override def toString: String = str
 }
+
+class StringPatch(_payload: String) extends Patch(StringWrapper(_payload))
