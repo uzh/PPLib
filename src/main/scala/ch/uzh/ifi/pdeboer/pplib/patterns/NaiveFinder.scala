@@ -24,7 +24,7 @@ import scala.util.Random
 
 	def getPatches(maxToInclude: Int) = {
 		val candidatePatches = patches.filter(_.displays < findersPerItem)
-		val sortedPatches = if (shuffle) Random.shuffle(candidatePatches) else candidatePatches
+		val sortedPatches = memoizer.mem("sortedPatches")(if (shuffle) Random.shuffle(candidatePatches) else candidatePatches)
 
 		sortedPatches.take(maxToInclude)
 	}
