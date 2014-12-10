@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, StringPatch}
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 
 import scala.util.Random
@@ -64,16 +65,13 @@ trait GeneticAlgorithmDriver {
 	def mutate(patch: Patch): Patch
 
 	def fitness(patch: Patch): Double
+
+	def populationFromPatchList(patchList: List[Patch]) = new GAPopulation(patchList.map(d => new GAChromosome(d, 0)))
 }
 
 trait GeneticAlgorithmTerminator {
 	def shouldEvolve(populations: List[GAPopulation]): Boolean
 }
-
-class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTerminator {
-	override def shouldEvolve(populations: List[GAPopulation]): Boolean = populations.size < limit
-}
-
 
 class GAChromosome(val patch: Patch, val fitness: Double) extends Comparable[GAChromosome] {
 	override def compareTo(o: GAChromosome): Int = fitness.compareTo(o.fitness)
@@ -81,4 +79,38 @@ class GAChromosome(val patch: Patch, val fitness: Double) extends Comparable[GAC
 
 class GAPopulation(_chromosomes: List[GAChromosome]) {
 	val chromosomes = _chromosomes.sorted
+}
+
+class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTerminator {
+	override def shouldEvolve(populations: List[GAPopulation]): Boolean = populations.size < limit
+}
+
+class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
+								  val combineQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them, taking the best out of both. First paragraph: ", "Second paragraph:"),
+								  val combineTitle: String = "Please combine the following two paragraphs",
+								  val mutateQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph"),
+								  val mutateTitle: String = "Please refine the following paragraph",
+								  val ratingTitle: String = "Please rate the following paragraph",
+								  val ratingQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes"),
+								  val data: List[Patch]) extends GeneticAlgorithmDriver {
+	override def initialPopulation: GAPopulation = populationFromPatchList(data)
+
+	override def combine(patch1: Patch, patch2: Patch): Patch =
+		new StringPatch(portal.sendQueryAndAwaitResult(
+			new FreetextQuery(combineQuestion.getInstructions(patch1 + "", patch2 + ""), "", combineTitle))
+			.asInstanceOf[FreetextAnswer].answer)
+
+
+	override def mutate(patch: Patch): Patch = new StringPatch(portal.sendQueryAndAwaitResult(
+		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", combineTitle)).get
+		.asInstanceOf[FreetextAnswer].answer)
+
+	override def fitness(patch: Patch): Double = {
+		val options = List("Very good", "good", "bad", "very bad")
+		val answer = portal.sendQueryAndAwaitResult(
+			MultipleChoiceQuery(ratingQuestion.getInstructions(patch + ""), options, 1, 1, ratingTitle)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+		val index = options.indexOf(answer) + 1d
+
+		index / options.length.toDouble
+	}
 }
