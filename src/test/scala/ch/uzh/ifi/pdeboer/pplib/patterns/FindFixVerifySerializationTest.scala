@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, MockHCompPortal}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.MockHCompPortal
 import ch.uzh.ifi.pdeboer.pplib.process.FileProcessMemoizer
 import org.junit.{Assert, Test}
 
@@ -37,7 +37,7 @@ class FindFixVerifySerializationTest {
 	def testSerializationOfFFVProcess: Unit = {
 		val driver = new FFVDefaultHCompDriver(
 			List("asdf1", "asdf2").zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
-			new CostCountingEnabledHCompPortal(HComp.mechanicalTurk), new FFVFindQuestion("asdf?"), new FFVFixQuestion("asdf?"),
+			portal, new FFVFindQuestion("asdf?"), new FFVFixQuestion("asdf?"),
 			"ftitle", "fixtitle", FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
 			FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER, FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER,
 			true
