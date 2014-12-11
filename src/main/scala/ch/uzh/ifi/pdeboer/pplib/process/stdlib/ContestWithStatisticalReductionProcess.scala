@@ -66,7 +66,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 }
 
 object ContestWithStatisticalReductionProcess {
-	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the sentence that fits best in terms of writing style, grammar and low mistake count"))))
+	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best")))

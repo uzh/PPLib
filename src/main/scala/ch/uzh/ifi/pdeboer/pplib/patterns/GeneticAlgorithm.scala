@@ -88,12 +88,12 @@ class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTe
 }
 
 object GeneticAlgorithmHCompDriver {
-	val DEFAULT_RATING_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes")
+	val DEFAULT_RATING_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_RATING_TITLE: String = "Please rate the following paragraph"
 	val DEFAULT_MUTATE_TITLE: String = "Please refine the following paragraph"
-	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph")
+	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_COMBINE_TITLE: String = "Please combine the following two paragraphs"
-	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph.")
+	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph. Please do not accept more than 1 HIT in this group.")
 }
 
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,

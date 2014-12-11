@@ -129,10 +129,10 @@ trait FindFixVerifyDriver[T] {
 @SerialVersionUID(1l) case class FFVPatch[T](patch: T, patchIndex: Int) extends Serializable
 
 object FFVDefaultHCompDriver {
-	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved")
+	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved.")
 	val DEFAULT_FIND_TITLE = "Find erroneous sentences"
 
-	val DEFAULT_FIX_QUESTION = new FFVFixQuestion("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
+	val DEFAULT_FIX_QUESTION = new FFVFixQuestion("Other crowd workers have agreed on this sentence being erroneous. Please fix it", "Please also do not accept more than 1 HIT in this group")
 	val DEFAULT_FIX_TITLE = "Please fix this sentence"
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
@@ -151,9 +151,9 @@ class FFVFindQuestion(val question: String) extends Serializable {
 	def fullQuestion(allPatches: List[FFVPatch[String]]) = question
 }
 
-class FFVFixQuestion(val question: String) extends Serializable {
+class FFVFixQuestion(val question: String, val disclaimer: String = "") extends Serializable {
 	def fullQuestion(patch: FFVPatch[String], allPatches: List[FFVPatch[String]]) =
-		HCompInstructionsWithTuple(question).getInstructions(patch.patch)
+		HCompInstructionsWithTuple(question, questionAfterTuples = disclaimer).getInstructions(patch.patch)
 }
 
 class FFVFixQuestionInclOtherPatches(val questionBeforePatch: String, val questionAfterPatch: String = "",
