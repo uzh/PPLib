@@ -87,15 +87,24 @@ class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTe
 	override def shouldEvolve(populations: List[GAPopulation]): Boolean = populations.size < limit
 }
 
+object GeneticAlgorithmHCompDriver {
+	val DEFAULT_RATING_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes")
+	val DEFAULT_RATING_TITLE: String = "Please rate the following paragraph"
+	val DEFAULT_MUTATE_TITLE: String = "Please refine the following paragraph"
+	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph")
+	val DEFAULT_COMBINE_TITLE: String = "Please combine the following two paragraphs"
+	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph.")
+}
+
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 								  val data: Patch,
 								  val populationSize: Int = 10,
-								  val combineQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph."),
-								  val combineTitle: String = "Please combine the following two paragraphs",
-								  val mutateQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph"),
-								  val mutateTitle: String = "Please refine the following paragraph",
-								  val ratingTitle: String = "Please rate the following paragraph",
-								  val ratingQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes")
+								  val combineQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_COMBINE_QUESTION,
+								  val combineTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_COMBINE_TITLE,
+								  val mutateQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_QUESTION,
+								  val mutateTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_TITLE,
+								  val ratingTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_RATING_TITLE,
+								  val ratingQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION
 									 ) extends GeneticAlgorithmDriver {
 	override def initialPopulation: GAPopulation = populationFromPatchList(
 		U.parallelify(1 to populationSize).map(d => mutate(data)).toList)
