@@ -31,10 +31,11 @@ trait HCompPortalAdapter extends LazyLogger {
 
 	private var queryLog = List.empty[HCompQueryStats]
 
-	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties()): Future[Option[HCompAnswer]] = Future {
+	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
 		val properties = if (details.paymentCents < 1) HCompQueryProperties(query.suggestedPaymentCents) else details
-		
-		val budgetAfterQuery = budget match {
+
+		val budgetAfterQuery = if (omitBudgetCalculation) budget
+		else budget match {
 			case Some(x) => Some(x - properties.paymentCents)
 			case None => None
 		}
@@ -72,8 +73,18 @@ trait HCompPortalAdapter extends LazyLogger {
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
 		val future = sendQuery(query, properties)
-		Await.result(future, maxWaitTime)
-		future.value.get.get
+		val timeAtMaxWait = new DateTime(DateTime.now().getMillis + maxWaitTime.toMillis)
+		if (maxWaitTime.toMillis <= 0) None
+		else {
+			val waitStep = Math.min(properties.cancelAndRepostAfter.toMillis, maxWaitTime.toMillis)
+			Await.result(future, waitStep milliseconds)
+			if (future.value.isDefined) {
+				future.value.get.get
+			} else if (timeAtMaxWait.isAfterNow) {
+				cancelQuery(query)
+				sendQueryAndAwaitResult(query, properties, maxWaitTime = (timeAtMaxWait.getMillis - DateTime.now().getMillis) millis)
+			} else None
+		}
 	}
 
 	def getDefaultPortalKey: String
@@ -87,7 +98,7 @@ class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extend
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
 
-	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties): Future[Option[HCompAnswer]] = {
+	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
 			spentCents += properties.paymentCents
 			spentPerQuery += query.identifier -> properties.paymentCents
@@ -264,7 +275,7 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(paymentCents: Int = 0) extends Serializable
+case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 6 hours) extends Serializable
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]
