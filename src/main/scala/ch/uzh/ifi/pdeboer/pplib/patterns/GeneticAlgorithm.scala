@@ -15,7 +15,8 @@ class GeneticAlgorithmExecutor(@transient var driver: GeneticAlgorithmDriver,
 							   val elitism: Double = 0.1,
 							   val recombinationFraction: Double = 0.8,
 							   val mutationFraction: Double = 0.1,
-							   @transient memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
+							   @transient memoizer: ProcessMemoizer = new NoProcessMemoizer(),
+							   val memoizerPrefix: String = "") extends Serializable {
 
 	private var populations: List[GAPopulation] = List(driver.initialPopulation)
 

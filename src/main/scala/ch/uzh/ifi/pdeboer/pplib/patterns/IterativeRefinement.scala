@@ -22,8 +22,8 @@ class IterativeRefinementExecutor(val textToRefine: String,
 	var currentState: String = textToRefine
 
 	def step(stepNumber: Int): Unit = {
-		val newState = memoizer.mem("refinement" + stepNumber)(driver.refine(textToRefine, currentState))
-		currentState = memoizer.mem("bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
+		val newState = memoizer.mem(memoizerPrefix + "refinement" + stepNumber)(driver.refine(textToRefine, currentState))
+		currentState = memoizer.mem(memoizerPrefix + "bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
 	}
 
 	lazy val refinedText: String = {
