@@ -15,7 +15,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, Pro
 class IterativeRefinementExecutor(val textToRefine: String,
 								  val driver: IterativeRefinementDriver[String],
 								  val numIterations: Int = DEFAULT_ITERATION_COUNT,
-								  val memoizer: ProcessMemoizer = new NoProcessMemoizer()) {
+								  val memoizer: ProcessMemoizer = new NoProcessMemoizer(),
+								  val memoizerPrefix: String = "") {
 	assert(numIterations > 0)
 
 	var currentState: String = textToRefine

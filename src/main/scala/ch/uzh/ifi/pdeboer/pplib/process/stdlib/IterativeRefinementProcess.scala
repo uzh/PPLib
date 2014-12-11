@@ -20,7 +20,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		data.map(d => {
 			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get,
 				QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS.get)
-			val exec = new IterativeRefinementExecutor(d, driver, ITERATION_COUNT.get, memoizer)
+			val exec = new IterativeRefinementExecutor(d, driver, ITERATION_COUNT.get, memoizer, d)
 			exec.refinedText
 		})
 	}
