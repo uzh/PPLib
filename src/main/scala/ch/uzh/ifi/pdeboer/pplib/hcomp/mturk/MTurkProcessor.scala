@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, GrowingTimer, U}
+import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, LazyLogger, U}
 
 import scala.concurrent.duration._
 import scala.xml.NodeSeq
@@ -55,7 +55,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		}
 	}
 
-	def handleAssignmentResult(a: Assignment): Some[HCompAnswer] = {
+	def handleAssignmentResult(a: Assignment): Option[HCompAnswer] = {
 		try {
 			//We approve all assignments by default. Don't like rejections
 			service.ApproveAssignment(a)
@@ -65,10 +65,12 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		}
 
 		val xml = a.AnswerXML
-		val answer: HCompAnswer = MTQuery.convert(query).interpret(xml)
-		answer.acceptTime = a.AcceptTime
-		answer.submitTime = a.SubmitTime
-		Some(answer)
+		val answer = MTQuery.convert(query).interpret(xml)
+		answer.map(answer => {
+			answer.acceptTime = a.AcceptTime
+			answer.submitTime = a.SubmitTime
+			answer
+		})
 	}
 
 	def hitXML(question: NodeSeq) =

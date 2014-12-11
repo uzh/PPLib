@@ -147,6 +147,8 @@ trait HCompQuery extends Serializable {
 	final val identifier: Int = HCompIDGen.next()
 
 	def answerTrivialCases: Option[HCompAnswer] = None
+
+	def valueIsRequired: Boolean = true
 }
 
 @SerialVersionUID(1l)
@@ -222,10 +224,12 @@ case class FreetextQuery(question: String, defaultAnswer: String = "", title: St
 
 	def this(question: String) = this(question, "", question)
 
-	var valueIsRequired: Boolean = defaultAnswer.equals("")
+	private var _valueIsRequired: Boolean = defaultAnswer.equals("")
+
+	override def valueIsRequired = _valueIsRequired
 
 	def setRequired(required: Boolean) = {
-		valueIsRequired = required;
+		_valueIsRequired = required
 		this
 	}
 
@@ -244,7 +248,7 @@ case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAns
 }
 
 @SerialVersionUID(1l)
-case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "") extends HCompQuery with Serializable {
+case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "", override val valueIsRequired: Boolean = true) extends HCompQuery with Serializable {
 	assert(maxNumberOfResults < 1 || maxNumberOfResults >= minNumberOfResults)
 
 	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, 1, question)

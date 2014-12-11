@@ -32,7 +32,7 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(FreetextAnswer(ftq, "C3"), q.interpret(xml))
+		Assert.assertEquals(Some(FreetextAnswer(ftq, "C3")), q.interpret(xml))
 	}
 
 	@Test
@@ -54,7 +54,7 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(MultipleChoiceAnswer(mtc,
-			mtc.options.map(o => o -> (o == "b")).toMap), q.interpret(xml))
+		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b")).toMap)), q.interpret(xml))
 	}
 }
