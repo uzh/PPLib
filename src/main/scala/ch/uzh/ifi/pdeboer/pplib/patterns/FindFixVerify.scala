@@ -133,7 +133,7 @@ object FFVDefaultHCompDriver {
 	val DEFAULT_FIND_TITLE = "Find erroneous sentences"
 
 	val DEFAULT_FIX_QUESTION = new FFVFixQuestion("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
-	val DEFAULT_FIX_TITLE = "Please fix these sentences"
+	val DEFAULT_FIX_TITLE = "Please fix this sentence"
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")

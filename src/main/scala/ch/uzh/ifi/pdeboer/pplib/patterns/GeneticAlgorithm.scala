@@ -89,7 +89,7 @@ class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTe
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 								  val data: Patch,
 								  val populationSize: Int = 10,
-								  val combineQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them, taking the best out of both. First paragraph: ", "Second paragraph:"),
+								  val combineQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph."),
 								  val combineTitle: String = "Please combine the following two paragraphs",
 								  val mutateQuestion: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph"),
 								  val mutateTitle: String = "Please refine the following paragraph",

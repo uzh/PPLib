@@ -61,7 +61,7 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 
 object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_REFINEMENT: String = "Please refine the following sentence"
-	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further")
+	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further.", "If you're unhappy with the current state, just copy&paste the original sentence and fix it.")
 	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTuple("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
