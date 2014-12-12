@@ -20,7 +20,7 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
-			val driver = new GeneticAlgorithmHCompDriver(portal, new StringPatch(d))
+			val driver = new GeneticAlgorithmHCompDriver(portal, new StringPatch(d), costPerQuestion = QUESTION_PRICE.get)
 			val terminator: GAIterationLimitTerminator = new GAIterationLimitTerminator(10)
 			val exec = memoizer.memWithReinitialization(d + "ga_exec")(new GeneticAlgorithmExecutor(driver, terminator, memoizer = memoizer, memoizerPrefix = d)) { exec =>
 				exec.driver = driver
