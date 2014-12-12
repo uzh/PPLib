@@ -3,10 +3,9 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, StringPatch}
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
-import ch.uzh.ifi.pdeboer.pplib.util.U
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 import scala.util.Random
-import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 /**
  * Created by pdeboer on 10/12/14.
@@ -78,11 +77,11 @@ trait GeneticAlgorithmTerminator {
 	def shouldEvolve(populations: List[GAPopulation]): Boolean
 }
 
-class GAChromosome(val patch: Patch, val fitness: Double) extends Comparable[GAChromosome] {
+class GAChromosome(val patch: Patch, val fitness: Double) extends Comparable[GAChromosome] with Serializable {
 	override def compareTo(o: GAChromosome): Int = fitness.compareTo(o.fitness)
 }
 
-class GAPopulation(_chromosomes: List[GAChromosome]) {
+class GAPopulation(_chromosomes: List[GAChromosome]) extends Serializable {
 	val chromosomes = _chromosomes.sorted
 }
 
@@ -110,7 +109,7 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 								  val ratingQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION
 									 ) extends GeneticAlgorithmDriver {
 	override def initialPopulation: GAPopulation = populationFromPatchList(
-		U.parallelify(1 to populationSize).map(d => mutate(data)).toList)
+		(1 to populationSize).mpar.map(d => mutate(data)).toList)
 
 	override def combine(patch1: Patch, patch2: Patch): Patch =
 		new StringPatch(portal.sendQueryAndAwaitResult(
