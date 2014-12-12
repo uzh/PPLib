@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.util.Random
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 /**
  * Created by pdeboer on 10/12/14.
@@ -18,7 +19,9 @@ class GeneticAlgorithmExecutor(@transient var driver: GeneticAlgorithmDriver,
 							   @transient memoizer: ProcessMemoizer = new NoProcessMemoizer(),
 							   val memoizerPrefix: String = "") extends Serializable {
 
-	private var populations: List[GAPopulation] = List(driver.initialPopulation)
+	private var populations: List[GAPopulation] = List(
+		memoizer.mem(memoizerPrefix + "initialPop")(driver.initialPopulation)
+	)
 
 	lazy val refinedData = {
 		do {
@@ -32,11 +35,11 @@ class GeneticAlgorithmExecutor(@transient var driver: GeneticAlgorithmDriver,
 	def evolve: GAPopulation = {
 		val (elites: List[Patch], otherChromosomes: List[Patch]) = splitEliteAndNonElite(latestChromosomes)
 
-		val newChromosomes = U.parallelify(otherChromosomes).map(c => processPatch(c)).toList
+		val newChromosomes = otherChromosomes.mpar.map(c => processPatch(c)).toList
 
 		val allNewChromosomes = elites ::: newChromosomes
 		val newPopulation = new GAPopulation(
-			U.parallelify(allNewChromosomes).map(c => new GAChromosome(c, driver.fitness(c))).toList)
+			allNewChromosomes.mpar.map(c => new GAChromosome(c, driver.fitness(c))).toList)
 
 		newPopulation
 	}

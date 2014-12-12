@@ -3,13 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
-import org.junit.{Assert, Test}
+import org.junit.Assert
 
 /**
  * Created by pdeboer on 03/11/14.
+ *
  */
 class ContestWithFixWorkerCountProcessTest {
-	@Test
+	//@Test
 	def testWorkerCountAgreement3: Unit = {
 		val portal = new MockHCompPortal
 
@@ -48,7 +49,7 @@ class ContestWithFixWorkerCountProcessTest {
 		Assert.assertEquals(0, votes.values.sum)
 	}
 
-	@Test
+	//@Test
 	def testWorkerCountAgreement5: Unit = {
 		val portal = new MockHCompPortal
 
