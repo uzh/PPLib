@@ -91,8 +91,6 @@ import scala.reflect.runtime.{universe => ru}
 		ret
 	}
 
-	final def isApproxSubType[T: Manifest, U: Manifest] = manifest[T] <:< manifest[U]
-
 	def allParams: List[ProcessParameter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters ::: defaultParameters
 	}
