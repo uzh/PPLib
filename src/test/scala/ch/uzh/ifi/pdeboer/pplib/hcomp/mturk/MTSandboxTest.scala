@@ -10,7 +10,7 @@ class MTSandboxTest {
 	//@Test
 	def testSendTextBox: Unit = {
 		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(FreetextQuery("what's your name? <b>nothing much</b>"), HCompQueryProperties(5))
-		val answer = r.get.as[FreetextAnswer]
+		val answer = r.get.is[FreetextAnswer]
 		println(answer.answer)
 	}
 
@@ -47,7 +47,7 @@ class MTSandboxTest {
 				participantName,
 				participantContinent,
 				participantAge
-			), "Please answer the following questions about you")).get.as[CompositeQueryAnswer]
+			), "Please answer the following questions about you")).get.is[CompositeQueryAnswer]
 
 		println(SurveyResult(
 			name = result.get[FreetextAnswer](participantName).answer,

@@ -20,7 +20,7 @@ object Survey extends App {
 				participantName,
 				participantContinent,
 				participantAge
-			), "Please answer the following questions about you")).get.as[CompositeQueryAnswer]
+			), "Please answer the following questions about you")).get.is[CompositeQueryAnswer]
 
 		SurveyResult(
 			name = result.get[FreetextAnswer](participantName).answer,

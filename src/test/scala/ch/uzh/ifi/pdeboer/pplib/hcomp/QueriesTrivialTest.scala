@@ -10,7 +10,7 @@ class MultipleChoiceQueryTrivialTest {
 	def testHasTrivialSolutionMaxNumResults(): Unit = {
 		val q = MultipleChoiceQuery("", List("test"), maxNumberOfResults = 1, minNumberOfResults = 1)
 		val trivialAnswer: Option[HCompAnswer] = q.answerTrivialCases
-		Assert.assertTrue(trivialAnswer.isDefined && trivialAnswer.get.as[MultipleChoiceAnswer].selectedAnswer == "test")
+		Assert.assertTrue(trivialAnswer.isDefined && trivialAnswer.get.is[MultipleChoiceAnswer].selectedAnswer == "test")
 	}
 
 	@Test

@@ -159,7 +159,7 @@ trait HCompQuery extends Serializable {
 trait HCompAnswer extends Serializable {
 	def query: HCompQuery
 
-	def as[T]: T = this.asInstanceOf[T]
+	def is[T]: T = this.asInstanceOf[T]
 
 	var postTime: DateTime = null
 	var acceptTime: Option[DateTime] = None

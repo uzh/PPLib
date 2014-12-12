@@ -26,7 +26,7 @@ class HCompPortalAdapterTest {
 
 		val q = new FreetextQuery("question")
 		val answer = portal.sendQueryAndAwaitResult(q, HCompQueryProperties(cancelAndRepostAfter = 1 hour), 1 hour)
-		Assert.assertEquals("worked", answer.get.as[FreetextAnswer].answer)
+		Assert.assertEquals("worked", answer.get.is[FreetextAnswer].answer)
 		Assert.assertEquals(1, portal.calls.length)
 	}
 
@@ -36,7 +36,7 @@ class HCompPortalAdapterTest {
 
 		val q = new FreetextQuery("question")
 		val answer = portal.sendQueryAndAwaitResult(q, HCompQueryProperties(cancelAndRepostAfter = 600 millis), 1 hour)
-		Assert.assertEquals("worked", answer.get.as[FreetextAnswer].answer)
+		Assert.assertEquals("worked", answer.get.is[FreetextAnswer].answer)
 		println(portal.calls.mkString(","))
 		Assert.assertEquals(3, portal.calls.length)
 	}

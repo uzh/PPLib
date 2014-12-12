@@ -17,7 +17,7 @@ class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 			val queries = data.map(d => FreetextQuery(questionPerCriterion.getInstructions(d)) -> d).toMap
 
 			val results = portal.sendQueryAndAwaitResult(
-				CompositeQuery(queries.keys.toList, INSTRUCTIONS.get)).get.as[CompositeQueryAnswer]
+				CompositeQuery(queries.keys.toList, INSTRUCTIONS.get)).get.is[CompositeQueryAnswer]
 
 			queries.map {
 				case (key, value) => value -> results.get[FreetextAnswer](key).answer
