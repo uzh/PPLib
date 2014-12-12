@@ -48,7 +48,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 			MultipleChoiceQuery(
 				instructions.getInstructions(auxString),
 				alternatives, 1, 1, title),
-			HCompQueryProperties(paymentCents = 3)
+			PRICE_PER_VOTE.get
 
 		) match {
 			case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
@@ -62,7 +62,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(AUX_STRING_PARAMETER, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES) ::: super.optionalParameters
+		List(AUX_STRING_PARAMETER, PRICE_PER_VOTE, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES) ::: super.optionalParameters
 }
 
 object ContestWithStatisticalReductionProcess {
@@ -72,4 +72,5 @@ object ContestWithStatisticalReductionProcess {
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best")))
 	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(30)))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
 }

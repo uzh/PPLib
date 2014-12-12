@@ -20,7 +20,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 			memoizer.mem("it" + w)(
 				portal.sendQueryAndAwaitResult(
 					createMultipleChoiceQuestion(alternatives, INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
-					HCompQueryProperties(paymentCents = 3)
+					PRICE_PER_VOTE.get
 				) match {
 					case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 					case _ => throw new IllegalStateException("didnt get any response") //TODO change me
@@ -36,7 +36,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(AUX_STRING,
-			TITLE, INSTRUCTIONS, WORKER_COUNT) ::: super.optionalParameters
+			TITLE, INSTRUCTIONS, WORKER_COUNT, PRICE_PER_VOTE) ::: super.optionalParameters
 }
 
 object ContestWithFixWorkerCountProcess {
@@ -45,4 +45,5 @@ object ContestWithFixWorkerCountProcess {
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
 }
