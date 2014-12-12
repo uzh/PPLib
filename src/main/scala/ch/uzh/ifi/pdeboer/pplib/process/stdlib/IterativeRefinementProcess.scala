@@ -25,7 +25,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		}).toList
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS, ITERATION_COUNT)
+	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS, ITERATION_COUNT, QUESTION_PRICE)
 }
 
 object IterativeRefinementProcess {
