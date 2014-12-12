@@ -1,10 +1,10 @@
-package ch.uzh.ifi.pdeboer.pplib.patterns
+package ch.uzh.ifi.pdeboer.pplib.patterns.pruners
 
 /**
  * Created by pdeboer on 27/11/14.
  * Only makes sense if data is normally distributed.
  */
-class SigmaPruner(data: List[Double], numSigmas: Int = 3) {
+class SigmaCalculator(data: List[Double], numSigmas: Int = 3) {
 	assert(numSigmas >= 0)
 
 	lazy val sum: Double = data.reduce(_ + _)
@@ -17,6 +17,4 @@ class SigmaPruner(data: List[Double], numSigmas: Int = 3) {
 	lazy val minAllowedValue: Double = mean - distance
 	lazy val maxAllowedValue: Double = mean + distance
 
-	lazy val dataWithinRange: List[Double] =
-		data.filter(v => v >= minAllowedValue && v <= maxAllowedValue)
 }

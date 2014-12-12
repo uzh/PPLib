@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextAnswer, FreetextQuery, HCompInstructionsWithTuple, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.patterns.SigmaPruner
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithSigmaPruning._
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
@@ -20,20 +20,12 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 					val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
 					portal.sendQueryAndAwaitResult(FreetextQuery(
 						questionPerLine.getInstructions(line), line, TITLE_PER_QUESTION.get), QUESTION_PRICE.get).get.is[FreetextAnswer]
-				})
+				}).toList
 
-				val pruner = new SigmaPruner(
-					answers.map(_.processingTimeMillis.toDouble).toList,
-					NUM_SIGMAS.get)
-
-				val answersWithinSigmas = answers.filter(a => {
-					val procTime: Double = a.processingTimeMillis.toDouble
-					procTime >= pruner.minAllowedValue && procTime <= pruner.maxAllowedValue
-				})
-
+				val answersWithinSigmas: List[HCompAnswer] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
 				logger.info(s"pruned ${answers.size - answersWithinSigmas.size} answers")
 
-				answersWithinSigmas.map(_.answer).toList
+				answersWithinSigmas.map(_.is[FreetextAnswer].answer).toList
 			}
 
 			val selectionProcess: ProcessStub[List[String], String] = SELECTION_PROCESS.get
