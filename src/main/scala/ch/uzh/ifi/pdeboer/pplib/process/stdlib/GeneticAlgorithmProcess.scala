@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HCompInstructionsWithTuple}
 import ch.uzh.ifi.pdeboer.pplib.patterns.GeneticAlgorithmHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{GAIterationLimitTerminator, GeneticAlgorithmExecutor, GeneticAlgorithmHCompDriver}
 import ch.uzh.ifi.pdeboer.pplib.process._
@@ -31,7 +31,7 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 		}).toList
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(ELITISM, RECOMBINATION_FRACTION, MUTATION_FRACTION) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PRICE, ELITISM, RECOMBINATION_FRACTION, MUTATION_FRACTION) ::: super.optionalParameters
 }
 
 object GeneticAlgorithmProcess {
@@ -44,4 +44,5 @@ object GeneticAlgorithmProcess {
 	val MUTATE_TITLE = new ProcessParameter[String]("mutateTitle", QuestionParam(), Some(List(DEFAULT_MUTATE_TITLE)))
 	val RATING_QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("ratingQuestion", QuestionParam(), Some(List(DEFAULT_RATING_QUESTION)))
 	val RATING_TITLE = new ProcessParameter[String]("ratingTitle", QuestionParam(), Some(List(DEFAULT_RATING_TITLE)))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION)))
 }

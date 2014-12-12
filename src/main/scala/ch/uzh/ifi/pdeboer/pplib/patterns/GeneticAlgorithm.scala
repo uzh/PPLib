@@ -96,6 +96,7 @@ object GeneticAlgorithmHCompDriver {
 	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_COMBINE_TITLE: String = "Please combine the following two paragraphs"
 	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph. Please do not accept more than 1 HIT in this group.")
+	val DEFAULT_COST_PER_QUESTION = HCompQueryProperties()
 }
 
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
@@ -106,19 +107,20 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 								  val mutateQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_QUESTION,
 								  val mutateTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_TITLE,
 								  val ratingTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_RATING_TITLE,
-								  val ratingQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION
+								  val ratingQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION,
+								  val costPerQuestion: HCompQueryProperties = GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION
 									 ) extends GeneticAlgorithmDriver {
 	override def initialPopulation: GAPopulation = populationFromPatchList(
 		(1 to populationSize).mpar.map(d => mutate(data)).toList)
 
 	override def combine(patch1: Patch, patch2: Patch): Patch =
 		new StringPatch(portal.sendQueryAndAwaitResult(
-			new FreetextQuery(combineQuestion.getInstructions(patch1 + "", patch2 + ""), "", combineTitle))
+			new FreetextQuery(combineQuestion.getInstructions(patch1 + "", patch2 + ""), "", combineTitle), costPerQuestion)
 			.get.is[FreetextAnswer].answer)
 
 
 	override def mutate(patch: Patch): Patch = new StringPatch(portal.sendQueryAndAwaitResult(
-		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", mutateTitle)).get
+		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", mutateTitle), costPerQuestion).get
 		.is[FreetextAnswer].answer)
 
 	override def fitness(patch: Patch): Double = {
