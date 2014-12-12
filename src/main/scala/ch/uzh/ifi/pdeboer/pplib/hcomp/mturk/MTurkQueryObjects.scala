@@ -94,12 +94,17 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 	}
 
 	override def interpret(xml: NodeSeq): Option[HCompAnswer] = {
-		val selected = (getRelevantAnswerFromResponseXML(xml) \\ "SelectionIdentifier").map(i => {
+		val relevantXMLAnswers: NodeSeq = getRelevantAnswerFromResponseXML(xml) \\ "SelectionIdentifier"
+		val selected = relevantXMLAnswers.map(i => {
 			val selectionId: String = i.text.split("_")(1)
-			val cleanedSelectionId: String = selectionId.replaceAll("[^0-9]", "")
-			if (cleanedSelectionId == "") -1 else cleanedSelectionId.toInt
+			val cleanedSelectionId: String = selectionId.replaceAll("[^0-9]*", "")
+			if (cleanedSelectionId == "") {
+				logger.error(s"cleaned section ID part and nothing was left. original $i, splitted ${selectionId.mkString(",")}")
+				-1
+			} else cleanedSelectionId.toInt
 		}).toSet
 		val selections: Map[String, Boolean] = rawQuery.options.zipWithIndex.map(o => o._1 -> selected.contains(o._2)).toMap
+		assert(relevantXMLAnswers.size == selections.values.count(_ == true))
 		val answer = MultipleChoiceAnswer(rawQuery, selections)
 		if (rawQuery.minNumberOfResults > 0 && answer.selectedAnswers.size == 0) {
 			logger.error("expected result for multiple choice query, but got none. Here's the complete answer: " + xml.toString())
