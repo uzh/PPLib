@@ -47,11 +47,13 @@ trait IterativeRefinementDriver[T] {
 class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 						   val titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT,
 						   val questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT,
-						   val votingProcess: ProcessStub[List[String], String] = DEFAULT_VOTING_PROCESS) extends IterativeRefinementDriver[String] {
+						   val votingProcess: ProcessStub[List[String], String] = DEFAULT_VOTING_PROCESS,
+						   val questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE
+							  ) extends IterativeRefinementDriver[String] {
 
 	override def refine(originalTextToRefine: String, currentRefinementState: String): String = {
 		val q = FreetextQuery(questionForRefinement.getInstructions(originalTextToRefine), currentRefinementState, titleForRefinementQuestion)
-		val answer = portal.sendQueryAndAwaitResult(q, properties = HCompQueryProperties(5)).get.asInstanceOf[FreetextAnswer]
+		val answer = portal.sendQueryAndAwaitResult(q, properties = questionPricing).get.asInstanceOf[FreetextAnswer]
 		answer.answer
 	}
 
@@ -59,7 +61,6 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 		votingProcess.process(candidates)
 	}
 }
-
 object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_REFINEMENT: String = "Please refine the following sentence"
 	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further.", "If you're unhappy with the current state, just copy&paste the original sentence and fix it.", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
@@ -71,4 +72,5 @@ object IRDefaultHCompDriver {
 		TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
 		WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING
 	))
+	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }
