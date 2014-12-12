@@ -1,9 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
-import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
-import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
+import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
@@ -198,13 +198,12 @@ object ProcessStub {
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
+	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)
 
 	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
-		val par = (1 to workerCount).view.par
-		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
-		par
+		(1 to workerCount).view.mpar
 	}
 
 	def isParallel = PARALLEL_EXECUTION_PARAMETER.get

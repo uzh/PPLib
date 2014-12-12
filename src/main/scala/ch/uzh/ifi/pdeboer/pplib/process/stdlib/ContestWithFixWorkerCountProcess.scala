@@ -16,7 +16,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 	override def run(alternatives: List[String]): String = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
-		val answers = getCrowdWorkers(WORKER.get).map(w =>
+		val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 			memoizer.mem("it" + w)(
 				portal.sendQueryAndAwaitResult(
 					createMultipleChoiceQuestion(alternatives, INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
@@ -36,7 +36,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(AUX_STRING,
-			TITLE, INSTRUCTIONS, WORKER) ::: super.optionalParameters
+			TITLE, INSTRUCTIONS, WORKER_COUNT) ::: super.optionalParameters
 }
 
 object ContestWithFixWorkerCountProcess {
@@ -44,5 +44,5 @@ object ContestWithFixWorkerCountProcess {
 	val AUX_STRING = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
-	val WORKER = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))
+	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))
 }

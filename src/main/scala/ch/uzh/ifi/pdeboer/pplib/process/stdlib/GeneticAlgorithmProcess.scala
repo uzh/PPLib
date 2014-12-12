@@ -5,6 +5,8 @@ import ch.uzh.ifi.pdeboer.pplib.patterns.GeneticAlgorithmHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{GAIterationLimitTerminator, GeneticAlgorithmExecutor, GeneticAlgorithmHCompDriver}
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.StringPatch
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+
 
 /**
  * Created by pdeboer on 10/12/14.
@@ -17,7 +19,7 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 	override protected def run(data: List[String]): List[String] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
-		data.map(d => {
+		data.mpar.map(d => {
 			val driver = new GeneticAlgorithmHCompDriver(portal, new StringPatch(d))
 			val terminator: GAIterationLimitTerminator = new GAIterationLimitTerminator(10)
 			val exec = memoizer.memWithReinitialization(d + "ga_exec")(
@@ -27,7 +29,7 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 				exec
 			}
 			exec.refinedData(0).toString
-		})
+		}).toList
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(ELITISM, RECOMBINATION_FRACTION, MUTATION_FRACTION) ::: super.optionalParameters

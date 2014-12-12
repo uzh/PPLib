@@ -38,7 +38,7 @@ class ContestWithFixWorkerCountProcessTest {
 		portal.filters ::= f
 
 		val subject = new ContestWithFixWorkerCountProcess(
-			Map(ContestWithFixWorkerCountProcess.WORKER.key -> 3,
+			Map(ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 3,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
 				ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))
@@ -52,7 +52,7 @@ class ContestWithFixWorkerCountProcessTest {
 	def testWorkerCountAgreement5: Unit = {
 		val portal = new MockHCompPortal
 
-		val data = 1 to 5 map (_.toString) toList
+		val data: List[String] = 1 to 5 map (_.toString) toList
 
 		var votes = collection.mutable.HashMap[String, Int](
 			data(0) -> 4, //2 votes
@@ -79,7 +79,7 @@ class ContestWithFixWorkerCountProcessTest {
 		portal.filters ::= f
 
 		val subject = new ContestWithFixWorkerCountProcess(
-			Map(ContestWithFixWorkerCountProcess.WORKER.key -> 5,
+			Map(ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 5,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal,
 				ProcessStubWithHCompPortalAccess.PARALLEL_EXECUTION_PARAMETER.key -> false,
 				ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> HCompInstructionsWithTuple("")))

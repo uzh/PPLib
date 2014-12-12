@@ -140,7 +140,7 @@ object FFVDefaultHCompDriver {
 	val DEFAULT_VERIFY_PROCESS = new ContestWithFixWorkerCountProcess(Map(
 		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
 		ContestWithFixWorkerCountProcess.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
-		ContestWithFixWorkerCountProcess.WORKER.key -> 3
+		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 3
 	))
 
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER: Option[ProcessParameter[String]] = None
