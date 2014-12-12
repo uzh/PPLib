@@ -112,12 +112,12 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 	override def combine(patch1: Patch, patch2: Patch): Patch =
 		new StringPatch(portal.sendQueryAndAwaitResult(
 			new FreetextQuery(combineQuestion.getInstructions(patch1 + "", patch2 + ""), "", combineTitle))
-			.asInstanceOf[FreetextAnswer].answer)
+			.get.as[FreetextAnswer].answer)
 
 
 	override def mutate(patch: Patch): Patch = new StringPatch(portal.sendQueryAndAwaitResult(
 		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", mutateTitle)).get
-		.asInstanceOf[FreetextAnswer].answer)
+		.as[FreetextAnswer].answer)
 
 	override def fitness(patch: Patch): Double = {
 		val options = List("Very good", "good", "bad", "very bad").reverse

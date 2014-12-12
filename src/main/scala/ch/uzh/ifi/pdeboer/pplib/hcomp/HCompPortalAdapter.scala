@@ -99,6 +99,10 @@ trait HCompPortalAdapter extends LazyLogger {
 	def cancelQuery(query: HCompQuery): Unit
 }
 
+trait BonusRejectionAndApprovalPortal extends HCompPortalAdapter {
+
+}
+
 class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]

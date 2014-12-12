@@ -17,7 +17,6 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
 
-
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val manager: MTurkManager = new MTurkManager(service, query, properties)
 		map += query.identifier -> manager

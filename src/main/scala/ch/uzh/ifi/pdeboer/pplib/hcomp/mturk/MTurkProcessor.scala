@@ -14,7 +14,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	var cancelled: Boolean = false
 
 	def waitForResponse() = {
-		val timer = new GrowingTimer(1 second, 1.1, 30 seconds)
+		val timer = new GrowingTimer(1 second, 1.0001, 20 seconds)
 		U.retry(100000) {
 			//at least 27h
 			if (!cancelled) {
