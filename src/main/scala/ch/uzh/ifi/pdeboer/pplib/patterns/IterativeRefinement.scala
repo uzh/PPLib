@@ -76,7 +76,7 @@ object IRDefaultHCompDriver {
 	val DEFAULT_VOTING_PROCESS = new ContestWithFixWorkerCountProcess(Map(
 		INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
 		TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
-		WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
+		WORKER_COUNT.key -> 1,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
 	))
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
