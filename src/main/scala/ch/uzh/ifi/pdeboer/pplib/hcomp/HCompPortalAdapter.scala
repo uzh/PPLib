@@ -252,12 +252,13 @@ case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAns
 }
 
 @SerialVersionUID(1l)
-case class MultipleChoiceQuery(question: String, options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "", override val valueIsRequired: Boolean = true) extends HCompQuery with Serializable {
+case class MultipleChoiceQuery(question: String, private val _options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "", override val valueIsRequired: Boolean = true) extends HCompQuery with Serializable {
+	val options = _options.distinct
 	assert(maxNumberOfResults < 1 || maxNumberOfResults >= minNumberOfResults)
 
 	def this(question: String, options: List[String], maxNumberOfResults: Int) = this(question, options, maxNumberOfResults, 1, question)
 
-	def maxSelections = if (maxNumberOfResults < 1) options.length else maxNumberOfResults
+	def maxSelections = if (maxNumberOfResults < 1) options.size else maxNumberOfResults
 
 	override def answerTrivialCases: Option[HCompAnswer] =
 		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options(0) -> true)))
