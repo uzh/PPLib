@@ -19,7 +19,7 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 				val answers = getCrowdWorkers(ANSWERS_TO_COLLECT_PER_LINE.get).map(w => {
 					val questionPerLine: HCompInstructionsWithTuple = QUESTION_PER_LINE.get
 					portal.sendQueryAndAwaitResult(FreetextQuery(
-						questionPerLine.getInstructions(line), line, TITLE_PER_QUESTION.get), COST_PER_LINE.get).get.is[FreetextAnswer]
+						questionPerLine.getInstructions(line), line, TITLE_PER_QUESTION.get), QUESTION_PRICE.get).get.is[FreetextAnswer]
 				})
 
 				val pruner = new SigmaPruner(
@@ -42,7 +42,7 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 		}).toList
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(COST_PER_LINE, TITLE_PER_QUESTION, QUESTION_PER_LINE, SELECTION_PROCESS, NUM_SIGMAS, ANSWERS_TO_COLLECT_PER_LINE) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION_PER_LINE, SELECTION_PROCESS, NUM_SIGMAS, ANSWERS_TO_COLLECT_PER_LINE) ::: super.optionalParameters
 }
 
 object ContestWithSigmaPruning {
@@ -51,5 +51,5 @@ object ContestWithSigmaPruning {
 	val SELECTION_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("selectionProcess", WorkflowParam(), Some(List(new ContestWithFixWorkerCountProcess())))
 	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", OtherParam(), Some(List(3)))
 	val ANSWERS_TO_COLLECT_PER_LINE = new ProcessParameter[Int]("answersToCollectPerLine", OtherParam(), Some(List(5)))
-	val COST_PER_LINE = new ProcessParameter[HCompQueryProperties]("costPerLine", OtherParam(), Some(List(HCompQueryProperties())))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("costPerLine", OtherParam(), Some(List(HCompQueryProperties())))
 }
