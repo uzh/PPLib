@@ -48,7 +48,8 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 						   val titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT,
 						   val questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT,
 						   val votingProcess: ProcessStub[List[String], String] = DEFAULT_VOTING_PROCESS,
-						   val questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE
+						   val questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE,
+						   val memoizerPrefix: String = ""
 							  ) extends IterativeRefinementDriver[String] {
 
 	override def refine(originalTextToRefine: String, currentRefinementState: String): String = {
@@ -58,6 +59,11 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 	}
 
 	override def selectBestRefinement(candidates: List[String]): String = {
+		val memoizer: Option[String] = votingProcess.getParam(ProcessStub.MEMOIZER_NAME)
+		if (memoizer.isDefined) {
+			votingProcess.params += (ProcessStub.MEMOIZER_NAME.key -> Some(memoizer.get + "_" + memoizerPrefix))
+		}
+
 		votingProcess.process(candidates)
 	}
 }
@@ -70,7 +76,8 @@ object IRDefaultHCompDriver {
 	val DEFAULT_VOTING_PROCESS = new ContestWithFixWorkerCountProcess(Map(
 		INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
 		TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
-		WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING
+		WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
+		ProcessStub.MEMOIZER_NAME.key -> "IR_voting"
 	))
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }
