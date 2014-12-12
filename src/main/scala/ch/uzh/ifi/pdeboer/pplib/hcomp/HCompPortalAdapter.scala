@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Prunable
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
 import org.joda.time.DateTime
@@ -156,7 +157,7 @@ trait HCompQuery extends Serializable {
 }
 
 @SerialVersionUID(1l)
-trait HCompAnswer extends Serializable {
+trait HCompAnswer extends Serializable with Prunable {
 	def query: HCompQuery
 
 	def is[T]: T = this.asInstanceOf[T]
@@ -167,6 +168,8 @@ trait HCompAnswer extends Serializable {
 	var receivedTime: DateTime = null
 
 	def processingTimeMillis: Long = submitTime.getOrElse(receivedTime).getMillis - acceptTime.getOrElse(postTime).getMillis
+
+	override def prunableDouble = processingTimeMillis.toDouble
 }
 
 @SerialVersionUID(1l)

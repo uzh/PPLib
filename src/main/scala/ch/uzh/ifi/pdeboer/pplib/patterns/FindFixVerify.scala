@@ -2,12 +2,12 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.FindFixVerifyExecutor.FFVPatchContainer
+import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{NoPruner, Prunable, Pruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.util.U
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 import scala.collection.mutable
-import scala.collection.parallel.ForkJoinTaskSupport
 import scala.util.Random
 
 /**
@@ -15,13 +15,14 @@ import scala.util.Random
  */
 @SerialVersionUID(1l)
 class FindFixVerifyExecutor[T](
-														_driver: FindFixVerifyDriver[T],
-														val maxPatchesCountInFind: Int = 10,
-														val findersCount: Int = 3,
-														val minFindersCountThatNeedToAgreeForFix: Int = 2,
-														val fixersPerPatch: Int = 3,
-														val parallelWorkers: Boolean = true,
-														_memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
+								  _driver: FindFixVerifyDriver[T],
+								  val maxPatchesCountInFind: Int = 10,
+								  val findersCount: Int = 3,
+								  val minFindersCountThatNeedToAgreeForFix: Int = 2,
+								  val fixersPerPatch: Int = 3,
+								  val parallelWorkers: Boolean = true,
+								  _memoizer: ProcessMemoizer = new NoProcessMemoizer(),
+								  val pruner: Pruner = new NoPruner()) extends Serializable {
 	@transient var driver = _driver
 	@transient var memoizer = _memoizer
 
@@ -34,15 +35,23 @@ class FindFixVerifyExecutor[T](
 
 	def runUntilConverged(): Unit = {
 		val toFix = memoizer.mem("toFix")(findPatches())
-		val fixes = memoizer.mem("fixes")(getAlternativesForPatchesToFix(toFix))
+		val fixes: List[FFVPatch[T]] = memoizer.mem("fixes")(getAlternativesForPatchesToFix(toFix))
+		val prunedFixes = memoizer.mem("prunedFixes")(pruneFixes(fixes))
 		val fixesAdded = memoizer.mem("fixesAdded") {
-			addFixesAsAlternativesToAllPatches(fixes)
+			addFixesAsAlternativesToAllPatches(prunedFixes)
 			""
 		}
 
 		val bestPatchesFound = memoizer.mem("bestPatchesFound")(getBestPatchesFromAllPatchesVAR())
 		saveBestPatchesToAllPatches(bestPatchesFound)
 		ran = true
+	}
+
+	protected def pruneFixes(patches: List[FFVPatch[T]]): List[FFVPatch[T]] = {
+		patches match {
+			case p: List[PrunablePatch[T]] => pruner.prune(p)
+			case w => w
+		}
 	}
 
 	protected def saveBestPatchesToAllPatches(bestPatchesFound: List[FFVPatch[T]]) {
@@ -61,14 +70,10 @@ class FindFixVerifyExecutor[T](
 	}
 
 	protected def getAlternativesForPatchesToFix(toFix: List[FFVPatch[T]]): List[FFVPatch[T]] = {
-		getRange(fixersPerPatch).map(i => toFix.par.map(p => driver.fix(p))).flatten.toList
+		(1 to fixersPerPatch).mpar.map(i => {
+			toFix.mpar.map(p => driver.fix(p))
+		}).flatten.toList
 	}
-
-	private def getRange(to: Int) = if (parallelWorkers) {
-		val par = (1 to to).view.par
-		par.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
-		par
-	} else (1 to to).view
 
 	protected def findPatches() = {
 		var findSteps = new mutable.HashMap[Int, List[FFVPatchContainer[T]]]()
@@ -78,7 +83,7 @@ class FindFixVerifyExecutor[T](
 			findSteps += k -> list
 		})
 
-		val selectedElementsInFind = getRange(findersCount).map(l => findSteps.par.map(p => driver.find(p._2.map(_.original)))).flatten.flatten
+		val selectedElementsInFind = (1 to findersCount).mpar.map(l => findSteps.par.map(p => driver.find(p._2.map(_.original)))).flatten.flatten
 		selectedElementsInFind.foreach(e => {
 			val container = allPatches.get(e.patchIndex).get //should exist except if driver messes with index. out of scope for us
 			container.finders += 1
@@ -97,6 +102,7 @@ object FindFixVerifyExecutor {
 										 var best: Option[FFVPatch[E]] = None) extends Serializable
 
 }
+
 trait FindFixVerifyDriver[T] {
 	def orderedPatches: List[FFVPatch[T]]
 
@@ -126,7 +132,15 @@ trait FindFixVerifyDriver[T] {
 	def verify(patch: FFVPatch[T], alternatives: List[FFVPatch[T]]): FFVPatch[T]
 }
 
-@SerialVersionUID(1l) case class FFVPatch[T](patch: T, patchIndex: Int) extends Serializable
+@SerialVersionUID(1l) class FFVPatch[T](val patch: T, val patchIndex: Int) extends Serializable
+
+object FFVPatch {
+	def apply[T](patch: T, patchIndex: Int) = new FFVPatch[T](patch, patchIndex)
+}
+
+class PrunablePatch[T](original: FFVPatch[T], val answer: HCompAnswer) extends FFVPatch[T](original.patch, original.patchIndex) with Prunable {
+	override def prunableDouble: Double = answer.prunableDouble
+}
 
 object FFVDefaultHCompDriver {
 	val DEFAULT_FIND_QUESTION = new FFVFindQuestion("Please select sentences you think are erroneous and should be improved.")
@@ -145,6 +159,8 @@ object FFVDefaultHCompDriver {
 
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER: Option[ProcessParameter[String]] = None
 	val DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER: (List[FFVPatch[String]] => String) = _.mkString(".")
+
+	val DEFAULT_PRUNER = new NoPruner()
 }
 
 class FFVFindQuestion(val question: String) extends Serializable {
@@ -175,7 +191,8 @@ class FFVDefaultHCompDriver(
 							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
 							   val verifyProcessContextParameter: Option[ProcessParameter[String]] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER,
 							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER,
-							   val shuffleMultipleChoiceQueries: Boolean = true
+							   val shuffleMultipleChoiceQueries: Boolean = true,
+							   val pruner: Pruner = FFVDefaultHCompDriver.DEFAULT_PRUNER
 							   ) extends FindFixVerifyDriver[String] {
 
 	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
@@ -202,9 +219,9 @@ class FFVDefaultHCompDriver(
 		val res = portal.sendQueryAndAwaitResult(
 			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle),
 			HCompQueryProperties(6)
-		).get.asInstanceOf[FreetextAnswer]
+		).get.is[FreetextAnswer]
 
-		FFVPatch[String](res.answer, patch.patchIndex)
+		new PrunablePatch(FFVPatch[String](res.answer, patch.patchIndex), res)
 	}
 
 

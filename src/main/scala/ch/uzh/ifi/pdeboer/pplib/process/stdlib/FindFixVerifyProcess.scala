@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.patterns._
+import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Pruner
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess._
 
@@ -42,7 +43,7 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 		PATCHES_COUNT_IN_FIND, FINDERS_COUNT,
 		MIN_FINDERS_TO_AGREE_FOR_FIX, FIXERS_PER_PATCH, SHUFFLE_CHOICES,
 
-		VERIFY_PROCESS_CONTEXT_PARAMETER, VERIFY_PROCESS_CONTEXT_FLATTENER
+		VERIFY_PROCESS_CONTEXT_PARAMETER, VERIFY_PROCESS_CONTEXT_FLATTENER, PRUNER
 	)
 }
 
@@ -62,4 +63,6 @@ object FindFixVerifyProcess {
 
 	val VERIFY_PROCESS_CONTEXT_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER)))
 	val VERIFY_PROCESS_CONTEXT_FLATTENER = new ProcessParameter[(List[FFVPatch[String]] => String)]("verifyProcessContextFlattener", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER)))
+
+	val PRUNER = new ProcessParameter[Pruner]("pruner", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_PRUNER)))
 }
