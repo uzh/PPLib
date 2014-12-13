@@ -1,11 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+
 /**
  * Created by pdeboer on 30/11/14.
  */
@@ -25,7 +26,8 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		}).toList
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS, ITERATION_COUNT, QUESTION_PRICE)
+	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS, ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)
+
 }
 
 object IterativeRefinementProcess {
@@ -34,4 +36,6 @@ object IterativeRefinementProcess {
 	val VOTING_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
 	val ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(DEFAULT_QUESTION_PRICE)))
+	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", OtherParam(), Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
+	val TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = new ProcessParameter[Int]("toleratedNumberOfIterationsBelowThreshold", OtherParam(), Some(List(DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)))
 }
