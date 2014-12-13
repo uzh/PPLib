@@ -7,6 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 /**
  * Created by pdeboer on 30/11/14.
@@ -17,7 +18,7 @@ class IterativeRefinementExecutor(val textToRefine: String,
 								  val memoizer: ProcessMemoizer = new NoProcessMemoizer(),
 								  val memoizerPrefix: String = "",
 								  val stringDifferenceThreshold: Int = DEFAULT_STRING_DIFFERENCE_THRESHOLD,
-								  val toleratedNumberOfIterationsBelowThreshold: Int = DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD) {
+								  val toleratedNumberOfIterationsBelowThreshold: Int = DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD) extends LazyLogger {
 	assert(numIterations > 0)
 
 	var currentState: String = textToRefine
@@ -35,6 +36,7 @@ class IterativeRefinementExecutor(val textToRefine: String,
 		for (i <- 1 to numIterations) {
 			if (iterationWatcher.shouldRunAnotherIteration)
 				step(i)
+			else logger.info(s"ending IR early due to unchanging answer. Step $i")
 		}
 		currentState
 	}
