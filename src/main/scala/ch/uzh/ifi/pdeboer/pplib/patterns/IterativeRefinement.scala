@@ -6,7 +6,6 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
 
 /**
@@ -84,9 +83,9 @@ object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
 	val DEFAULT_VOTING_PROCESS = new ContestWithFixWorkerCountProcess(Map(
-		INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
-		TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
-		WORKER_COUNT.key -> 1,
+		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
+		ContestWithFixWorkerCountProcess.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
+		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 1,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
 	))
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
