@@ -16,19 +16,26 @@ class IterativeRefinementExecutor(val textToRefine: String,
 								  val driver: IterativeRefinementDriver[String],
 								  val numIterations: Int = DEFAULT_ITERATION_COUNT,
 								  val memoizer: ProcessMemoizer = new NoProcessMemoizer(),
-								  val memoizerPrefix: String = "") {
+								  val memoizerPrefix: String = "",
+								  val stringDifferenceThreshold: Int = DEFAULT_STRING_DIFFERENCE_THRESHOLD,
+								  val toleratedNumberOfIterationsBelowThreshold: Int = DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD) {
 	assert(numIterations > 0)
 
 	var currentState: String = textToRefine
+	protected val iterationWatcher = new IterationWatcher(textToRefine, stringDifferenceThreshold, toleratedNumberOfIterationsBelowThreshold)
 
 	def step(stepNumber: Int): Unit = {
 		val newState = memoizer.mem(memoizerPrefix + "refinement" + stepNumber)(driver.refine(textToRefine, currentState))
-		currentState = memoizer.mem(memoizerPrefix + "bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
+		iterationWatcher.addIteration(newState)
+		if (iterationWatcher.shouldRunAnotherIteration)
+			currentState = memoizer.mem(memoizerPrefix + "bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
+		else currentState = newState
 	}
 
 	lazy val refinedText: String = {
 		for (i <- 1 to numIterations) {
-			step(i)
+			if (iterationWatcher.shouldRunAnotherIteration)
+				step(i)
 		}
 		currentState
 	}
@@ -36,6 +43,8 @@ class IterativeRefinementExecutor(val textToRefine: String,
 
 object IterativeRefinementExecutor {
 	val DEFAULT_ITERATION_COUNT: Int = 5
+	val DEFAULT_STRING_DIFFERENCE_THRESHOLD = 1
+	val DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = 2
 }
 
 trait IterativeRefinementDriver[T] {
@@ -67,6 +76,7 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 		votingProcess.process(candidates)
 	}
 }
+
 object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_REFINEMENT: String = "Please refine the following sentence"
 	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further.", "If you're unhappy with the current state, just copy&paste the original sentence and fix it.", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")

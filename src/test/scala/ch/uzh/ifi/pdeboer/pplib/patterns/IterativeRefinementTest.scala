@@ -9,9 +9,17 @@ class IterativeRefinementTest {
 	@Test
 	def testExecutor(): Unit = {
 		val text = "asdf"
-		val exec = new IterativeRefinementExecutor(text, new SimpleIRDriver(), 5)
+		val exec = new IterativeRefinementExecutor(text, new SimpleIRDriver(), 5, stringDifferenceThreshold = 0)
 
 		Assert.assertEquals("asdf11111", exec.refinedText)
+	}
+
+	@Test
+	def testExecutorWithIterationWatcher(): Unit = {
+		val text = "asdf"
+		val exec = new IterativeRefinementExecutor(text, new SimpleIRDriver(), 5, stringDifferenceThreshold = 1)
+
+		Assert.assertEquals("asdf11", exec.refinedText)
 	}
 
 	class SimpleIRDriver extends IterativeRefinementDriver[String] {

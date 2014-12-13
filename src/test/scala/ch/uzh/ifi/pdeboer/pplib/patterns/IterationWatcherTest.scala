@@ -16,28 +16,28 @@ class IterationWatcherTest {
 
 	@Test
 	def testIterationsEqual: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, numberOfToleratedLowSteps = 1)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, toleratedNumberOfIterationsBelowThreshold = 1)
 		watcher.addIteration(string1)
 		Assert.assertFalse(watcher.shouldRunAnotherIteration)
 	}
 
 	@Test
 	def testIterationsAlmostEqual: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 1, numberOfToleratedLowSteps = 1)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 1, toleratedNumberOfIterationsBelowThreshold = 1)
 		watcher.addIteration(string1 + "a")
 		Assert.assertFalse(watcher.shouldRunAnotherIteration)
 	}
 
 	@Test
 	def testIterationShouldContinue: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, numberOfToleratedLowSteps = 1)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, toleratedNumberOfIterationsBelowThreshold = 1)
 		watcher.addIteration(string1 + "aasdf")
 		Assert.assertTrue(watcher.shouldRunAnotherIteration)
 	}
 
 	@Test
 	def testMultiIterationStep: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, numberOfToleratedLowSteps = 1)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, toleratedNumberOfIterationsBelowThreshold = 1)
 
 		Assert.assertTrue(List("a", "s", "d", "f").forall(c => {
 			watcher.addIteration(c)
@@ -47,7 +47,7 @@ class IterationWatcherTest {
 
 	@Test
 	def testMultiIterationStepBad: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, numberOfToleratedLowSteps = 1)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, toleratedNumberOfIterationsBelowThreshold = 1)
 
 		Assert.assertTrue(List("a", "s", "d", "f").forall(c => {
 			watcher.addIteration(c)
@@ -60,7 +60,7 @@ class IterationWatcherTest {
 
 	@Test
 	def testMultiIteration2StepBad: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, numberOfToleratedLowSteps = 2)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 0, toleratedNumberOfIterationsBelowThreshold = 2)
 
 		Assert.assertTrue(List("a", "s", "d", "d").forall(c => {
 			watcher.addIteration(c)
@@ -77,7 +77,7 @@ class IterationWatcherTest {
 
 	@Test
 	def testMultiIteration2StepBadWithStringDistance: Unit = {
-		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 2, numberOfToleratedLowSteps = 2)
+		val watcher: IterationWatcher = new IterationWatcher(string1, stringDifferenceTerminationThreshold = 2, toleratedNumberOfIterationsBelowThreshold = 2)
 		Assert.assertTrue(List("as88", "as99").forall(c => {
 			watcher.addIteration(c)
 			watcher.shouldRunAnotherIteration
