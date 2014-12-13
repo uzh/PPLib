@@ -64,6 +64,7 @@ object U {
 	}
 	def removeWhitespaces(str: String) = str.replaceAll("\\s*", "")
 
+	//taken from http://oldfashionedsoftware.com/2009/11/19/string-distance-and-refactoring-in-scala/
 	def stringDistance(s1: String, s2: String): Int = {
 		val memo = scala.collection.mutable.Map[(List[Char], List[Char]), Int]()
 		def min(a: Int, b: Int, c: Int) = Math.min(Math.min(a, b), c)
