@@ -70,9 +70,7 @@ class FindFixVerifyExecutor[T](
 	}
 
 	protected def getAlternativesForPatchesToFix(toFix: List[FFVPatch[T]]): List[FFVPatch[T]] = {
-		(1 to fixersPerPatch).mpar.map(i => {
-			toFix.mpar.map(p => driver.fix(p))
-		}).flatten.toList
+		toFix.mpar.map(p => driver.fix(p)).toList
 	}
 
 	protected def findPatches() = {
@@ -115,7 +113,7 @@ trait FindFixVerifyDriver[T] {
 	def find(patches: List[FFVPatch[T]]): List[FFVPatch[T]]
 
 	/**
-	 * use a single crowd worker to fix this patch. If working with strings, you may
+	 * Fix this patch. If you're working with strings, you may
 	 * want to show crowd workers context to that patch
 	 * @param patch
 	 * @return fixed version of that patch, that will be shown as an alternative in the next step
@@ -217,8 +215,7 @@ class FFVDefaultHCompDriver(
 
 	override def fix(patch: FFVPatch[String]): FFVPatch[String] = {
 		val res = portal.sendQueryAndAwaitResult(
-			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle),
-			HCompQueryProperties(6)
+			FreetextQuery(fixQuestion.fullQuestion(patch, orderedPatches), "", fixTitle)
 		).get.is[FreetextAnswer]
 
 		new PrunablePatch(FFVPatch[String](res.answer, patch.patchIndex), res)

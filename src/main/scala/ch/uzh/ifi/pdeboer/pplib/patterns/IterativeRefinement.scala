@@ -79,8 +79,8 @@ class IRDefaultHCompDriver(val portal: HCompPortalAdapter,
 
 object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_REFINEMENT: String = "Please refine the following sentence"
-	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further.", "If you're unhappy with the current state, just copy&paste the original sentence and fix it.", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
-	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTuple("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
+	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTuple("Other crowd workers have refined the text below to the state you see in the text field. Please refine it further.", "If you're unhappy with the current state, just copy&paste the original sentence and fix it.", questionAfterTuples = "We will accept only your first HIT in this group, please don't accept any other. We don't like REJECTIONS, but due to bad experiences we had to deploy a system that detects malicious / unchanged sentences and will reject your answer if it's deemed unhelpful by both, the software and afterwards a human - so please don't cheat. ")
+	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTuple("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more", questionAfterTuples = "We will only accept your first HIT in this group.")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
 	val DEFAULT_VOTING_PROCESS = new ContestWithFixWorkerCountProcess(Map(
