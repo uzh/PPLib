@@ -20,8 +20,8 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
-			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, d)
-			val exec = new IterativeRefinementExecutor(d, driver, MAX_ITERATION_COUNT.get, memoizer, d)
+			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, d.hashCode.toString)
+			val exec = new IterativeRefinementExecutor(d, driver, MAX_ITERATION_COUNT.get, memoizer, d.hashCode.toString)
 			exec.refinedText
 		}).toList
 	}

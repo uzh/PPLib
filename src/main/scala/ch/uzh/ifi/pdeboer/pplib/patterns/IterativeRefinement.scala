@@ -72,7 +72,7 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter,
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
 		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix + "selectbest" + memPrefixInParams))
+		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
 		votingProcess.process(candidates)
