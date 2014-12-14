@@ -3,14 +3,14 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithSigmaPruning._
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 /**
  * Created by pdeboer on 01/12/14.
  */
-@PPLibProcess("create.refine.contestwithsixsigma")
-class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
+@PPLibProcess("create.refine.collectionwithsixsigma")
+class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
 	override protected def run(data: List[String]): List[String] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
@@ -37,7 +37,7 @@ class ContestWithSigmaPruning(params: Map[String, Any] = Map.empty) extends Proc
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION_PER_LINE, SELECTION_PROCESS, NUM_SIGMAS, ANSWERS_TO_COLLECT_PER_LINE) ::: super.optionalParameters
 }
 
-object ContestWithSigmaPruning {
+object CollectionWithSigmaPruning {
 	val QUESTION_PER_LINE = new ProcessParameter[HCompInstructionsWithTuple]("questionPerLine", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please refine the following sentence", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
 	val TITLE_PER_QUESTION = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please refine the following sentence")))
 	val SELECTION_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("selectionProcess", WorkflowParam(), Some(List(new ContestWithFixWorkerCountProcess())))

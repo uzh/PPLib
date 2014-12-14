@@ -195,7 +195,22 @@ object ProcessStub {
 	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", OtherParam(), Some(List(true)))
 	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", OtherParam(), Some(List(None)))
 
-	def create[IN, OUT](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty) = {
+	def create[IN: ClassTag, OUT: ClassTag](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None) = {
+		if (factory.isDefined) {
+			factory.get.buildProcess[IN, OUT](params)
+		} else {
+			new DefaultProcessFactory(baseClass).buildProcess[IN, OUT](params)
+		}
+	}
+}
+
+trait ProcessFactory {
+	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT]
+}
+
+class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends ProcessFactory {
+	override def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any]): ProcessStub[IN, OUT] = {
+		println(baseClass.getDeclaredConstructors.mkString(","))
 		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
 		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[IN, OUT]]
 	}

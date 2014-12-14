@@ -8,11 +8,11 @@ import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 /**
  * Created by pdeboer on 14/12/14.
  */
-class FixPatchExecuter(@transient val driver: FixPatchDriver,
+class FixPatchExecuter(@transient var driver: FixPatchDriver,
 					   val allOrderedPatches: List[Patch],
 					   val indicesOfPatchesToFix: List[Int],
 					   val patchesToIncludeBeforeAndAfterMain: (Int, Int) = (2, 2),
-					   @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(),
+					   @transient var memoizer: ProcessMemoizer = new NoProcessMemoizer(),
 					   val memoizerPrefix: String = "") extends Serializable with LazyLogger {
 
 	lazy val allFixedPatches: List[(Int, Patch)] = {
