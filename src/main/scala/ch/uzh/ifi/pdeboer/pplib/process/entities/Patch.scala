@@ -21,5 +21,4 @@ class Patch(val payload: Serializable) extends Serializable {
 case class StringWrapper(str: String) extends Serializable {
 	override def toString: String = str
 }
-
 class StringPatch(_payload: String) extends Patch(StringWrapper(_payload))

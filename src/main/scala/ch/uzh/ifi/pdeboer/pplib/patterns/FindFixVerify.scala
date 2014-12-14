@@ -197,16 +197,15 @@ class FFVDefaultHCompDriver(
 							   ) extends FindFixVerifyDriver[String] {
 
 
-	//payments taken from http://eprints.soton.ac.uk/372107/1/aaai15-budgetfix.pdf
-
 	override def find(patches: List[FFVPatch[String]]): List[FFVPatch[String]] = {
 		val choices = if (shuffleMultipleChoiceQueries) Random.shuffle(orderedPatches) else orderedPatches
+
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(
 				findQuestion.fullQuestion(choices),
 				patches.map(_.patch),
 				-1, 1, findTitle), HCompQueryProperties(3))
-			.get.asInstanceOf[MultipleChoiceAnswer]
+			.get.is[MultipleChoiceAnswer]
 
 		res.selectedAnswers.map(a => {
 			patches.find(_.patch.equals(a)).get

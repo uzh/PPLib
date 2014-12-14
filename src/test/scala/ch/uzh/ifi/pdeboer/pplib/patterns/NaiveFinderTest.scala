@@ -36,5 +36,4 @@ class NaiveFinderTest {
 		extends NaiveFinder(data, question, title, findersPerItem, shuffle, portal, maxItemsPerFind, memoizer) {
 		def iterations: List[List[Patch]] = selectionIterations.map(_.map(_.patch))
 	}
-
 }
