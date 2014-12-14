@@ -1,7 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.VerifyTestProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import org.junit.{Assert, Test}
 
 /**
@@ -35,20 +36,13 @@ class FindFixVerifyDriverTest {
 
 	@Test
 	def testVerify: Unit = {
-		val verifyProcess: VerifyTestProcessStub = new VerifyTestProcessStub(Map.empty[String, AnyRef])
-		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"), verifyProcess = verifyProcess)
+		val verifyProcess = new PassableProcessParam[List[String], String](classOf[VerifyTestProcessStub])
+		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"), verifyProcessParam = verifyProcess)
 
 		val res = driver.verify(orderedPatches(0), orderedPatches)
 		Assert.assertEquals("a", res.patch)
-		Assert.assertTrue(verifyProcess.wasCalled)
-	}
-
-	private class VerifyTestProcessStub(params: Map[String, AnyRef]) extends ProcessStub[List[String], String](params) {
-		var wasCalled: Boolean = false
-
-		override protected def run(data: List[String]): String = {
-			wasCalled = true
-			"a"
-		}
+		Assert.assertEquals(1, verifyProcess.createdProcesses.length)
+		Assert.assertTrue(verifyProcess.createdProcesses(0).asInstanceOf[VerifyTestProcessStub].wasCalled)
 	}
 }
+

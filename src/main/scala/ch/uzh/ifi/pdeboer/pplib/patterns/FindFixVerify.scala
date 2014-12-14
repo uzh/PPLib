@@ -4,6 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.FindFixVerifyExecutor.FFVPatchContainer
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{NoPruner, Prunable, Pruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
@@ -151,7 +152,7 @@ object FFVDefaultHCompDriver {
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
-	val DEFAULT_VERIFY_PROCESS = new ContestWithFixWorkerCountProcess(Map(
+	val DEFAULT_VERIFY_PROCESS = new PassableProcessParam[List[String], String](classOf[ContestWithFixWorkerCountProcess], Map(
 		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
 		ContestWithFixWorkerCountProcess.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
 		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 3
@@ -188,16 +189,13 @@ class FFVDefaultHCompDriver(
 							   val fixQuestion: FFVFixQuestion = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
 							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
-							   val verifyProcess: ProcessStub[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
+							   val verifyProcessParam: PassableProcessParam[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
 							   val verifyProcessContextParameter: Option[ProcessParameter[String]] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER,
 							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER,
 							   val shuffleMultipleChoiceQueries: Boolean = true,
 							   val pruner: Pruner = FFVDefaultHCompDriver.DEFAULT_PRUNER
 							   ) extends FindFixVerifyDriver[String] {
 
-	if (verifyProcess.getParamByKey[HCompPortalAdapter]("portal").isEmpty) {
-		verifyProcess.params += "portal" -> portal
-	}
 
 	//payments taken from http://eprints.soton.ac.uk/372107/1/aaai15-budgetfix.pdf
 
@@ -225,6 +223,15 @@ class FFVDefaultHCompDriver(
 
 
 	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
+		val memoizerPrefix = patch.patch
+		val memPrefixInParams: String = verifyProcessParam.getParam[Option[String]](
+			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+
+		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
+		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some("verify" + memoizerPrefix + memPrefixInParams))
+
+		val verifyProcess = verifyProcessParam.create(lowerPriorityParams, higherPriorityParams)
+
 		if (verifyProcessContextParameter.isDefined)
 			verifyProcess.params += verifyProcessContextParameter.get.key -> verifyProcessContextFlattener(orderedPatches)
 
