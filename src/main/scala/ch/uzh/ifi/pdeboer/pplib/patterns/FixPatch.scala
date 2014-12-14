@@ -44,7 +44,7 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch]) extends
 
 		val memPrefixInParams: String = process.getParam[Option[String]](
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams + "fixprocess"))
+		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess"))
 		val fixProcess = process.create(higherPrioParams = higherPriorityParams)
 		fixProcess.process(patch)
 	}

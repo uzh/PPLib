@@ -227,7 +227,7 @@ class FFVDefaultHCompDriver(
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
 		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some("verify" + memoizerPrefix + memPrefixInParams))
+		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some("verify" + memoizerPrefix.hashCode + memPrefixInParams))
 
 		val verifyProcess = verifyProcessParam.create(lowerPriorityParams, higherPriorityParams)
 
