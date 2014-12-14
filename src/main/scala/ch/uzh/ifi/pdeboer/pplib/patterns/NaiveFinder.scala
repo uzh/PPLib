@@ -15,8 +15,7 @@ import scala.util.Random
 @SerialVersionUID(1L) class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTuple,
 				  title: String, findersPerItem: Int, shuffle: Boolean,
 				  @transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-				  @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer()
-					 ) {
+				  @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer()) {
 
 	@SerialVersionUID(1l) protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
 
@@ -53,9 +52,12 @@ import scala.util.Random
 	}
 
 	def askCrowdWorkers(items: List[PatchContainer]): List[PatchContainer] = {
+		val data: List[String] = items.map(_.patch.toString)
+		val orderedData = if (shuffle) Random.shuffle(data) else data
+
 		val answer = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(question.getInstructions(""),
-				items.map(_.patch.toString), 0, title = title)).get.asInstanceOf[MultipleChoiceAnswer]
+				orderedData, 0, title = title)).get.asInstanceOf[MultipleChoiceAnswer]
 		answer.selectedAnswers.map(a => {
 			items.find(i => i.patch.toString == a).get
 		})

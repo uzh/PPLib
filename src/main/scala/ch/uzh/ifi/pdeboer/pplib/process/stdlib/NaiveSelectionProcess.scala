@@ -4,19 +4,24 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.patterns.NaiveFinder
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
 
 /**
  * Created by pdeboer on 05/12/14.
  */
+@PPLibProcess("decide.prune.naiveselection")
 class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
+
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
+
 	override protected def run(data: List[Patch]): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		val finder = new NaiveFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
-		finder.selectionsPerPatch.map(s => (1 to s._2).map(p => s._1)).flatten.toList
+		finder.result.filter(_._2 > THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
 	}
+
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, TITLE, FINDERS_PER_ITEM, MAX_ITEMS_PER_FIND, SHUFFLE, THRESHOLD_TO_KEEP_ITEM)
 }
 
 object NaiveSelectionProcess {
@@ -25,4 +30,5 @@ object NaiveSelectionProcess {
 	val FINDERS_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
 	val MAX_ITEMS_PER_FIND = new ProcessParameter[Int]("maxItemsPerFind", OtherParam(), Some(List(5)))
 	val SHUFFLE = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
+	val THRESHOLD_TO_KEEP_ITEM = new ProcessParameter[Int]("threshold", OtherParam(), Some(List(1)))
 }
