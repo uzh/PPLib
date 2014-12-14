@@ -23,7 +23,7 @@ class IterativeRefinementTest {
 	}
 
 	class SimpleIRDriver extends IterativeRefinementDriver[String] {
-		override def refine(originalToRefine: String, refinementState: String): String = refinementState + "1"
+		override def refine(originalToRefine: String, refinementState: String, iteration: Int): String = refinementState + "1"
 
 		override def selectBestRefinement(candidates: List[String]): String = candidates.maxBy(_.length)
 	}
