@@ -10,7 +10,6 @@ import scala.util.Random
  */
 @PPLibProcess("decide.vote.fix")
 class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
-
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
 
 	override def run(alternatives: List[String]): String = {
