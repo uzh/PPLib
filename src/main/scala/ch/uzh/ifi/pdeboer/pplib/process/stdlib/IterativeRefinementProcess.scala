@@ -5,6 +5,7 @@ import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 /**
@@ -19,8 +20,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
-			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get,
-				VOTING_PROCESS_PARAMS.get, QUESTION_PRICE.get, d)
+			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, d)
 			val exec = new IterativeRefinementExecutor(d, driver, MAX_ITERATION_COUNT.get, memoizer, d)
 			exec.refinedText
 		}).toList
@@ -33,7 +33,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 object IterativeRefinementProcess {
 	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", QuestionParam(), Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
 	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTuple]("questionForRefinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
-	val VOTING_PROCESS_TYPE = new ProcessParameter[Class[_ <: ProcessStub[List[String], String]]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
+	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[List[String], String]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
 	val VOTING_PROCESS_PARAMS = new ProcessParameter[Map[String, Any]]("votingProcessParams", WorkflowParam(), Some(List(Map.empty)))
 	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(DEFAULT_QUESTION_PRICE)))

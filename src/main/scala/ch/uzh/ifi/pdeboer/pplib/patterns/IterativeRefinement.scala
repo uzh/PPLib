@@ -5,8 +5,9 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
-import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 /**
@@ -54,7 +55,11 @@ trait IterativeRefinementDriver[T] {
 	def selectBestRefinement(candidates: List[T]): String
 }
 
-class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessType: Class[_ <: ProcessStub[List[String], String]] = DEFAULT_VOTING_PROCESS, votingProcessMap: Map[String, Any] = Map.empty, questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
+class IRDefaultHCompDriver(portal: HCompPortalAdapter,
+						   titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT,
+						   questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT,
+						   votingProcessParam: PassableProcessParam[List[String], String] = DEFAULT_VOTING_PROCESS,
+						   questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 
 	override def refine(originalTextToRefine: String, currentRefinementState: String): String = {
 		val q = FreetextQuery(questionForRefinement.getInstructions(originalTextToRefine), currentRefinementState, titleForRefinementQuestion)
@@ -63,10 +68,13 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 	}
 
 	override def selectBestRefinement(candidates: List[String]): String = {
-		val votingProcess = ProcessStub.create[List[String], String](votingProcessType, votingProcessMap ++ Map(
-			ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix + "selectbest")
-		))
+		val memPrefixInParams: String = votingProcessParam.getParam[Option[String]](
+			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
+		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
+		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix + "selectbest" + memPrefixInParams))
+
+		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
 		votingProcess.process(candidates)
 	}
 }
@@ -77,12 +85,13 @@ object IRDefaultHCompDriver {
 	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTuple("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more", questionAfterTuples = "We will only accept your first HIT in this group.")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 1
-	val DEFAULT_VOTING_PROCESS = classOf[ContestWithFixWorkerCountProcess]
 	val DEFAULT_VOTING_PROCESS_PARAMS = Map(
 		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
 		ContestWithFixWorkerCountProcess.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
 		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
 	)
+	val DEFAULT_VOTING_PROCESS = new PassableProcessParam(
+		classOf[ContestWithFixWorkerCountProcess], DEFAULT_VOTING_PROCESS_PARAMS)
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }
