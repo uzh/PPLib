@@ -26,7 +26,7 @@ class IterativeRefinementExecutor(val textToRefine: String,
 	protected val iterationWatcher = new IterationWatcher(textToRefine, stringDifferenceThreshold, toleratedNumberOfIterationsBelowThreshold)
 
 	def step(stepNumber: Int): Unit = {
-		val newState = memoizer.mem(memoizerPrefix + "refinement" + stepNumber)(driver.refine(textToRefine, currentState))
+		val newState = memoizer.mem(memoizerPrefix + "refinement" + stepNumber)(driver.refine(textToRefine, currentState, stepNumber))
 		iterationWatcher.addIteration(newState)
 		if (iterationWatcher.shouldRunAnotherIteration)
 			currentState = memoizer.mem(memoizerPrefix + "bestRefinement" + stepNumber)(driver.selectBestRefinement(List(currentState, newState)))
@@ -50,7 +50,7 @@ object IterativeRefinementExecutor {
 }
 
 trait IterativeRefinementDriver[T] {
-	def refine(originalToRefine: T, refinementState: T): String
+	def refine(originalToRefine: T, refinementState: T, iterationId: Int): String
 
 	def selectBestRefinement(candidates: List[T]): String
 }
@@ -61,8 +61,9 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter,
 						   votingProcessParam: PassableProcessParam[List[String], String] = DEFAULT_VOTING_PROCESS,
 						   questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 
-	override def refine(originalTextToRefine: String, currentRefinementState: String): String = {
-		val q = FreetextQuery(questionForRefinement.getInstructions(originalTextToRefine), currentRefinementState, titleForRefinementQuestion)
+	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
+		val q = FreetextQuery(
+			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState), "", titleForRefinementQuestion + iterationId)
 		val answer = portal.sendQueryAndAwaitResult(q, properties = questionPricing).get.asInstanceOf[FreetextAnswer]
 		answer.answer
 	}
