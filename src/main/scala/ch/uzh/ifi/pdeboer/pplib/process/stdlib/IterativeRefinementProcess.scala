@@ -19,22 +19,23 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
-			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get,
-				QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS.get, QUESTION_PRICE.get)
-			val exec = new IterativeRefinementExecutor(d, driver, ITERATION_COUNT.get, memoizer, d)
+			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get,
+				VOTING_PROCESS_PARAMS.get, QUESTION_PRICE.get, d)
+			val exec = new IterativeRefinementExecutor(d, driver, MAX_ITERATION_COUNT.get, memoizer, d)
 			exec.refinedText
 		}).toList
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS, ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)
+	override def optionalParameters: List[ProcessParameter[_]] = List(TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS_TYPE, MAX_ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD, VOTING_PROCESS_PARAMS)
 
 }
 
 object IterativeRefinementProcess {
 	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", QuestionParam(), Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
 	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTuple]("questionForRefinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
-	val VOTING_PROCESS = new ProcessParameter[ProcessStub[List[String], String]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
-	val ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
+	val VOTING_PROCESS_TYPE = new ProcessParameter[Class[_ <: ProcessStub[List[String], String]]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
+	val VOTING_PROCESS_PARAMS = new ProcessParameter[Map[String, Any]]("votingProcessParams", WorkflowParam(), Some(List(Map.empty)))
+	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(DEFAULT_QUESTION_PRICE)))
 	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", OtherParam(), Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
 	val TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = new ProcessParameter[Int]("toleratedNumberOfIterationsBelowThreshold", OtherParam(), Some(List(DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)))

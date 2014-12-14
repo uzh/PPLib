@@ -69,7 +69,6 @@ class InstanciatedParameterVariantGenerator[T: ClassTag](_base: T, initWithDefau
 }
 
 class TypedParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
-	//very ugly stuff //TODO check
 	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
 	protected val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
 	protected val base: ProcessStub[_, _] = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[ProcessStub[_, _]]

@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import java.lang.reflect.Constructor
+
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
@@ -192,6 +194,11 @@ import scala.reflect.runtime.{universe => ru}
 object ProcessStub {
 	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", OtherParam(), Some(List(true)))
 	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", OtherParam(), Some(List(None)))
+
+	def create[IN, OUT](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty) = {
+		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
+		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[IN, OUT]]
+	}
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
