@@ -71,7 +71,9 @@ class FindFixVerifyExecutor[T](
 	}
 
 	protected def getAlternativesForPatchesToFix(toFix: List[FFVPatch[T]]): List[FFVPatch[T]] = {
-		toFix.mpar.map(p => driver.fix(p)).toList
+		(1 to fixersPerPatch).mpar.map(i => {
+			toFix.mpar.map(p => driver.fix(p))
+		}).flatten.toList
 	}
 
 	protected def findPatches() = {

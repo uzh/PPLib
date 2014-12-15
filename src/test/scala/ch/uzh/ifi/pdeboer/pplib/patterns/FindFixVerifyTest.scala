@@ -21,7 +21,7 @@ class FindFixVerifyTest extends LazyLogger {
 
 		exec.addFixesAsAlternativesToAllPatches(fixes)
 		val bestPatches = exec.getBestPatchesFromAllPatchesVAR()
-		Assert.assertEquals("verify errorous", badPatches.map(_.best).toSet, bestPatches.toSet)
+		Assert.assertEquals("verify erroneous", badPatches.map(_.best).toSet, bestPatches.toSet)
 	}
 
 	@Test

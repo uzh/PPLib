@@ -236,3 +236,7 @@ object ProcessStubWithHCompPortalAccess {
 	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", OtherParam(), Some(List(true)))
 }
 
+
+trait ProcessWithAllData {
+
+}
