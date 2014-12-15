@@ -26,6 +26,7 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 		exec.allFixedPatches.map(_._2)
 	}
 
+
 	override def optionalParameters: List[ProcessParameter[_]] = List(ALL_DATA, TARGET_PARAMETER_TO_PASS_ALL_DATA,
 		TARGET_PARAMETER_TO_PASS_PATCHES_AFTER, TARGET_PARAMETER_TO_PASS_PATCHES_BEFORE, PATCHES_TO_INCLUDE_BEFORE_AND_AFTER_MAIN)
 
