@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, NoProcessMemoizer, ProcessMemoizer}
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
@@ -38,13 +38,22 @@ trait FixPatchDriver {
 	def fix(patch: Patch, patchesBefore: List[Patch] = Nil, patchesAfterwards: List[Patch] = Nil): Patch
 }
 
-class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch]) extends FixPatchDriver with LazyLogger {
+class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
+						val targetParamToPassPatchesBefore: Option[ProcessParameter[List[Patch]]] = None,
+						val targetParamToPassPatchesAfter: Option[ProcessParameter[List[Patch]]] = None) extends FixPatchDriver with LazyLogger {
 	override def fix(patch: Patch, patchesBefore: List[Patch], patchesAfterwards: List[Patch]): Patch = {
 		logger.info(s"Fixing patch $patch with before: ${patchesBefore.mkString(",")} and after ${patchesAfterwards.mkString(",")}")
 
 		val memPrefixInParams: String = process.getParam[Option[String]](
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess"))
+
+		val targetForPatchesBefore = if (targetParamToPassPatchesBefore.isDefined) Map(targetParamToPassPatchesBefore.get.key -> patchesBefore) else Map()
+		val targetForPatchesAfter = if (targetParamToPassPatchesAfter.isDefined) Map(targetParamToPassPatchesAfter.get.key -> patchesAfterwards) else Map()
+
+		val higherPriorityParams = Map(
+			ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess")
+		) ++ targetForPatchesBefore ++ targetForPatchesAfter
+
 		val fixProcess = process.create(higherPrioParams = higherPriorityParams)
 		fixProcess.process(patch)
 	}
