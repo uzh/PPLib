@@ -19,7 +19,7 @@ class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStu
 		val memoizerName: String = memoizerPrefix + memPrefixInParams
 		val memoizer = if (memoizerName == "") None else Some(memoizerName)
 
-		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
+		val lowerPriorityParams = params
 		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> memoizer)
 
 		val process = processType.create(lowerPriorityParams, higherPriorityParams)

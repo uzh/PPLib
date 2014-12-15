@@ -11,8 +11,8 @@ class CollectDecideProcess(params: Map[String, Any] = Map.empty) extends Process
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess._
 
 	override protected def run(data: String): String = {
-		val collection = COLLECT.get.create().process(data)
-		DECIDE.get.create().process(collection)
+		val collection = COLLECT.get.create(params).process(data)
+		DECIDE.get.create(params).process(collection)
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =

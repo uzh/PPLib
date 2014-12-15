@@ -12,8 +12,6 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 	import FixPatchProcess._
 
 	override protected def run(dataToFix: List[Patch]): List[Patch] = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
-
 		val allData = ALL_DATA.get ::: dataToFix.filter(d => !ALL_DATA.get.contains(d))
 
 		val indicesToFix: List[Int] = allData.zipWithIndex.filter(d => dataToFix.contains(d._1)).map(_._2)

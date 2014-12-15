@@ -210,7 +210,7 @@ trait ProcessFactory {
 
 class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends ProcessFactory {
 	override def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any]): ProcessStub[IN, OUT] = {
-		println(baseClass.getDeclaredConstructors.mkString(","))
+		//println(baseClass.getDeclaredConstructors.mkString(","))
 		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
 		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[IN, OUT]]
 	}
@@ -234,9 +234,4 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 object ProcessStubWithHCompPortalAccess {
 	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", PortalParam(), Some(HComp.allDefinedPortals))
 	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", OtherParam(), Some(List(true)))
-}
-
-
-trait ProcessWithAllData {
-
 }
