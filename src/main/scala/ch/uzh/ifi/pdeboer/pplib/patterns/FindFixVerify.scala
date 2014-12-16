@@ -4,7 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.FindFixVerifyExecutor.FFVPatchContainer
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{NoPruner, Prunable, Pruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
@@ -22,8 +22,7 @@ class FindFixVerifyExecutor[T](
 								  val minFindersCountThatNeedToAgreeForFix: Int = 2,
 								  val fixersPerPatch: Int = 3,
 								  val parallelWorkers: Boolean = true,
-								  _memoizer: ProcessMemoizer = new NoProcessMemoizer(),
-								  val pruner: Pruner = new NoPruner()) extends Serializable {
+								  _memoizer: ProcessMemoizer = new NoProcessMemoizer()) extends Serializable {
 	@transient var driver = _driver
 	@transient var memoizer = _memoizer
 
@@ -37,9 +36,8 @@ class FindFixVerifyExecutor[T](
 	def runUntilConverged(): Unit = {
 		val toFix = memoizer.mem("toFix")(findPatches())
 		val fixes: List[FFVPatch[T]] = memoizer.mem("fixes")(getAlternativesForPatchesToFix(toFix))
-		val prunedFixes = memoizer.mem("prunedFixes")(pruneFixes(fixes))
 		val fixesAdded = memoizer.mem("fixesAdded") {
-			addFixesAsAlternativesToAllPatches(prunedFixes)
+			addFixesAsAlternativesToAllPatches(fixes)
 			""
 		}
 
@@ -48,12 +46,6 @@ class FindFixVerifyExecutor[T](
 		ran = true
 	}
 
-	protected def pruneFixes(patches: List[FFVPatch[T]]): List[FFVPatch[T]] = {
-		patches match {
-			case p: List[PrunablePatch[T]] => pruner.prune(p)
-			case w => w
-		}
-	}
 
 	protected def saveBestPatchesToAllPatches(bestPatchesFound: List[FFVPatch[T]]) {
 		bestPatchesFound.foreach(p => allPatches(p.patchIndex).best = Some(p))
@@ -139,6 +131,15 @@ object FFVPatch {
 	def apply[T](patch: T, patchIndex: Int) = new FFVPatch[T](patch, patchIndex)
 }
 
+object FFVPatchToPatch {
+	implicit def ffvToPatch(p: FFVPatch[_]): IndexedPatch = {
+		p.patch match {
+			case s: Serializable => new IndexedPatch(p.patch.toString, p.patchIndex, Some(s))
+			case _ => new IndexedPatch(p.patch.toString, p.patchIndex)
+		}
+	}
+}
+
 class PrunablePatch[T](original: FFVPatch[T], val answer: HCompAnswer) extends FFVPatch[T](original.patch, original.patchIndex) with Prunable {
 	override def prunableDouble: Double = answer.prunableDouble
 }
@@ -152,7 +153,7 @@ object FFVDefaultHCompDriver {
 
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTuple("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
-	val DEFAULT_VERIFY_PROCESS = new PassableProcessParam[List[String], String](classOf[ContestWithFixWorkerCountProcess], Map(
+	val DEFAULT_VERIFY_PROCESS = new PassableProcessParam[List[Patch], Patch](classOf[ContestWithFixWorkerCountProcess], Map(
 		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
 		ContestWithFixWorkerCountProcess.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
 		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 3
@@ -189,7 +190,7 @@ class FFVDefaultHCompDriver(
 							   val fixQuestion: FFVFixQuestion = FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION,
 							   val findTitle: String = FFVDefaultHCompDriver.DEFAULT_FIND_TITLE,
 							   val fixTitle: String = FFVDefaultHCompDriver.DEFAULT_FIX_TITLE,
-							   val verifyProcessParam: PassableProcessParam[List[String], String] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
+							   val verifyProcessParam: PassableProcessParam[List[Patch], Patch] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS,
 							   val verifyProcessContextParameter: Option[ProcessParameter[String]] = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER,
 							   val verifyProcessContextFlattener: (List[FFVPatch[String]] => String) = FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_FLATTENER,
 							   val shuffleMultipleChoiceQueries: Boolean = true,
@@ -234,8 +235,9 @@ class FFVDefaultHCompDriver(
 		if (verifyProcessContextParameter.isDefined)
 			verifyProcess.params += verifyProcessContextParameter.get.key -> verifyProcessContextFlattener(orderedPatches)
 
-		val result = verifyProcess.process(alternatives.map(_.patch))
+		val result: Patch = verifyProcess.process(alternatives.map(p => FFVPatchToPatch.ffvToPatch(p)))
 
-		FFVPatch[String](result, patch.patchIndex)
+		FFVPatch[String](result.value, patch.patchIndex)
 	}
+
 }

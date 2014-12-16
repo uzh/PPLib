@@ -3,21 +3,23 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
 
 /**
  * Created by pdeboer on 01/12/14.
  */
 @PPLibProcess("create.refine.collectionwithsixsigma")
-class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[String, List[String]](params) {
-	override protected def run(line: String): List[String] = {
+class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, List[Patch]](params) {
+	override protected def run(line: Patch): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		val answerTextsWithinSigmas = memoizer.mem("answer_line_" + line) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION.get
 				portal.sendQueryAndAwaitResult(FreetextQuery(
-					questionPerLine.getInstructions(line), line, TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
+					questionPerLine.getInstructions(line + ""), line, TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
 			}).toList
 
 			val answersWithinSigmas: List[HCompAnswer] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
@@ -25,7 +27,7 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 
 			answersWithinSigmas.map(_.is[FreetextAnswer].answer).toList
 		}
-		answerTextsWithinSigmas
+		answerTextsWithinSigmas.map(a => line.duplicate(a))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters

@@ -3,29 +3,51 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 /**
  * Created by pdeboer on 05/12/14.
  */
-class Patch(val payload: Serializable) extends Serializable {
-	override def toString = payload.toString
+class Patch(val value: String, val payload: Option[_ <: Serializable] = None) extends Serializable {
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch]
 
 	override def equals(other: Any): Boolean = other match {
 		case that: Patch =>
-			payload == that.payload
+			(that canEqual this) &&
+				value == that.value
 		case _ => false
 	}
 
 	override def hashCode(): Int = {
-		val state = Seq(payload)
+		val state = Seq(value)
 		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 	}
+
+	override def toString = value
+
+	def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload) = new Patch(value, payload)
 }
 
-class PatchWithIndex(_payload: Serializable, val index: Int) extends Patch(_payload)
+class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializable] = None) extends Patch(value, payload) {
+	def this(t: (String, Int)) = this(t._1, t._2)
 
-case class StringWrapper(str: String) extends Serializable {
-	override def toString: String = str
+	override def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload): Patch = new IndexedPatch(value, index, payload)
+
+
+	override def canEqual(other: Any): Boolean = other.isInstanceOf[IndexedPatch]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: IndexedPatch =>
+			super.equals(that) &&
+				(that canEqual this) &&
+				index == that.index
+		case _ => false
+	}
+
+	override def hashCode(): Int = {
+		val state = Seq(super.hashCode(), index)
+		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+	}
+
+	override def toString = value
 }
 
-class StringPatch(_payload: String) extends Patch(StringWrapper(_payload))
-
-class StringPatchWithIndex(_payload: String, _index: Int) extends PatchWithIndex(StringWrapper(_payload), _index) {
-	def this(p: (String, Int)) = this(p._1, p._2)
+object PatchConversion {
+	implicit def patchToString(p: Patch): String = p.toString
 }

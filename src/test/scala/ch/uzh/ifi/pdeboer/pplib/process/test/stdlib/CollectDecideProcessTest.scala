@@ -1,8 +1,10 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import java.io.File
+
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess
-import org.junit.{Assert, Test}
+import org.junit.{Before, Assert, Test}
 
 /**
  * Created by pdeboer on 05/12/14.
@@ -11,10 +13,16 @@ class CollectDecideProcessTest {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess._
 
+	@Before
+	def rmState(): Unit = {
+		new File("state/").delete()
+	}
+
+
 	@Test
 	def testEachProcessIsCalled: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
-		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process("test")
+		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
 		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
 		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
 	}
@@ -22,13 +30,12 @@ class CollectDecideProcessTest {
 	@Test
 	def testDefaultParam: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
-		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process("test")
+		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
 		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
 		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
 	}
 
-	def collectProcess = new PassableProcessParam[String, List[String]](classOf[SignalingProcess[String, List[String]]], Map(SignalingProcess.OUTPUT.key -> List("a", "b")), Some(new SignalingProcessFactory()))
+	def collectProcess = new PassableProcessParam[Patch, List[Patch]](classOf[SignalingProcess[Patch, List[Patch]]], Map(SignalingProcess.OUTPUT.key -> List("a", "b").map(l => new Patch(l))), Some(new SignalingProcessFactory()))
 
-	def decideProcess = new PassableProcessParam[List[String], String](classOf[SignalingProcess[List[String], String]], Map(SignalingProcess.OUTPUT.key -> "a"), Some(new SignalingProcessFactory()))
-
+	def decideProcess = new PassableProcessParam[List[Patch], Patch](classOf[SignalingProcess[List[Patch], Patch]], Map(SignalingProcess.OUTPUT.key -> new Patch("a")), Some(new SignalingProcessFactory()))
 }

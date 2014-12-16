@@ -4,7 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HCompInstructionsWi
 import ch.uzh.ifi.pdeboer.pplib.patterns.GeneticAlgorithmHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{GAIterationLimitTerminator, GeneticAlgorithmExecutor, GeneticAlgorithmHCompDriver}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.StringPatch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 
@@ -12,22 +12,22 @@ import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
  * Created by pdeboer on 10/12/14.
  */
 @PPLibProcess("create.refine.geneticalgorithm")
-class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
+class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.GeneticAlgorithmProcess._
 
-	override protected def run(data: List[String]): List[String] = {
+	override protected def run(data: List[Patch]): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
-			val driver = new GeneticAlgorithmHCompDriver(portal, new StringPatch(d), costPerQuestion = QUESTION_PRICE.get)
+			val driver = new GeneticAlgorithmHCompDriver(portal, d, costPerQuestion = QUESTION_PRICE.get)
 			val terminator: GAIterationLimitTerminator = new GAIterationLimitTerminator(10)
-			val exec = memoizer.memWithReinitialization(d + "ga_exec")(new GeneticAlgorithmExecutor(driver, terminator, memoizer = memoizer, memoizerPrefix = d)) { exec =>
+			val exec = memoizer.memWithReinitialization(d + "ga_exec")(new GeneticAlgorithmExecutor(driver, terminator, memoizer = memoizer, memoizerPrefix = d.value)) { exec =>
 				exec.driver = driver
 				exec.terminationCriterion = terminator
 				exec
 			}
-			exec.refinedData(0).toString
+			d.duplicate(exec.refinedData(0).toString)
 		}).toList
 	}
 

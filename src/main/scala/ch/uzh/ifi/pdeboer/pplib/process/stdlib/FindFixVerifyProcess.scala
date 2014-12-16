@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.patterns._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Pruner
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess._
 
 import scala.concurrent.duration._
@@ -54,7 +54,7 @@ object FindFixVerifyProcess {
 	val FIND_TITLE = new ProcessParameter[String]("findTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIND_TITLE)))
 	val FIX_TITLE = new ProcessParameter[String]("fixTitle", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_TITLE)))
 	val FIX_QUESTION = new ProcessParameter[FFVFixQuestion]("fixQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
-	val VERIFY_PROCESS = new ProcessParameter[PassableProcessParam[List[String], String]]("verifyProcess", WorkflowParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS)))
+	val VERIFY_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("verifyProcess", WorkflowParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS)))
 
 	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Integer]("patchesInFind", OtherParam(), Some(List(7)))
 	val FINDERS_COUNT = new ProcessParameter[Integer]("findersCount", WorkerCountParam(), Some(List(3)))

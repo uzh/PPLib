@@ -5,7 +5,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
@@ -58,7 +58,7 @@ trait IterativeRefinementDriver[T] {
 class IRDefaultHCompDriver(portal: HCompPortalAdapter,
 						   titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT,
 						   questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT,
-						   votingProcessParam: PassableProcessParam[List[String], String] = DEFAULT_VOTING_PROCESS,
+						   votingProcessParam: PassableProcessParam[List[Patch], Patch] = DEFAULT_VOTING_PROCESS,
 						   questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 
 	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
@@ -76,7 +76,7 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter,
 		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
-		votingProcess.process(candidates)
+		votingProcess.process(candidates.map(c => new Patch(c))).value
 	}
 }
 

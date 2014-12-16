@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, StringPatch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import org.junit.{Assert, Test}
 
 /**
@@ -22,17 +22,17 @@ class GeneticAlgorithmExecutorTest {
 
 		override def initialPopulation: GAPopulation = new GAPopulation(
 			List("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
-				.map(c => new GAChromosome(new StringPatch(c), 0))
+				.map(c => new GAChromosome(new Patch(c), 0))
 		)
 
 		override def combine(patch1: Patch, patch2: Patch): Patch = {
 			counter += 1
-			new StringPatch("" + patch1 + patch2)
+			new Patch("" + patch1 + patch2)
 		}
 
 		override def mutate(patch: Patch): Patch = {
 			counter += 1
-			new StringPatch(patch + "1")
+			new Patch(patch + "1")
 		}
 
 		override def fitness(patch: Patch): Double = -patch.toString.length

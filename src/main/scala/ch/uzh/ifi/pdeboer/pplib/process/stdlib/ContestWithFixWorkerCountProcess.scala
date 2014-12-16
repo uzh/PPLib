@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
 import scala.util.Random
 
@@ -9,23 +10,24 @@ import scala.util.Random
  * Created by pdeboer on 31/10/14.
  */
 @PPLibProcess("decide.vote.fix")
-class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
 
-	override def run(alternatives: List[String]): String = {
+	override def run(alternatives: List[Patch]): Patch = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 			memoizer.mem("it" + w)(
 				portal.sendQueryAndAwaitResult(
-					createMultipleChoiceQuestion(alternatives, INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
+					createMultipleChoiceQuestion(alternatives.map(_.toString), INSTRUCTIONS.get, AUX_STRING.get, TITLE.get),
 					PRICE_PER_VOTE.get
 				) match {
 					case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 					case _ => throw new IllegalStateException("didnt get any response") //TODO change me
 				})).toList
 
-		answers.groupBy(s => s).maxBy(s => s._2.size)._1
+		val valueOfAnswer: String = answers.groupBy(s => s).maxBy(s => s._2.size)._1
+		alternatives.find(_.value == valueOfAnswer).get
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[String], instructions: HCompInstructionsWithTuple, auxString: String, title: String): MultipleChoiceQuery = {

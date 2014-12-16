@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.VerifyTestProcessStub
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
 import org.junit.{Assert, Test}
 
 /**
@@ -36,7 +36,7 @@ class FindFixVerifyDriverTest {
 
 	@Test
 	def testVerify: Unit = {
-		val verifyProcess = new PassableProcessParam[List[String], String](classOf[VerifyTestProcessStub])
+		val verifyProcess = new PassableProcessParam[List[Patch], Patch](classOf[VerifyTestProcessStub])
 		val driver = new FFVDefaultHCompDriver(orderedPatches, portal, new FFVFindQuestion("findtest"), new FFVFixQuestion("fixtest"), verifyProcessParam = verifyProcess)
 
 		val res = driver.verify(orderedPatches(0), orderedPatches)

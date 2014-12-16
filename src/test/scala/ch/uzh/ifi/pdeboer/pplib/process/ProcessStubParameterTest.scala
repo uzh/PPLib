@@ -8,14 +8,14 @@ import org.junit.{Assert, Test}
 class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(chk = List(new ProcessParameter[String]("test", OtherParam())), Map(OtherParam() + "_test" -> "asdf"))
+		new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test", OtherParam())), params = Map(OtherParam() + "_test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test2", OtherParam())), Map(OtherParam() + "_test" -> "asdf"))
+			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test2", OtherParam())), params = Map(OtherParam() + "_test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
@@ -24,9 +24,31 @@ class ProcessStubParameterTest {
 	}
 
 	@Test
+	def testExpectedParamExists: Unit = {
+		val params = new ProcessParameter[String]("test222", OtherParam(), None)
+		val proc = new TestRecombImplparams(paramsOnRun = List(params))
+		try {
+			proc.process("bla")
+			Assert.assertTrue(false) //should throw exception
+		}
+		catch {
+			case e: Exception => Assert.assertTrue(true)
+		}
+	}
+
+	@Test
+	def testExpectedParamExistsAndItDoes: Unit = {
+		val params = new ProcessParameter[String]("test", OtherParam(), None)
+		val proc = new TestRecombImplparams(paramsOnRun = List(params), params = Map(params.key -> "blupp"))
+		proc.process("bla")
+		Assert.assertTrue(true) //should throw exception
+		Assert.assertEquals("blupp", proc.getParam(params))
+	}
+
+	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(chk = List(new ProcessParameter[String]("test", OtherParam())), Map(OtherParam() + "_test" -> List.empty[String]))
+			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test", OtherParam())), params = Map(OtherParam() + "_test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {
@@ -34,8 +56,11 @@ class ProcessStubParameterTest {
 		}
 	}
 
-	private class TestRecombImplparams(chk: List[ProcessParameter[_]], params: Map[String, AnyRef]) extends ProcessStub[String, String](params = params) {
-		override def expectedParametersOnConstruction: List[ProcessParameter[_]] = chk
+	private class TestRecombImplparams(paramsOnConstruct: List[ProcessParameter[_]] = Nil, paramsOnRun: List[ProcessParameter[_]] = Nil, params: Map[String, AnyRef] = Map.empty) extends ProcessStub[String, String](params = params) {
+		override def expectedParametersOnConstruction: List[ProcessParameter[_]] = paramsOnConstruct
+
+
+		override def expectedParametersBeforeRun: List[ProcessParameter[_]] = paramsOnRun
 
 		override def run(data: String): String = "test"
 	}

@@ -18,7 +18,7 @@ class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends Proces
 		val finder = new NaiveFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
-		finder.result.filter(_._2 > THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
+		finder.result.filter(_._2 >= THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, TITLE, FINDERS_PER_ITEM, MAX_ITEMS_PER_FIND, SHUFFLE, THRESHOLD_TO_KEEP_ITEM)

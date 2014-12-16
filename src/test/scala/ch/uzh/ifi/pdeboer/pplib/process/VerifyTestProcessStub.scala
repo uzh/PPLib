@@ -1,13 +1,15 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+
 /**
  * Created by pdeboer on 14/12/14.
  */
-class VerifyTestProcessStub(params: Map[String, Any] = Map.empty) extends ProcessStub[List[String], String](params) {
+class VerifyTestProcessStub(params: Map[String, Any] = Map.empty) extends ProcessStub[List[Patch], Patch](params) {
 	var wasCalled: Boolean = false
 
-	override protected def run(data: List[String]): String = {
+	override protected def run(data: List[Patch]): Patch = {
 		wasCalled = true
-		"a"
+		new Patch("a")
 	}
 }

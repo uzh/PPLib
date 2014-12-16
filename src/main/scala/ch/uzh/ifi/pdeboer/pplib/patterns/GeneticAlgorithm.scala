@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, StringPatch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
@@ -114,12 +114,12 @@ class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 		(1 to populationSize).mpar.map(d => mutate(data)).toList)
 
 	override def combine(patch1: Patch, patch2: Patch): Patch =
-		new StringPatch(portal.sendQueryAndAwaitResult(
+		patch1.duplicate(portal.sendQueryAndAwaitResult(
 			new FreetextQuery(combineQuestion.getInstructions(patch1 + "", patch2 + ""), "", combineTitle), costPerQuestion)
 			.get.is[FreetextAnswer].answer)
 
 
-	override def mutate(patch: Patch): Patch = new StringPatch(portal.sendQueryAndAwaitResult(
+	override def mutate(patch: Patch): Patch = patch.duplicate(portal.sendQueryAndAwaitResult(
 		new FreetextQuery(mutateQuestion.getInstructions(patch + ""), "", mutateTitle), costPerQuestion).get
 		.is[FreetextAnswer].answer)
 

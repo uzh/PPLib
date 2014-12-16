@@ -1,17 +1,17 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{StringWrapper, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import org.junit.{Assert, Test}
 
 /**
  * Created by pdeboer on 14/12/14.
  */
 class FixPatchTest {
-	val (plannedQuestion: Patch, plannedAnswer: Patch) = (new Patch(new StringWrapper("hallo")), new Patch(new StringWrapper("hallo2")))
+	val (plannedQuestion: Patch, plannedAnswer: Patch) = (new Patch("hallo"), new Patch("hallo2"))
 
 	@Test
 	def testFixForPatchAtIndex: Unit = {
-		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(new StringWrapper(p)))
+		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(p))
 		val allPatches: List[Patch] = allPatchesBase.take(2) ::: List(plannedQuestion) ::: allPatchesBase.takeRight(2)
 
 		val driver = new FixPatchTrivialDriver(Map(plannedQuestion -> plannedAnswer))
@@ -25,7 +25,7 @@ class FixPatchTest {
 
 	@Test
 	def testFixForPatchAtIndexWithNotEnoughTrailingAndLeading: Unit = {
-		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(new StringWrapper(p)))
+		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(p))
 		val allPatches: List[Patch] = allPatchesBase.take(2) ::: List(plannedQuestion) ::: allPatchesBase.takeRight(2)
 
 		val driver = new FixPatchTrivialDriver(Map(plannedQuestion -> plannedAnswer))
@@ -39,7 +39,7 @@ class FixPatchTest {
 
 	@Test
 	def testFixForPatchAtIndexWithMoreThanEnough: Unit = {
-		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(new StringWrapper(p)))
+		val allPatchesBase: List[Patch] = List("a", "b", "c", "d").map(p => new Patch(p))
 		val allPatches: List[Patch] = allPatchesBase.take(2) ::: List(plannedQuestion) ::: allPatchesBase.takeRight(2)
 
 		val driver = new FixPatchTrivialDriver(Map(plannedQuestion -> plannedAnswer))
