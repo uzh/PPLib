@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 import scala.util.Random
@@ -10,23 +11,25 @@ import scala.util.Random
  * Created by pdeboer on 03/11/14.
  */
 @PPLibProcess("decide.consensus.statistical")
-class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess._
 
 	protected val MONTECARLO_ITERATIONS: Int = 100000
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
 
-	override protected def run(data: List[String]): String = {
+	override protected def run(data: List[Patch]): Patch = {
+		val stringData = data.map(_.value)
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		var iteration: Int = 0
 		do {
 			iteration += 1
-			val choice: String = memoizer.mem("it" + iteration)(castVote(data))
+			val choice: String = memoizer.mem("it" + iteration)(castVote(stringData))
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
-		} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
+		} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
-		itemWithMostVotes._1
+		val winner = itemWithMostVotes._1
+		data.find(d => (d.value == winner)).get
 	}
 
 	def itemWithMostVotes: (String, Int) = {

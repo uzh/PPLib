@@ -1,9 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.recombination._
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionProcess, DualPathwayProcess, FindFixVerifyProcess}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionProcess, FindFixVerifyProcess}
 
 /**
  * Created by pdeboer on 04/11/14.
@@ -20,17 +19,6 @@ object TranslatorAllInOneOLD extends App {
 
 	//list type explicitly stated to speed up compilation (type inferencer). remove before production release
 	val candidateProcessesParameterGenerators = Map(
-		tp.REWRITE_PART -> List[ParameterVariantGenerator[_]](
-			new TypedParameterVariantGenerator[DPParagraphRewrite](initWithDefaults = true)
-				.addParameterVariations(DualPathwayProcess.QUESTION_NEW_PROCESSED_ELEMENT.key, List(
-				List("Evaluate this element!", "Please evaluate this element").map(h => HCompInstructionsWithTuple(h)).toList)), //usage of functional patterns
-			new TypedParameterVariantGenerator[FFVParagraphRewrite](initWithDefaults = true)
-				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7)) //2 possible values for this param
-				.addParameterVariations(FindFixVerifyProcess.FIXERS_PER_PATCH.key, List(5, 7))
-				.addParameterVariations(FindFixVerifyProcess.VERIFY_PROCESS.key,
-					ProcessDB.get[List[String], String]("select.") //online recombination
-				)
-		),
 		tp.SYNTAX_CHECK -> List[ParameterVariantGenerator[_]](
 			new TypedParameterVariantGenerator[FFVSyntaxChecker](initWithDefaults = true)
 				.addParameterVariations(FindFixVerifyProcess.FINDERS_COUNT.key, List(5, 7))

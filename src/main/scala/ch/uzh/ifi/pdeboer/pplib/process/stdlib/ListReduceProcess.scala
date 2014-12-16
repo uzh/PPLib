@@ -1,16 +1,16 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub, ProcessStubWithHCompPortalAccess, WorkflowParam}
 
 /**
  * Created by pdeboer on 14/12/14.
  */
-class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[String, String] {
+class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, Patch] {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListReduceProcess._
 
-	override protected def run(data: String): String = {
+	override protected def run(data: Patch): Patch = {
 		val processType = CHILD_PROCESS.get
 		val memoizerPrefix = ProcessStub.MEMOIZER_NAME.get.getOrElse("")
 		val memPrefixInParams: String = processType.getParam[Option[String]](
@@ -30,5 +30,5 @@ class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStu
 }
 
 object ListReduceProcess {
-	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[List[String], String]]("childProcess", WorkflowParam(), None)
+	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("childProcess", WorkflowParam(), None)
 }

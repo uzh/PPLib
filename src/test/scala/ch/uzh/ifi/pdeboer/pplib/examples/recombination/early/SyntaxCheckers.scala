@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.recombination
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixVerifyProcess
 import ch.uzh.ifi.pdeboer.pplib.process.{OtherParam, ProcessParameter, ProcessStub}
 
@@ -13,7 +14,7 @@ class FFVSyntaxChecker(params: Map[String, Any] = Map.empty[String, Any]) extend
 	lazy val ffvProcess = new FindFixVerifyProcess(params)
 
 	override protected def run(data: String): String = {
-		val input = data.split(getParam(SPLIT_EXPLODER)).toList
+		val input = data.split(getParam(SPLIT_EXPLODER)).map(s => new Patch(s)).toList
 		ffvProcess.process(input).mkString(getParam(SPLIT_IMPLODER))
 	}
 

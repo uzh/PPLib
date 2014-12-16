@@ -12,10 +12,10 @@ import scala.concurrent.duration._
  * Created by pdeboer on 04/11/14.
  */
 @PPLibProcess("create.refine.findfixverify")
-class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
-	override protected def run(data: List[String]): List[String] = {
+class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
+	override protected def run(data: List[Patch]): List[Patch] = {
 		val driver = new FFVDefaultHCompDriver(
-			data.zipWithIndex.map(d => FFVPatch[String](d._1, d._2)),
+			data.zipWithIndex.map(d => FFVPatch[String](d._1.value, d._2)),
 			portal, FIND_QUESTION.get, FIX_QUESTION.get,
 			FIND_TITLE.get, FIX_TITLE.get, VERIFY_PROCESS.get,
 			VERIFY_PROCESS_CONTEXT_PARAMETER.get, VERIFY_PROCESS_CONTEXT_FLATTENER.get,
@@ -33,7 +33,7 @@ class FindFixVerifyProcess(params: Map[String, Any] = Map.empty[String, Any]) ex
 			exec
 		})
 
-		exec.bestPatches.map(_.patch)
+		exec.bestPatches.map(f => FFVPatchToPatch.ffvToPatch(f))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(

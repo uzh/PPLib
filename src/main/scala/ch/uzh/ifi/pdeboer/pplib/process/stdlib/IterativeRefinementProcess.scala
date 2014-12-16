@@ -12,17 +12,17 @@ import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
  * Created by pdeboer on 30/11/14.
  */
 @PPLibProcess("create.refine.iterativerefinement")
-class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
+class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess._
 
-	override protected def run(data: List[String]): List[String] = {
+	override protected def run(data: List[Patch]): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
 			val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, d.hashCode.toString)
-			val exec = new IterativeRefinementExecutor(d, driver, MAX_ITERATION_COUNT.get, memoizer, d.hashCode.toString)
-			exec.refinedText
+			val exec = new IterativeRefinementExecutor(d.value, driver, MAX_ITERATION_COUNT.get, memoizer, d.hashCode.toString)
+			d.duplicate(exec.refinedText)
 		}).toList
 	}
 

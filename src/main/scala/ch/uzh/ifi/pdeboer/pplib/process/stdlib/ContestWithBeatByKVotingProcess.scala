@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompQueryProperties, MultipleChoiceAnswer, MultipleChoiceQuery}
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
 import scala.collection.mutable
 import scala.util.Random
@@ -10,20 +11,21 @@ import scala.util.Random
  * Created by pdeboer on 28/11/14.
  */
 @PPLibProcess("decide.vote.beatbyk")
-class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], String](params) {
+class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	protected var votes = mutable.HashMap.empty[String, Int]
 
-	override protected def run(data: List[String]): String = {
+	override protected def run(data: List[Patch]): Patch = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		var globalIteration: Int = 0
+		val stringData = data.map(_.value)
 
 		do {
 			getCrowdWorkers(delta).foreach(w => {
 				val answer = memoizer.mem("it" + w + "global" + globalIteration)(
-					portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
+					portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
 						HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
 				synchronized {
 					votes += answer -> votes.getOrElse(answer, 0)
@@ -32,7 +34,8 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			globalIteration += 1
 		} while (shouldStartAnotherIteration)
 
-		bestAndSecondBest._1._1
+		val winner = bestAndSecondBest._1._1
+		data.find(d => d.value == winner).get
 	}
 
 	def shouldStartAnotherIteration: Boolean = {
