@@ -30,7 +30,7 @@ class SimpleWriteProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object SimpleWriteProcess {
-	val QUESTION_PER_CRITERION = new ProcessParameter[HCompInstructionsWithTuple]("criterion", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please answer the following question"))))
+	val QUESTION_PER_CRITERION = new ProcessParameter[HCompInstructionsWithTupleStringified]("criterion", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please answer the following question"))))
 	val INSTRUCTIONS = new ProcessParameter[String]("instructions", QuestionParam(), Some(List("Please answer the following questions truthfully")))
 	val STORIES_PER_CRITERION = new ProcessParameter[Int]("stories_count", OtherParam(), Some(List(3, 5)))
 }

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
 
@@ -42,8 +42,8 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object DualPathwayProcess {
-	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("_old_el", QuestionParam(), Some(List(HCompInstructionsWithTuple("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
-	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTuple]("_new_el", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please refine the following sentence"))))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_old_el", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_new_el", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence"))))
 	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", QuestionParam(), Some(List("Please fix up the following sentences")))
 	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", QuestionParam(), Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
 	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(14 days)))

@@ -17,7 +17,7 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 
 		val answerTextsWithinSigmas = memoizer.mem("answer_line_" + line) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
-				val questionPerLine: HCompInstructionsWithTuple = QUESTION.get
+				val questionPerLine: HCompInstructionsWithTupleStringified = QUESTION.get
 				portal.sendQueryAndAwaitResult(FreetextQuery(
 					questionPerLine.getInstructions(line + ""), "", TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
 			}).toList
@@ -34,7 +34,7 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 }
 
 object CollectionWithSigmaPruning {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected"))))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected"))))
 	val TITLE_PER_QUESTION = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please refine the following sentence")))
 	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", OtherParam(), Some(List(3)))
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))

@@ -1,9 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, Patch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, FileProcessMemoizer}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
-import ch.uzh.ifi.pdeboer.pplib.process.{FileProcessMemoizer, ProcessStub}
 
 /**
  * Created by pdeboer on 14/12/14.

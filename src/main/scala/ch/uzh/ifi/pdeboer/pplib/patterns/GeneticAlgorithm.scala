@@ -90,24 +90,24 @@ class GAIterationLimitTerminator(val limit: Int = 10) extends GeneticAlgorithmTe
 }
 
 object GeneticAlgorithmHCompDriver {
-	val DEFAULT_RATING_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
+	val DEFAULT_RATING_QUESTION: HCompInstructionsWithTupleStringified = new HCompInstructionsWithTupleStringified("Please rate the following paragraph in terms of syntax, its writing style, grammar and possible mistakes", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_RATING_TITLE: String = "Please rate the following paragraph"
 	val DEFAULT_MUTATE_TITLE: String = "Please refine the following paragraph"
-	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTuple = new HCompInstructionsWithTuple("Please refine the following paragraph", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
+	val DEFAULT_MUTATE_QUESTION: HCompInstructionsWithTupleStringified = new HCompInstructionsWithTupleStringified("Please refine the following paragraph", questionAfterTuples = "Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_COMBINE_TITLE: String = "Please combine the following two paragraphs"
-	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTuple("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph. Please do not accept more than 1 HIT in this group.")
+	val DEFAULT_COMBINE_QUESTION = new HCompInstructionsWithTupleStringified("The following two paragraphs should be more or less equal. Please try to combine both of them and taking the best out of both. First paragraph: ", "Second paragraph:", "You can copy&paste the paragraph you like more into the field to begin with and augment it with elements of the other paragraph. Please do not accept more than 1 HIT in this group.")
 	val DEFAULT_COST_PER_QUESTION = HCompQueryProperties()
 }
 
 class GeneticAlgorithmHCompDriver(val portal: HCompPortalAdapter,
 								  val data: Patch,
 								  val populationSize: Int = 10,
-								  val combineQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_COMBINE_QUESTION,
+								  val combineQuestion: HCompInstructionsWithTupleStringified = GeneticAlgorithmHCompDriver.DEFAULT_COMBINE_QUESTION,
 								  val combineTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_COMBINE_TITLE,
-								  val mutateQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_QUESTION,
+								  val mutateQuestion: HCompInstructionsWithTupleStringified = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_QUESTION,
 								  val mutateTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_MUTATE_TITLE,
 								  val ratingTitle: String = GeneticAlgorithmHCompDriver.DEFAULT_RATING_TITLE,
-								  val ratingQuestion: HCompInstructionsWithTuple = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION,
+								  val ratingQuestion: HCompInstructionsWithTupleStringified = GeneticAlgorithmHCompDriver.DEFAULT_RATING_QUESTION,
 								  val costPerQuestion: HCompQueryProperties = GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION
 									 ) extends GeneticAlgorithmDriver {
 	override def initialPopulation: GAPopulation = populationFromPatchList(

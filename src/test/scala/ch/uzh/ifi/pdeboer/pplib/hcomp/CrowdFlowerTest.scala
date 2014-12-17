@@ -49,7 +49,7 @@ class CrowdFlowerTest {
 							 | team for life sciences laboratory Google X at the conference WSJD Live the
 							 | Wall Street Journal.""".stripMargin
 		val res = HComp.crowdFlower.sendQueryAndAwaitResult(
-			FreetextQuery(HCompInstructionsWithTuple("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
+			FreetextQuery(HCompInstructionsWithTupleStringified("Other crowd workers have agreed on this sentence being erroneous. Please fix it")
 				.getInstructions(data))
 		).get.asInstanceOf[FreetextAnswer]
 

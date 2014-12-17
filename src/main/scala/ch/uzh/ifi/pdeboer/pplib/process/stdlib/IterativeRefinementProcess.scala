@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
@@ -32,7 +32,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 
 object IterativeRefinementProcess {
 	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", QuestionParam(), Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
-	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTuple]("questionForRefinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
+	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("questionForRefinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
 	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
 	val VOTING_PROCESS_PARAMS = new ProcessParameter[Map[String, Any]]("votingProcessParams", WorkflowParam(), Some(List(Map.empty)))
 	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))

@@ -12,7 +12,8 @@ class PassableProcessParam[IN: ClassTag, OUT: ClassTag](val clazz: Class[_ <: Pr
 														val factory: Option[ProcessFactory] = None) {
 	protected var _createdProcesses = List.empty[ProcessStub[IN, OUT]]
 
-	def create(lowerPrioParams: Map[String, Any] = Map.empty, higherPrioParams: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = {
+	def create(lowerPrioParams: Map[String, Any] = Map.empty,
+			   higherPrioParams: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = {
 		val res = ProcessStub.create[IN, OUT](clazz, (lowerPrioParams ++ params) ++ higherPrioParams, factory)
 		_createdProcesses = res :: _createdProcesses
 		res

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified
 import ch.uzh.ifi.pdeboer.pplib.patterns.NaiveFinder
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
@@ -25,7 +25,7 @@ class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends Proces
 }
 
 object NaiveSelectionProcess {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTuple("Please select sentences you think are erroneous and should be improved"))))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select sentences you think are erroneous and should be improved"))))
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Find erroneous sentences")))
 	val FINDERS_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
 	val MAX_ITEMS_PER_FIND = new ProcessParameter[Int]("maxItemsPerFind", OtherParam(), Some(List(5)))

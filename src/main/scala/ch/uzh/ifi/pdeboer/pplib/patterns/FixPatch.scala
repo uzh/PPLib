@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
@@ -64,22 +64,31 @@ object FixVerifyFPDriver {
 
 	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions("Please refine the following sentence:", "Your answer will be evaluated by an artificial intelligence and other crowd workers; malicous answers will be rejected.")
 
-	def beforeAfterInstructions(question: String, questionAfter: String = "", targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ".", targetField: ProcessParameter[HCompInstructionsWithTuple] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+	def beforeAfterInstructions(question: String, questionAfter: String = "", targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[HCompInstructionsWithTupleStringified] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <p>The
-			{if (before.length > 1) targetNameSingular else targetNamePlural}
+			{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
 			before this
-			{targetNameSingular}
-			are listed below according to their order of appereance</p>.toString + <i>
+			{targetNameSingular}{if (before.length > 1) " are  " else " is "}
+			listed below
+			{if (before.length > 1) " according to their order of appearance"}
+		</p>.toString + <p>
+			<i>
 			{before.mkString(joiner)}
-		</i>.toString
+			</i>
+		</p>.toString
 		val afterXML = <p>The
-			{if (after.length > 1) targetNameSingular else targetNamePlural}
+			{" " + (if (after.length > 1) targetNamePlural else targetNameSingular) + " "}
 			after this
-			{targetNameSingular}
-			are listed below according to their order of appereance</p>.toString + <i>
+			{targetNameSingular}{if (after.length > 1) " are " else " is "}
+			listed below
+			{if (after.length > 1) " according to their order of appearance"}
+		</p>.toString + <p>
+			<i>
 			{after.mkString(joiner)}
-		</i>.toString
-		val q = HCompInstructionsWithTuple(question,
+			</i>
+		</p>.toString
+
+		val q = HCompInstructionsWithTupleStringified(question,
 			questionBetweenTuples = "" + (if (before.length > 0) beforeXML) + (if (after.length > 0) afterXML),
 			questionAfterTuples = questionAfter)
 		p.params += targetField.key -> q

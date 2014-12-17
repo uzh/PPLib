@@ -6,7 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process._
 /**
  * Created by pdeboer on 05/12/14.
  */
-class CollectDecideProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, Patch](params) {
+class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, Patch](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess._
 

@@ -8,7 +8,7 @@ import org.junit.{Assert, Test}
  */
 class DualPathWayDefaultHCompDriverComparisonTest {
 	val portal = new MockHCompPortal()
-	val emptyQ: HCompInstructionsWithTuple = HCompInstructionsWithTuple("")
+	val emptyQ: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("")
 	val data: List[String] = List("a", "b", "c", "d")
 
 	@Test
@@ -69,7 +69,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 		createFilterRule("d", "e")
 	)
 	val data: List[String] = List("a", "b", "c", "d")
-	val emptyQ: HCompInstructionsWithTuple = HCompInstructionsWithTuple("")
+	val emptyQ: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("")
 
 	@Test
 	def testProcessingUnitAllCorrectInclNewItem(): Unit = {

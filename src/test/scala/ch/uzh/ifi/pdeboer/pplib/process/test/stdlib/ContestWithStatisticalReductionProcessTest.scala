@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, MockHCompPortal}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$, MockHCompPortal}
 import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
@@ -22,7 +22,7 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
+				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
@@ -47,7 +47,7 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTuple(""),
+				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.95,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false

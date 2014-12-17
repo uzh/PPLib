@@ -172,28 +172,40 @@ trait HCompAnswer extends Serializable with Prunable {
 	override def prunableDouble = processingTimeMillis.toDouble
 }
 
-@SerialVersionUID(1l)
-case class HCompInstructionsWithTuple(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
+class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questionBetweenTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _questionAfterTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
 	def getInstructions(data1: String, data2: String = "") =
 		NodeSeq.fromSeq(<placeholder>
 			<p>
-				{questionBeforeTuples}
+				{_questionBeforeTuples}
 			</p>
 			<p>
 				<i>
 					{data1}
 				</i>
-			</p>{if (questionBetweenTuples != "") <p>
-				{questionBetweenTuples}
-			</p>}{if (data2 != "" && enableSecondDataFieldIfAvailable) <p>
+			</p>{if (_questionBetweenTuples.length > 0) <p>
+				{_questionBetweenTuples}
+			</p>}{if (data2 != "" && _enableSecondDataFieldIfAvailable) <p>
 				<i>
 					{data2}
 				</i>
-			</p>}{if (questionAfterTuples != "") <p>
-				{questionAfterTuples}
+			</p>}{if (_questionAfterTuples.length > 0) <p>
+				{_questionAfterTuples}
 			</p>}
 		</placeholder>
 			.child).toString
+}
+
+import HCompInstructionsWithTupleStringified._
+@SerialVersionUID(1l)
+case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends HCompInstructionsWithTuple(
+	format(questionBeforeTuples), format(questionBetweenTuples), format(questionAfterTuples), enableSecondDataFieldIfAvailable) with Serializable {
+}
+
+object HCompInstructionsWithTupleStringified {
+	protected[hcomp] def format(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
+	else <p>
+		{str}
+	</p>.child
 }
 
 @SerialVersionUID(1l)
