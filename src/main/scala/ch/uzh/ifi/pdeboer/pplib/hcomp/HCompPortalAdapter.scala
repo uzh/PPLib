@@ -203,7 +203,7 @@ case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, q
 }
 
 object HCompInstructionsWithTupleStringified {
-	protected[hcomp] def format(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
+	protected[HCompInstructionsWithTupleStringified] def format(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
 	else <p>
 		{str}
 	</p>.child
