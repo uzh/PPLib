@@ -4,8 +4,10 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.SigmaPruner
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
+
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 01/12/14.
@@ -18,7 +20,7 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 		val answerTextsWithinSigmas = memoizer.mem("answer_line_" + line) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION.get
-				val instructions: String = questionPerLine.getInstructions(line + "")
+				val instructions: String = questionPerLine.getInstructions(line + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
 				portal.sendQueryAndAwaitResult(FreetextQuery(
 					instructions, "", TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
 			}).toList
@@ -31,11 +33,12 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 		answerTextsWithinSigmas.map(a => line.duplicate(a))
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters
 }
 
 object CollectionWithSigmaPruning {
 	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected"))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
 	val TITLE_PER_QUESTION = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please refine the following sentence")))
 	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", OtherParam(), Some(List(3)))
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(3)))

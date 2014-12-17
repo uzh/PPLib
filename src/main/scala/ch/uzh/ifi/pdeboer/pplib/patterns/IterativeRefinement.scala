@@ -87,7 +87,7 @@ object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 1
 	val DEFAULT_VOTING_PROCESS_PARAMS = Map(
-		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> DEFAULT_QUESTION_FOR_VOTING,
+		ContestWithFixWorkerCountProcess.QUESTION.key -> DEFAULT_QUESTION_FOR_VOTING,
 		ContestWithFixWorkerCountProcess.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
 		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")

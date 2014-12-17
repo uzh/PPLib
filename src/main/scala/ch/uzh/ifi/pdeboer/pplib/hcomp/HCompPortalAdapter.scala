@@ -174,7 +174,7 @@ trait HCompAnswer extends Serializable with Prunable {
 
 @SerialVersionUID(1l)
 class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questionBetweenTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _questionAfterTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
-	def getInstructions(data1: String, data2: String = "") =
+	def getInstructions(data1: String, data2: String = "", htmlData: NodeSeq = Nil) =
 		NodeSeq.fromSeq(<placeholder>
 			<p>
 				{_questionBeforeTuples}
@@ -189,7 +189,7 @@ class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questi
 				</i>
 			</p>}{if (_questionAfterTuples.length > 0) <p>
 				{_questionAfterTuples}
-			</p>}
+			</p>}{htmlData}
 		</placeholder>
 			.child).toString
 
@@ -200,10 +200,10 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
 
 @SerialVersionUID(1l)
 case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends HCompInstructionsWithTuple(
-	prep(questionBeforeTuples), prep(questionBetweenTuples), if (questionAfterTuples == "") Nil
+	prep(questionBeforeTuples), if (questionBetweenTuples == "") Nil
 	else <p>
-		{questionAfterTuples}
-	</p>, enableSecondDataFieldIfAvailable) with Serializable {
+		{questionBetweenTuples}
+	</p>, prep(questionAfterTuples), enableSecondDataFieldIfAvailable) with Serializable {
 }
 
 object HCompInstructionsWithTupleStringified {

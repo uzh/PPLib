@@ -154,7 +154,7 @@ object FFVDefaultHCompDriver {
 	val DEFAULT_VERIFY_TITLE = "Choose the best sentence"
 	val DEFAULT_VERIFY_QUESTION = HCompInstructionsWithTupleStringified("Other crowd workers have come up with the following alternatives for the sentence below. Please select the one you think works best")
 	val DEFAULT_VERIFY_PROCESS = new PassableProcessParam[List[Patch], Patch](classOf[ContestWithFixWorkerCountProcess], Map(
-		ContestWithFixWorkerCountProcess.INSTRUCTIONS.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
+		ContestWithFixWorkerCountProcess.QUESTION.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_QUESTION,
 		ContestWithFixWorkerCountProcess.TITLE.key -> FFVDefaultHCompDriver.DEFAULT_VERIFY_TITLE,
 		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 3
 	))

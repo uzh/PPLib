@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
@@ -64,11 +63,9 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
 object FixVerifyFPDriver {
 	type FVFPDBeforeAfterHandler = Option[(ProcessStub[Patch, Patch], List[Patch], List[Patch]) => Unit]
 
-	import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
+	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions()
 
-	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions(prep("Please refine the following sentence. Keep in mind that it should fit in with the sentences before this one and after this one."), prep("Your answer will be evaluated by an artificial intelligence and other crowd workers; malicous answers will be rejected."))
-
-	def beforeAfterInstructions(question: NodeSeq, questionAfter: NodeSeq = NodeSeq.fromSeq(Nil), targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[HCompInstructionsWithTuple] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = CollectionWithSigmaPruning.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <before>
 			<p>The
 				{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
@@ -95,13 +92,11 @@ object FixVerifyFPDriver {
 				</i>
 			</p>
 		</after>.child
-		val xml = <all>
+
+		val xml: NodeSeq = <all>
 			{if (before.length > 0) beforeXML}{if (after.length > 0) afterXML}
 		</all>.child
 
-		val q = new HCompInstructionsWithTuple(question,
-			_questionBetweenTuples = xml,
-			_questionAfterTuples = questionAfter)
-		p.params += targetField.key -> q
+		p.params += targetField.key -> Some(xml)
 	})
 }
