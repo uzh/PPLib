@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{InstanciatedParameterVariantGenerator, TypedParameterVariantGenerator}
 import org.junit.{Assert, Test}
 
@@ -49,6 +50,7 @@ class ProcessStubParameterGenerationTest {
 		Assert.assertTrue(variations.size == 9)
 	}
 
+
 	@Test
 	def testInstanciatedParamVariation(): Unit = {
 		val gen = new InstanciatedParameterVariantGenerator(new TestProcessStub())
@@ -58,6 +60,19 @@ class ProcessStubParameterGenerationTest {
 		val instanciatedVariants = gen.generateVariationsAndInstanciate()
 		Assert.assertEquals(expectedParamVariations.length, instanciatedVariants.length)
 		Assert.assertTrue("class correct", instanciatedVariants.forall(i => i.getClass == classOf[TestProcessStub]))
+	}
+
+
+	@Test
+	def testPassableProcessParamVariation(): Unit = {
+		//TODO code me
+		val gen = new InstanciatedParameterVariantGenerator(new TestProcessStub())
+		val expectedParamVariations = gen.generateParameterVariations()
+		Assert.assertTrue(expectedParamVariations.length > 0)
+
+		val passables = gen.generatePassableProcesses()
+		Assert.assertEquals(expectedParamVariations.length, passables.length)
+		Assert.assertTrue("class correct", passables.forall(i => i.getClass == classOf[PassableProcessParam[_, _]]))
 	}
 
 	@Test
