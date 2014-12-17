@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 import scala.util.Random
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 03/11/14.
@@ -41,15 +42,15 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 	}
 
 	def castVote(choices: List[String]): String = {
-		val instructions = INSTRUCTIONS_PARAMETER.get
-		val auxString = AUX_STRING_PARAMETER.get
+		val instructions = QUESTION.get
+		val auxString = INSTRUCTION_ITALIC.get
 		val title = TITLE_PARAMETER.get
 		val alternatives = if (SHUFFLE_CHOICES.get) Random.shuffle(choices) else choices
 
 
 		portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(
-				instructions.getInstructions(auxString),
+				instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
 				alternatives, 1, 1, title),
 			PRICE_PER_VOTE.get
 
@@ -65,13 +66,14 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(AUX_STRING_PARAMETER, PRICE_PER_VOTE, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, INSTRUCTIONS_PARAMETER, MAX_VOTES) ::: super.optionalParameters
+		List(INSTRUCTION_ITALIC, QUESTION_AUX, PRICE_PER_VOTE, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, QUESTION, MAX_VOTES) ::: super.optionalParameters
 }
 
 object ContestWithStatisticalReductionProcess {
-	val INSTRUCTIONS_PARAMETER = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
+	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val AUX_STRING_PARAMETER = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best")))
 	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(30)))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))

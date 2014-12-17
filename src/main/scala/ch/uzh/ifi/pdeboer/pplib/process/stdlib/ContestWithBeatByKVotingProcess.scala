@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
 import scala.collection.mutable
 import scala.util.Random
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 28/11/14.
@@ -51,16 +52,17 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		new MultipleChoiceQuery(INSTRUCTIONS.get.getInstructions(AUX_STRING.get), choices, 1, 1, TITLE.get)
+		new MultipleChoiceQuery(QUESTION.get.getInstructions(INSTRUCTION_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, TITLE.get)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS, K) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION, K) ::: super.optionalParameters
 }
 
 object ContestWithBeatByKVotingProcess {
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
-	val INSTRUCTIONS = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
-	val AUX_STRING = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
+	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val K = new ProcessParameter[Int]("k", OtherParam(), Some(List(2)))
 	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))

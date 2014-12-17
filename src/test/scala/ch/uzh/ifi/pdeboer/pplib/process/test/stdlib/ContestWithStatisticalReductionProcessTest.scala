@@ -22,7 +22,7 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTupleStringified(""),
+				ContestWithStatisticalReductionProcess.QUESTION.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
@@ -47,7 +47,7 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.INSTRUCTIONS_PARAMETER.key -> HCompInstructionsWithTupleStringified(""),
+				ContestWithStatisticalReductionProcess.QUESTION.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.95,
 				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
