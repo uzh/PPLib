@@ -1,11 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 14/12/14.
@@ -62,35 +64,44 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
 object FixVerifyFPDriver {
 	type FVFPDBeforeAfterHandler = Option[(ProcessStub[Patch, Patch], List[Patch], List[Patch]) => Unit]
 
-	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions("Please refine the following sentence:", "Your answer will be evaluated by an artificial intelligence and other crowd workers; malicous answers will be rejected.")
+	import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
 
-	def beforeAfterInstructions(question: String, questionAfter: String = "", targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[HCompInstructionsWithTupleStringified] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
-		val beforeXML = <p>The
-			{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
-			before this
-			{targetNameSingular}{if (before.length > 1) " are  " else " is "}
-			listed below
-			{if (before.length > 1) " according to their order of appearance"}
-		</p>.toString + <p>
-			<i>
-			{before.mkString(joiner)}
-			</i>
-		</p>.toString
-		val afterXML = <p>The
-			{" " + (if (after.length > 1) targetNamePlural else targetNameSingular) + " "}
-			after this
-			{targetNameSingular}{if (after.length > 1) " are " else " is "}
-			listed below
-			{if (after.length > 1) " according to their order of appearance"}
-		</p>.toString + <p>
-			<i>
-			{after.mkString(joiner)}
-			</i>
-		</p>.toString
+	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions(prep("Please refine the following sentence. Keep in mind that it should fit in with the sentences before this one and after this one."), prep("Your answer will be evaluated by an artificial intelligence and other crowd workers; malicous answers will be rejected."))
 
-		val q = HCompInstructionsWithTupleStringified(question,
-			questionBetweenTuples = "" + (if (before.length > 0) beforeXML) + (if (after.length > 0) afterXML),
-			questionAfterTuples = questionAfter)
+	def beforeAfterInstructions(question: NodeSeq, questionAfter: NodeSeq = NodeSeq.fromSeq(Nil), targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[HCompInstructionsWithTuple] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+		val beforeXML = <before>
+			<p>The
+				{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
+				before this
+				{targetNameSingular}{if (before.length > 1) " are  " else " is "}
+				listed below
+				{if (before.length > 1) " according to their order of appearance"}
+			</p> <p>
+				<i>
+					{before.mkString(joiner)}
+				</i>
+			</p>
+		</before>.child
+		val afterXML = <after>
+			<p>The
+				{" " + (if (after.length > 1) targetNamePlural else targetNameSingular) + " "}
+				after this
+				{targetNameSingular}{if (after.length > 1) " are " else " is "}
+				listed below
+				{if (after.length > 1) " according to their order of appearance"}
+			</p> <p>
+				<i>
+					{after.mkString(joiner)}
+				</i>
+			</p>
+		</after>.child
+		val xml = <all>
+			{if (before.length > 0) beforeXML}{if (after.length > 0) afterXML}
+		</all>.child
+
+		val q = new HCompInstructionsWithTuple(question,
+			_questionBetweenTuples = xml,
+			_questionAfterTuples = questionAfter)
 		p.params += targetField.key -> q
 	})
 }

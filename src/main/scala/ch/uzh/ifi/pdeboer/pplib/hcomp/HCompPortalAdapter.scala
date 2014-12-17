@@ -183,9 +183,7 @@ class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questi
 				<i>
 					{data1}
 				</i>
-			</p>{if (_questionBetweenTuples.length > 0) <p>
-				{_questionBetweenTuples}
-			</p>}{if (data2 != "" && _enableSecondDataFieldIfAvailable) <p>
+			</p>{if (_questionBetweenTuples.length > 0) _questionBetweenTuples}{if (data2 != "" && _enableSecondDataFieldIfAvailable) <p>
 				<i>
 					{data2}
 				</i>
@@ -194,16 +192,22 @@ class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questi
 			</p>}
 		</placeholder>
 			.child).toString
+
+	//TODO write function that flattens "P"'s
 }
 
-import HCompInstructionsWithTupleStringified._
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
+
 @SerialVersionUID(1l)
 case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends HCompInstructionsWithTuple(
-	format(questionBeforeTuples), format(questionBetweenTuples), format(questionAfterTuples), enableSecondDataFieldIfAvailable) with Serializable {
+	prep(questionBeforeTuples), prep(questionBetweenTuples), if (questionAfterTuples == "") Nil
+	else <p>
+		{questionAfterTuples}
+	</p>, enableSecondDataFieldIfAvailable) with Serializable {
 }
 
 object HCompInstructionsWithTupleStringified {
-	protected[HCompInstructionsWithTupleStringified] def format(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
+	def prep(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
 	else <p>
 		{str}
 	</p>.child

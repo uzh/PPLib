@@ -1,16 +1,15 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, FileProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
+import ch.uzh.ifi.pdeboer.pplib.process.{FileProcessMemoizer, ProcessStub}
 
 /**
  * Created by pdeboer on 14/12/14.
  */
 object FindAndFix extends App {
 	val data = List("correct1", "correct2", "error1", "correct3").zipWithIndex.map(p => new IndexedPatch(p))
-	val findProcess = new NaiveSelectionProcess(Map(FINDERS_PER_ITEM.key -> 1))
+	val findProcess = new NaiveSelectionProcess(Map(NaiveSelectionProcess.FINDERS_PER_ITEM.key -> 1))
 	val fixProcess = new FixPatchProcess(Map(
 		FixPatchProcess.ALL_DATA.key -> data,
 		FixPatchProcess.FIXER_PROCESS.key -> new PassableProcessParam[Patch, Patch](classOf[CollectDecideProcess], params = Map(
