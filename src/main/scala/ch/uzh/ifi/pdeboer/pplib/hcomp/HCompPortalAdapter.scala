@@ -172,6 +172,7 @@ trait HCompAnswer extends Serializable with Prunable {
 	override def prunableDouble = processingTimeMillis.toDouble
 }
 
+@SerialVersionUID(1l)
 class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questionBetweenTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _questionAfterTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
 	def getInstructions(data1: String, data2: String = "") =
 		NodeSeq.fromSeq(<placeholder>
