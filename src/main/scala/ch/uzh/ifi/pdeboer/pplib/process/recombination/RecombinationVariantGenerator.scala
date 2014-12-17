@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import java.lang.reflect.Constructor
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub}
 
 import scala.collection.mutable
@@ -19,7 +20,7 @@ class RecombinationVariantGenerator(configs: Map[String, List[ProcessStub[_, _]]
 	}
 }
 
-trait ParameterVariantGenerator[T] {
+abstract class ParameterVariantGenerator[T: ClassTag] {
 	protected def targetConstructor: Constructor[_]
 
 	protected def base: ProcessStub[_, _]
@@ -53,6 +54,11 @@ trait ParameterVariantGenerator[T] {
 			k.asInstanceOf[List[(String, Any)]].toMap
 		})
 	}
+
+	def generatePassableProcesses[IN: ClassTag, OUT: ClassTag](): List[PassableProcessParam[_, _]] =
+		generateParameterVariations().map(params => {
+			new PassableProcessParam[IN, OUT](base.asInstanceOf[ProcessStub[IN, OUT]].getClass, params)
+		})
 
 	def generateVariationsAndInstanciate(): List[T] =
 		generateParameterVariations()
