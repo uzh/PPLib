@@ -16,7 +16,7 @@ import scala.reflect.runtime.{universe => ru}
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any] = Map.empty[String, AnyRef]) extends LazyLogger with Serializable {
+@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with Serializable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
 

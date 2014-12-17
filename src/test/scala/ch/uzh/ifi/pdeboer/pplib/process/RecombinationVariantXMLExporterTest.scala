@@ -87,7 +87,7 @@ class RecombinationVariantXMLExporterTest {
 	}
 
 
-	private class TestProcess[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends ProcessStub[IN, OUT]() {
+	private class TestProcess[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends ProcessStub[IN, OUT](Map.empty) {
 		//not needed. Yes, it's ugly
 		override protected def run(data: IN): OUT = ???
 

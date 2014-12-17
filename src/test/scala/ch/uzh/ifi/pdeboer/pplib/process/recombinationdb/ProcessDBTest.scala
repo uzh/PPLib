@@ -93,7 +93,7 @@ class ProcessDBTest {
 
 	private class C(val c: String = "")
 
-	private class TestProcessStubParent(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[String, A]() {
+	private class TestProcessStubParent(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[String, A](params) {
 		override protected def run(data: String): A = {
 			new A(data)
 		}

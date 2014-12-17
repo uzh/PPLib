@@ -13,16 +13,17 @@ object FindAndFix extends App {
 	val findProcess = new NaiveSelectionProcess(Map(FINDERS_PER_ITEM.key -> 1))
 	val fixProcess = new FixPatchProcess(Map(
 		FixPatchProcess.ALL_DATA.key -> data,
-		FixPatchProcess.FIXER_PROCESS.key -> new PassableProcessParam[Patch, Patch](classOf[CollectDecideProcess], Map(
+		FixPatchProcess.FIXER_PROCESS.key -> new PassableProcessParam[Patch, Patch](classOf[CollectDecideProcess], params = Map(
 			CollectDecideProcess.COLLECT.key -> new PassableProcessParam[Patch, List[Patch]](classOf[CollectionWithSigmaPruning], Map(
-				CollectionWithSigmaPruning.WORKER_COUNT.key -> 1,
+				CollectionWithSigmaPruning.WORKER_COUNT.key -> 2,
 				ProcessStub.MEMOIZER_NAME.key -> Some("collectioncreator")
 			)),
 			CollectDecideProcess.DECIDE.key -> new PassableProcessParam[List[Patch], Patch](classOf[ContestWithFixWorkerCountProcess], Map(
 				ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> 1,
 				ProcessStub.MEMOIZER_NAME.key -> Some("contest")
 			))
-		))
+		)),
+		ProcessStub.MEMOIZER_NAME.key -> Some("collectDecide")
 	))
 
 	val memoizer = new FileProcessMemoizer("findfixtest")
@@ -30,6 +31,6 @@ object FindAndFix extends App {
 	val toFix = memoizer.mem("tofix")(findProcess.process(data))
 	val fixed = fixProcess.process(toFix).asInstanceOf[List[IndexedPatch]]
 
-	val fixedPatchesMapByIndex = fixed.map(p => p.index -> p.payload).toMap
+	val fixedPatchesMapByIndex = fixed.map(p => p.index -> p.value).toMap
 	println(data.zipWithIndex.map(d => fixedPatchesMapByIndex.get(d._2).getOrElse(d._1)).mkString(","))
 }

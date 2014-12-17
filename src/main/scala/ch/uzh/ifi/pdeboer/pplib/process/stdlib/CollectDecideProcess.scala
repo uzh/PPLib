@@ -20,7 +20,7 @@ class CollectDecideProcess(params: Map[String, Any] = Map.empty) extends Process
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 
 		val collection: List[Patch] = memoizer.mem("collectProcess")(COLLECT.get.create(params).process(data))
-		memoizer.mem("decideProcess")(DECIDE.get.create(params).process(collection))
+		memoizer.mem(getClass.getSimpleName + "decideProcess")(DECIDE.get.create(params).process(collection))
 	}
 }
 

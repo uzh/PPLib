@@ -1,6 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTuple
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
@@ -39,22 +41,47 @@ trait FixPatchDriver {
 }
 
 class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
-						val targetParamToPassPatchesBefore: Option[ProcessParameter[List[Patch]]] = None,
-						val targetParamToPassPatchesAfter: Option[ProcessParameter[List[Patch]]] = None) extends FixPatchDriver with LazyLogger {
+						val beforeAfterHandler: FixVerifyFPDriver.FVFPDBeforeAfterHandler = FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER) extends FixPatchDriver with LazyLogger {
+
 	override def fix(patch: Patch, patchesBefore: List[Patch], patchesAfterwards: List[Patch]): Patch = {
 		logger.info(s"Fixing patch $patch with before: ${patchesBefore.mkString(",")} and after ${patchesAfterwards.mkString(",")}")
 
 		val memPrefixInParams: String = process.getParam[Option[String]](
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
-		val targetForPatchesBefore = if (targetParamToPassPatchesBefore.isDefined) Map(targetParamToPassPatchesBefore.get.key -> patchesBefore) else Map()
-		val targetForPatchesAfter = if (targetParamToPassPatchesAfter.isDefined) Map(targetParamToPassPatchesAfter.get.key -> patchesAfterwards) else Map()
-
 		val higherPriorityParams = Map(
 			ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess")
-		) ++ targetForPatchesBefore ++ targetForPatchesAfter
+		)
 
 		val fixProcess = process.create(higherPrioParams = higherPriorityParams)
+		if (beforeAfterHandler.isDefined) beforeAfterHandler.get.apply(fixProcess, patchesBefore, patchesAfterwards)
 		fixProcess.process(patch)
 	}
+}
+
+object FixVerifyFPDriver {
+	type FVFPDBeforeAfterHandler = Option[(ProcessStub[Patch, Patch], List[Patch], List[Patch]) => Unit]
+
+	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions("Please refine the following sentence:", "Your answer will be evaluated by an artificial intelligence and other crowd workers; malicous answers will be rejected.")
+
+	def beforeAfterInstructions(question: String, questionAfter: String = "", targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ".", targetField: ProcessParameter[HCompInstructionsWithTuple] = CollectionWithSigmaPruning.QUESTION) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+		val beforeXML = <p>The
+			{if (before.length > 1) targetNameSingular else targetNamePlural}
+			before this
+			{targetNameSingular}
+			are listed below according to their order of appereance</p>.toString + <i>
+			{before.mkString(joiner)}
+		</i>.toString
+		val afterXML = <p>The
+			{if (after.length > 1) targetNameSingular else targetNamePlural}
+			after this
+			{targetNameSingular}
+			are listed below according to their order of appereance</p>.toString + <i>
+			{after.mkString(joiner)}
+		</i>.toString
+		val q = HCompInstructionsWithTuple(question,
+			questionBetweenTuples = "" + (if (before.length > 0) beforeXML) + (if (after.length > 0) afterXML),
+			questionAfterTuples = questionAfter)
+		p.params += targetField.key -> q
+	})
 }
