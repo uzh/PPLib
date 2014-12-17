@@ -202,21 +202,36 @@ object ProcessStub {
 			new DefaultProcessFactory(baseClass).buildProcess[IN, OUT](params)
 		}
 	}
+
+	def typelessCreate(baseClass: Class[_ <: ProcessStub[_, _]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None): ProcessStub[_, _] = {
+		if (factory.isDefined) {
+			factory.get.typelessBuildProcess(params)
+		} else {
+			new DefaultProcessFactory(baseClass).buildProcess(params)
+		}
+	}
 }
 
 trait ProcessFactory {
-	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT]
+	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
+
+	def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _]
 }
 
 class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends ProcessFactory {
 	override def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any]): ProcessStub[IN, OUT] = {
 		//println(baseClass.getDeclaredConstructors.mkString(","))
+		typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
+	}
+
+	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
 		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
-		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[IN, OUT]]
+		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[_, _]]
 	}
 }
 
 abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
+
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 

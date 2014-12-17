@@ -26,4 +26,8 @@ object SignalingProcess {
 class SignalingProcessFactory extends ProcessFactory {
 	override def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any]): ProcessStub[IN, OUT] =
 		new SignalingProcess[IN, OUT](params)
+
+	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
+		throw new IllegalArgumentException("cant touch this")
+	}
 }

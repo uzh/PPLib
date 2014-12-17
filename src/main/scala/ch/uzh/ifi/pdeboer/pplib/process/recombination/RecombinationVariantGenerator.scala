@@ -62,7 +62,7 @@ abstract class ParameterVariantGenerator[T: ClassTag] {
 
 	def generateVariationsAndInstanciate(): List[T] =
 		generateParameterVariations()
-			.map(params => targetConstructor.newInstance(params))
+			.map(params => ProcessStub.typelessCreate(base.getClass, params))
 			.asInstanceOf[List[T]]
 }
 
@@ -75,9 +75,10 @@ class InstanciatedParameterVariantGenerator[T: ClassTag](_base: T, initWithDefau
 }
 
 class TypedParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
-	val declaredConstructors = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructors
-	protected val targetConstructor: Constructor[_] = implicitly[ClassTag[T]].runtimeClass.getDeclaredConstructor(classOf[Map[String, Any]])
-	protected val base: ProcessStub[_, _] = targetConstructor.newInstance(Map.empty[String, Any]).asInstanceOf[ProcessStub[_, _]]
+	val clazz = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[ProcessStub[_, _]]]
+	val declaredConstructors = clazz.getDeclaredConstructors
+	protected val targetConstructor: Constructor[_] = clazz.getDeclaredConstructor(classOf[Map[String, Any]])
+	protected val base: ProcessStub[_, _] = ProcessStub.typelessCreate(clazz, Map.empty) //TODO change me to typeful creation
 
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
