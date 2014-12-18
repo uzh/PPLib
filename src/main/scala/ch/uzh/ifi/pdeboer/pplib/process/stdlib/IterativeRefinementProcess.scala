@@ -25,7 +25,6 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, QUESTION_AUX.get, data.hashCode.toString)
 		val exec = new IterativeRefinementExecutor(data.value, driver, MAX_ITERATION_COUNT.get, memoizer, data.hashCode.toString)
 		data.duplicate(exec.refinedText)
-
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS_TYPE, MAX_ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD, VOTING_PROCESS_PARAMS)

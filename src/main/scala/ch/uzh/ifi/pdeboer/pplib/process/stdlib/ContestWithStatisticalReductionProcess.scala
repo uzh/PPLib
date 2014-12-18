@@ -25,7 +25,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		var iteration: Int = 0
 		do {
 			iteration += 1
-			val choice: String = memoizer.mem("it" + iteration)(castVote(stringData))
+			val choice: String = memoizer.mem("it" + iteration)(castVote(stringData, iteration))
 			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
 		} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
@@ -41,17 +41,16 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		MonteCarlo.minAgreementRequired(data.size, votesCast.values.sum, confidence, MONTECARLO_ITERATIONS)
 	}
 
-	def castVote(choices: List[String]): String = {
+	def castVote(choices: List[String], iteration: Int): String = {
 		val instructions = QUESTION.get
 		val auxString = INSTRUCTION_ITALIC.get
 		val title = TITLE_PARAMETER.get
 		val alternatives = if (SHUFFLE_CHOICES.get) Random.shuffle(choices) else choices
 
-
 		portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(
 				instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
-				alternatives, 1, 1, title),
+				alternatives, 1, 1, title + iteration),
 			PRICE_PER_VOTE.get
 
 		) match {
@@ -74,8 +73,8 @@ object ContestWithStatisticalReductionProcess {
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
 	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best")))
-	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(30)))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best ")))
+	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
 	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
 }
