@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$, MockHCompPortal}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, MockHCompPortal}
 import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
@@ -68,7 +68,7 @@ class ContestWithStatisticalReductionProcessTest {
 
 		def votesCastPub = votesCast
 
-		override def castVote(alternatives: List[String]): String = {
+		override def castVote(alternatives: List[String], iteration: Int): String = {
 			val nonWinningCandidates = votesToCast.filter(k => k._2 > 0).keys
 				.map(l => (l, Random.nextDouble())).toList.sortBy(_._2)
 			//cast random vote out of master plan
