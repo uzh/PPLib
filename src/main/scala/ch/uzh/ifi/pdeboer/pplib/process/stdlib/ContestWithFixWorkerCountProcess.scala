@@ -21,7 +21,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 		val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 			memoizer.mem("it" + w)(
 				portal.sendQueryAndAwaitResult(
-					createMultipleChoiceQuestion(alternatives.map(_.toString), QUESTION.get, INSTRUCTION_ITALIC.get, TITLE.get),
+					createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList, QUESTION.get, INSTRUCTION_ITALIC.get, TITLE.get),
 					PRICE_PER_VOTE.get
 				) match {
 					case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
@@ -29,6 +29,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 				})).toList
 
 		val valueOfAnswer: String = answers.groupBy(s => s).maxBy(s => s._2.size)._1
+		logger.info("got answer " + valueOfAnswer)
 		alternatives.find(_.value == valueOfAnswer).get
 	}
 
