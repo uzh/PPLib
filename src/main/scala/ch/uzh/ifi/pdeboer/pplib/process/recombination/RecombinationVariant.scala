@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, ProcessStubWithHCompPortalAccess}
 
 import scala.reflect.ClassTag
@@ -8,17 +9,17 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationVariant(val stubs: Map[String, ProcessStub[_, _]]) {
+class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 	var name: Option[String] = None
+	private var procs: List[(String, ProcessStub[_, _])] = Nil
 
-	def apply[IN, OUT](key: String, data: IN) = getProcess(key).process(data)
+	def created = procs
 
-	def getProcess[IN, OUT](key: String) = stubs(key).asInstanceOf[ProcessStub[IN, OUT]]
-
-	def totalCost = stubs.values.map {
-		case v: ProcessStubWithHCompPortalAccess[_, _] => v.portal.cost
-		case _ => 0d
-	}.sum
+	def createProcess[IN, OUT](key: String): ProcessStub[IN, OUT] = {
+		val p = stubs(key).asInstanceOf[PassableProcessParam[IN, OUT]].create()
+		procs = (key, p) :: procs
+		p
+	}
 }
 
 class RecombinationVariantXMLExporter(val variant: RecombinationVariant, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
@@ -29,7 +30,7 @@ class RecombinationVariantXMLExporter(val variant: RecombinationVariant, val pro
 			</Name>
 			case _ => {}
 		}}<ProcessExecutions>
-			{variant.stubs.map {
+			{variant.created.map {
 				case (processKey, process) => {
 					<ProcessExecution>
 						<Name>

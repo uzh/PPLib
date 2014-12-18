@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.RecombinationVariantGenerator
 import org.junit.{Assert, Test}
 
@@ -9,9 +10,9 @@ import org.junit.{Assert, Test}
 class RecombinationVariantGeneratorTest {
 	@Test
 	def testSimpleCombination(): Unit = {
-		val list1 = List(new TestProcessStub(1), new TestProcessStub(2))
-		val list2 = List(new TestProcessStub(3))
-		val list3 = List(new TestProcessStub(4), new TestProcessStub(5))
+		val list1 = List(new TestProcessPassable(1), new TestProcessPassable(2))
+		val list2 = List(new TestProcessPassable(3))
+		val list3 = List(new TestProcessPassable(4), new TestProcessPassable(5))
 
 		val configMap = List(("list1", list1), ("list2", list2), ("list3", list3)).toMap
 
@@ -24,7 +25,7 @@ class RecombinationVariantGeneratorTest {
 		)
 
 		val actualCombinations = gen.variants.map(r => {
-			val stub = r.stubs.asInstanceOf[Map[String, TestProcessStub]]
+			val stub = r.stubs.asInstanceOf[Map[String, TestProcessPassable]]
 			List(stub("list1").id, stub("list2").id, stub("list3").id)
 		}).toList
 
@@ -35,7 +36,9 @@ class RecombinationVariantGeneratorTest {
 		a.forall(b.contains(_)) && b.forall(a.contains(_))
 	}
 
-	private class TestProcessStub(val id: Int) extends ProcessStub[Integer, Integer](Map.empty) {
+	private class TestProcessPassable(val id: Int) extends PassableProcessParam[Integer, Integer](classOf[TestProcessStub])
+
+	private class TestProcessStub(_params: Map[String, Any]) extends ProcessStub[Integer, Integer](Map.empty) {
 		override def run(data: Integer): Integer = data.asInstanceOf[Integer]
 	}
 

@@ -17,7 +17,7 @@ class MTSandboxTest {
 	//@Test
 	def testSendSinglechoice: Unit = {
 		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(MultipleChoiceQuery("what do you like best?", List("Tea", "Coffee", "Dr. Pepper", "Red Bull"), 1))
-		val answer = r match {
+		val answer = r.get match {
 			case a: MultipleChoiceAnswer => a.selectedAnswer
 			case _ => println(r)
 		}
@@ -27,7 +27,7 @@ class MTSandboxTest {
 	//@Test
 	def testSendMultiplechoice: Unit = {
 		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(MultipleChoiceQuery("what do you like best?", List("Tea", "Coffee", "Dr. Pepper", "Red Bull"), 10))
-		val answer = r match {
+		val answer = r.get match {
 			case a: MultipleChoiceAnswer => a.selectedAnswer
 			case _ => println(r)
 		}

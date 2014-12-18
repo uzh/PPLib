@@ -11,11 +11,11 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationVariantGenerator(configs: Map[String, List[ProcessStub[_, _]]]) {
+class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessParam[_, _]]]) {
 	lazy val variants = {
-		val listOfTupleLists: List[List[(String, ProcessStub[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
+		val listOfTupleLists: List[List[(String, PassableProcessParam[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			new RecombinationVariant(k.asInstanceOf[List[(String, ProcessStub[_, _])]].toMap)
+			new RecombinationVariant(k.asInstanceOf[List[(String, PassableProcessParam[_, _])]].toMap)
 		})
 	}
 }
