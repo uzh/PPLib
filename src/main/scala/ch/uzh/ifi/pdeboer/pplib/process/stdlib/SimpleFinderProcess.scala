@@ -30,5 +30,5 @@ object SimpleFinderProcess {
 	val FINDERS_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
 	val MAX_ITEMS_PER_FIND = new ProcessParameter[Int]("maxItemsPerFind", OtherParam(), Some(List(5)))
 	val SHUFFLE = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val THRESHOLD_TO_KEEP_ITEM = new ProcessParameter[Int]("threshold", OtherParam(), Some(List(1)))
+	val THRESHOLD_TO_KEEP_ITEM = new ProcessParameter[Int]("threshold", OtherParam(), Some(List(2)))
 }
