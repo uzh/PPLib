@@ -8,11 +8,11 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 05/12/14.
  */
-class NaiveFinderTest {
+class SimpleFinderTest {
 	@Test
 	def testPartitioning: Unit = {
 		val data = List("a", "b", "c").map(p => new Patch(p))
-		val finder = new NaiveFinderPublic(data, HCompInstructionsWithTupleStringified(""), "title", 2,
+		val finder = new SimpleFinderPublic(data, HCompInstructionsWithTupleStringified(""), "title", 2,
 			shuffle = false, null, maxItemsPerFind = 2)
 
 		Assert.assertEquals(List(data.take(2), data.take(2), data.takeRight(1), data.takeRight(1)), finder.iterations)
@@ -24,7 +24,7 @@ class NaiveFinderTest {
 		val portal: MockHCompPortal = new MockHCompPortal
 		portal.createMultipleChoiceFilterRule("nom", Set("b"))
 
-		val finder = new NaiveFinderPublic(data, HCompInstructionsWithTupleStringified("nom"), "title", 2,
+		val finder = new SimpleFinderPublic(data, HCompInstructionsWithTupleStringified("nom"), "title", 2,
 			shuffle = false, portal, maxItemsPerFind = 3)
 
 		Assert.assertEquals(1, finder.selectionsPerPatch.size)
@@ -32,8 +32,8 @@ class NaiveFinderTest {
 		Assert.assertEquals(Map(new Patch("a") -> 0, new Patch("b") -> 2, new Patch("c") -> 0), finder.result)
 	}
 
-	private class NaiveFinderPublic(data: List[Patch], question: HCompInstructionsWithTupleStringified, title: String, findersPerItem: Int, shuffle: Boolean, portal: HCompPortalAdapter, maxItemsPerFind: Int = 5, memoizer: ProcessMemoizer = new NoProcessMemoizer())
-		extends NaiveFinder(data, question, title, findersPerItem, shuffle, portal, maxItemsPerFind, memoizer) {
+	private class SimpleFinderPublic(data: List[Patch], question: HCompInstructionsWithTupleStringified, title: String, findersPerItem: Int, shuffle: Boolean, portal: HCompPortalAdapter, maxItemsPerFind: Int = 5, memoizer: ProcessMemoizer = new NoProcessMemoizer())
+		extends SimpleFinder(data, question, title, findersPerItem, shuffle, portal, maxItemsPerFind, memoizer) {
 		def iterations: List[List[Patch]] = selectionIterations.map(_.map(_.patch))
 	}
 }

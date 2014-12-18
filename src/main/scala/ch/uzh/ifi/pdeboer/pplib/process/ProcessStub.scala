@@ -230,7 +230,7 @@ class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends Pr
 	}
 }
 
-abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any] = Map.empty[String, AnyRef]) extends ProcessStub[INPUT, OUTPUT](params) {
+abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](_params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._

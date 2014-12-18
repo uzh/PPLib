@@ -12,7 +12,7 @@ import scala.util.Random
 /**
  * Created by pdeboer on 05/12/14.
  */
-@SerialVersionUID(1L) class NaiveFinder(data: List[Patch], question: HCompInstructionsWithTupleStringified,
+@SerialVersionUID(1L) class SimpleFinder(data: List[Patch], question: HCompInstructionsWithTupleStringified,
 				  title: String, findersPerItem: Int, shuffle: Boolean,
 				  @transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
 				  @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer()) {

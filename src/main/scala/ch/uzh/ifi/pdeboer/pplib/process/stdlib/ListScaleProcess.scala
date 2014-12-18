@@ -6,11 +6,11 @@ import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub, ProcessS
 /**
  * Created by pdeboer on 14/12/14.
  */
-class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, Patch] {
+class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](_params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListReduceProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListScaleProcess._
 
-	override protected def run(data: Patch): Patch = {
+	override protected def run(data: List[Patch]): List[Patch] = {
 		val processType = CHILD_PROCESS.get
 		val memoizerPrefix = ProcessStub.MEMOIZER_NAME.get.getOrElse("")
 		val memPrefixInParams: String = processType.getParam[Option[String]](
@@ -22,13 +22,15 @@ class ListReduceProcess(params: Map[String, Any] = Map.empty) extends ProcessStu
 		val lowerPriorityParams = params
 		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> memoizer)
 
-		val process = processType.create(lowerPriorityParams, higherPriorityParams)
-		process.process(List(data))
+		data.map(d => {
+			val process = processType.create(lowerPriorityParams, higherPriorityParams)
+			process.process(d)
+		})
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(CHILD_PROCESS)
 }
 
-object ListReduceProcess {
-	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("childProcess", WorkflowParam(), None)
+object ListScaleProcess {
+	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("childProcess", WorkflowParam(), None)
 }

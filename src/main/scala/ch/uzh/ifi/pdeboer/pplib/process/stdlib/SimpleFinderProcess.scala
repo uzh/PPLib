@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified
-import ch.uzh.ifi.pdeboer.pplib.patterns.NaiveFinder
+import ch.uzh.ifi.pdeboer.pplib.patterns.SimpleFinder
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 
@@ -15,7 +15,7 @@ class SimpleFinderProcess(params: Map[String, Any] = Map.empty) extends ProcessS
 
 	override protected def run(data: List[Patch]): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
-		val finder = new NaiveFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
+		val finder = new SimpleFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
 		finder.result.filter(_._2 >= THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
