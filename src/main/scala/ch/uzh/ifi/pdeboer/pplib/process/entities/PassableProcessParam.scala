@@ -19,6 +19,13 @@ class PassableProcessParam[IN: ClassTag, OUT: ClassTag](val clazz: Class[_ <: Pr
 		res
 	}
 
+	def setParams(p: Map[String, Any], replace: Boolean = false): Unit = {
+		if (replace)
+			params = params ++ p
+		else
+			params = p ++ params
+	}
+
 	def createdProcesses = _createdProcesses
 
 	def getParam[T](key: String) = params.get(key).asInstanceOf[Option[T]]

@@ -5,10 +5,12 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 30/11/14.
@@ -55,15 +57,10 @@ trait IterativeRefinementDriver[T] {
 	def selectBestRefinement(candidates: List[T]): String
 }
 
-class IRDefaultHCompDriver(portal: HCompPortalAdapter,
-						   titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT,
-						   questionForRefinement: HCompInstructionsWithTupleStringified = DEFAULT_QUESTION_FOR_REFINEMENT,
-						   votingProcessParam: PassableProcessParam[List[Patch], Patch] = DEFAULT_VOTING_PROCESS,
-						   questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
-
+class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTupleStringified = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: PassableProcessParam[List[Patch], Patch] = DEFAULT_VOTING_PROCESS, questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
 		val q = FreetextQuery(
-			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState), "", titleForRefinementQuestion + iterationId)
+			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState, questionAux.getOrElse(Nil)), "", titleForRefinementQuestion + iterationId)
 		val answer = portal.sendQueryAndAwaitResult(q, properties = questionPricing).get.asInstanceOf[FreetextAnswer]
 		answer.answer
 	}

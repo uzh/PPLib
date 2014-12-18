@@ -9,7 +9,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.{FileProcessMemoizer, ProcessStub}
  */
 object FindAndFix extends App {
 	val data = List("correct1", "correct2", "error1", "correct3").zipWithIndex.map(p => new IndexedPatch(p))
-	val findProcess = new NaiveSelectionProcess(Map(NaiveSelectionProcess.FINDERS_PER_ITEM.key -> 1))
+	val findProcess = new SimpleFinderProcess(Map(SimpleFinderProcess.FINDERS_PER_ITEM.key -> 1))
 	val fixProcess = new FixPatchProcess(Map(
 		FixPatchProcess.ALL_DATA.key -> data,
 		FixPatchProcess.FIXER_PROCESS.key -> new PassableProcessParam[Patch, Patch](classOf[CollectDecideProcess], params = Map(

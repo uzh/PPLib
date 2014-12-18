@@ -8,10 +8,10 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 /**
  * Created by pdeboer on 05/12/14.
  */
-@PPLibProcess("decide.prune.naiveselection")
-class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
+@PPLibProcess("decide.prune.simplefinder")
+class SimpleFinderProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.NaiveSelectionProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SimpleFinderProcess._
 
 	override protected def run(data: List[Patch]): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
@@ -24,7 +24,7 @@ class NaiveSelectionProcess(params: Map[String, Any] = Map.empty) extends Proces
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, TITLE, FINDERS_PER_ITEM, MAX_ITEMS_PER_FIND, SHUFFLE, THRESHOLD_TO_KEEP_ITEM)
 }
 
-object NaiveSelectionProcess {
+object SimpleFinderProcess {
 	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select sentences you think are erroneous and should be improved"))))
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Find erroneous sentences")))
 	val FINDERS_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
