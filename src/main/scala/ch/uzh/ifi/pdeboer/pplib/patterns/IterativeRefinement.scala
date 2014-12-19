@@ -6,7 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest$
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
@@ -84,12 +84,12 @@ object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 1
 	val DEFAULT_VOTING_PROCESS_PARAMS = Map(
-		ContestWithFixWorkerCountProcess.QUESTION.key -> DEFAULT_QUESTION_FOR_VOTING,
-		ContestWithFixWorkerCountProcess.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
-		ContestWithFixWorkerCountProcess.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
+		Contest.QUESTION.key -> DEFAULT_QUESTION_FOR_VOTING,
+		Contest.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
+		Contest.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
 	)
 	val DEFAULT_VOTING_PROCESS = new PassableProcessParam(
-		classOf[ContestWithFixWorkerCountProcess], DEFAULT_VOTING_PROCESS_PARAMS)
+		classOf[Contest], DEFAULT_VOTING_PROCESS_PARAMS)
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }

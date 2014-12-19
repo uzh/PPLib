@@ -10,10 +10,10 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 31/10/14.
  */
-@PPLibProcess("decide.vote.fix")
-class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
+@PPLibProcess("decide.vote.contest")
+class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithFixWorkerCountProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest._
 
 	override def run(alternatives: List[Patch]): Patch = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
@@ -43,7 +43,7 @@ class ContestWithFixWorkerCountProcess(params: Map[String, Any] = Map.empty[Stri
 			QUESTION_AUX, TITLE, QUESTION, WORKER_COUNT, PRICE_PER_VOTE) ::: super.optionalParameters
 }
 
-object ContestWithFixWorkerCountProcess {
+object Contest {
 	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
 	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
