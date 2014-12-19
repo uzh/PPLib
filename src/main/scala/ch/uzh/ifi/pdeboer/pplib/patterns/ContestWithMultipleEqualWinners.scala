@@ -5,17 +5,18 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
-import scala.collection.parallel.ForkJoinTaskSupport
-import scala.collection.parallel.immutable.ParSet
+import scala.collection.parallel.{ParSet, ForkJoinTaskSupport}
 import scala.util.Random
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 05/12/14.
  */
-@SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: HCompInstructionsWithTupleStringified,
-				  title: String, findersPerItem: Int, shuffle: Boolean,
-				  @transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-				  @transient val memoizer: ProcessMemoizer = new NoProcessMemoizer()) {
+@SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: HCompInstructionsWithTuple,
+															title: String, findersPerItem: Int, shuffle: Boolean,
+															@transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
+															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None
+															   ) {
 
 	@SerialVersionUID(1l) protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
 
@@ -56,7 +57,7 @@ import scala.util.Random
 		val orderedData = if (shuffle) Random.shuffle(data) else data
 
 		val answer = portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(question.getInstructions(""),
+			MultipleChoiceQuery(question.getInstructions("", htmlData = questionAux.getOrElse(Nil)),
 				orderedData, 0, title = title)).get.asInstanceOf[MultipleChoiceAnswer]
 		answer.selectedAnswers.map(a => {
 			items.find(i => i.patch.toString == a).get
