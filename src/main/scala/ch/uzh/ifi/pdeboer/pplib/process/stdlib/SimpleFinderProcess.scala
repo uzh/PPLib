@@ -14,11 +14,14 @@ class SimpleFinderProcess(params: Map[String, Any] = Map.empty) extends ProcessS
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.SimpleFinderProcess._
 
 	override protected def run(data: List[Patch]): List[Patch] = {
+		logger.info("running simple finder on: \n -" + data.mkString("\n -"))
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		val finder = new SimpleFinder(data, QUESTION.get, TITLE.get, FINDERS_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_FIND.get, memoizer)
 
-		finder.result.filter(_._2 >= THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
+		val res = finder.result.filter(_._2 >= THRESHOLD_TO_KEEP_ITEM.get).map(_._1).toList
+		logger.info("simple finder selected: \n -" + res.mkString("\n -"))
+		res
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, TITLE, FINDERS_PER_ITEM, MAX_ITEMS_PER_FIND, SHUFFLE, THRESHOLD_TO_KEEP_ITEM)

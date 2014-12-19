@@ -14,23 +14,24 @@ import scala.xml.NodeSeq
  */
 @PPLibProcess("create.refine.collectionwithsixsigma")
 class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, List[Patch]](params) {
-	override protected def run(line: Patch): List[Patch] = {
+	override protected def run(patch: Patch): List[Patch] = {
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		logger.info("running contest with sigma pruning for patch " + patch)
 
-		val answerTextsWithinSigmas = memoizer.mem("answer_line_" + line) {
+		val answerTextsWithinSigmas: List[String] = memoizer.mem("answer_line_" + patch) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION.get
-				val instructions: String = questionPerLine.getInstructions(line + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
+				val instructions: String = questionPerLine.getInstructions(patch + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
 				portal.sendQueryAndAwaitResult(FreetextQuery(
 					instructions, "", TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
 			}).toList
 
-			val answersWithinSigmas: List[HCompAnswer] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
-			logger.info(s"pruned ${answers.size - answersWithinSigmas.size} answers")
+			val withinSigma: List[HCompAnswer] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
+			logger.info(s"pruned ${answers.size - withinSigma.size} answers for patch " + patch)
 
-			answersWithinSigmas.map(_.is[FreetextAnswer].answer).toList
+			withinSigma.map(a => a.is[FreetextAnswer].answer).toSet.toList
 		}
-		answerTextsWithinSigmas.map(a => line.duplicate(a))
+		answerTextsWithinSigmas.map(a => patch.duplicate(a))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters

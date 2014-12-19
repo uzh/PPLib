@@ -47,7 +47,7 @@ trait HCompPortalAdapter extends LazyLogger {
 			synchronized {
 				_budget = budgetAfterQuery
 			}
-			logger.info(s"sending query $query with properties $properties . Budget after query $budget")
+			logger.debug(s"sending query $query with properties $properties . Budget after query $budget")
 			val timeBefore = new DateTime()
 
 			val answer = query.answerTrivialCases match {
@@ -57,7 +57,7 @@ trait HCompPortalAdapter extends LazyLogger {
 
 			val timeAfter = new DateTime()
 			val durationMillis = timeAfter.getMillis - timeBefore.getMillis
-			logger.info(s"got answer for query $query after $durationMillis ms. Answer = $answer")
+			logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
 
 			answer match {
 				case Some(x: HCompAnswer) => {
