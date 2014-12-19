@@ -57,4 +57,58 @@ class MTQueryParsingTest {
 		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
 			mtc.options.map(o => o -> (o == "b")).toMap)), q.interpret(xml))
 	}
+
+
+	@Test
+	def testInterpretationMultipleChoiceMultipleIDs: Unit = {
+		val mtc = MultipleChoiceQuery("q", List("a", "b", "c"), 1)
+		val q = MTQuery.convert(mtc)
+
+		//Taken from http://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_QuestionFormAnswersDataStructureArticle.html
+		val xml = <QuestionFormAnswers xmlns="[the QuestionFormAnswers schema URL]">
+			<Answer>
+				<QuestionIdentifier>asdf</QuestionIdentifier>
+				<FreeText>C3</FreeText>
+			</Answer>
+			<Answer>
+				<QuestionIdentifier>
+					{q.id}
+				</QuestionIdentifier>
+				<SelectionIdentifier>query2_1</SelectionIdentifier>
+			</Answer>
+			<Answer>
+				<QuestionIdentifier>
+					ddd
+				</QuestionIdentifier>
+				<SelectionIdentifier>query2_1</SelectionIdentifier>
+			</Answer>
+		</QuestionFormAnswers>
+
+		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b")).toMap)), q.interpret(xml))
+	}
+
+
+	@Test
+	def testInterpretationMultipleChoiceWithNewLine: Unit = {
+		val mtc = MultipleChoiceQuery("q", List("a\na", "b\nb", "c\nc"), 1)
+		val q = MTQuery.convert(mtc)
+
+		//Taken from http://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_QuestionFormAnswersDataStructureArticle.html
+		val xml = <QuestionFormAnswers xmlns="[the QuestionFormAnswers schema URL]">
+			<Answer>
+				<QuestionIdentifier>asdf</QuestionIdentifier>
+				<FreeText>C3</FreeText>
+			</Answer>
+			<Answer>
+				<QuestionIdentifier>
+					{q.id}
+				</QuestionIdentifier>
+				<SelectionIdentifier>query2_1</SelectionIdentifier>
+			</Answer>
+		</QuestionFormAnswers>
+
+		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b\nb")).toMap)), q.interpret(xml))
+	}
 }

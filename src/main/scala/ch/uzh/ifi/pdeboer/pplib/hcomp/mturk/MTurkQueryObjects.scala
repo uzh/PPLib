@@ -67,6 +67,8 @@ class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
 }
 
 class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
+	val processedOptions = rawQuery.options.map(_.replaceAll("\\n", ""))
+
 	def answerSpecification: NodeSeq = {
 		<SelectionAnswer>
 			<MinSelectionCount>
@@ -79,7 +81,7 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 				{if (rawQuery.maxSelections == 1 && rawQuery.minNumberOfResults == 1) "radiobutton" else "checkbox"}
 			</StyleSuggestion>
 			<Selections>
-				{rawQuery.options.zipWithIndex.map(o => {
+				{processedOptions.zipWithIndex.map(o => {
 				<Selection>
 					<SelectionIdentifier>
 						{id + "_" + o._2}
