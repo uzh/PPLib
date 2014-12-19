@@ -30,6 +30,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
 		val winner = itemWithMostVotes._1
+		logger.info(s"contest with statistical reduction finished after $iteration rounds. Winner: $winner")
 		data.find(d => (d.value == winner)).get
 	}
 

@@ -241,7 +241,8 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 
 	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)
 
-	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
+	def
+	getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
 		(1 to workerCount).view.mpar
 	}
 

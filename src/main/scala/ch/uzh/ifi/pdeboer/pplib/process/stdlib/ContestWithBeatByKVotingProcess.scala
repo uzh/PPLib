@@ -22,7 +22,6 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
 		var globalIteration: Int = 0
 		val stringData = data.map(_.value)
-
 		do {
 			getCrowdWorkers(delta).foreach(w => {
 				val answer = memoizer.mem("it" + w + "global" + globalIteration)(
@@ -36,6 +35,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		} while (shouldStartAnotherIteration)
 
 		val winner = bestAndSecondBest._1._1
+		logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
 		data.find(d => d.value == winner).get
 	}
 
