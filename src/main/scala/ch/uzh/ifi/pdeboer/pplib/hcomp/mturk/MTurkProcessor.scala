@@ -29,7 +29,12 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 
 	def cancelHIT(): Unit = {
 		cancelled = true
-		service.DisableHIT(hit)
+		try {
+			service.DisableHIT(hit)
+		}
+		catch {
+			case e: Throwable => logger.error(s"got exception when trying to cancel query '${query.question}'", e)
+		}
 		//service.deleteHITs(Array(hit.getHITId), true, true, emptyCallback)
 	}
 

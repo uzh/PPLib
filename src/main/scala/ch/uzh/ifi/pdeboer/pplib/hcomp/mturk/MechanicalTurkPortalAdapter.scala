@@ -27,7 +27,12 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	override def getDefaultPortalKey: String = MechanicalTurkPortalAdapter.PORTAL_KEY
 
 	override def cancelQuery(query: HCompQuery): Unit = {
-		map(query.identifier).cancelHIT()
+		val managerOption: Option[MTurkManager] = map.get(query.identifier)
+		if (managerOption.isDefined) {
+			managerOption.get.cancelHIT()
+		} else {
+			logger.info(s"could not find query '${query.question}' when trying to cancel it")
+		}
 	}
 }
 
