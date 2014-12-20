@@ -19,24 +19,28 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	protected var votes = mutable.HashMap.empty[String, Int]
 
 	override protected def run(data: List[Patch]): Patch = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
-		var globalIteration: Int = 0
-		val stringData = data.map(_.value)
-		do {
-			getCrowdWorkers(delta).foreach(w => {
-				val answer = memoizer.mem("it" + w + "global" + globalIteration)(
-					portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
-						HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
-				synchronized {
-					votes += answer -> votes.getOrElse(answer, 0)
-				}
-			})
-			globalIteration += 1
-		} while (shouldStartAnotherIteration)
+		if (data.size == 1) data(0)
+		else if (data.size == 0) null
+		else {
+			val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+			var globalIteration: Int = 0
+			val stringData = data.map(_.value)
+			do {
+				getCrowdWorkers(delta).foreach(w => {
+					val answer = memoizer.mem("it" + w + "global" + globalIteration)(
+						portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
+							HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
+					synchronized {
+						votes += answer -> votes.getOrElse(answer, 0)
+					}
+				})
+				globalIteration += 1
+			} while (shouldStartAnotherIteration)
 
-		val winner = bestAndSecondBest._1._1
-		logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
-		data.find(d => d.value == winner).get
+			val winner = bestAndSecondBest._1._1
+			logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
+			data.find(d => d.value == winner).get
+		}
 	}
 
 	def shouldStartAnotherIteration: Boolean = {
