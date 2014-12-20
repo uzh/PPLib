@@ -30,6 +30,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 		val managerOption: Option[MTurkManager] = map.get(query.identifier)
 		if (managerOption.isDefined) {
 			managerOption.get.cancelHIT()
+			logger.info(s"cancelled '${query.title}'")
 		} else {
 			logger.info(s"could not find query '${query.question}' when trying to cancel it")
 		}
