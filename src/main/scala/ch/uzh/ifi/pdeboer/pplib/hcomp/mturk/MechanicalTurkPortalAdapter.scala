@@ -2,9 +2,10 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+import org.joda.time.DateTime
 
 import scala.collection.mutable
-
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 /**
  * Created by pdeboer on 19/11/14.
  */
@@ -13,13 +14,13 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
-	var map = mutable.HashMap.empty[Int, MTurkManager]
+	var map = mutable.HashMap.empty[Int, MTurkQueries]
 
 	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val manager: MTurkManager = new MTurkManager(service, query, properties)
-		map += query.identifier -> manager
+		map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
 		manager.createHIT()
 		manager.waitForResponse()
 	}
@@ -27,14 +28,34 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	override def getDefaultPortalKey: String = MechanicalTurkPortalAdapter.PORTAL_KEY
 
 	override def cancelQuery(query: HCompQuery): Unit = {
-		val managerOption: Option[MTurkManager] = map.get(query.identifier)
+		val managerOption = map.get(query.identifier)
 		if (managerOption.isDefined) {
-			managerOption.get.cancelHIT()
+			managerOption.get.list.mpar.foreach(q => try {
+				//naively cancel all previous queries just to make sure
+				q._2.cancelHIT()
+			}
+			catch {
+				case e: Exception => {}
+			})
 			logger.info(s"cancelled '${query.title}'")
 		} else {
 			logger.info(s"could not find query '${query.question}' when trying to cancel it")
 		}
 	}
+
+	protected[MechanicalTurkPortalAdapter] class MTurkQueries() {
+		private var sent: List[(DateTime, MTurkManager)] = Nil
+
+		def list = sent
+
+		def add(manager: MTurkManager) = {
+			this.synchronized {
+				sent = (DateTime.now(), manager) :: sent
+			}
+			this
+		}
+	}
+
 }
 
 object MechanicalTurkPortalAdapter {
