@@ -20,18 +20,22 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 	protected var votesCast = scala.collection.mutable.Map.empty[String, Int]
 
 	override protected def run(data: List[Patch]): Patch = {
-		val stringData = data.map(_.value)
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
-		var iteration: Int = 0
-		do {
-			iteration += 1
-			val choice: String = memoizer.mem("it" + iteration)(castVote(stringData, iteration))
-			votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
-		} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
+		if (data.size == 0) null
+		else if (data.size == 1) data(0)
+		else {
+			val stringData = data.map(_.value)
+			val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+			var iteration: Int = 0
+			do {
+				iteration += 1
+				val choice: String = memoizer.mem("it" + iteration)(castVote(stringData, iteration))
+				votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
+			} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
 
-		val winner = itemWithMostVotes._1
-		logger.info(s"contest with statistical reduction finished after $iteration rounds. Winner: $winner")
-		data.find(d => (d.value == winner)).get
+			val winner = itemWithMostVotes._1
+			logger.info(s"contest with statistical reduction finished after $iteration rounds. Winner: $winner")
+			data.find(d => (d.value == winner)).get
+		}
 	}
 
 	def itemWithMostVotes: (String, Int) = {
