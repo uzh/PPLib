@@ -26,8 +26,8 @@ import scala.reflect.runtime.{universe => ru}
 		params += key -> value
 	}
 
-	lazy val processMemoizer = MEMOIZER_NAME.get match {
-		case Some(x: String) => Some(new FileProcessMemoizer(x))
+	def getProcessMemoizer(identity: String) = MEMOIZER_NAME.get match {
+		case Some(x: String) => Some(new FileProcessMemoizer(x + identity))
 		case _ => None
 	}
 

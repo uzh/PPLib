@@ -12,6 +12,8 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess._
 
 	override protected def run(dataToFix: List[Patch]): List[Patch] = {
+		val memoizer: ProcessMemoizer = getProcessMemoizer(dataToFix.hashCode() + "").getOrElse(new NoProcessMemoizer())
+
 		val allData = ALL_DATA.get ::: dataToFix.filter(d => !ALL_DATA.get.contains(d))
 
 		val indicesToFix: List[Int] = allData.zipWithIndex.filter(d => dataToFix.contains(d._1)).map(_._2)
@@ -22,7 +24,7 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 			fixerProcess.params += targetParamToPassAllData.get.key -> ALL_DATA.get
 		}
 		val driver = new FixVerifyFPDriver(fixerProcess, FIXER_BEFORE_AFTER_HANDLER.get)
-		val exec = new FixPatchExecuter(driver, allData, indicesToFix)
+		val exec = new FixPatchExecuter(driver, allData, indicesToFix, PATCHES_TO_INCLUDE_BEFORE_AND_AFTER_MAIN.get, memoizer)
 		exec.allFixedPatches.map(_._2)
 	}
 

@@ -16,7 +16,7 @@ class Collection(params: Map[String, Any] = Map.empty) extends ProcessStubWithHC
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection._
 
 	override protected def run(line: Patch): List[Patch] = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(line.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 		val answers: List[String] = memoizer.mem("answer_line_" + line) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {

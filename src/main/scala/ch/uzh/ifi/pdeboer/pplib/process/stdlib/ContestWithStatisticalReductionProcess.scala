@@ -24,7 +24,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		else if (data.size == 1) data(0)
 		else {
 			val stringData = data.map(_.value)
-			val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+			val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 			var iteration: Int = 0
 			do {
 				iteration += 1

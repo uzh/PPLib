@@ -17,7 +17,7 @@ class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends Proces
 	override protected def processCategoryNames: List[String] = List("create.refine.collectdecide")
 
 	override protected def run(data: Patch): Patch = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 		logger.info("Running collect-phase for patch")
 		val collection: List[Patch] = memoizer.mem("collectProcess")(COLLECT.get.create(params).process(data))

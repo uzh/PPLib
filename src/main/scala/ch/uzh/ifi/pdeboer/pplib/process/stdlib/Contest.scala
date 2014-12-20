@@ -20,7 +20,7 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends Process
 		if (alternatives.size == 0) null
 		else if (alternatives.size == 1) alternatives(0)
 		else {
-			val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+			val memoizer: ProcessMemoizer = getProcessMemoizer(alternatives.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 				memoizer.mem("it" + w)(

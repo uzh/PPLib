@@ -17,7 +17,7 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.GeneticAlgorithmProcess._
 
 	override protected def run(data: List[Patch]): List[Patch] = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 		data.mpar.map(d => {
 			val driver = new GeneticAlgorithmHCompDriver(portal, d, costPerQuestion = QUESTION_PRICE.get)

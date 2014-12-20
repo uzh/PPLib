@@ -15,7 +15,7 @@ import scala.xml.NodeSeq
 @PPLibProcess("create.refine.collectionwithsixsigma")
 class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, List[Patch]](params) {
 	override protected def run(patch: Patch): List[Patch] = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(patch.hashCode() + "").getOrElse(new NoProcessMemoizer())
 		logger.info("running contest with sigma pruning for patch " + patch)
 
 		val answerTextsWithinSigmas: List[String] = memoizer.mem("answer_line_" + patch) {

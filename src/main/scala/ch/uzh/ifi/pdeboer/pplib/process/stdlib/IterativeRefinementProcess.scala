@@ -18,7 +18,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess._
 
 	override protected def run(data: Patch): Patch = {
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 		VOTING_PROCESS_TYPE.get.setParams(params, replace = false)
 

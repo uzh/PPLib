@@ -17,7 +17,7 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 
 	override protected def run(data: List[Patch]): List[Patch] = {
 		logger.info("running simple finder on: \n -" + data.mkString("\n -"))
-		val memoizer: ProcessMemoizer = processMemoizer.getOrElse(new NoProcessMemoizer())
+		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 		val finder = new ContestWithMultipleEqualWinners(data, QUESTION.get, TITLE.get, WORKERS_TO_ASK_PER_ITEM.get,
 			SHUFFLE.get, portal, MAX_ITEMS_PER_ITERATION.get, memoizer, QUESTION_AUX.get)
 
