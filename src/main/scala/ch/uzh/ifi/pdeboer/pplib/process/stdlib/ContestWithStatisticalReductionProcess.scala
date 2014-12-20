@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
-import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
+import ch.uzh.ifi.pdeboer.pplib.util.{MonteCarlo, U}
 
 import scala.util.Random
 import scala.xml.NodeSeq
@@ -48,15 +48,20 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		val title = TITLE_PARAMETER.get
 		val alternatives = if (SHUFFLE_CHOICES.get) Random.shuffle(choices) else choices
 
-		portal.sendQueryAndAwaitResult(
-			MultipleChoiceQuery(
-				instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
-				alternatives, 1, 1, title + iteration),
-			PRICE_PER_VOTE.get
+		U.retry(3) {
+			portal.sendQueryAndAwaitResult(
+				MultipleChoiceQuery(
+					instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
+					alternatives, 1, 1, title + iteration),
+				PRICE_PER_VOTE.get
 
-		) match {
-			case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
-			case _ => throw new IllegalStateException("didnt get any response") //TODO change me
+			) match {
+				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
+				case _ => {
+					logger.info(getClass.getSimpleName + " didnt get a vote when asked for it.")
+					throw new IllegalStateException("didnt get any response")
+				}
+			}
 		}
 	}
 

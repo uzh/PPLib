@@ -14,7 +14,7 @@ import scala.concurrent.forkjoin.ForkJoinPool
 /**
  * Created by pdeboer on 15/10/14.
  */
-object U {
+object U extends LazyLogger {
 	val hugeForkJoinPool = new ForkJoinPool(10000)
 	val tinyForkJoinPool = new ForkJoinPool(1)
 
@@ -35,8 +35,10 @@ object U {
 		try {
 			fn
 		} catch {
-			case e if n > 1 =>
+			case e if n > 1 => {
+				logger.debug("retry got exception", e)
 				retry(n - 1)(fn)
+			}
 		}
 	}
 
