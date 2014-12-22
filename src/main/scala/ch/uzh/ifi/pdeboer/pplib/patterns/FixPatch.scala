@@ -67,7 +67,11 @@ object FixVerifyFPDriver {
 
 	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = CollectionWithSigmaPruning.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <before>
-			<p>The
+			<p>The following information is just provided such that you get a better feel for the whole. Please
+				<b>do not</b>
+				copy
+				&amp;
+				past it into your answer. The
 				{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
 				before this
 				{targetNameSingular}{if (before.length > 1) " are  " else " is "}

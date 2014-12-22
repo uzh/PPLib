@@ -20,6 +20,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 	override protected def run(data: Patch): Patch = {
 		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
+		logger.info("started refinement process for patch " + data)
 		VOTING_PROCESS_TYPE.get.setParams(params, replace = false)
 
 		val driver = new IRDefaultHCompDriver(portal, TITLE_FOR_REFINEMENT.get, QUESTION_FOR_REFINEMENT.get, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, QUESTION_AUX.get, data.hashCode.toString)
