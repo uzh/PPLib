@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HComp, HCompInstructionsWithTupleStringified$}
 import ch.uzh.ifi.pdeboer.pplib.patterns.DPHCompDriverDefaultComparisonInstructionsConfig
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
 
 /**
@@ -18,7 +19,7 @@ object DualPathwayTranslation extends App {
 		  |China is pushing its space program with great strides. The first space probe 'Chang'e 3 "had landed on 15 December 2013, the Moon and the vehicle had" Jadehase "exposed (Yutu). This was China after the United States and the Soviet Union the third nation in the world that has made a moon landing.
 		  |The moon flights to demonstrate the technological capability of China's second largest economy""".stripMargin
 
-	val paragraphs = textToImprove.split("\n").map(_.trim).toList
+	val paragraphs = textToImprove.split("\n").map(_.trim).zipWithIndex.map(d => new IndexedPatch(d)).toList
 
 	HComp.addPortal(new CrowdFlowerPortalAdapter("Fix-Up English Translation", sandbox = true))
 

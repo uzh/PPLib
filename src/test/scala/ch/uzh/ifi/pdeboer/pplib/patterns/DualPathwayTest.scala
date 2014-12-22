@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import org.junit.{Assert, Test}
 
 /**
@@ -49,7 +50,7 @@ class DualPathwayTest {
 		driver.data zip dpe.result.reverse forall (t => {
 			val number = t._1.replaceAll("[^0-9]", "")
 			Assert.assertEquals(number, t._2.answer)
-			Assert.assertEquals(t._1, t._2.data)
+			Assert.assertEquals(t._1, t._2.data.value)
 			true
 		})
 	}
@@ -76,7 +77,7 @@ class DualPathwayTest {
 			Thread.sleep(10)
 
 			val fixedPrevChunks: List[DPChunk] = previousChunksToCheck.map(c => {
-				DPChunk(c.elementIndex, c.data, c.data.replaceAll("[^0-9]", ""))
+				DPChunk(c.elementIndex, c.data, c.data.value.replaceAll("[^0-9]", ""))
 			}).toList
 
 			if (newChunkElementId.isEmpty) {
@@ -92,7 +93,7 @@ class DualPathwayTest {
 
 				lastStepId = newChunkElementId.get
 
-				DPChunk(newChunkElementId.get, dataPacket, answer) :: fixedPrevChunks
+				DPChunk(newChunkElementId.get, new IndexedPatch(dataPacket, newChunkElementId.get), answer) :: fixedPrevChunks
 			}
 		}
 

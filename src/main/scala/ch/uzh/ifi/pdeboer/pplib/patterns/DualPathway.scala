@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.concurrent.duration._
@@ -139,15 +140,17 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 	}
 }
 
-@SerialVersionUID(1l) case class DPChunk(elementIndex: Int, data: String, var answer: String = "", var aux: String = "") extends Serializable {
+@SerialVersionUID(1l) case class DPChunk(elementIndex: Int, data: IndexedPatch, var answer: String = "", var aux: String = "") extends Serializable {
 	val created: Date = new Date()
 
 	override def toString: String = s"$data=$answer"
+
+	def answerAsPatch = data.duplicate(answer).asInstanceOf[IndexedPatch]
 }
 
 
 @SerialVersionUID(1l) class DualPathWayDefaultHCompDriver(
-									   val data: List[String],
+															 val data: List[IndexedPatch],
 									   val portal: HCompPortalAdapter,
 									   val questionPerOldProcessedElement: HCompInstructionsWithTupleStringified,
 									   val questionPerNewProcessedElement: HCompInstructionsWithTupleStringified,
@@ -155,7 +158,7 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
 									   val timeout: Duration = 14 days) extends DPDriver with Serializable {
 
-	lazy val indexMap: Map[Int, String] = data.zipWithIndex.map(d => (d._2.toInt, d._1)).toMap
+	lazy val indexMap: Map[Int, IndexedPatch] = data.map(d => (d.index, d)).toMap
 
 	/**
 	 * return newest chunk first
@@ -163,11 +166,11 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 	 * @return
 	 */
 	override def processChunksAndPossiblyAddNew(previousChunksToCheck: List[DPChunk], newChunkElementId: Option[Int] = None): List[DPChunk] = {
-		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement.getInstructions(c.data, c.answer), c.answer, c)).toList
+		val previousQueries = previousChunksToCheck.map(c => new DPFreetextQuery(questionPerOldProcessedElement.getInstructions(c.data.value, c.answer), c.answer, c)).toList
 		val newQuery = if (newChunkElementId.isDefined) {
 			val c = DPChunk(newChunkElementId.get, indexMap(newChunkElementId.get))
 			Some(List(new DPFreetextQuery(
-				questionPerNewProcessedElement.getInstructions(c.data), "", c)))
+				questionPerNewProcessedElement.getInstructions(c.data.value), "", c)))
 		} else None
 
 		val composite = CompositeQuery(

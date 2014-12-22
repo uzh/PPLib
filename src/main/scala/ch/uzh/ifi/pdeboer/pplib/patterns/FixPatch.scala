@@ -45,7 +45,7 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
 						val beforeAfterHandler: FixVerifyFPDriver.FVFPDBeforeAfterHandler = FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER) extends FixPatchDriver with LazyLogger {
 
 	override def fix(patch: Patch, patchesBefore: List[Patch], patchesAfterwards: List[Patch]): Patch = {
-		logger.info(s"Fixing patch $patch with before: ${patchesBefore.mkString(",")} and after ${patchesAfterwards.mkString(",")}")
+		logger.info(s"Fixing patch $patch")
 
 		val memPrefixInParams: String = process.getParam[Option[String]](
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")

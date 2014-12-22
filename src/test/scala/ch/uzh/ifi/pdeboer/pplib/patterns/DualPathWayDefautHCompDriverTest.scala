@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import org.junit.{Assert, Test}
 
 /**
@@ -9,7 +10,7 @@ import org.junit.{Assert, Test}
 class DualPathWayDefaultHCompDriverComparisonTest {
 	val portal = new MockHCompPortal()
 	val emptyQ: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("")
-	val data: List[String] = List("a", "b", "c", "d")
+	val data = List("a", "b", "c", "d").zipWithIndex.map(d => new IndexedPatch(d))
 
 	@Test
 	def testComparisonAndAdvance(): Unit = {
@@ -25,7 +26,7 @@ class DualPathWayDefaultHCompDriverComparisonTest {
 		portal.filters ::= f
 		val driver = newDriver(ADVANCE_IS_OK)
 
-		val pathway = driver.indexMap.map(i => DPChunk(i._1, i._2, i._2)).toList
+		val pathway = driver.indexMap.map(i => DPChunk(i._1, i._2, i._2.value)).toList
 
 		val ret = driver.comparePathwaysAndDecideWhetherToAdvance(
 			pathway, pathway
@@ -48,7 +49,7 @@ class DualPathWayDefaultHCompDriverComparisonTest {
 		portal.filters ::= f
 		val driver = newDriver(ADVANCE_NOT_OK)
 
-		val pathway = driver.indexMap.map(i => DPChunk(i._1, i._2, i._2)).toList
+		val pathway = driver.indexMap.map(i => DPChunk(i._1, i._2, i._2.value)).toList
 
 		val ret = driver.comparePathwaysAndDecideWhetherToAdvance(
 			pathway, pathway
@@ -68,7 +69,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 		createFilterRule("a", "b"), createFilterRule("b", "c"), createFilterRule("c", "d"),
 		createFilterRule("d", "e")
 	)
-	val data: List[String] = List("a", "b", "c", "d")
+	val data = List("a", "b", "c", "d").zipWithIndex.map(d => new IndexedPatch(d))
 	val emptyQ: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("")
 
 	@Test
@@ -76,7 +77,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 		val driver = newDriver
 		val ret = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(1, "b", "c"), DPChunk(0, "a", "b")),
+				DPChunk(1, new IndexedPatch("b", 1), "c"), DPChunk(0, new IndexedPatch("a", 0), "b")),
 			Some(2)
 		)
 
@@ -92,7 +93,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 
 		val retFixedError = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(1, "b", "c", "WRONG"), DPChunk(0, "a", "b", "WRONG2")),
+				DPChunk(1, new IndexedPatch("b", 1), "c", "WRONG"), DPChunk(0, new IndexedPatch("a", 0), "b", "WRONG2")),
 			Some(2)
 		)
 		Assert.assertEquals(List("b", "c", "d").toSet, retFixedError.map(_.answer).toSet)
@@ -103,7 +104,7 @@ class DualPathWayDefaultHCompDriverProcessingTest {
 		val driver = newDriver
 		val ret = driver.processChunksAndPossiblyAddNew(
 			List(
-				DPChunk(1, "b", "c"), DPChunk(0, "a", "b")))
+				DPChunk(1, new IndexedPatch("b", 1), "c"), DPChunk(0, new IndexedPatch("a", 0), "b")))
 
 		Assert.assertEquals(List("b", "c").toSet, ret.map(_.answer).toSet)
 	}

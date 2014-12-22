@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$}
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, Patch}
 
 import scala.concurrent.duration.{Duration, _}
 
@@ -11,7 +12,7 @@ import scala.concurrent.duration.{Duration, _}
  * Created by pdeboer on 04/11/14.
  */
 @PPLibProcess("create.refine.dualpathway")
-class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[String], List[String]](params) {
+class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[IndexedPatch], List[IndexedPatch]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess._
 
@@ -20,7 +21,7 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 	 * @param data
 	 * @return
 	 */
-	override protected def run(data: List[String]): List[String] = {
+	override protected def run(data: List[IndexedPatch]): List[IndexedPatch] = {
 		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 		val driver = new DualPathWayDefaultHCompDriver(data, portal, QUESTION_OLD_PROCESSED_ELEMENT.get,
@@ -30,7 +31,7 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 			exec.driver = driver
 			exec
 		})
-		exec.result.map(_.answer)
+		exec.result.map(_.answerAsPatch)
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] =
