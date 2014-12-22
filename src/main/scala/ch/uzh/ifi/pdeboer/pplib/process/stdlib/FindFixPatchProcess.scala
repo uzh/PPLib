@@ -11,7 +11,11 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends Process
 	import FindFixPatchProcess._
 
 	override protected def run(data: List[Patch]): List[Patch] = {
-		data
+		val find = FIND_PROCESS.get.create()
+		val fixer = FIX_PROCESS.get.create(Map(FixPatchProcess.ALL_DATA.key -> data))
+
+		val found = find.process(data)
+		fixer.process(found)
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(FIND_PROCESS, FIX_PROCESS)
