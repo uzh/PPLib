@@ -27,7 +27,7 @@ sealed trait MTQuery extends LazyLogger {
 			</IsRequired>
 			<QuestionContent>
 				<FormattedContent>
-					{scala.xml.PCData(question.take(1999))}
+					{scala.xml.PCData(question.take(1900))}
 				</FormattedContent>
 			</QuestionContent>
 			<AnswerSpecification>
