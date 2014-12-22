@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
 import java.lang.annotation
+import java.util.concurrent.atomic.AtomicReference
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.reflections.Reflections
@@ -8,7 +9,7 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
-import scala.collection.parallel.{ParSeq, ForkJoinTaskSupport}
+import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
 import scala.concurrent.forkjoin.ForkJoinPool
 
 /**
@@ -64,6 +65,7 @@ object U extends LazyLogger {
 
 		reflections.getTypesAnnotatedWith(anno).toSet
 	}
+
 	def removeWhitespaces(str: String) = str.replaceAll("\\s*", "")
 
 	//taken from http://oldfashionedsoftware.com/2009/11/19/string-distance-and-refactoring-in-scala/
@@ -82,5 +84,34 @@ object U extends LazyLogger {
 		}
 
 		sd(s1.toList, s2.toList)
+	}
+
+	import scala.concurrent._
+
+	def interruptableFuture[T](fun: () => T)(implicit ex: ExecutionContext): (Future[T], () => Boolean) = {
+		val p = Promise[T]()
+		val f = p.future
+		val aref = new AtomicReference[Thread](null)
+		p tryCompleteWith Future {
+			val thread = Thread.currentThread
+			aref.synchronized {
+				aref.set(thread)
+			}
+			try fun() finally {
+				val wasInterrupted = (aref.synchronized {
+					aref getAndSet null
+				}) ne thread
+				//Deal with interrupted flag of this thread in desired
+			}
+		}
+
+		(f, () => {
+			aref.synchronized {
+				Option(aref getAndSet null) foreach {
+					_.interrupt()
+				}
+			}
+			p.tryFailure(new CancellationException)
+		})
 	}
 }

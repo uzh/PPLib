@@ -33,6 +33,10 @@ trait HCompPortalAdapter extends LazyLogger {
 	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
+		sendQueryNoFuture(query, details, omitBudgetCalculation)
+	}
+
+	def sendQueryNoFuture(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Option[HCompAnswer] = {
 		val properties = if (details.paymentCents < 1) HCompQueryProperties(query.suggestedPaymentCents) else details
 
 		val budgetAfterQuery = if (omitBudgetCalculation) budget
@@ -73,7 +77,10 @@ trait HCompPortalAdapter extends LazyLogger {
 	}
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
-		val future = sendQuery(query, properties)
+		val (future, cancelQueryFuture) = U.interruptableFuture[Option[HCompAnswer]] { () =>
+			sendQueryNoFuture(query, properties)
+		}
+
 		logger.info(s"sending query ${query.identifier}")
 		val timeAtMaxWait = new DateTime(DateTime.now().getMillis + maxWaitTime.toMillis)
 		if (maxWaitTime.toMillis <= 0) None
@@ -86,6 +93,7 @@ trait HCompPortalAdapter extends LazyLogger {
 			catch {
 				case e: TimeoutException =>
 					if (timeAtMaxWait.isAfterNow) {
+						cancelQueryFuture()
 						cancelQuery(query)
 						sendQueryAndAwaitResult(query, properties,
 							maxWaitTime = (timeAtMaxWait.getMillis - DateTime.now().getMillis) millis)
@@ -101,9 +109,6 @@ trait HCompPortalAdapter extends LazyLogger {
 	def cancelQuery(query: HCompQuery): Unit
 }
 
-trait BonusRejectionAndApprovalPortal extends HCompPortalAdapter {
-
-}
 
 class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
