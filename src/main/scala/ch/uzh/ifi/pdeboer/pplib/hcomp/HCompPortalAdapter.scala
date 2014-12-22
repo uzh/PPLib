@@ -134,7 +134,12 @@ class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extend
 	override def cancelQuery(query: HCompQuery): Unit = {
 		decoratedPortal.cancelQuery(query)
 		decoratedPortal.synchronized {
-			spentCents -= spentPerQuery(query.identifier)
+			try {
+				spentCents -= spentPerQuery(query.identifier)
+			}
+			catch {
+				case e: Throwable => logger.info(s"couldn't find query with ID ${query.identifier}. Did not deduce it's money", e)
+			}
 		}
 	}
 }
