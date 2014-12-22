@@ -66,6 +66,8 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 	}
 
 	override def selectBestRefinement(candidates: List[String]): String = {
+		val candidatesDistinct = candidates.distinct
+
 		val memPrefixInParams: String = votingProcessParam.getParam[Option[String]](
 			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
@@ -73,7 +75,7 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
-		votingProcess.process(candidates.map(c => new Patch(c))).value
+		votingProcess.process(candidatesDistinct.map(c => new Patch(c))).value
 	}
 }
 

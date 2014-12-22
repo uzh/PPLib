@@ -21,8 +21,9 @@ class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends Proces
 
 		logger.info("Running collect-phase for patch")
 		val collection: List[Patch] = memoizer.mem("collectProcess")(COLLECT.get.create(params).process(data))
-		logger.info(s"got ${collection.length} results. Running Decision Process..")
-		val res = memoizer.mem(getClass.getSimpleName + "decideProcess")(DECIDE.get.create(params).process(collection))
+		val collectionDistinct = collection.distinct
+		logger.info(s"got ${collection.length} results. ${collectionDistinct.length} after pruning. Running decide")
+		val res = memoizer.mem(getClass.getSimpleName + "decideProcess")(DECIDE.get.create(params).process(collectionDistinct))
 		logger.info(s"Collect/decide for $res has finished with Patch $res")
 		res
 	}
