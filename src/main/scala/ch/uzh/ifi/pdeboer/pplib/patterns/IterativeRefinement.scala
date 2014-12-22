@@ -80,7 +80,7 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 object IRDefaultHCompDriver {
 	val DEFAULT_TITLE_FOR_REFINEMENT: String = "Please refine the following sentence"
 	val DEFAULT_QUESTION_FOR_REFINEMENT = HCompInstructionsWithTupleStringified("Other crowd workers have refined the text below", "To this state: ", questionAfterTuples = "Please refine it further. We don't like REJECTIONS, but due to bad experiences we had to deploy a system that detects malicious / unchanged sentences and will reject your answer if it's deemed unhelpful by both, the software and afterwards a human - so please don't cheat. ")
-	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTupleStringified("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more", questionAfterTuples = "We will only accept your first HIT in this group.")
+	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTupleStringified("Other crowd workers have written the following refinements to the sentence below. Please select the one you like more. If there are multiple sentences in one item, please ensure to NOT pick that one as there should be only one", questionAfterTuples = "We will only accept your first HIT in this group.")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
 	val DEFAULT_VOTING_PROCESS_PARAMS = Map(
