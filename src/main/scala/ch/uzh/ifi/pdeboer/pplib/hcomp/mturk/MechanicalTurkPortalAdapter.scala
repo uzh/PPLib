@@ -19,6 +19,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
+		logger.info("registering query " + query.identifier)
 		val manager: MTurkManager = new MTurkManager(service, query, properties)
 		map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
 		manager.createHIT()
@@ -39,7 +40,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 			})
 			logger.info(s"cancelled '${query.title}'")
 		} else {
-			logger.info(s"could not find query '${query.question}' when trying to cancel it")
+			logger.info(s"could not find query with ID '${query.identifier}' when trying to cancel it")
 		}
 	}
 
