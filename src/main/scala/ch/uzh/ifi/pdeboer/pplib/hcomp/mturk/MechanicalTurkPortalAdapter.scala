@@ -22,7 +22,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		if (bannedQueryIDs.contains(query.identifier)) {
-			logger.info(s"query identifyer ${query.identifier} is banned. will not execute query.")
+			logger.info(s"query identifier ${query.identifier} is banned. will not execute query.")
 			None
 		} else {
 			logger.info("registering query " + query.identifier)
