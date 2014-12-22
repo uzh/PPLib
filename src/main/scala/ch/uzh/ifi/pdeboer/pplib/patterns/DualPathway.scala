@@ -151,12 +151,12 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 
 @SerialVersionUID(1l) class DualPathWayDefaultHCompDriver(
 															 val data: List[IndexedPatch],
-									   val portal: HCompPortalAdapter,
-									   val questionPerOldProcessedElement: HCompInstructionsWithTupleStringified,
-									   val questionPerNewProcessedElement: HCompInstructionsWithTupleStringified,
-									   val questionPerProcessingTask: String,
-									   val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
-									   val timeout: Duration = 14 days) extends DPDriver with Serializable {
+															 val portal: HCompPortalAdapter,
+															 val questionPerOldProcessedElement: HCompInstructionsWithTupleStringified,
+															 val questionPerNewProcessedElement: HCompInstructionsWithTupleStringified,
+															 val questionPerProcessingTask: String,
+															 val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
+															 val timeout: Duration = 14 days) extends DPDriver with Serializable {
 
 	lazy val indexMap: Map[Int, IndexedPatch] = data.map(d => (d.index, d)).toMap
 

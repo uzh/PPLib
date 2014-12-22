@@ -71,7 +71,7 @@ object FixVerifyFPDriver {
 				<b>do not</b>
 				copy
 				&amp;
-				past it into your answer. The
+				paste it into your answer. The
 				{" " + (if (before.length > 1) targetNamePlural else targetNameSingular) + " "}
 				before this
 				{targetNameSingular}{if (before.length > 1) " are  " else " is "}
