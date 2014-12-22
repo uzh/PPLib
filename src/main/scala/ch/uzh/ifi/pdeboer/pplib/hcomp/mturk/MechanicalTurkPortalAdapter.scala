@@ -1,11 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
 import scala.collection.mutable
-import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+
 /**
  * Created by pdeboer on 19/11/14.
  */
@@ -15,15 +16,21 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
 	var map = mutable.HashMap.empty[Int, MTurkQueries]
+	var bannedQueryIDs = mutable.HashSet.empty[Int]
 
 	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
-		logger.info("registering query " + query.identifier)
-		val manager: MTurkManager = new MTurkManager(service, query, properties)
-		map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
-		manager.createHIT()
-		manager.waitForResponse()
+		if (bannedQueryIDs.contains(query.identifier)) {
+			logger.info(s"query identifyer ${query.identifier} is banned. will not execute query.")
+			None
+		} else {
+			logger.info("registering query " + query.identifier)
+			val manager: MTurkManager = new MTurkManager(service, query, properties)
+			map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
+			manager.createHIT()
+			manager.waitForResponse()
+		}
 	}
 
 	override def getDefaultPortalKey: String = MechanicalTurkPortalAdapter.PORTAL_KEY
@@ -41,6 +48,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 			logger.info(s"cancelled '${query.title}'")
 		} else {
 			logger.info(s"could not find query with ID '${query.identifier}' when trying to cancel it")
+			bannedQueryIDs += query.identifier
 		}
 	}
 
