@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 /**
  * Created by pdeboer on 05/12/14.
  */
+@SerialVersionUID(1l)
 class Patch(val value: String, val payload: Option[_ <: Serializable] = None) extends Serializable {
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch]
@@ -24,7 +25,8 @@ class Patch(val value: String, val payload: Option[_ <: Serializable] = None) ex
 	def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload) = new Patch(value, payload)
 }
 
-class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializable] = None) extends Patch(value, payload) {
+@SerialVersionUID(1l)
+class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializable] = None) extends Patch(value, payload) with Serializable {
 	def this(t: (String, Int)) = this(t._1, t._2)
 
 	override def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload): Patch = new IndexedPatch(value, index, payload)

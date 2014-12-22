@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners.PatchContainer
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.U
@@ -17,14 +18,11 @@ import scala.xml.NodeSeq
 															@transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
 															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None
 															   ) {
-
-	@SerialVersionUID(1l) protected class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
-
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 
 	def getPatches(maxToInclude: Int) = {
 		val candidatePatches = patches.filter(_.displays < findersPerItem)
-		val sortedPatches = memoizer.mem("sortedPatches")(
+		val sortedPatches: List[PatchContainer] = memoizer.mem("sortedPatches")(
 			if (shuffle) Random.shuffle(candidatePatches) else candidatePatches)
 
 		sortedPatches.take(maxToInclude)
@@ -73,4 +71,10 @@ import scala.xml.NodeSeq
 	def result = data.map(d => d -> 0).toMap ++ selectedContainers.map(p => (p.patch, p.selects)).toMap
 
 	def selectionsPerPatch: Map[Patch, Int] = result.filter(v => v._2 > 0).toMap
+}
+
+object ContestWithMultipleEqualWinners {
+
+	@SerialVersionUID(1l) protected[ContestWithMultipleEqualWinners] class PatchContainer(val patch: Patch, var displays: Int = 0, var selects: Int = 0) extends Serializable
+
 }
