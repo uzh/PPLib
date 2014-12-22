@@ -23,7 +23,7 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 }
 
 class RecombinationVariantXMLExporter(val variant: RecombinationVariant, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
-	def xml = <Variant>
+	def xml: NodeSeq = <Variant>
 		{variant.name match {
 			case Some(x: String) => <Name>
 				{x}
