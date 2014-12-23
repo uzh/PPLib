@@ -16,21 +16,15 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
 	var map = mutable.HashMap.empty[Int, MTurkQueries]
-	var bannedQueryIDs = mutable.HashSet.empty[Int]
 
 	val service = new MTurkService(accessKey, secretKey, new Server(serviceURL))
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
-		if (bannedQueryIDs.contains(query.identifier)) {
-			logger.info(s"query identifier ${query.identifier} is banned. will not execute query.")
-			None
-		} else {
-			logger.info("registering query " + query.identifier)
-			val manager: MTurkManager = new MTurkManager(service, query, properties)
-			map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
-			manager.createHIT()
-			manager.waitForResponse()
-		}
+		logger.info("registering query " + query.identifier)
+		val manager: MTurkManager = new MTurkManager(service, query, properties)
+		map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
+		manager.createHIT()
+		manager.waitForResponse()
 	}
 
 	override def getDefaultPortalKey: String = MechanicalTurkPortalAdapter.PORTAL_KEY
@@ -48,7 +42,6 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 			logger.info(s"cancelled '${query.title}'")
 		} else {
 			logger.info(s"could not find query with ID '${query.identifier}' when trying to cancel it")
-			bannedQueryIDs += query.identifier
 		}
 	}
 
