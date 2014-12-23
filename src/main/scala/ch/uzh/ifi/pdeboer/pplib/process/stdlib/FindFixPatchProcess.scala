@@ -21,7 +21,6 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends Process
 			fixer.process(found)).asInstanceOf[List[IndexedPatch]]
 			.map(f => (f.index, f)).toMap
 
-
 		data.map(d => fixed.get(d.index).getOrElse(d))
 	}
 
