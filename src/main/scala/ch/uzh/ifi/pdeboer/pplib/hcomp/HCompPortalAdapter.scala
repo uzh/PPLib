@@ -81,7 +81,6 @@ trait HCompPortalAdapter extends LazyLogger {
 			sendQueryNoFuture(query, properties)
 		}
 
-		logger.info(s"sending query ${query.identifier}")
 		val timeAtMaxWait = new DateTime(DateTime.now().getMillis + maxWaitTime.toMillis)
 		if (maxWaitTime.toMillis <= 0) None
 		else {

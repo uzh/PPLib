@@ -50,8 +50,8 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		val dollars: Double = properties.paymentCents.toDouble / 100d
 
 		val qualifications: List[QualificationRequirement] = List(
-			QualificationRequirement.Worker_Locale === "US",
-			QualificationRequirement.Worker_NumberHITsApproved >= 500)
+			//QualificationRequirement.Worker_Locale === "US",
+			QualificationRequirement.Worker_NumberHITsApproved >= 1000)
 		val hitTypeID = service.RegisterHITType(query.title.take(120), query.question, Price(dollars.toString), ONE_DAY, Seq.empty[String], ONE_DAY, qualifications)
 		hit = service.CreateHIT(hitTypeID, new Question(mtQuery.xml), ONE_DAY, 1).HITId
 		hit

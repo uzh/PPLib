@@ -28,7 +28,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 		data.duplicate(exec.refinedText)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS_TYPE, MAX_ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD, VOTING_PROCESS_PARAMS)
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, TITLE_FOR_REFINEMENT, QUESTION_FOR_REFINEMENT, VOTING_PROCESS_TYPE, MAX_ITERATION_COUNT, QUESTION_PRICE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)
 
 }
 
@@ -38,7 +38,6 @@ object IterativeRefinementProcess {
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
 
 	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
-	val VOTING_PROCESS_PARAMS = new ProcessParameter[Map[String, Any]]("votingProcessParams", WorkflowParam(), Some(List(Map.empty)))
 	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(DEFAULT_QUESTION_PRICE)))
 	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", OtherParam(), Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
