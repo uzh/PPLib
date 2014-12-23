@@ -74,7 +74,9 @@ private[mturk] case class Assignment(hit: String, xml: Node) {
 	val isRejected = this.assignmentStatus == AssignmentStatus.Rejected
 }
 
-private[mturk] sealed class Question(val xml: Node)
+private[mturk] sealed class Question(val xml: Node) {
+	def trimmedXML = scala.xml.Utility.trim(xml)
+}
 
 private[mturk] object Question {
 
@@ -321,7 +323,7 @@ private[mturk] class MTurkService(
 					 MaxAssignments: Int,
 					 RequesterAnnotation: Option[String] = None): CreatedHIT = {
 		val basicParams = Seq(
-			"Question=" + URLEncoder.encode(Question.xml.toString, "UTF8"),
+			"Question=" + URLEncoder.encode(Question.trimmedXML.toString, "UTF8"),
 			"HITTypeId=" + URLEncoder.encode(HITTypeId, "UTF8"),
 			"LifetimeInSeconds=" + LifetimeInSeconds,
 			"MaxAssignments=" + MaxAssignments)

@@ -42,8 +42,8 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	 * @return HIT ID
 	 */
 	def createHIT(): String = {
-		if (query.question.length > 1900)
-			logger.error("your question was longer than 1900 characters, which is not allowed by MTurk. Truncated the question to " + query.question.take(1999))
+		if (scala.xml.PCData(query.question).length > 1999)
+			logger.error("your question was longer than 1999 characters, which is not allowed by MTurk. Truncated the question to " + query.question.take(1999))
 		val mtQuery = MTQuery.convert(query)
 
 		val ONE_DAY: Int = 60 * 60 * 24
