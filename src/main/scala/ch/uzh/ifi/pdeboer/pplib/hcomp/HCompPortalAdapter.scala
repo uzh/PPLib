@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.{QTNumberHITsApproved, QTPercentAssignmentsApproved, QTPercentAssignmentsRejected}
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Prunable
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
@@ -320,7 +321,8 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 hour, qualifications: List[QueryWorkerQualification] = Nil) extends Serializable
+case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 hour, qualifications: List[QueryWorkerQualification] =
+List(new QTPercentAssignmentsApproved > 90, new QTPercentAssignmentsRejected < 5, new QTNumberHITsApproved > 1000)) extends Serializable
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.PercentAssignmentsSubmitted
+import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.QTPercentAssignmentsSubmitted
 import ch.uzh.ifi.pdeboer.pplib.hcomp.QueryWorkerQualification
 import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.QualificationRequirement.Worker_PercentAssignmentsSubmitted
 import org.junit.{Assert, Test}
@@ -11,7 +11,7 @@ import org.junit.{Assert, Test}
 class MTurkQualficationsTest {
 	@Test
 	def testConversion: Unit = {
-		val b: QueryWorkerQualification = new PercentAssignmentsSubmitted() > "1"
+		val b: QueryWorkerQualification = new QTPercentAssignmentsSubmitted() > 1
 		val actual = MTurkQualificationObjectConversion.toMTurkQualificationRequirement(b)
 		val expected: QualificationRequirement = Worker_PercentAssignmentsSubmitted > 1
 		Assert.assertEquals(expected, actual)

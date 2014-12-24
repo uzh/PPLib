@@ -6,48 +6,48 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.QueryComparator._
  * Created by pdeboer on 24/12/14.
  */
 @SerialVersionUID(1L)
-case class QueryWorkerQualification(id: QualificationType, comparator: QueryComparator, value: String) extends Serializable
+case class QueryWorkerQualification(id: QualificationType[_], comparator: QueryComparator, value: String) extends Serializable
 
 @SerialVersionUID(1L)
-abstract class QualificationType extends Serializable {
+abstract class QualificationType[T] extends Serializable {
 	def value: String
 
-	def <(value: String) = QueryWorkerQualification(this, QueryComparator.LessThan(), value)
+	def <(value: T) = QueryWorkerQualification(this, QueryComparator.LessThan(), value.toString)
 
-	def >(value: String) = QueryWorkerQualification(this, QueryComparator.GreaterThan(), value)
+	def >(value: T) = QueryWorkerQualification(this, QueryComparator.GreaterThan(), value.toString)
 
-	def <=(value: String) = QueryWorkerQualification(this, LessThanOrEqualTo(), value)
+	def <=(value: T) = QueryWorkerQualification(this, LessThanOrEqualTo(), value.toString)
 
-	def >=(value: String) = QueryWorkerQualification(this, GreaterThanOrEqualTo(), value)
+	def >=(value: T) = QueryWorkerQualification(this, GreaterThanOrEqualTo(), value.toString)
 
-	def ===(value: String) = QueryWorkerQualification(this, EqualTo(), value)
+	def ===(value: T) = QueryWorkerQualification(this, EqualTo(), value.toString)
 
-	def !===(value: String) = QueryWorkerQualification(this, NotEqualTo(), value)
+	def !===(value: T) = QueryWorkerQualification(this, NotEqualTo(), value.toString)
 
-	def ?(value: String) = QueryWorkerQualification(this, Exists(), value)
+	def ?(value: T) = QueryWorkerQualification(this, Exists(), value.toString)
 }
 
 object QualificationType {
 
-	class ClassNameForwarder extends QualificationType {
+	class ClassNameForwarder[T] extends QualificationType[T] {
 		def value = getClass.getSimpleName
 	}
 
-	class PercentAssignmentsSubmitted extends ClassNameForwarder
+	class QTPercentAssignmentsSubmitted extends ClassNameForwarder[Int]
 
-	class PercentAssignmentsAbandoned extends ClassNameForwarder
+	class QTPercentAssignmentsAbandoned extends ClassNameForwarder[Int]
 
-	class PercentAssignmentsReturned extends ClassNameForwarder
+	class QTPercentAssignmentsReturned extends ClassNameForwarder[Int]
 
-	class PercentAssignmentsApproved extends ClassNameForwarder
+	class QTPercentAssignmentsApproved extends ClassNameForwarder[Int]
 
-	class PercentAssignmentsRejected extends ClassNameForwarder
+	class QTPercentAssignmentsRejected extends ClassNameForwarder[Int]
 
-	class NumberHITsApproved extends ClassNameForwarder
+	class QTNumberHITsApproved extends ClassNameForwarder[Int]
 
-	class Adult extends ClassNameForwarder
+	class QTAdult extends ClassNameForwarder[Int]
 
-	class Locale extends ClassNameForwarder
+	class QTLocale extends ClassNameForwarder[String]
 
 }
 

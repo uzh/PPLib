@@ -10,18 +10,18 @@ import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 object MTurkQualificationObjectConversion extends LazyLogger {
 	implicit def toMTurkQualificationRequirement(workerQualification: QueryWorkerQualification): QualificationRequirement = {
 		val isIntegerBased: Option[IntegerValueFactory] = workerQualification.id match {
-			case e: QualificationType.PercentAssignmentsSubmitted => Some(QualificationRequirement.Worker_PercentAssignmentsSubmitted)
-			case e: QualificationType.PercentAssignmentsAbandoned => Some(QualificationRequirement.Worker_PercentAssignmentsAbandoned)
-			case e: QualificationType.PercentAssignmentsReturned => Some(QualificationRequirement.Worker_PercentAssignmentsReturned)
-			case e: QualificationType.PercentAssignmentsApproved => Some(QualificationRequirement.Worker_PercentAssignmentsApproved)
-			case e: QualificationType.PercentAssignmentsRejected => Some(QualificationRequirement.Worker_PercentAssignmentsRejected)
-			case e: QualificationType.NumberHITsApproved => Some(QualificationRequirement.Worker_NumberHITsApproved)
-			case e: QualificationType.Adult => Some(QualificationRequirement.Worker_Adult)
+			case e: QualificationType.QTPercentAssignmentsSubmitted => Some(QualificationRequirement.Worker_PercentAssignmentsSubmitted)
+			case e: QualificationType.QTPercentAssignmentsAbandoned => Some(QualificationRequirement.Worker_PercentAssignmentsAbandoned)
+			case e: QualificationType.QTPercentAssignmentsReturned => Some(QualificationRequirement.Worker_PercentAssignmentsReturned)
+			case e: QualificationType.QTPercentAssignmentsApproved => Some(QualificationRequirement.Worker_PercentAssignmentsApproved)
+			case e: QualificationType.QTPercentAssignmentsRejected => Some(QualificationRequirement.Worker_PercentAssignmentsRejected)
+			case e: QualificationType.QTNumberHITsApproved => Some(QualificationRequirement.Worker_NumberHITsApproved)
+			case e: QualificationType.QTAdult => Some(QualificationRequirement.Worker_Adult)
 			case e => None
 		}
 
 		val isStringBased: Option[Factory[String]] = workerQualification.id match {
-			case e: QualificationType.Locale => Some(QualificationRequirement.Worker_Locale)
+			case e: QualificationType.QTLocale => Some(QualificationRequirement.Worker_Locale)
 			case e => None
 		}
 
