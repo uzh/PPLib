@@ -209,14 +209,14 @@ private[mturk] object QualificationRequirement {
 	 *
 	 * Provides "exists", "===" and "!==" syntax for invoking comparators.
 	 */
-	private[mturk] abstract class Factory[VALUE](QualificationTypeId: String, valueName: String) {
+	private[mturk] abstract class Factory[VALUE](val QualificationTypeId: String, val valueName: String) {
 		def exists = QualificationRequirement(this.QualificationTypeId, Comparator.Exists)
 
 		def ===(value: VALUE) = this.comparing(Comparator.EqualTo, value)
 
 		def !==(value: VALUE) = this.comparing(Comparator.NotEqualTo, value)
 
-		protected def comparing(comparator: String, value: VALUE) = QualificationRequirement(
+		def comparing(comparator: String, value: VALUE) = QualificationRequirement(
 			QualificationTypeId = this.QualificationTypeId,
 			Comparator = comparator,
 			extraParameters = Seq(this.valueName -> value.toString))
@@ -229,8 +229,8 @@ private[mturk] object QualificationRequirement {
 	 * Provides "exists", "===", "!==", "<", "<=", ">" and ">=" syntax for
 	 * invoking comparators.
 	 */
-	private[mturk] abstract class IntegerValueFactory(QualificationTypeId: String)
-		extends Factory[Int](QualificationTypeId, "IntegerValue") {
+	private[mturk] abstract class IntegerValueFactory(_QualificationTypeId: String)
+		extends Factory[Int](_QualificationTypeId, "IntegerValue") {
 		def <(value: Int) = this.comparing(Comparator.LessThan, value)
 
 		def <=(value: Int) = this.comparing(Comparator.LessThanOrEqualTo, value)

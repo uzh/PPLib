@@ -320,7 +320,7 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 hour) extends Serializable
+case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 hour, qualifications: List[QueryWorkerQualification] = Nil) extends Serializable
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]
