@@ -92,6 +92,7 @@ trait HCompPortalAdapter extends LazyLogger {
 			catch {
 				case e: TimeoutException =>
 					if (timeAtMaxWait.isAfterNow) {
+						logger.info(s"query with identifier ${query.identifier} timed out. Reposting..")
 						cancelQueryFuture()
 						cancelQuery(query)
 						sendQueryAndAwaitResult(query, properties,

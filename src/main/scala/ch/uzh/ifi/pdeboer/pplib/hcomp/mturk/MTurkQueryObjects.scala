@@ -32,7 +32,7 @@ sealed trait MTQuery extends LazyLogger {
 			</IsRequired>
 			<QuestionContent>
 				<FormattedContent>
-					{PCData(limitLength(U.removeWhitespaces(question)))}
+					{PCData(limitLength(question))}
 				</FormattedContent>
 			</QuestionContent>
 			<AnswerSpecification>
