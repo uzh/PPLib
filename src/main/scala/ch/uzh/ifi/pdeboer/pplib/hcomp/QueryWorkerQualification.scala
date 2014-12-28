@@ -6,7 +6,9 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.QueryComparator._
  * Created by pdeboer on 24/12/14.
  */
 @SerialVersionUID(1L)
-case class QueryWorkerQualification(id: QualificationType[_], comparator: QueryComparator, value: String) extends Serializable
+case class QueryWorkerQualification(id: QualificationType[_], comparator: QueryComparator, value: String) extends Serializable {
+	override def toString: String = id + " -[" + comparator + "]-> " + value
+}
 
 @SerialVersionUID(1L)
 abstract class QualificationType[T] extends Serializable {
@@ -28,9 +30,10 @@ abstract class QualificationType[T] extends Serializable {
 }
 
 object QualificationType {
-
 	class ClassNameForwarder[T] extends QualificationType[T] {
-		def value = getClass.getSimpleName
+		def value = getClass.getSimpleName.substring(2)
+
+		override def toString: String = value
 	}
 
 	class QTPercentAssignmentsSubmitted extends ClassNameForwarder[Int]
@@ -54,6 +57,8 @@ object QualificationType {
 @SerialVersionUID(1L)
 sealed trait QueryComparator extends Serializable {
 	def value: String
+
+	override def toString: String = value
 }
 
 object QueryComparator {
