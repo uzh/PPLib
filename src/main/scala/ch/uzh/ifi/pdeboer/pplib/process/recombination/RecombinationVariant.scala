@@ -22,7 +22,40 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 	}
 }
 
-class RecombinationVariantXMLExporter(val variant: RecombinationVariant, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
+class SimpleRecombinationVariantXMLExporter(val variant: RecombinationVariant) {
+	def passableToXML(passableProcessParam: PassableProcessParam[_, _]): NodeSeq =
+		<ProcessDef>
+			<Class>
+				{passableProcessParam.clazz}
+			</Class>
+			<Params>
+				{passableProcessParam.params.map(param =>
+				<Param>
+					<Key>
+						{param._1}
+					</Key> <Value>
+					{param._2 match {
+						case pa: PassableProcessParam[_, _] => passableToXML(pa)
+						case o => o
+					}}
+				</Value>
+				</Param>
+			)}
+			</Params>
+		</ProcessDef>
+
+	def xml: NodeSeq = <ProcessClasses>
+		{variant.stubs.map(p => {
+			<Process>
+				<Key>
+					{p._1}
+				</Key>{passableToXML(p._2)}
+			</Process>
+		})}
+	</ProcessClasses>
+}
+
+class RecombinationVariantProcessXMLExporter(val variant: RecombinationVariant, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
 	def xml: NodeSeq = <Variant>
 		{variant.name match {
 			case Some(x: String) => <Name>

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationVariant, RecombinationVariantXMLExporter}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationVariant, RecombinationVariantProcessXMLExporter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
 
@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 28/11/14.
  */
-class RecombinationVariantXMLExporterTest {
+class RecombinationVariantProcessXMLExporterTest {
 	@Test
 	def testStringListExport: Unit = {
 		val inputDataProcess: List[String] = List("test1", "test2")
@@ -19,7 +19,7 @@ class RecombinationVariantXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
-		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
+		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<List><Item>test1</Item><Item>test2</Item></List>",
@@ -35,7 +35,7 @@ class RecombinationVariantXMLExporterTest {
 		val processType = new PassableProcessWithRuns[Set[String], String](Map(inputDataProcess -> outputDataProcess))
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
-		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
+		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<Set><Item>test1</Item><Item>test2</Item></Set>",
@@ -52,7 +52,7 @@ class RecombinationVariantXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
-		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
+		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<List><Item>1</Item><Item>2</Item><Item>3</Item></List>",
@@ -70,7 +70,7 @@ class RecombinationVariantXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
-		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
+		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<Map><Item><Key>key1</Key><Value>value1</Value></Item><Item><Key>key2</Key><Value>value2</Value></Item></Map>",
@@ -87,7 +87,7 @@ class RecombinationVariantXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
-		val exporter = new RecombinationVariantXMLExporter(variant) //List is default
+		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Categories><Category></Category></Categories><Parameters><Parameter><Name>other_memoizerName</Name><Category>other</Category><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>other_storeExecutionResults</Name><Category>other</Category><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
