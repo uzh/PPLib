@@ -7,7 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.QueryComparator._
  */
 @SerialVersionUID(1L)
 case class QueryWorkerQualification(id: QualificationType[_], comparator: QueryComparator, value: String) extends Serializable {
-	override def toString: String = id + " -[" + comparator + "]-> " + value
+	override def toString: String = id + " " + comparator + " " + value
 }
 
 @SerialVersionUID(1L)
