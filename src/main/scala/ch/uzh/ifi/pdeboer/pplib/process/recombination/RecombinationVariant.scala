@@ -23,7 +23,7 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 }
 
 class SimpleRecombinationVariantXMLExporter(val variant: RecombinationVariant) {
-	def passableToXML(passableProcessParam: PassableProcessParam[_, _]): NodeSeq =
+	def passableToXML(passableProcessParam: PassableProcessParam[_, _], maxRecursions: Int = 4): NodeSeq =
 		<ProcessDef>
 			<Class>
 				{passableProcessParam.clazz}
@@ -35,7 +35,7 @@ class SimpleRecombinationVariantXMLExporter(val variant: RecombinationVariant) {
 						{param._1}
 					</Key> <Value>
 					{param._2 match {
-						case pa: PassableProcessParam[_, _] => passableToXML(pa)
+						case pa: PassableProcessParam[_, _] if maxRecursions > 0 => passableToXML(pa, maxRecursions - 1)
 						case o => o
 					}}
 				</Value>
