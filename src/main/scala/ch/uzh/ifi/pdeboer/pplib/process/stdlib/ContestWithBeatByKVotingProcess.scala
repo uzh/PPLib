@@ -29,7 +29,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 				getCrowdWorkers(delta).foreach(w => {
 					val answer = memoizer.mem("it" + w + "global" + globalIteration)(
 						portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
-							HCompQueryProperties(3)).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
+							PRICE_PER_VOTE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
 					synchronized {
 						votes += answer -> votes.getOrElse(answer, 0)
 					}
