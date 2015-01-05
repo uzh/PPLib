@@ -25,9 +25,11 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends Process
 	}
 
 	def getMemoizerForProcess(process: PassableProcessParam[List[Patch], List[Patch]], suffix: String = "") = {
-		val memPrefixInParams: String = process.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
-		Some(memPrefixInParams.hashCode + suffix)
+		if (getProcessMemoizer("").isDefined) {
+			val memPrefixInParams = process.getParam[Option[String]](
+				ProcessStub.MEMOIZER_NAME.key).flatten
+			memPrefixInParams.map(m => m.hashCode + suffix)
+		} else None
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(FIND_PROCESS, FIX_PROCESS)
