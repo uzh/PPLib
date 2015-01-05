@@ -17,7 +17,6 @@ abstract class QualificationType[T] extends Serializable {
 	def <(value: T) = QueryWorkerQualification(this, QueryComparator.LessThan(), value.toString)
 
 	def >(value: T) = QueryWorkerQualification(this, QueryComparator.GreaterThan(), value.toString)
-
 	def <=(value: T) = QueryWorkerQualification(this, LessThanOrEqualTo(), value.toString)
 
 	def >=(value: T) = QueryWorkerQualification(this, GreaterThanOrEqualTo(), value.toString)

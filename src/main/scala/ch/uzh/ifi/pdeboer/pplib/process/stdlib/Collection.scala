@@ -33,7 +33,6 @@ class Collection(params: Map[String, Any] = Map.empty) extends ProcessStubWithHC
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION_PRICE, TITLE_PER_QUESTION, QUESTION, WORKER_COUNT) ::: super.optionalParameters
 }
-
 object Collection {
 	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected, so please don't just submit a copy&paste of the original text"))))
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
