@@ -59,7 +59,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		new MultipleChoiceQuery(QUESTION.get.getInstructions(INSTRUCTION_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, TITLE.get)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION, K) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, INSTRUCTION_ITALIC, MAX_VOTES, PRICE_PER_VOTE, QUESTION_AUX, QUESTION, K, TITLE)
 }
 
 object ContestWithBeatByKVotingProcess {
@@ -70,4 +70,6 @@ object ContestWithBeatByKVotingProcess {
 	val K = new ProcessParameter[Int]("k", OtherParam(), Some(List(2)))
 	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
+
 }
