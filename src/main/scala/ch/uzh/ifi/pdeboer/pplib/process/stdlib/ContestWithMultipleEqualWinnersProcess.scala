@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
 import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
@@ -19,7 +19,7 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 		logger.info("running simple finder on: \n -" + data.map(_.value.replaceAll("\n", "")).mkString("\n -"))
 		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 		val finder = new ContestWithMultipleEqualWinners(data, QUESTION.get, TITLE.get, WORKERS_TO_ASK_PER_ITEM.get,
-			SHUFFLE.get, portal, MAX_ITEMS_PER_ITERATION.get, memoizer, QUESTION_AUX.get)
+			SHUFFLE.get, portal, MAX_ITEMS_PER_ITERATION.get, memoizer, QUESTION_AUX.get, PRICE_PER_VOTE.get)
 
 		val res = finder.result.filter(_._2 >= THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM.get).map(_._1).toList
 		logger.info("simple finder selected: \n -" + res.mkString("\n -"))
@@ -32,7 +32,7 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 object ContestWithMultipleEqualWinnersProcess {
 	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select sentences you think are erroneous and should be improved"))))
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
-
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(5))))
 	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Find erroneous sentences")))
 	val WORKERS_TO_ASK_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
 	val MAX_ITEMS_PER_ITERATION = new ProcessParameter[Int]("maxItemsPerFind", OtherParam(), Some(List(10)))

@@ -16,7 +16,7 @@ import scala.xml.NodeSeq
 @SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: HCompInstructionsWithTuple,
 															title: String, findersPerItem: Int, shuffle: Boolean,
 															@transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None
+															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None, pricePerVote: HCompQueryProperties = new HCompQueryProperties()
 															   ) {
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 
@@ -56,7 +56,7 @@ import scala.xml.NodeSeq
 
 		val answer = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(question.getInstructions("", htmlData = questionAux.getOrElse(Nil)),
-				orderedData, 0, title = title)).get.asInstanceOf[MultipleChoiceAnswer]
+				orderedData, 0, title = title), pricePerVote).get.asInstanceOf[MultipleChoiceAnswer]
 		answer.selectedAnswers.map(a => {
 			items.find(i => i.patch.toString == a).get
 		})
