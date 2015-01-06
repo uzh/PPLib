@@ -26,7 +26,7 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 		res
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, QUESTION_AUX, TITLE, WORKERS_TO_ASK_PER_ITEM, MAX_ITEMS_PER_ITERATION, SHUFFLE, THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM)
+	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION, QUESTION_AUX, TITLE, WORKERS_TO_ASK_PER_ITEM, MAX_ITEMS_PER_ITERATION, SHUFFLE, THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM, PRICE_PER_VOTE)
 }
 
 object ContestWithMultipleEqualWinnersProcess {
