@@ -59,7 +59,9 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 	}
 
 	def findAllUnapprovedHitsAndApprove: Unit = {
+		var total: Int = 0
 		service.SearchHITs().foreach(h => {
+			total += 1
 			try {
 				service.GetAssignmentsForHIT(h.HITId).headOption match {
 					case Some(x: Assignment) => try {
@@ -74,6 +76,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 				case e: Exception => logger.info("could not get assignments for hit " + h)
 			}
 		})
+		logger.info(s"total: $total hits")
 	}
 
 }
