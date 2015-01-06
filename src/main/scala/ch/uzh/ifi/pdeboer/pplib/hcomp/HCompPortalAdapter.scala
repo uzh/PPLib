@@ -190,12 +190,12 @@ class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questi
 		NodeSeq.fromSeq(<placeholder>
 			<p>
 				{_questionBeforeTuples}
-			</p>
-			<p>
-				<i>
-					{data1}
-				</i>
-			</p>{if (_questionBetweenTuples.length > 0) _questionBetweenTuples}{if (data2 != "" && _enableSecondDataFieldIfAvailable) <p>
+			</p>{if (data1 != "")
+				<p>
+					<i>
+						{data1}
+					</i>
+				</p>}{if (_questionBetweenTuples.length > 0) _questionBetweenTuples}{if (data2 != "" && _enableSecondDataFieldIfAvailable) <p>
 				<i>
 					{data2}
 				</i>

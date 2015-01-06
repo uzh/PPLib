@@ -194,8 +194,7 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 		val res = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(questionPerComparisonTask.getQuestion(pathway1, pathway2),
 				choices, 1, 1, title = questionPerComparisonTask.title),
-			maxWaitTime = timeout,
-			properties = HCompQueryProperties(2)
+			maxWaitTime = timeout
 		)
 		res.get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer == questionPerComparisonTask.positiveAnswerForComparison
 	}
@@ -206,16 +205,17 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 
 }
 
-class DPHCompDriverDefaultComparisonInstructionsConfig(
-														  val title: String = "Comparison",
-														  val preText: String = "Please compare both solutions and check if they are equal or not. (They don't need to have the exact same characters; much rather they should be equal in quality)",
-														  val postText: String = "",
-														  val questionTitle: String = "Question",
-														  val leftTitle: String = "Solution 1",
-														  val rightTitle: String = "Solution 2",
-														  val positiveAnswerForComparison: String = "Yes, they are equal",
-														  val negativeAnswerForComparison: String = "No, they are NOT equal",
-														  val shuffleChoices: Boolean = true) {
+@SerialVersionUID(1l)
+case class DPHCompDriverDefaultComparisonInstructionsConfig(
+															   title: String = "Comparison",
+															   preText: String = "Please compare both solutions and check if they are equal or not. (They don't need to have the exact same characters; much rather they should be equal in quality)",
+															   postText: String = "",
+															   questionTitle: String = "Question",
+															   leftTitle: String = "Solution 1",
+															   rightTitle: String = "Solution 2",
+															   positiveAnswerForComparison: String = "Yes, they are equal",
+															   negativeAnswerForComparison: String = "No, they are NOT equal",
+															   shuffleChoices: Boolean = true) extends Serializable {
 	def getQuestion(left: List[DPChunk], right: List[DPChunk]): String = NodeSeq.fromSeq(<div>
 		<h1>
 			{title}
