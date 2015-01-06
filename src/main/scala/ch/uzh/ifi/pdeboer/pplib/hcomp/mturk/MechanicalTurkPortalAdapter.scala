@@ -60,6 +60,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	def findAllUnapprovedHitsAndApprove: Unit = {
 		var total: Int = 0
+		var totalApproved: Int = 0
 		import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 		service.SearchHITs().toList.mpar.foreach(h => {
 			logger.info("processing hit " + h)
@@ -67,7 +68,10 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 			try {
 				service.GetAssignmentsForHIT(h.HITId).headOption match {
 					case Some(x: Assignment) => try {
-						service.ApproveAssignment(x)
+						if (!x.isApproved) {
+							totalApproved += 1
+							service.ApproveAssignment(x)
+						}
 					}
 					catch {
 						case e: Exception => logger.info("could not approve " + x)
@@ -78,7 +82,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 				case e: Exception => logger.info("could not get assignments for hit " + h)
 			}
 		})
-		logger.info(s"total: $total hits")
+		logger.info(s"total: $total hits of which we approved $totalApproved")
 	}
 
 	def expireAllHits: Unit = {
@@ -89,7 +93,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 					service.DisableHIT(h.HITId)
 			}
 			catch {
-				case e: Exception => logger.info("could not disable hit " + h)
+				case e: Exception => logger.info(e.getMessage + "could not disable hit " + h)
 			}
 		})
 	}
