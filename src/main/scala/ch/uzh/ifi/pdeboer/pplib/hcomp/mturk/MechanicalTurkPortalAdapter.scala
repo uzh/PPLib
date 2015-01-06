@@ -60,7 +60,8 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	def findAllUnapprovedHitsAndApprove: Unit = {
 		var total: Int = 0
-		service.SearchHITs().foreach(h => {
+		import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+		service.SearchHITs().toList.mpar.foreach(h => {
 			total += 1
 			try {
 				service.GetAssignmentsForHIT(h.HITId).headOption match {
