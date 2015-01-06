@@ -16,7 +16,7 @@ import scala.concurrent.forkjoin.ForkJoinPool
  * Created by pdeboer on 15/10/14.
  */
 object U extends LazyLogger {
-	val hugeForkJoinPool = new ForkJoinPool(200)
+	val hugeForkJoinPool = new ForkJoinPool(300)
 	val tinyForkJoinPool = new ForkJoinPool(1)
 
 	def parallelify[T](seq: Seq[T]): ParSeq[T] = {

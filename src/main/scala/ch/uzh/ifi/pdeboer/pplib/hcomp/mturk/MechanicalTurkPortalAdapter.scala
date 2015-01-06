@@ -81,6 +81,19 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 		logger.info(s"total: $total hits")
 	}
 
+	def expireAllHits: Unit = {
+		import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+		service.SearchHITs().toList.mpar.foreach(h => {
+			try {
+				if (h.Expiration.isAfterNow)
+					service.DisableHIT(h.HITId)
+			}
+			catch {
+				case e: Exception => logger.info("could not disable hit " + h)
+			}
+		})
+	}
+
 }
 
 object MechanicalTurkPortalAdapter {
