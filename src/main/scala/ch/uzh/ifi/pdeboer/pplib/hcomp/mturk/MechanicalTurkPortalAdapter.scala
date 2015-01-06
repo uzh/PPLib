@@ -62,6 +62,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 		var total: Int = 0
 		import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 		service.SearchHITs().toList.mpar.foreach(h => {
+			logger.info("processing hit " + h)
 			total += 1
 			try {
 				service.GetAssignmentsForHIT(h.HITId).headOption match {
