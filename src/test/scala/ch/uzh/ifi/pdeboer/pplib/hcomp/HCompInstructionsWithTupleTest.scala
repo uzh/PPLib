@@ -10,12 +10,12 @@ class HCompInstructionsWithTupleTest {
 	@Test
 	def testHTMLElementRenderingDisabledInStringified: Unit = {
 		var res = (HCompInstructionsWithTupleStringified("<p>test</p>").getInstructions(""))
-		Assert.assertEquals("<p>&lt;p&gt;test&lt;/p&gt;</p><p><i></i></p>", U.removeWhitespaces(res))
+		Assert.assertEquals("<p>&lt;p&gt;test&lt;/p&gt;</p>", U.removeWhitespaces(res))
 	}
 
 	@Test
 	def testHTMLRenderingAllowedInNormal: Unit = {
 		val res = new HCompInstructionsWithTuple(<asdf>question?</asdf>)
-		Assert.assertEquals("<p><asdf>question?</asdf></p><p><i></i></p>", U.removeWhitespaces(res.getInstructions("")))
+		Assert.assertEquals("<p><asdf>question?</asdf></p>", U.removeWhitespaces(res.getInstructions("")))
 	}
 }
