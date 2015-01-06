@@ -58,6 +58,24 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 		}
 	}
 
+	def findAllUnapprovedHitsAndApprove: Unit = {
+		service.SearchHITs().foreach(h => {
+			try {
+				service.GetAssignmentsForHIT(h.HITId).headOption match {
+					case Some(x: Assignment) => try {
+						service.ApproveAssignment(x)
+					}
+					catch {
+						case e: Exception => logger.info("could not approve " + x)
+					}
+				}
+			}
+			catch {
+				case e: Exception => logger.info("could not get assignments for hit " + h)
+			}
+		})
+	}
+
 }
 
 object MechanicalTurkPortalAdapter {
