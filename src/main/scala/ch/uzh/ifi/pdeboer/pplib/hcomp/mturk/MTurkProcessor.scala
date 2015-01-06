@@ -69,7 +69,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	def handleAssignmentResult(a: Assignment): Option[HCompAnswer] = {
 		try {
 			//We approve all assignments by default. Don't like rejections
-			service.ApproveAssignment(a)
+			service.ApproveAssignment(a, "Thanks for being part of our project")
 		}
 		catch {
 			case e: Exception => logger.error("could not approve assignment", e)
