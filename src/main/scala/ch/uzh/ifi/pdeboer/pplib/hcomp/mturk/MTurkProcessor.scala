@@ -47,7 +47,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		val mtQuery = MTQuery.convert(query)
 
 		val ONE_DAY: Int = 60 * 60 * 24
-		val TEN_MINUTES: INT = 10 * 60
+		val TEN_MINUTES: Int = 10 * 60
 		val dollars: Double = properties.paymentCents.toDouble / 100d
 
 		val qualifications: List[QualificationRequirement] = properties.qualifications.map(q =>

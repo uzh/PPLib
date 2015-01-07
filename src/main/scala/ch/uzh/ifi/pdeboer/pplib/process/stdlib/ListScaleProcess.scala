@@ -1,30 +1,23 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub, ProcessStubWithHCompPortalAccess, WorkflowParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStubWithHCompPortalAccess, WorkflowParam}
 
 /**
  * Created by pdeboer on 14/12/14.
  */
-class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](_params) {
+class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[IndexedPatch], List[IndexedPatch]](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListScaleProcess._
 
-	override protected def run(data: List[Patch]): List[Patch] = {
+	override protected def run(data: List[IndexedPatch]): List[IndexedPatch] = {
 		val processType = CHILD_PROCESS.get
-		val memoizerPrefix = ProcessStub.MEMOIZER_NAME.get.getOrElse("")
-		val memPrefixInParams: String = processType.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
-
-		val memoizerName: String = memoizerPrefix + memPrefixInParams
-		val memoizer = if (memoizerName == "") None else Some(memoizerName)
 
 		val lowerPriorityParams = params
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> memoizer)
 
 		data.map(d => {
-			val process = processType.create(lowerPriorityParams, higherPriorityParams)
-			process.process(d)
+			val process = processType.create(lowerPriorityParams)
+			process.process(d).asInstanceOf[IndexedPatch]
 		})
 	}
 
