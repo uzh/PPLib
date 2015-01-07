@@ -321,7 +321,7 @@ case class HCompException(query: HCompQuery, exception: Throwable) extends HComp
 case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 hour, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
+case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
 
 object HCompQueryProperties {
 	val DEFAULT_QUALIFICATIONS = List(new QTLocale === "US", new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000)
