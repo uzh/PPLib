@@ -56,7 +56,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 			portal.sendQueryAndAwaitResult(
 				MultipleChoiceQuery(
 					instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
-					alternatives, 1, 1, title + iteration),
+					alternatives, 1, 1, title + iteration + "_" + Math.abs(Random.nextInt())),
 				PRICE_PER_VOTE.get
 
 			) match {

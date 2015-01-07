@@ -5,6 +5,7 @@ import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
 
+import scala.util.Random
 import scala.xml.NodeSeq
 
 /**
@@ -23,7 +24,7 @@ class Collection(params: Map[String, Any] = Map.empty) extends ProcessStubWithHC
 				val questionPerLine: HCompInstructionsWithTuple = QUESTION.get
 				val instructions: String = questionPerLine.getInstructions(line + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
 				portal.sendQueryAndAwaitResult(FreetextQuery(
-					instructions, "", TITLE_PER_QUESTION.get + w), QUESTION_PRICE.get).get.is[FreetextAnswer]
+					instructions, "", TITLE_PER_QUESTION.get + w + "_" + Math.abs(Random.nextInt())), QUESTION_PRICE.get).get.is[FreetextAnswer]
 			}).toList
 
 			answers.map(_.is[FreetextAnswer].answer).toSet.toList

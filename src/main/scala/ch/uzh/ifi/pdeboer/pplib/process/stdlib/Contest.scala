@@ -26,7 +26,7 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends Process
 				memoizer.mem("it" + w)(
 					U.retry(2) {
 						portal.sendQueryAndAwaitResult(
-							createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList, QUESTION.get, INSTRUCTION_ITALIC.get, TITLE.get),
+							createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList, QUESTION.get, INSTRUCTION_ITALIC.get, TITLE.get + " " + Math.abs(Random.nextInt())),
 							PRICE_PER_VOTE.get
 						) match {
 							case Some(a: MultipleChoiceAnswer) => a.selectedAnswer

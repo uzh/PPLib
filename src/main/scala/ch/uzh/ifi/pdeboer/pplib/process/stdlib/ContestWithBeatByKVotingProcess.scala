@@ -56,7 +56,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		new MultipleChoiceQuery(QUESTION.get.getInstructions(INSTRUCTION_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, TITLE.get)
+		new MultipleChoiceQuery(QUESTION.get.getInstructions(INSTRUCTION_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, TITLE.get + " " + Math.abs(Random.nextInt()))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, INSTRUCTION_ITALIC, MAX_VOTES, PRICE_PER_VOTE, QUESTION_AUX, QUESTION, K, TITLE)

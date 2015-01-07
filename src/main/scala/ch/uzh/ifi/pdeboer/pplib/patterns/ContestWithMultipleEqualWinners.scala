@@ -56,7 +56,7 @@ import scala.xml.NodeSeq
 
 		val answer = portal.sendQueryAndAwaitResult(
 			MultipleChoiceQuery(question.getInstructions("", htmlData = questionAux.getOrElse(Nil)),
-				orderedData, 0, title = title), pricePerVote).get.asInstanceOf[MultipleChoiceAnswer]
+				orderedData, 0, title = title + " " + Math.abs(Random.nextInt())), pricePerVote).get.asInstanceOf[MultipleChoiceAnswer]
 		answer.selectedAnswers.map(a => {
 			items.find(i => i.patch.toString == a).get
 		})
