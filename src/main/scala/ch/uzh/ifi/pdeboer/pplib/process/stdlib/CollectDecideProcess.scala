@@ -48,6 +48,6 @@ object CollectDecideProcess {
 
 
 @SerialVersionUID(1l)
-class PatchEmbeddedInString(val before: String = "", val after: String = "") extends Serializable {
+case class PatchEmbeddedInString(before: String = "", after: String = "") extends Serializable {
 	def getMessage(patch: Patch) = before + patch.value + after
 }

@@ -13,6 +13,8 @@ import scala.reflect.ClassTag
 	def t = implicitly[ClassTag[T]]
 
 	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
+
+	override def toString: String = key
 }
 
 @SerialVersionUID(1l) class ProcessParameterCategory(val parameterPrefix: String) extends Serializable {
