@@ -14,11 +14,6 @@ sealed trait MTQuery extends LazyLogger {
 
 	def questionXML: NodeSeq
 
-	def limitLength(question: String = rawQuery.question, limit: Int = 1900): String = if (PCData(question).toString.length > limit)
-		limitLength(question.substring(0, question.length - 1), limit)
-	else question
-
-
 	def defaultQuestionXML(injectedXML: NodeSeq, title: String = rawQuery.title, question: String = rawQuery.question, valueIsRequired: Boolean = rawQuery.valueIsRequired) =
 		<Question>
 			<QuestionIdentifier>
@@ -32,7 +27,7 @@ sealed trait MTQuery extends LazyLogger {
 			</IsRequired>
 			<QuestionContent>
 				<FormattedContent>
-					{PCData(limitLength(question))}
+					{PCData(question)}
 				</FormattedContent>
 			</QuestionContent>
 			<AnswerSpecification>
