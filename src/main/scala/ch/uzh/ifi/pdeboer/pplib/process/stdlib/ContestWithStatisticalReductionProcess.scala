@@ -26,6 +26,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 			val stringData = data.map(_.value)
 			val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 			var iteration: Int = 0
+			data.foreach(d => votesCast += (d.value -> 0))
 			do {
 				iteration += 1
 				val choice: String = memoizer.mem("it" + iteration)(castVote(stringData, iteration))
