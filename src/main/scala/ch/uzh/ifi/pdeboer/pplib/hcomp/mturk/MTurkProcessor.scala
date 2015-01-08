@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, LazyLogger, U}
+import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, LazyLogger}
 
 import scala.concurrent.duration._
 import scala.xml.NodeSeq
@@ -15,16 +15,21 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 
 	def waitForResponse() = {
 		val timer = new GrowingTimer(1 second, 1.0001, 20 seconds)
-		U.retry(100000) {
-			//at least 27h
-			if (!cancelled) {
+		//very very ugly, but we dont have a break statement in scala..
+		var answer: Option[HCompAnswer] = None
+		try {
+			(1 to 100000).view.foreach(i => {
+				answer = poll()
+				if (cancelled || answer.isDefined) throw new Exception("I'm actually not an Exception")
 				timer.waitTime
-
-				val answer = poll()
-				if (answer == None) throw new IllegalStateException("let's wait some more")
-				answer
-			} else None
+			})
 		}
+		catch {
+			case e: Exception => {
+				/*hopefully we land here*/
+			}
+		}
+		answer
 	}
 
 	def cancelHIT(): Unit = {
