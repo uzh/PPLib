@@ -22,6 +22,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		if (data.size == 1) data(0)
 		else if (data.size == 0) null
 		else {
+			data.foreach(d => votes += (d.value -> 0))
 			val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 			var globalIteration: Int = 0
 			val stringData = data.map(_.value)
