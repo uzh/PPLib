@@ -27,11 +27,13 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			var globalIteration: Int = 0
 			val stringData = data.map(_.value)
 			do {
+				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(delta).foreach(w => {
-					val answer = memoizer.mem("it" + w + "global" + globalIteration)(
-						portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
-							PRICE_PER_VOTE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer)
-					synchronized {
+					val answer = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
+						PRICE_PER_VOTE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+					logger.info("waiting for lock..")
+					stringData.synchronized {
+						logger.info("got lock. storing vote")
 						votes += answer -> votes.getOrElse(answer, 0)
 					}
 				})
@@ -48,7 +50,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		delta < K.get && votes.values.sum + delta < MAX_VOTES.get
 	}
 
-	def delta = if (votes.size == 0) 3 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
+	def delta = if (votes.values.sum == 0) 3 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
 
 	def bestAndSecondBest = {
 		val sorted = votes.toList.sortBy(-_._2)

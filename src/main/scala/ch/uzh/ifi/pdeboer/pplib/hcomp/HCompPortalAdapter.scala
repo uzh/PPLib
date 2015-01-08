@@ -78,6 +78,10 @@ trait HCompPortalAdapter extends LazyLogger {
 	}
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
+		val future: Future[Option[HCompAnswer]] = sendQuery(query, properties)
+		Await.result(future, 1 day)
+		future.value.get.get
+		/*
 		val (future, cancelQueryFuture) = U.interruptableFuture[Option[HCompAnswer]] { () =>
 			sendQueryNoFuture(query, properties)
 		}
@@ -101,6 +105,7 @@ trait HCompPortalAdapter extends LazyLogger {
 					} else None
 			}
 		}
+		*/
 	}
 
 	def getDefaultPortalKey: String
