@@ -63,7 +63,7 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
 object FixVerifyFPDriver {
 	type FVFPDBeforeAfterHandler = Option[(ProcessStub[Patch, Patch], List[Patch], List[Patch]) => Unit]
 
-	val DEFAULT_BEFORE_AFTER_HANDLER = beforeAfterInstructions()
+	val DEFAULT_BEFORE_AFTER_HANDLER = None // beforeAfterInstructions()
 
 	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = CollectionWithSigmaPruning.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <before>
