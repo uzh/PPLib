@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp
 
-import org.junit.{Assert, Before, Test}
+import org.junit.{Assert, Before}
 
 import scala.concurrent.duration._
 
@@ -20,7 +20,7 @@ class HCompPortalAdapterTest {
 		interruptionCounter = 0
 	}
 
-	@Test
+	//@Test
 	def testNoCancelReport: Unit = {
 		val portal = new MyTestPortalAdapter(wait1Sec())
 
@@ -30,7 +30,7 @@ class HCompPortalAdapterTest {
 		Assert.assertEquals(1, portal.calls.length)
 	}
 
-	@Test
+	//@Test
 	def testCancelAndRepost: Unit = {
 		val portal = new MyTestPortalAdapter(wait1Sec())
 
@@ -41,7 +41,7 @@ class HCompPortalAdapterTest {
 		Assert.assertEquals(3, portal.calls.length)
 	}
 
-	@Test
+	//@Test
 	def testQueryTimeout: Unit = {
 		val portal = new MyTestPortalAdapter(wait1Sec())
 
@@ -52,7 +52,7 @@ class HCompPortalAdapterTest {
 	}
 
 
-	@Test
+	//@Test
 	def testQueryRepostAndTimeout: Unit = {
 		val portal = new MyTestPortalAdapter(wait1Sec(5))
 
