@@ -56,10 +56,10 @@ object FindFixVerifyProcess {
 	val FIX_QUESTION = new ProcessParameter[FFVFixQuestion]("fixQuestion", QuestionParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_FIX_QUESTION)))
 	val VERIFY_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("verifyProcess", WorkflowParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS)))
 
-	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Integer]("patchesInFind", OtherParam(), Some(List(7)))
-	val FINDERS_COUNT = new ProcessParameter[Integer]("findersCount", WorkerCountParam(), Some(List(3)))
-	val MIN_FINDERS_TO_AGREE_FOR_FIX = new ProcessParameter[Integer]("minFindersToAgree", OtherParam(), Some(List(2)))
-	val FIXERS_PER_PATCH = new ProcessParameter[Integer]("fixersPerPatch", WorkerCountParam(), Some(List(3)))
+	val PATCHES_COUNT_IN_FIND = new ProcessParameter[Int]("patchesInFind", OtherParam(), Some(List(7)))
+	val FINDERS_COUNT = new ProcessParameter[Int]("findersCount", WorkerCountParam(), Some(List(3)))
+	val MIN_FINDERS_TO_AGREE_FOR_FIX = new ProcessParameter[Int]("minFindersToAgree", OtherParam(), Some(List(2)))
+	val FIXERS_PER_PATCH = new ProcessParameter[Int]("fixersPerPatch", WorkerCountParam(), Some(List(3)))
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 
 	val VERIFY_PROCESS_CONTEXT_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("verifyProcessContextParameter", OtherParam(), Some(List(FFVDefaultHCompDriver.DEFAULT_VERIFY_PROCESS_CONTEXT_PARAMETER)))

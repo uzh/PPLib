@@ -48,5 +48,5 @@ object DualPathwayProcess {
 	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", QuestionParam(), Some(List("Please fix up the following sentences")))
 	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", QuestionParam(), Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
 	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(14 days)))
-	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Integer]("chunk_count", OtherParam(), Some(List(2)))
+	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Int]("chunk_count", OtherParam(), Some(List(2)))
 }

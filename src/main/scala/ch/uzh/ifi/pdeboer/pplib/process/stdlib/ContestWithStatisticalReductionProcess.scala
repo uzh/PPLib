@@ -86,6 +86,6 @@ object ContestWithStatisticalReductionProcess {
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
 	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best ")))
 	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
-	val CONFIDENCE_PARAMETER = new ProcessParameter[java.lang.Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
+	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
 	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
 }
