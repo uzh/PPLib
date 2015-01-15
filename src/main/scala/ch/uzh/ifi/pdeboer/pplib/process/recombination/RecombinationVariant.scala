@@ -17,7 +17,9 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 
 	def createProcess[IN, OUT](key: String): ProcessStub[IN, OUT] = {
 		val p = stubs(key).asInstanceOf[PassableProcessParam[IN, OUT]].create()
-		procs = (key, p) :: procs
+		stubs.synchronized {
+			procs = (key, p) :: procs
+		}
 		p
 	}
 }
