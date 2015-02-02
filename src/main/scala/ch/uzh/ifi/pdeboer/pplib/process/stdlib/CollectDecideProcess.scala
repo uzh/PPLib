@@ -38,12 +38,12 @@ class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends Proces
 }
 
 object CollectDecideProcess {
-	val FORWARD_PARAMS_TO_COLLECT = new ProcessParameter[Boolean]("forwardParamsToCollect", OtherParam(), Some(List(true)))
-	val FORWARD_PARAMS_TO_DECIDE = new ProcessParameter[Boolean]("forwardParamsToDecide", OtherParam(), Some(List(true)))
-	val COLLECT = new ProcessParameter[PassableProcessParam[Patch, List[Patch]]]("collect", WorkflowParam(), None)
-	val DECIDE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("decide", WorkflowParam(), None)
-	val FORWARD_PATCH_TO_DECIDE_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("forwardPatchToDecideParameter", OtherParam(), Some(List(None)))
-	val FORWARD_PATCH_TO_DECIDE_MESSAGE = new ProcessParameter[PatchEmbeddedInString]("forwardPatchToDecideMessage", OtherParam(), Some(List(new PatchEmbeddedInString("The original sentence was: "))))
+	val FORWARD_PARAMS_TO_COLLECT = new ProcessParameter[Boolean]("forwardParamsToCollect", Some(List(true)))
+	val FORWARD_PARAMS_TO_DECIDE = new ProcessParameter[Boolean]("forwardParamsToDecide", Some(List(true)))
+	val COLLECT = new ProcessParameter[PassableProcessParam[Patch, List[Patch]]]("collect", None)
+	val DECIDE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("decide", None)
+	val FORWARD_PATCH_TO_DECIDE_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("forwardPatchToDecideParameter", Some(List(None)))
+	val FORWARD_PATCH_TO_DECIDE_MESSAGE = new ProcessParameter[PatchEmbeddedInString]("forwardPatchToDecideMessage", Some(List(new PatchEmbeddedInString("The original sentence was: "))))
 }
 
 

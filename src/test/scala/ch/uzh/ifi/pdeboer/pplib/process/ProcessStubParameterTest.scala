@@ -8,14 +8,14 @@ import org.junit.{Assert, Test}
 class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyOK(): Unit = {
-		new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test", OtherParam())), params = Map(OtherParam() + "_test" -> "asdf"))
+		new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test")), params = Map("test" -> "asdf"))
 		Assert.assertTrue(true) //no exception happened
 	}
 
 	@Test
 	def testParameterDoesntExist(): Unit = {
 		try {
-			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test2", OtherParam())), params = Map(OtherParam() + "_test" -> "asdf"))
+			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test2")), params = Map("test" -> "asdf"))
 			Assert.assertFalse(true) //no exception here :(
 		}
 		catch {
@@ -25,7 +25,7 @@ class ProcessStubParameterTest {
 
 	@Test
 	def testExpectedParamExists: Unit = {
-		val params = new ProcessParameter[String]("test222", OtherParam(), None)
+		val params = new ProcessParameter[String]("test222", None)
 		val proc = new TestRecombImplparams(paramsOnRun = List(params))
 		try {
 			proc.process("bla")
@@ -38,7 +38,7 @@ class ProcessStubParameterTest {
 
 	@Test
 	def testExpectedParamExistsAndItDoes: Unit = {
-		val params = new ProcessParameter[String]("test", OtherParam(), None)
+		val params = new ProcessParameter[String]("test", None)
 		val proc = new TestRecombImplparams(paramsOnRun = List(params), params = Map(params.key -> "blupp"))
 		proc.process("bla")
 		Assert.assertTrue(true) //should throw exception
@@ -48,7 +48,7 @@ class ProcessStubParameterTest {
 	@Test
 	def testTypeSafetyNotOK(): Unit = {
 		try {
-			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test", OtherParam())), params = Map(OtherParam() + "_test" -> List.empty[String]))
+			new TestRecombImplparams(paramsOnConstruct = List(new ProcessParameter[String]("test")), params = Map("test" -> List.empty[String]))
 			Assert.assertTrue(false) //no exception happened. somethings wrong
 		}
 		catch {

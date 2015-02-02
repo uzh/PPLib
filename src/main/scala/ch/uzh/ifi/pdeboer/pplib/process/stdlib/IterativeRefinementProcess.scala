@@ -33,13 +33,13 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends P
 }
 
 object IterativeRefinementProcess {
-	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", QuestionParam(), Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
-	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("questionForRefinement", QuestionParam(), Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
+	val TITLE_FOR_REFINEMENT = new ProcessParameter[String]("titleForRefinement", Some(List(DEFAULT_TITLE_FOR_REFINEMENT)))
+	val QUESTION_FOR_REFINEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("questionForRefinement", Some(List(DEFAULT_QUESTION_FOR_REFINEMENT)))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
 
-	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("votingProcess", WorkflowParam(), Some(List(DEFAULT_VOTING_PROCESS)))
-	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", OtherParam(), Some(List(DEFAULT_ITERATION_COUNT)))
-	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(DEFAULT_QUESTION_PRICE)))
-	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", OtherParam(), Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
-	val TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = new ProcessParameter[Int]("toleratedNumberOfIterationsBelowThreshold", OtherParam(), Some(List(DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)))
+	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("votingProcess", Some(List(DEFAULT_VOTING_PROCESS)))
+	val MAX_ITERATION_COUNT = new ProcessParameter[Int]("iterationCount", Some(List(DEFAULT_ITERATION_COUNT)))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", Some(List(DEFAULT_QUESTION_PRICE)))
+	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
+	val TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = new ProcessParameter[Int]("toleratedNumberOfIterationsBelowThreshold", Some(List(DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)))
 }

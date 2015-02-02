@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStubWithHCompPortalAccess, WorkflowParam}
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStubWithHCompPortalAccess}
 
 /**
  * Created by pdeboer on 14/12/14.
@@ -25,5 +25,5 @@ class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends ProcessStu
 }
 
 object ListScaleProcess {
-	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("childProcess", WorkflowParam(), None)
+	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("childProcess", None)
 }

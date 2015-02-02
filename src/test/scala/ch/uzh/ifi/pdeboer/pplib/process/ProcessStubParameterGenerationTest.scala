@@ -93,8 +93,8 @@ object ProcessStubParameterGenerationTest {
 }
 
 object TestProcessStub {
-	val TEST_PARAM1 = new ProcessParameter[String]("testparam1", OtherParam(), Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1))
-	val TEST_PARAM2 = new ProcessParameter[Integer]("testparam2", OtherParam(), Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
+	val TEST_PARAM1 = new ProcessParameter[String]("testparam1", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM1))
+	val TEST_PARAM2 = new ProcessParameter[Integer]("testparam2", Some(ProcessStubParameterGenerationTest.DEFAULT_VALUES_PARAM2))
 }
 
 class TestProcessStub(params: Map[String, AnyRef] = Map.empty[String, AnyRef]) extends ProcessStub[String, String](params) {

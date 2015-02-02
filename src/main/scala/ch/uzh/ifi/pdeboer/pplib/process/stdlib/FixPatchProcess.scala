@@ -36,9 +36,9 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 }
 
 object FixPatchProcess {
-	val ALL_DATA = new ProcessParameter[List[Patch]]("allData", OtherParam(), Some(List(Nil)))
-	val TARGET_PARAMETER_TO_PASS_ALL_DATA = new ProcessParameter[Option[ProcessParameter[List[Patch]]]]("targetParamToPassPatchesAllData", OtherParam(), Some(List(Some(FixPatchProcess.ALL_DATA))))
-	val PATCHES_TO_INCLUDE_BEFORE_AND_AFTER_MAIN = new ProcessParameter[(Int, Int)]("patchesToIncludeBeforeAndAfterMain", OtherParam(), Some(List((1, 1))))
-	val FIXER_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("fixerProcess", WorkflowParam(), None)
-	val FIXER_BEFORE_AFTER_HANDLER = new ProcessParameter[FixVerifyFPDriver.FVFPDBeforeAfterHandler]("beforeAfterHandler", OtherParam(), Some(List(FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER)))
+	val ALL_DATA = new ProcessParameter[List[Patch]]("allData", Some(List(Nil)))
+	val TARGET_PARAMETER_TO_PASS_ALL_DATA = new ProcessParameter[Option[ProcessParameter[List[Patch]]]]("targetParamToPassPatchesAllData", Some(List(Some(FixPatchProcess.ALL_DATA))))
+	val PATCHES_TO_INCLUDE_BEFORE_AND_AFTER_MAIN = new ProcessParameter[(Int, Int)]("patchesToIncludeBeforeAndAfterMain", Some(List((1, 1))))
+	val FIXER_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("fixerProcess", None)
+	val FIXER_BEFORE_AFTER_HANDLER = new ProcessParameter[FixVerifyFPDriver.FVFPDBeforeAfterHandler]("beforeAfterHandler", Some(List(FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER)))
 }

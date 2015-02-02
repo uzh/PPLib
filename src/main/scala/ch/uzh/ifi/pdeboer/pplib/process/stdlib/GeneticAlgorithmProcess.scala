@@ -35,14 +35,14 @@ class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends Proc
 }
 
 object GeneticAlgorithmProcess {
-	val ELITISM = new ProcessParameter[Double]("elitism", OtherParam(), Some(List(.1d)))
-	val RECOMBINATION_FRACTION = new ProcessParameter[Double]("recombinationFraction", OtherParam(), Some(List(.8d)))
-	val MUTATION_FRACTION = new ProcessParameter[Double]("mutationFraction", OtherParam(), Some(List(.1d)))
-	val COMBINE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("combineQuestion", QuestionParam(), Some(List(DEFAULT_COMBINE_QUESTION)))
-	val COMBINE_TITLE = new ProcessParameter[String]("combineTitle", QuestionParam(), Some(List(DEFAULT_COMBINE_TITLE)))
-	val MUTATE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("mutateQuestion", QuestionParam(), Some(List(DEFAULT_MUTATE_QUESTION)))
-	val MUTATE_TITLE = new ProcessParameter[String]("mutateTitle", QuestionParam(), Some(List(DEFAULT_MUTATE_TITLE)))
-	val RATING_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("ratingQuestion", QuestionParam(), Some(List(DEFAULT_RATING_QUESTION)))
-	val RATING_TITLE = new ProcessParameter[String]("ratingTitle", QuestionParam(), Some(List(DEFAULT_RATING_TITLE)))
-	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", OtherParam(), Some(List(GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION)))
+	val ELITISM = new ProcessParameter[Double]("elitism", Some(List(.1d)))
+	val RECOMBINATION_FRACTION = new ProcessParameter[Double]("recombinationFraction", Some(List(.8d)))
+	val MUTATION_FRACTION = new ProcessParameter[Double]("mutationFraction", Some(List(.1d)))
+	val COMBINE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("combineQuestion", Some(List(DEFAULT_COMBINE_QUESTION)))
+	val COMBINE_TITLE = new ProcessParameter[String]("combineTitle", Some(List(DEFAULT_COMBINE_TITLE)))
+	val MUTATE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("mutateQuestion", Some(List(DEFAULT_MUTATE_QUESTION)))
+	val MUTATE_TITLE = new ProcessParameter[String]("mutateTitle", Some(List(DEFAULT_MUTATE_TITLE)))
+	val RATING_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("ratingQuestion", Some(List(DEFAULT_RATING_QUESTION)))
+	val RATING_TITLE = new ProcessParameter[String]("ratingTitle", Some(List(DEFAULT_RATING_TITLE)))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", Some(List(GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION)))
 }

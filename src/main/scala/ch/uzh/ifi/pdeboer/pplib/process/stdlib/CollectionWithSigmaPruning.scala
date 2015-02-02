@@ -47,11 +47,11 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends P
 }
 
 object CollectionWithSigmaPruning {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected, so please don't just submit a copy&paste of the original text."))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
-	val TITLE_PER_QUESTION = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please refine the following sentence")))
-	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", OtherParam(), Some(List(3)))
-	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", WorkerCountParam(), Some(List(5, 3)))
-	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", OtherParam(), Some(List(HCompQueryProperties())))
-	val PRUNE_TEXT_LENGTH = new ProcessParameter[Boolean]("pruneByTextLength", OtherParam(), Some(List(true)))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence:", questionAfterTuples = "Your answer will be evaluated by other crowd workers and an artificial intelligence. Malicious answers will get rejected, so please don't just submit a copy&paste of the original text."))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
+	val TITLE_PER_QUESTION = new ProcessParameter[String]("title", Some(List("Please refine the following sentence")))
+	val NUM_SIGMAS = new ProcessParameter[Int]("numSigmas", Some(List(3)))
+	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5, 3)))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", Some(List(HCompQueryProperties())))
+	val PRUNE_TEXT_LENGTH = new ProcessParameter[Boolean]("pruneByTextLength", Some(List(true)))
 }

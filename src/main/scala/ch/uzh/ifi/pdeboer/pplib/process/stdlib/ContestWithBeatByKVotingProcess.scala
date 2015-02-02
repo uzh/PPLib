@@ -66,13 +66,13 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 }
 
 object ContestWithBeatByKVotingProcess {
-	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Select the sentence that fits best")))
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
-	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
-	val K = new ProcessParameter[Int]("k", OtherParam(), Some(List(2)))
-	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
-	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
+	val TITLE = new ProcessParameter[String]("title", Some(List("Select the sentence that fits best")))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
+	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", Some(List("")))
+	val K = new ProcessParameter[Int]("k", Some(List(2)))
+	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", Some(List(20)))
+	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(3))))
 
 }

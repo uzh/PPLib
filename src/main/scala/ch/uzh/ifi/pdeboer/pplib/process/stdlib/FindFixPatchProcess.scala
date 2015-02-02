@@ -36,6 +36,6 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends Process
 }
 
 object FindFixPatchProcess {
-	val FIND_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], List[Patch]]]("findProcess", WorkflowParam(), None)
-	val FIX_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], List[Patch]]]("fixProcess", WorkflowParam(), None)
+	val FIND_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], List[Patch]]]("findProcess", None)
+	val FIX_PROCESS = new ProcessParameter[PassableProcessParam[List[Patch], List[Patch]]]("fixProcess", None)
 }

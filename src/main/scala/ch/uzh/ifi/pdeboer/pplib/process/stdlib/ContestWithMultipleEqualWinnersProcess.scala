@@ -30,12 +30,12 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 }
 
 object ContestWithMultipleEqualWinnersProcess {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select sentences you think are erroneous and should be improved"))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(5))))
-	val TITLE = new ProcessParameter[String]("title", QuestionParam(), Some(List("Find erroneous sentences")))
-	val WORKERS_TO_ASK_PER_ITEM = new ProcessParameter[Int]("finders", WorkerCountParam(), Some(List(3)))
-	val MAX_ITEMS_PER_ITERATION = new ProcessParameter[Int]("maxItemsPerFind", OtherParam(), Some(List(10)))
-	val SHUFFLE = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM = new ProcessParameter[Int]("threshold", OtherParam(), Some(List(2)))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTupleStringified("Please select sentences you think are erroneous and should be improved"))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(5))))
+	val TITLE = new ProcessParameter[String]("title", Some(List("Find erroneous sentences")))
+	val WORKERS_TO_ASK_PER_ITEM = new ProcessParameter[Int]("finders", Some(List(3)))
+	val MAX_ITEMS_PER_ITERATION = new ProcessParameter[Int]("maxItemsPerFind", Some(List(10)))
+	val SHUFFLE = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
+	val THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM = new ProcessParameter[Int]("threshold", Some(List(2)))
 }

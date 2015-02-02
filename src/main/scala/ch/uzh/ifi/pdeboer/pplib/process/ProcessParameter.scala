@@ -5,8 +5,8 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 28/11/14.
  */
-@SerialVersionUID(1l) class ProcessParameter[T: ClassTag](keyPostfix: String, val parameterCategory: ProcessParameterCategory = OtherParam(), val candidateDefinitions: Option[Iterable[T]] = None) extends Serializable {
-	def key = parameterCategory + "_" + keyPostfix
+@SerialVersionUID(1l) class ProcessParameter[T: ClassTag](keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None) extends Serializable {
+	def key = keyPostfix
 
 	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
 
@@ -16,29 +16,3 @@ import scala.reflect.ClassTag
 
 	override def toString: String = key
 }
-
-@SerialVersionUID(1l) class ProcessParameterCategory(val parameterPrefix: String) extends Serializable {
-	ProcessParameterCategory.add(this)
-
-	override def toString = parameterPrefix
-}
-
-object ProcessParameterCategory {
-	private var paramCategories = Map.empty[String, ProcessParameterCategory]
-
-	def add(cat: ProcessParameterCategory): Unit = {
-		paramCategories += cat.parameterPrefix -> cat
-	}
-
-	def getAll = paramCategories.toMap
-}
-
-case class WorkerCountParam() extends ProcessParameterCategory("workercount")
-
-case class PortalParam() extends ProcessParameterCategory("portal")
-
-case class QuestionParam() extends ProcessParameterCategory("question")
-
-case class WorkflowParam() extends ProcessParameterCategory("process")
-
-case class OtherParam() extends ProcessParameterCategory("other")

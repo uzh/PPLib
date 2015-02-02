@@ -43,10 +43,10 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 }
 
 object DualPathwayProcess {
-	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_old_el", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
-	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_new_el", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence"))))
-	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", QuestionParam(), Some(List("Please fix up the following sentences")))
-	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", QuestionParam(), Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
-	val TIMEOUT = new ProcessParameter[Duration]("timeout", OtherParam(), Some(List(14 days)))
-	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Int]("chunk_count", OtherParam(), Some(List(2)))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_old_el", Some(List(HCompInstructionsWithTupleStringified("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_new_el", Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence"))))
+	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", Some(List("Please fix up the following sentences")))
+	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
+	val TIMEOUT = new ProcessParameter[Duration]("timeout", Some(List(14 days)))
+	val CHUNK_COUNT_TO_INCLUDE = new ProcessParameter[Int]("chunk_count", Some(List(2)))
 }

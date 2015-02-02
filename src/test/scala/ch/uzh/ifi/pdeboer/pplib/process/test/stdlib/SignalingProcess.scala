@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.{OtherParam, ProcessFactory, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, ProcessParameter, ProcessStub}
 
 import scala.reflect.ClassTag
 
@@ -20,7 +20,7 @@ class SignalingProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = M
 }
 
 object SignalingProcess {
-	val OUTPUT = new ProcessParameter[AnyRef]("out", OtherParam(), None)
+	val OUTPUT = new ProcessParameter[AnyRef]("out", None)
 }
 
 class SignalingProcessFactory extends ProcessFactory {

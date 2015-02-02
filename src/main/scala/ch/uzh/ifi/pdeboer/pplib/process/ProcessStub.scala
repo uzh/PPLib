@@ -154,9 +154,6 @@ import scala.reflect.runtime.{universe => ru}
 				<Name>
 					{p.key}
 				</Name>
-				<Category>
-					{p.parameterCategory}
-				</Category>
 				<Value>
 					{getParam(p, useDefaultValues = true)}
 				</Value>
@@ -196,8 +193,8 @@ import scala.reflect.runtime.{universe => ru}
 }
 
 object ProcessStub {
-	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", OtherParam(), Some(List(true)))
-	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", OtherParam(), Some(List(None)))
+	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", Some(List(true)))
+	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", Some(List(None)))
 
 	def create[IN: ClassTag, OUT: ClassTag](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None) = {
 		if (factory.isDefined) {
@@ -252,6 +249,6 @@ abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTa
 }
 
 object ProcessStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", PortalParam(), Some(HComp.allDefinedPortals))
-	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", OtherParam(), Some(List(true)))
+	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
+	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
 }

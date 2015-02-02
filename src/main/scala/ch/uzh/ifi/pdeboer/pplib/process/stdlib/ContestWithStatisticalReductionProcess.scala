@@ -80,12 +80,12 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 }
 
 object ContestWithStatisticalReductionProcess {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", QuestionParam(), Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count"))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", QuestionParam(), Some(List(None)))
-	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", QuestionParam(), Some(List("")))
-	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", OtherParam(), Some(List(true)))
-	val TITLE_PARAMETER = new ProcessParameter[String]("title", QuestionParam(), Some(List("Please select the sentence that fits best ")))
-	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", OtherParam(), Some(List(20)))
-	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", OtherParam(), Some(List(0.9d, 0.95d, 0.99d)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", OtherParam(), Some(List(HCompQueryProperties(3))))
+	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count"))))
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
+	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", Some(List("")))
+	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
+	val TITLE_PARAMETER = new ProcessParameter[String]("title", Some(List("Please select the sentence that fits best ")))
+	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", Some(List(20)))
+	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
+	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(3))))
 }
