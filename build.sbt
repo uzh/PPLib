@@ -28,3 +28,5 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
 // To Skip Tests:
 //test in assembly := {}
+
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
