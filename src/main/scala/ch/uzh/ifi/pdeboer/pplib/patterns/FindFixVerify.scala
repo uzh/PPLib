@@ -4,7 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.FindFixVerifyExecutor.FFVPatchContainer
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{NoPruner, Prunable, Pruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{Contest, Contest$}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
@@ -225,10 +225,10 @@ class FFVDefaultHCompDriver(
 	override def verify(patch: FFVPatch[String], alternatives: List[FFVPatch[String]]): FFVPatch[String] = {
 		val memoizerPrefix = patch.patch
 		val memPrefixInParams: String = verifyProcessParam.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
-		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some("verify" + memoizerPrefix.hashCode + memPrefixInParams))
+		val lowerPriorityParams = Map(DefaultParameters.PORTAL_PARAMETER.key -> portal)
+		val higherPriorityParams = Map(DefaultParameters.MEMOIZER_NAME.key -> Some("verify" + memoizerPrefix.hashCode + memPrefixInParams))
 
 		val verifyProcess = verifyProcessParam.create(lowerPriorityParams, higherPriorityParams)
 

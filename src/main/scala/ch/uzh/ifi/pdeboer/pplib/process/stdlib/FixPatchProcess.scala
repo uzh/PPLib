@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FixPatchExecuter, FixVerifyFPDriver}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, PassableProcessParam, Patch}
 
 /**
  * Created by pdeboer on 14/12/14.

@@ -1,6 +1,7 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.parameter
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
 
 import scala.reflect.ClassTag
 
@@ -18,8 +19,6 @@ import scala.reflect.ClassTag
 
 	override def toString: String = key
 }
-
-class InstructionParameter(candidateDefinitions: Option[Iterable[HCompInstructionsWithTuple]] = None, keyPrefix: String = "") extends ProcessParameter[HCompInstructionsWithTuple](keyPrefix + "question", candidateDefinitions)
 
 trait InstructionGenerator {
 	def generate(base: InstructionData): HCompInstructionsWithTuple

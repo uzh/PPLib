@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.process.entities
+package ch.uzh.ifi.pdeboer.pplib.process.parameter
 
 /**
  * Created by pdeboer on 05/12/14.

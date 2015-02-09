@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.ProcessParameter
 import org.junit.{Assert, Test}
 
 /**

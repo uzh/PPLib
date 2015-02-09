@@ -1,8 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.FileProcessMemoizer
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, IndexedPatch, PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
-import ch.uzh.ifi.pdeboer.pplib.process.{FileProcessMemoizer, ProcessStub}
 
 /**
  * Created by pdeboer on 14/12/14.
@@ -15,14 +15,14 @@ object FindAndFix extends App {
 		FixPatchProcess.FIXER_PROCESS.key -> new PassableProcessParam[Patch, Patch](classOf[CollectDecideProcess], params = Map(
 			CollectDecideProcess.COLLECT.key -> new PassableProcessParam[Patch, List[Patch]](classOf[CollectionWithSigmaPruning], Map(
 				CollectionWithSigmaPruning.WORKER_COUNT.key -> 2,
-				ProcessStub.MEMOIZER_NAME.key -> Some("collectioncreator")
+				DefaultParameters.MEMOIZER_NAME.key -> Some("collectioncreator")
 			)),
 			CollectDecideProcess.DECIDE.key -> new PassableProcessParam[List[Patch], Patch](classOf[Contest], Map(
 				Contest.WORKER_COUNT.key -> 1,
-				ProcessStub.MEMOIZER_NAME.key -> Some("contest")
+				DefaultParameters.MEMOIZER_NAME.key -> Some("contest")
 			))
 		)),
-		ProcessStub.MEMOIZER_NAME.key -> Some("collectDecide")
+		DefaultParameters.MEMOIZER_NAME.key -> Some("collectDecide")
 	))
 
 	val memoizer = new FileProcessMemoizer("findfixtest")

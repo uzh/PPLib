@@ -2,8 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.PatchConversion._
 
 import scala.util.Random
 import scala.xml.NodeSeq

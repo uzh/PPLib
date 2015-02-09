@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.ProcessParameter
+import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, ProcessStub}
 
 import scala.reflect.ClassTag
 

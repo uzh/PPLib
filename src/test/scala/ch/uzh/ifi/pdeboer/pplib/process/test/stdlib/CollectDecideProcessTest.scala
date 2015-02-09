@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess
 import org.junit.{Before, Assert, Test}
 

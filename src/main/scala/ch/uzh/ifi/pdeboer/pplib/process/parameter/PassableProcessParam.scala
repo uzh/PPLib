@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.process.entities
+package ch.uzh.ifi.pdeboer.pplib.process.parameter
 
 import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, ProcessStub}
 

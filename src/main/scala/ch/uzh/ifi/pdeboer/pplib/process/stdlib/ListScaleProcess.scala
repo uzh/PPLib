@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, IndexedPatch, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
 
 /**
  * Created by pdeboer on 14/12/14.

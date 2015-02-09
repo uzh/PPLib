@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.VerifyTestProcessStub
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, PassableProcessParam}
 import org.junit.{Assert, Test}
 
 /**

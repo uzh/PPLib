@@ -5,9 +5,9 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{Contest}
-import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.xml.NodeSeq
@@ -69,10 +69,10 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 		val candidatesDistinct = candidates.distinct
 
 		val memPrefixInParams: String = votingProcessParam.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
-		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
+		val lowerPriorityParams = Map(DefaultParameters.PORTAL_PARAMETER.key -> portal)
+		val higherPriorityParams = Map(DefaultParameters.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
 		votingProcess.process(candidatesDistinct.map(c => new Patch(c))).value
@@ -89,7 +89,7 @@ object IRDefaultHCompDriver {
 		Contest.QUESTION.key -> DEFAULT_QUESTION_FOR_VOTING,
 		Contest.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
 		Contest.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
-		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
+		DefaultParameters.MEMOIZER_NAME.key -> Some("IR_voting")
 	)
 
 	val DEFAULT_VOTING_PROCESS = new PassableProcessParam(classOf[Contest], DEFAULT_VOTING_PROCESS_PARAMS)

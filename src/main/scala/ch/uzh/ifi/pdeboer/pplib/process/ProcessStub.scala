@@ -2,7 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.process
 
 import java.lang.reflect.Constructor
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.CostCountingEnabledHCompPortal
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, ProcessParameter}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.collection.parallel.ParSeq
@@ -11,7 +12,7 @@ import scala.reflect.runtime.{universe => ru}
 
 trait IParametrizable {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 
 	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
@@ -31,7 +32,7 @@ trait IParametrizable {
  */
 @SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with IParametrizable with Serializable {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 
 	implicit val processStub = this
 
@@ -193,9 +194,6 @@ trait IParametrizable {
 }
 
 object ProcessStub {
-	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", Some(List(true)))
-	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", Some(List(None)))
-
 	def create[IN: ClassTag, OUT: ClassTag](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None) = {
 		if (factory.isDefined) {
 			factory.get.buildProcess[IN, OUT](params)
@@ -233,10 +231,11 @@ class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends Pr
 
 trait HCompPortalAccess extends IParametrizable {
 	self: ProcessStub[_, _] =>
-	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
+
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	lazy val portal = new CostCountingEnabledHCompPortal(self.getParam(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER))
+	lazy val portal = new CostCountingEnabledHCompPortal(self.getParam(DefaultParameters.PORTAL_PARAMETER))
 
 	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
 		(1 to workerCount).view.mpar
@@ -247,7 +246,3 @@ trait HCompPortalAccess extends IParametrizable {
 	override def defaultParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.defaultParameters
 }
 
-object ProcessStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
-	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
-}
