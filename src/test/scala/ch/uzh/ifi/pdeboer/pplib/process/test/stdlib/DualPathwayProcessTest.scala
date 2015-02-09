@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortal
+import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
 import org.junit.{Assert, Test}
 
@@ -12,5 +14,12 @@ class DualPathwayProcessTest {
 		val constructor = classOf[DualPathwayProcess].getConstructor(classOf[Map[String, Any]])
 		constructor.newInstance(Map.empty[String, Any])
 		Assert.assertTrue(true) //exception if it fails
+	}
+
+	@Test
+	def testPortalParam = {
+		val portal = new RandomHCompPortal("bla")
+		val d = new DualPathwayProcess(Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal))
+		Assert.assertEquals(d.portal.decoratedPortal, portal)
 	}
 }

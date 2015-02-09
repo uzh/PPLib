@@ -11,8 +11,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 28/11/14.
  */
-@PPLibProcess("decide.vote.contestWithBeatByK")
-class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
+@PPLibProcess("decide.majorityVoteWithBeatByK")
+class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[List[Patch], Patch](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 

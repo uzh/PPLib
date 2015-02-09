@@ -1,9 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 
 import scala.concurrent.duration.{Duration, _}
 
@@ -11,9 +11,8 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-@PPLibProcess("create.refine.dualpathway")
-class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[IndexedPatch], List[IndexedPatch]](params) {
-
+@PPLibProcess("create.dualPathway")
+class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[List[IndexedPatch], List[IndexedPatch]](params) with HCompPortalAccess {
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess._
 
 	/**

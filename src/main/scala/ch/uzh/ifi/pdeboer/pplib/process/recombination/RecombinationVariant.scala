@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessStub, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.process.{HCompPortalAccess, ProcessStub}
 
 import scala.reflect.ClassTag
 import scala.xml.NodeSeq
@@ -71,7 +71,7 @@ class RecombinationVariantProcessXMLExporter(val variant: RecombinationVariant, 
 						<Name>
 							{processKey}
 						</Name>{process.xml}{process match {
-						case v: ProcessStubWithHCompPortalAccess[_, _] => <Cost>
+						case v: HCompPortalAccess => <Cost>
 							{v.portal.cost}
 						</Cost>
 						case _ => {}

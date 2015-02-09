@@ -11,8 +11,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 31/10/14.
  */
-@PPLibProcess("decide.vote.contest")
-class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
+@PPLibProcess("decide.majorityVote")
+class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[List[Patch], Patch](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest._
 

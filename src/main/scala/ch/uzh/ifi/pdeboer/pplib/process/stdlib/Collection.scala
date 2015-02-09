@@ -11,8 +11,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 01/12/14.
  */
-@PPLibProcess("create.refine.collection")
-class Collection(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, List[Patch]](params) {
+@PPLibProcess("create.collection")
+class Collection(params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, List[Patch]](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection._
 

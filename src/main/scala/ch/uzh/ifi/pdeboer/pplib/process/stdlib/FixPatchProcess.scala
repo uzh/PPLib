@@ -7,6 +7,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 /**
  * Created by pdeboer on 14/12/14.
  */
+@PPLibProcess("fix.fixPatch")
 class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[List[Patch], List[Patch]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess._

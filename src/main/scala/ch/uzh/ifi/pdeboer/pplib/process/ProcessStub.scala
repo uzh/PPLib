@@ -9,6 +9,19 @@ import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
+trait IParametrizable {
+
+	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
+
+	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
+}
+
 /**
  * Created by pdeboer on 09/10/14.
  *
@@ -16,7 +29,7 @@ import scala.reflect.runtime.{universe => ru}
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with Serializable {
+@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with IParametrizable with Serializable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
 
@@ -57,19 +70,6 @@ import scala.reflect.runtime.{universe => ru}
 	}
 
 	protected def run(data: INPUT): OUTPUT
-
-	/**
-	 * override this method to ensure the definition of some parameters.
-	 * Expected parameters of type "Option" will default to NONE if checked against.
-	 * @return
-	 */
-	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
 
 	protected def processCategoryNames: List[String] = Nil
 
@@ -231,15 +231,14 @@ class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends Pr
 	}
 }
 
-abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](_params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](_params) {
-
+trait HCompPortalAccess extends IParametrizable {
+	self: ProcessStub[_, _] =>
 	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)
+	lazy val portal = new CostCountingEnabledHCompPortal(self.getParam(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER))
 
-	def
-	getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
+	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
 		(1 to workerCount).view.mpar
 	}
 

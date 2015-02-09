@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessP
 /**
  * Created by pdeboer on 22/12/14.
  */
+@PPLibProcess("create.findAndFix")
 class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends ProcessStub[List[IndexedPatch], List[IndexedPatch]](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixPatchProcess._

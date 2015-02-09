@@ -13,8 +13,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 01/12/14.
  */
-@PPLibProcess("create.refine.collectionwithsixsigma")
-class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, List[Patch]](params) {
+@PPLibProcess("create.pruned.collectionWithSigmaPruning")
+class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, List[Patch]](params) with HCompPortalAccess {
 	override protected def run(patch: Patch): List[Patch] = {
 		val memoizer: ProcessMemoizer = getProcessMemoizer(patch.hashCode() + "").getOrElse(new NoProcessMemoizer())
 		logger.info("running contest with sigma pruning for patch " + patch)

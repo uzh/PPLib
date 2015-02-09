@@ -116,7 +116,7 @@ trait HCompPortalAdapter extends LazyLogger {
 }
 
 
-class CostCountingEnabledHCompPortal(decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
+class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
 

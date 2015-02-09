@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 /**
  * Created by pdeboer on 05/12/14.
  */
+@PPLibProcess("create.collectDecide")
 class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, Patch](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess._

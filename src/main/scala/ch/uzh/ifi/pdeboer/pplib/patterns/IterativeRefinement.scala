@@ -91,6 +91,7 @@ object IRDefaultHCompDriver {
 		Contest.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
 		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
 	)
+
 	val DEFAULT_VOTING_PROCESS = new PassableProcessParam(classOf[Contest], DEFAULT_VOTING_PROCESS_PARAMS)
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }

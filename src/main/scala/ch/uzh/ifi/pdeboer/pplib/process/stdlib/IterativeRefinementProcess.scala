@@ -13,7 +13,7 @@ import scala.xml.NodeSeq
  * Created by pdeboer on 30/11/14.
  */
 @PPLibProcess("create.refine.iterativerefinement")
-class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[Patch, Patch](params) {
+class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, Patch](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess._
 
