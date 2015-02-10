@@ -1,6 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.process.parameter
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HComp, HCompPortalAdapter}
+
+import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 09/02/15.
@@ -12,5 +14,9 @@ object DefaultParameters {
 	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", Some(List(true)))
 	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", Some(List(None)))
 
-	val INSTRUCTIONS = new ProcessParameter[InstructionData]("", None)
+	val INSTRUCTIONS = new ProcessParameter[InstructionData]("instructions", None)
+	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
+	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5)))
+	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", Some(List(HCompQueryProperties())))
+	val OVERRIDE_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("instructionGenerator", None)
 }

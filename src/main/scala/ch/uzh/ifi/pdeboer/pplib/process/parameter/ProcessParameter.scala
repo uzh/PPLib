@@ -21,21 +21,29 @@ import scala.reflect.ClassTag
 }
 
 trait InstructionGenerator {
-	def generate(base: InstructionData): HCompInstructionsWithTuple
+	def generateQuestion(base: InstructionData): HCompInstructionsWithTuple
+
+	def generateQuestionTitle(base: InstructionData): String
 }
 
-class InstructionData(val actionName: String = "refine the following paragraph",
-					  val detailedDescription: String = "grammar (e.g. tenses), coherence and text-sophistication",
-					  val evaluation: String = "Malicious/unchanged answers will get rejected. Your answer will be evaluated by other crowd workers.") {
+class InstructionData(
+						 val objectName: String = "paragraph",
+						 val actionName: String = "refine the following paragraph",
+						 val detailedDescription: String = "grammar (e.g. tenses), coherence and text-sophistication",
+						 val evaluation: String = "Malicious/unchanged answers will get rejected. Your answer will be evaluated by other crowd workers.") {
 }
 
 class SimpleInstructionGeneratorCreate extends InstructionGenerator {
-	override def generate(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
-		"Please " + base.actionName + "in terms of " + base.detailedDescription, base.evaluation)
+	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
+		generateQuestionTitle(base) + "in terms of " + base.detailedDescription, base.evaluation)
+
+	override def generateQuestionTitle(base: InstructionData): String = "Please " + base.actionName
 }
 
 class SimpleInstructionGeneratorDecide extends InstructionGenerator {
-	override def generate(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
+	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
 		"Before, crowd workers were asked to " + base.actionName, "Please select the one you like best in terms of " + base.detailedDescription
 	)
+
+	override def generateQuestionTitle(base: InstructionData): String = s"Please select the ${base.objectName} you like best"
 }

@@ -6,16 +6,14 @@ import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, PassablePro
 /**
  * Created by pdeboer on 05/12/14.
  */
-@PPLibProcess("create.collectDecide")
-class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends ProcessStub[Patch, Patch](_params) {
+@PPLibProcess
+class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends CreateProcess[Patch, Patch](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess._
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] =
 		List(COLLECT, DECIDE).asInstanceOf[List[ProcessParameter[_]]]
 
-
-	override protected def processCategoryNames: List[String] = List("create.refine.collectdecide")
 
 	override protected def run(data: Patch): Patch = {
 		val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())

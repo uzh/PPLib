@@ -10,8 +10,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 05/12/14.
  */
-@PPLibProcess("decide.majorityVoteWithMultipleEqualWinners")
-class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[List[Patch], List[Patch]](params) with HCompPortalAccess {
+@PPLibProcess
+class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empty) extends DecideProcess[List[Patch], List[Patch]](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithMultipleEqualWinnersProcess._
 

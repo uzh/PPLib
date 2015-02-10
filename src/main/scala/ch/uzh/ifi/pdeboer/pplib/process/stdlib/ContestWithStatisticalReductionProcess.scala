@@ -11,8 +11,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 03/11/14.
  */
-@PPLibProcess("decide.voteWithStatisticalConfidence")
-class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[List[Patch], Patch](params) with HCompPortalAccess {
+@PPLibProcess
+class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess._
 

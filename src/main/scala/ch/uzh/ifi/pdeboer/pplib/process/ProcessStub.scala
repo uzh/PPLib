@@ -2,8 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.process
 
 import java.lang.reflect.Constructor
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.CostCountingEnabledHCompPortal
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.collection.parallel.ParSeq
@@ -79,11 +79,7 @@ trait IParametrizable {
 			if (processCategoryNames == null)
 				Nil
 			else processCategoryNames
-		val annotation =
-			if (this.getClass.isAnnotationPresent(classOf[PPLibProcess]))
-				this.getClass.getAnnotation(classOf[PPLibProcess]).value()
-			else ""
-		(annotation :: names).map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
+		names.map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
 	}
 
 
@@ -211,6 +207,10 @@ object ProcessStub {
 	}
 }
 
+abstract class CreateProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
+
+abstract class DecideProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
+
 trait ProcessFactory {
 	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
 
@@ -241,8 +241,35 @@ trait HCompPortalAccess extends IParametrizable {
 		(1 to workerCount).view.mpar
 	}
 
-	def isParallel = PARALLEL_EXECUTION_PARAMETER.get
-
 	override def defaultParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.defaultParameters
+}
+
+trait InstructionHandler extends IParametrizable {
+	self: ProcessStub[_, _] =>
+
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+
+	def instructions: HCompInstructionsWithTuple =
+		instructionGenerator.generateQuestion(self.getParam(INSTRUCTIONS))
+
+	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))
+
+	def instructionGenerator: InstructionGenerator = {
+		val generator = self.getParamOption(OVERRIDE_INSTRUCTION_GENERATOR) match {
+			case None => defaultInstructionGenerator.get //TODO yep, this is horrible
+			case Some(x: InstructionGenerator) => x
+		}
+		generator
+	}
+
+	def defaultInstructionGenerator: Option[InstructionGenerator] = self match {
+		case x: CreateProcess[_, _] => Some(new SimpleInstructionGeneratorCreate())
+		case x: DecideProcess[_, _] => Some(new SimpleInstructionGeneratorDecide())
+		case _ => None
+	}
+
+	override def defaultParameters: List[ProcessParameter[_]] = List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE) ::: super.defaultParameters
+
+	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS) ::: super.defaultParameters
 }
 

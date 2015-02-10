@@ -7,8 +7,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, PassablePro
 /**
  * Created by pdeboer on 14/12/14.
  */
-@PPLibProcess("fix.fixPatch")
-class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[List[Patch], List[Patch]](params) {
+@PPLibProcess
+class FixPatchProcess(params: Map[String, Any] = Map.empty) extends CreateProcess[List[Patch], List[Patch]](params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess._
 

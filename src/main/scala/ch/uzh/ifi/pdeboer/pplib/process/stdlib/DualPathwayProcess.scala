@@ -11,8 +11,8 @@ import scala.concurrent.duration.{Duration, _}
 /**
  * Created by pdeboer on 04/11/14.
  */
-@PPLibProcess("create.dualPathway")
-class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStub[List[IndexedPatch], List[IndexedPatch]](params) with HCompPortalAccess {
+@PPLibProcess
+class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](params) with HCompPortalAccess {
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess._
 
 	/**

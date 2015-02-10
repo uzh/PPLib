@@ -6,8 +6,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.parameter._
 /**
  * Created by pdeboer on 22/12/14.
  */
-@PPLibProcess("create.findAndFix")
-class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends ProcessStub[List[IndexedPatch], List[IndexedPatch]](_params) {
+@PPLibProcess
+class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixPatchProcess._
 
