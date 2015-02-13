@@ -2,7 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import java.lang.reflect.Constructor
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
 import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
@@ -89,3 +90,31 @@ trait InstructionHandler extends IParametrizable {
 	}
 }
 
+trait QueryInjection extends IParametrizable {
+	self: ProcessStub[_, _] =>
+
+	def createComposite(baseQuery: List[HCompQuery]): CompositeQuery = CompositeQuery(baseQuery ::: INJECT_QUERIES.get.values.toList,
+		"", baseQuery.find(_.title != "").map(_.title).getOrElse(""))
+
+	def createComposite(baseQuery: HCompQuery): CompositeQuery = createComposite(List(baseQuery))
+
+	private def getQueryAnswersFromComposite(compositeAnswer: CompositeQueryAnswer, needle: Map[String, HCompQuery]): Map[String, HCompAnswer] =
+		needle.map(q => q._1 -> compositeAnswer.get[HCompAnswer](q._2)).toMap
+
+	def addInjectedAnswersToPatch(patch: Patch, compositeAnswers: List[CompositeQueryAnswer], additionalQueryData: Map[String, HCompQuery] = Map.empty): Unit = {
+		val map: List[Map[String, HCompAnswer]] = compositeAnswers.map(c =>
+			getQueryAnswersFromComposite(c, INJECT_QUERIES.get) ++
+				getQueryAnswersFromComposite(c, additionalQueryData))
+		if (map.size > 0) {
+			patch.auxiliaryInformation += ("answersForInjectedQueries" -> map)
+		}
+	}
+
+	def addInjectedAnswersToPatch(patch: Patch, compositeAnswer: CompositeQueryAnswer): Unit = {
+		addInjectedAnswersToPatch(patch, List(compositeAnswer))
+	}
+
+	override def defaultParameters: List[ProcessParameter[_]] = {
+		combineParameterLists(List(INJECT_QUERIES), super.defaultParameters)
+	}
+}

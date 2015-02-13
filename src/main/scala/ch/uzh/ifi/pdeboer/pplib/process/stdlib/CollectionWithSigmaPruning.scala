@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{SigmaCalculator, SigmaPruner}
-import ch.uzh.ifi.pdeboer.pplib.process._
+import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{Prunable, SigmaCalculator, SigmaPruner}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
@@ -12,7 +11,7 @@ import scala.util.Random
  * Created by pdeboer on 01/12/14.
  */
 @PPLibProcess
-class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends CreateProcess[Patch, List[Patch]](params) with HCompPortalAccess with InstructionHandler {
+class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends CreateProcess[Patch, List[Patch]](params) with HCompPortalAccess with InstructionHandler with QueryInjection {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
@@ -20,28 +19,38 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends C
 		val memoizer: ProcessMemoizer = getProcessMemoizer(patch.hashCode() + "").getOrElse(new NoProcessMemoizer())
 		logger.info("running contest with sigma pruning for patch " + patch)
 
-		val answerTextsWithinSigmas: List[String] = memoizer.mem("answer_line_" + patch) {
+		memoizer.mem("answer_line_" + patch) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
 
 				val instructionString: String = instructions.getInstructions(patch + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
-				portal.sendQueryAndAwaitResult(FreetextQuery(
-					instructionString, "", instructionTitle + w + "_" + Math.abs(Random.nextInt())), QUESTION_PRICE.get).get.is[FreetextAnswer]
+				val mainQuery: FreetextQuery = FreetextQuery(
+					instructionString, "", instructionTitle + w + "_" + Math.abs(Random.nextInt()))
+
+				val res = portal.sendQueryAndAwaitResult(createComposite(mainQuery), QUESTION_PRICE.get).get.is[CompositeQueryAnswer]
+				PrunableTuple(res, res.get[FreetextAnswer](mainQuery))
 			}).toList
 
-			val timeWithinSigma: List[HCompAnswer] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
+			val timeWithinSigma: List[PrunableTuple] = new SigmaPruner(NUM_SIGMAS.get).prune(answers)
 			logger.info(s"TIME MEASURE: pruned ${answers.size - timeWithinSigma.size} answers for patch " + patch)
 
-			val withinSigma = if (PRUNE_TEXT_LENGTH.get) {
-				val calc = new SigmaCalculator(timeWithinSigma.map(_.is[FreetextAnswer].answer.length.toDouble), NUM_SIGMAS.get)
+			val withinSigma: List[PrunableTuple] = if (PRUNE_TEXT_LENGTH.get) {
+				val calc = new SigmaCalculator(timeWithinSigma.map(_.freetextAnswer.answer.length.toDouble), NUM_SIGMAS.get)
 				timeWithinSigma.filter(a => {
-					val fta = a.is[FreetextAnswer].answer.length.toDouble
+					val fta = a.freetextAnswer.answer.length.toDouble
 					fta >= calc.minAllowedValue && fta <= calc.maxAllowedValue
 				})
 			} else timeWithinSigma
 
-			withinSigma.map(a => a.is[FreetextAnswer].answer).toSet.toList
+			withinSigma.map(a => {
+				val p = patch.duplicate(a.freetextAnswer.answer)
+				addInjectedAnswersToPatch(p, a.composite)
+				p
+			})
 		}
-		answerTextsWithinSigmas.map(a => patch.duplicate(a))
+	}
+
+	private case class PrunableTuple(composite: CompositeQueryAnswer, freetextAnswer: FreetextAnswer) extends Prunable {
+		override def prunableDouble: Double = freetextAnswer.prunableDouble
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(PRUNE_TEXT_LENGTH, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters

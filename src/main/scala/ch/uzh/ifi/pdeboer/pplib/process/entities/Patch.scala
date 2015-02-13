@@ -23,14 +23,22 @@ class Patch(val value: String, val payload: Option[_ <: Serializable] = None) ex
 
 	override def toString = value
 
-	def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload) = new Patch(value, payload)
+	def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload) = {
+		val p = new Patch(value, payload)
+		p.auxiliaryInformation = auxiliaryInformation
+		p
+	}
 }
 
 @SerialVersionUID(1l)
 class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializable] = None) extends Patch(value, payload) with Serializable {
 	def this(t: (String, Int)) = this(t._1, t._2)
 
-	override def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload): Patch = new IndexedPatch(value, index, payload)
+	override def duplicate(value: String, payload: Option[_ <: Serializable] = this.payload): Patch = {
+		val p = new IndexedPatch(value, index, payload)
+		p.auxiliaryInformation = auxiliaryInformation
+		p
+	}
 
 
 	override def canEqual(other: Any): Boolean = other.isInstanceOf[IndexedPatch]

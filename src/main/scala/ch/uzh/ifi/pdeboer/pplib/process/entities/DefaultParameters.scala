@@ -25,5 +25,5 @@ object DefaultParameters {
 
 	val MAX_ITERATIONS = new ProcessParameter[Int]("maxIterations", Some(List(20)))
 
-	val INJECT_QUERY = new ProcessParameter[List[HCompQuery]]("injectQuery", Some(List()))
+	val INJECT_QUERIES = new ProcessParameter[Map[String, HCompQuery]]("injectQuery", Some(List(Map.empty[String, HCompQuery])))
 }

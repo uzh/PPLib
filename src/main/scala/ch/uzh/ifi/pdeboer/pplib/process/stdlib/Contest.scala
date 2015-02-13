@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
@@ -11,7 +10,7 @@ import scala.util.Random
  * Created by pdeboer on 31/10/14.
  */
 @PPLibProcess
-class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
+class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with QueryInjection {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
@@ -24,11 +23,12 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 				memoizer.mem("it" + w)(
 					U.retry(2) {
+						val baseQuery: MultipleChoiceQuery = createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList)
 						portal.sendQueryAndAwaitResult(
-							createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList),
+							createComposite(baseQuery),
 							QUESTION_PRICE.get
 						) match {
-							case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
+							case Some(a: CompositeQueryAnswer) => (a, a.get[MultipleChoiceAnswer](baseQuery))
 							case _ => {
 								logger.info(s"${getClass.getSimpleName} didn't get answer for query. retrying..")
 								throw new IllegalStateException("didnt get any response")
@@ -37,9 +37,11 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 					}
 				)).toList
 
-			val valueOfAnswer: String = answers.groupBy(s => s).maxBy(s => s._2.size)._1
+			val valueOfAnswer = answers.groupBy(s => s._2.selectedAnswer).maxBy(s => s._2.length)._1
 			logger.info("got answer " + valueOfAnswer)
-			alternatives.find(_.value == valueOfAnswer).get
+			val p = alternatives.find(_.value == valueOfAnswer).get
+			addInjectedAnswersToPatch(p, answers.map(_._1))
+			p
 		}
 
 	}
