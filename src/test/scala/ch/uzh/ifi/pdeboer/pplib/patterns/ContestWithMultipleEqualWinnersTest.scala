@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompInstructionsWithTupleStringified$, HCompPortalAdapter, MockHCompPortal}
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import org.junit.{Assert, Test}
 

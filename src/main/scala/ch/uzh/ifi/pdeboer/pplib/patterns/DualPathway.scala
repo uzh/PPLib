@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.IndexedPatch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.concurrent.duration._

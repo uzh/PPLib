@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{GenericPassableProcessParam, Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, GenericPassableProcessParam, Patch, ProcessParameter}
 
 /**
  * Created by pdeboer on 30/11/14.
@@ -11,7 +11,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.parameter.{GenericPassableProcessParam, 
 @PPLibProcess
 class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends CreateProcess[Patch, Patch](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess._
 
 	override protected def run(data: Patch): Patch = {

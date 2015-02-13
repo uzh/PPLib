@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter._
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
  * Created by pdeboer on 22/12/14.

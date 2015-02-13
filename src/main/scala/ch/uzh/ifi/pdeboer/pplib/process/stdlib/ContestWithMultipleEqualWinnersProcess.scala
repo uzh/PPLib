@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, Patch, ProcessParameter}
 
 /**
  * Created by pdeboer on 05/12/14.
@@ -10,7 +10,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
 @PPLibProcess
 class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empty) extends DecideProcess[List[Patch], List[Patch]](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithMultipleEqualWinnersProcess._
 
 	override protected def run(data: List[Patch]): List[Patch] = {

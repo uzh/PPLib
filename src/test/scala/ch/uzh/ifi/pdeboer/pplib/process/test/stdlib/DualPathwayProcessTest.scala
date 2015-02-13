@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortal
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters
+import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
 import org.junit.{Assert, Test}
 

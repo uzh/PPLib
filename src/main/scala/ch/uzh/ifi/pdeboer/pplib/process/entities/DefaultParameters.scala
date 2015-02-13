@@ -1,6 +1,6 @@
-package ch.uzh.ifi.pdeboer.pplib.process.parameter
+package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQuery, HCompQueryProperties, HComp, HCompPortalAdapter}
 
 import scala.xml.NodeSeq
 
@@ -25,4 +25,5 @@ object DefaultParameters {
 
 	val MAX_ITERATIONS = new ProcessParameter[Int]("maxIterations", Some(List(20)))
 
+	val INJECT_QUERY = new ProcessParameter[List[HCompQuery]]("injectQuery", Some(List()))
 }

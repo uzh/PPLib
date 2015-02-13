@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, MockHCompPortal}
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 import org.junit.{Assert, Test}

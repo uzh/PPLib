@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, Patch}
 
 /**
  * Created by pdeboer on 14/12/14.

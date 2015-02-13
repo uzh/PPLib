@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, Patch, ProcessParameter}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -13,7 +13,7 @@ import scala.util.Random
 @PPLibProcess
 class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	protected var votes = mutable.HashMap.empty[String, Int]

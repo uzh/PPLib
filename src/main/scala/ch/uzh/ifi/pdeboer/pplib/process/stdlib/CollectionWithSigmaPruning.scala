@@ -3,8 +3,8 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{SigmaCalculator, SigmaPruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.PatchConversion._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, Patch, ProcessParameter}
 
 import scala.util.Random
 
@@ -14,7 +14,7 @@ import scala.util.Random
 @PPLibProcess
 class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends CreateProcess[Patch, List[Patch]](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning._
 	override protected def run(patch: Patch): List[Patch] = {
 		val memoizer: ProcessMemoizer = getProcessMemoizer(patch.hashCode() + "").getOrElse(new NoProcessMemoizer())

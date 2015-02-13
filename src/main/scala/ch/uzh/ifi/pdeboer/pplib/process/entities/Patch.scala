@@ -1,10 +1,11 @@
-package ch.uzh.ifi.pdeboer.pplib.process.parameter
+package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 /**
  * Created by pdeboer on 05/12/14.
  */
 @SerialVersionUID(1l)
 class Patch(val value: String, val payload: Option[_ <: Serializable] = None) extends Serializable {
+	var auxiliaryInformation: Map[String, Any] = Map.empty
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[Patch]
 

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
 
 import scala.reflect.ClassTag
 

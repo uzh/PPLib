@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{IndexedPatch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FindFixPatchProcess
 import junit.framework.Assert
 import org.junit.Test

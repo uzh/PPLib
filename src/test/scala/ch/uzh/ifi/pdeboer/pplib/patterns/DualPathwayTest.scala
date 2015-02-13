@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.IndexedPatch
+import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import org.junit.{Assert, Test}
 
 /**

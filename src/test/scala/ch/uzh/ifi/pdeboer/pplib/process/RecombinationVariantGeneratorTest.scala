@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, PassableProcessParam}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.RecombinationVariantGenerator
 import org.junit.{Assert, Test}
 

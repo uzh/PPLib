@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, Patch, ProcessParameter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.util.Random
@@ -13,7 +13,7 @@ import scala.util.Random
 @PPLibProcess
 class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
 	override def run(alternatives: List[Patch]): Patch = {
 		if (alternatives.size == 0) null

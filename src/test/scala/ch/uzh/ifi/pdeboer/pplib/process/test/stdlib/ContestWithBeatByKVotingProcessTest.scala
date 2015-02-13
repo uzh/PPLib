@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters
+import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess
 import org.junit.{Assert, Test}
 

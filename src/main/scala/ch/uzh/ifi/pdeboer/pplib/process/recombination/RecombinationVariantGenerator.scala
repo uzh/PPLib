@@ -2,8 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import java.lang.reflect.Constructor
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, PassableProcessParam}
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, ProcessParameter, PassableProcessParam}
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

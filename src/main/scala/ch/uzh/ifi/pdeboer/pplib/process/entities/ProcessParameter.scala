@@ -1,7 +1,6 @@
-package ch.uzh.ifi.pdeboer.pplib.process.parameter
+package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub
 
 import scala.reflect.ClassTag
 

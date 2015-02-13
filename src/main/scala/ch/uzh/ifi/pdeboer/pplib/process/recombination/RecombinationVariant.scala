@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.PassableProcessParam
-import ch.uzh.ifi.pdeboer.pplib.process.{HCompPortalAccess, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.HCompPortalAccess
 
 import scala.reflect.ClassTag
 import scala.xml.NodeSeq
