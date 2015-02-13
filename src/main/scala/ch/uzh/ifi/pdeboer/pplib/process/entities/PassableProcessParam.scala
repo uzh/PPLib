@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessFactory
+import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessFactory
 
 import scala.reflect.ClassTag
 

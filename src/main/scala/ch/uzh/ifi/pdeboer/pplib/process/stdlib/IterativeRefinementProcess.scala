@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, GenericPassableProcessParam, Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
  * Created by pdeboer on 30/11/14.

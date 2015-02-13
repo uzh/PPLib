@@ -4,7 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.{SigmaCalculator, SigmaPruner}
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.PatchConversion._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 import scala.util.Random
 

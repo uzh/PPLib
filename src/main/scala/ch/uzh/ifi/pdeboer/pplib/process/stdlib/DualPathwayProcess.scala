@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, ProcessParameter, IndexedPatch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 import scala.concurrent.duration.{Duration, _}
 

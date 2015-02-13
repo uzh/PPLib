@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, DefaultProcessFactory, FileProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.reflect.ClassTag

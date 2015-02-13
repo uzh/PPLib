@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
-import ch.uzh.ifi.pdeboer.pplib.process.FileProcessMemoizer
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, IndexedPatch, PassableProcessParam, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 
 /**

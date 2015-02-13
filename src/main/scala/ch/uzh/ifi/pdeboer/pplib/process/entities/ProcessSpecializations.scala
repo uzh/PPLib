@@ -1,20 +1,12 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import java.lang.reflect.Constructor
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HCompInstructionsWithTuple}
-import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
-
-
-
-
-
-
 
 abstract class CreateProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
 

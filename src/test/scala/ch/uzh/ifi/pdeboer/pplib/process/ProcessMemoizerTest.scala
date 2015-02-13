@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.FileProcessMemoizer
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IterativeRefinementProcess
 import org.junit.{Assert, Test}
 

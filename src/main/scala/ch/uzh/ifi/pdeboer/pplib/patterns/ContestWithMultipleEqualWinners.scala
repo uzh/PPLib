@@ -2,8 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners.PatchContainer
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
-import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{NoProcessMemoizer, ProcessMemoizer, Patch}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.parallel.{ParSet, ForkJoinTaskSupport}

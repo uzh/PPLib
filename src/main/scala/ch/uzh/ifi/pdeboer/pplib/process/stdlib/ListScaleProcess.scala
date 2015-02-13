@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.CreateProcess
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**

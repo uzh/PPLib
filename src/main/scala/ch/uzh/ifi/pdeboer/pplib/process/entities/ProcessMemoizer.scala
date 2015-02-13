@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.process
+package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import java.io._
 
