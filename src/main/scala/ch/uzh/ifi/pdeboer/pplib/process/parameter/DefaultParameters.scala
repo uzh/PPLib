@@ -14,7 +14,7 @@ object DefaultParameters {
 	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", Some(List(true)))
 	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", Some(List(None)))
 
-	val INSTRUCTIONS = new ProcessParameter[InstructionData]("instructions", None)
+	val INSTRUCTIONS = new ProcessParameter[InstructionData]("instructions", Some(List(new InstructionData())))
 	val INSTRUCTIONS_ITALIC = new ProcessParameter[String]("instructionItalic", Some(List("")))
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5)))
