@@ -11,7 +11,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 /**
  * Created by pdeboer on 10/12/14.
  */
-@PPLibProcess
+//@PPLibProcess
 class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends CreateProcess[List[Patch], List[Patch]](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.GeneticAlgorithmProcess._

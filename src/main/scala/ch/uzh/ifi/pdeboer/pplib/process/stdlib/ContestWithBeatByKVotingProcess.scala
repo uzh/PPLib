@@ -2,18 +2,18 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
 
 import scala.collection.mutable
 import scala.util.Random
-import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 28/11/14.
  */
 @PPLibProcess
-class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess {
+class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
 
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	protected var votes = mutable.HashMap.empty[String, Int]
@@ -30,7 +30,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(delta).foreach(w => {
 					val answer = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
-						PRICE_PER_VOTE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+						QUESTION_PRICE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
 					logger.info("waiting for lock..")
 					stringData.synchronized {
 						logger.info("got lock. storing vote")
@@ -47,7 +47,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	}
 
 	def shouldStartAnotherIteration: Boolean = {
-		delta < K.get && votes.values.sum + delta < MAX_VOTES.get
+		delta < K.get && votes.values.sum + delta < MAX_ITERATIONS.get
 	}
 
 	def delta = if (votes.values.sum == 0) 3 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
@@ -59,20 +59,12 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		new MultipleChoiceQuery(QUESTION.get.getInstructions(INSTRUCTION_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, TITLE.get + " " + Math.abs(Random.nextInt()))
+		new MultipleChoiceQuery(instructions.getInstructions(INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, instructionTitle)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, INSTRUCTION_ITALIC, MAX_VOTES, PRICE_PER_VOTE, QUESTION_AUX, QUESTION, K, TITLE)
+	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K, INSTRUCTIONS_ITALIC)
 }
 
 object ContestWithBeatByKVotingProcess {
-	val TITLE = new ProcessParameter[String]("title", Some(List("Select the sentence that fits best")))
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
-	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", Some(List("")))
 	val K = new ProcessParameter[Int]("k", Some(List(2)))
-	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", Some(List(20)))
-	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(3))))
-
 }

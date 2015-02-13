@@ -4,6 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, LazyLogger}
 
 import scala.concurrent.duration._
+import scala.util.Random
 import scala.xml.NodeSeq
 
 /**
@@ -58,7 +59,9 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		val qualifications: List[QualificationRequirement] = properties.qualifications.map(q =>
 			MTurkQualificationObjectConversion.toMTurkQualificationRequirement(q)).filterNot(_ == null)
 
-		val hitTypeID = service.RegisterHITType(query.title.take(120), query.question, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], ONE_DAY, qualifications)
+		val rnd = Math.abs(Random.nextInt()) + ""
+		val title: String = query.title.take(117 - rnd.length) + " [" + rnd + "]"
+		val hitTypeID = service.RegisterHITType(title, query.question, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], ONE_DAY, qualifications)
 		hit = service.CreateHIT(hitTypeID, new Question(mtQuery.xml), ONE_DAY, 1).HITId
 		hit
 	}

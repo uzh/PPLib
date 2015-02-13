@@ -2,19 +2,18 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.util.Random
-import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 31/10/14.
  */
 @PPLibProcess
-class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess {
+class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest._
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 
 	override def run(alternatives: List[Patch]): Patch = {
 		if (alternatives.size == 0) null
@@ -26,8 +25,8 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 				memoizer.mem("it" + w)(
 					U.retry(2) {
 						portal.sendQueryAndAwaitResult(
-							createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList, QUESTION.get, INSTRUCTION_ITALIC.get, TITLE.get + " " + Math.abs(Random.nextInt())),
-							PRICE_PER_VOTE.get
+							createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList),
+							QUESTION_PRICE.get
 						) match {
 							case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
 							case _ => {
@@ -45,22 +44,11 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 
 	}
 
-	def createMultipleChoiceQuestion(alternatives: List[String], instructions: HCompInstructionsWithTuple, auxString: String, title: String): MultipleChoiceQuery = {
+	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		new MultipleChoiceQuery(instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, title)
+		new MultipleChoiceQuery(instructions.getInstructions("", htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, instructionTitle + " " + Math.abs(Random.nextDouble()))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(INSTRUCTION_ITALIC,
-			QUESTION_AUX, TITLE, QUESTION, WORKER_COUNT, PRICE_PER_VOTE) ::: super.optionalParameters
-}
-
-object Contest {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTuple]("question", Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count", questionAfterTuples = "Please do not accept more than 1 HIT in this group."))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
-	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", Some(List("")))
-	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
-	val TITLE = new ProcessParameter[String]("title", Some(List("Select the sentence that fits best")))
-	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(3)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(3))))
+		List(WORKER_COUNT) ::: super.optionalParameters
 }

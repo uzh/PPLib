@@ -21,6 +21,12 @@ trait IParametrizable {
 	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
 
 	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
+
+	def combineParameterLists(paramsToAdd: List[ProcessParameter[_]], existingParameters: List[ProcessParameter[_]]): List[ProcessParameter[_]] = {
+		val existingKeys: List[String] = existingParameters.map(_.key)
+		val nonExisting = paramsToAdd.filterNot(p => existingKeys.contains(p.key))
+		nonExisting ::: existingParameters
+	}
 }
 
 /**
@@ -95,7 +101,8 @@ trait IParametrizable {
 	}
 
 	def allParams: List[ProcessParameter[_]] = {
-		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters ::: defaultParameters
+		expectedParametersOnConstruction ::: expectedParametersBeforeRun :::
+			optionalParameters ::: defaultParameters
 	}
 
 	def allParameterTypesCorrect: Boolean = {
@@ -138,13 +145,6 @@ trait IParametrizable {
 		<OutputClass>
 			{outputType.runtimeClass.getCanonicalName}
 		</OutputClass>
-		<Categories>
-			{processCategories.map(c => {
-			<Category>
-				{c.path}
-			</Category>
-		})}
-		</Categories>
 		<Parameters>
 			{allParams.map(p => {
 			<Parameter>
@@ -164,6 +164,10 @@ trait IParametrizable {
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	processCategories.foreach(c => ProcessDB.put(c, this))
+	if (allParams.map(_.key).toSet.size
+		!= allParams.map(_.key).size) {
+		println("bad")
+	}
 	assert(allParams.map(_.key).toSet.size
 		== allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
 
@@ -241,7 +245,7 @@ trait HCompPortalAccess extends IParametrizable {
 		(1 to workerCount).view.mpar
 	}
 
-	override def defaultParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.defaultParameters
+	override def defaultParameters: List[ProcessParameter[_]] = combineParameterLists(List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER), super.defaultParameters)
 }
 
 trait InstructionHandler extends IParametrizable {
@@ -268,8 +272,23 @@ trait InstructionHandler extends IParametrizable {
 		case _ => None
 	}
 
-	override def defaultParameters: List[ProcessParameter[_]] = List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE) ::: super.defaultParameters
+	override def defaultParameters: List[ProcessParameter[_]] = {
+		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE), super.defaultParameters)
+	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(INSTRUCTIONS) ::: super.defaultParameters
+	override def optionalParameters: List[ProcessParameter[_]] = {
+		val superParam: List[ProcessParameter[_]] = try {
+			super.optionalParameters
+		}
+		catch {
+			case e: AbstractMethodError => Nil
+
+			/**
+			 * AbstractMethodError occurs if class extends existing class with this trait, hence
+			 * trait is applied multiple times in a row
+			 */
+		}
+		combineParameterLists(List(INSTRUCTIONS), superParam)
+	}
 }
 

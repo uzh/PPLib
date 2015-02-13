@@ -30,5 +30,5 @@ class Collection(params: Map[String, Any] = Map.empty) extends CreateProcess[Pat
 		answers.map(a => line.duplicate(a))
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(QUESTION_AUX, QUESTION_PRICE, INSTRUCTIONS, WORKER_COUNT) ::: super.optionalParameters
+	override def optionalParameters: List[ProcessParameter[_]] = List(WORKER_COUNT) ::: super.optionalParameters
 }

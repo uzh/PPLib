@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, ProcessParameter, PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, PassableProcessParam, Patch, ProcessParameter}
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
@@ -65,7 +64,7 @@ object FixVerifyFPDriver {
 
 	val DEFAULT_BEFORE_AFTER_HANDLER = None // beforeAfterInstructions()
 
-	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = CollectionWithSigmaPruning.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = DefaultParameters.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <before>
 			<p>The following information is just provided such that you get a better feel for the whole. Please
 				<b>do not</b>
