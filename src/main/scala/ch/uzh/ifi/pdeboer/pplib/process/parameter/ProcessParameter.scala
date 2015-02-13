@@ -33,6 +33,12 @@ class InstructionData(
 						 val evaluation: String = "Malicious/unchanged answers will get rejected. Your answer will be evaluated by other crowd workers.") {
 }
 
+class ExplicitInstructionGenerator(question: HCompInstructionsWithTuple, title: String) extends InstructionGenerator {
+	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = question
+
+	override def generateQuestionTitle(base: InstructionData): String = title
+}
+
 class SimpleInstructionGeneratorCreate extends InstructionGenerator {
 	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
 		generateQuestionTitle(base) + "in terms of " + base.detailedDescription, base.evaluation)
