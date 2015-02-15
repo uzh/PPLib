@@ -4,15 +4,15 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HC
 import ch.uzh.ifi.pdeboer.pplib.patterns.GeneticAlgorithmHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{GAIterationLimitTerminator, GeneticAlgorithmExecutor, GeneticAlgorithmHCompDriver}
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{ProcessParameter, Patch}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 
 /**
  * Created by pdeboer on 10/12/14.
  */
-@PPLibProcess("create.refine.geneticalgorithm")
-class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[Patch], List[Patch]](params) {
+//@PPLibProcess
+class GeneticAlgorithmProcess(params: Map[String, Any] = Map.empty) extends CreateProcess[List[Patch], List[Patch]](params) with HCompPortalAccess {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.GeneticAlgorithmProcess._
 

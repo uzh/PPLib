@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, MockHCompPortal}
-import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 import org.junit.{Assert, Test}
@@ -22,10 +21,10 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.QUESTION.key -> HCompInstructionsWithTupleStringified(""),
+				DefaultParameters.INSTRUCTIONS.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
-				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
-				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
+				DefaultParameters.PORTAL_PARAMETER.key -> new MockHCompPortal(),
+				DefaultParameters.SHUFFLE_CHOICES.key -> false
 
 			))
 
@@ -47,10 +46,10 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				ContestWithStatisticalReductionProcess.QUESTION.key -> HCompInstructionsWithTupleStringified(""),
+				DefaultParameters.INSTRUCTIONS.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.95,
-				ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> new MockHCompPortal(),
-				ContestWithStatisticalReductionProcess.SHUFFLE_CHOICES.key -> false
+				DefaultParameters.PORTAL_PARAMETER.key -> new MockHCompPortal(),
+				DefaultParameters.SHUFFLE_CHOICES.key -> false
 			))
 
 		Assert.assertEquals(new Patch("2"), subject.process(data))

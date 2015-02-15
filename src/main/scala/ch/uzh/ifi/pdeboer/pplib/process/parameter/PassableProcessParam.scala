@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.process.entities
+package ch.uzh.ifi.pdeboer.pplib.process.parameter
 
 import ch.uzh.ifi.pdeboer.pplib.process.{ProcessFactory, ProcessStub}
 
@@ -7,7 +7,7 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 14/12/14.
  */
-class PassableProcessParam[IN: ClassTag, OUT: ClassTag](val clazz: Class[_ <: ProcessStub[IN, OUT]],
+class GenericPassableProcessParam[IN: ClassTag, OUT: ClassTag, Base <: ProcessStub[IN, OUT]](val clazz: Class[_ <: Base],
 														var params: Map[String, Any] = Map.empty,
 														val factory: Option[ProcessFactory] = None) {
 	protected var _createdProcesses = List.empty[ProcessStub[IN, OUT]]
@@ -30,3 +30,8 @@ class PassableProcessParam[IN: ClassTag, OUT: ClassTag](val clazz: Class[_ <: Pr
 
 	def getParam[T](key: String) = params.get(key).asInstanceOf[Option[T]]
 }
+
+class PassableProcessParam[IN: ClassTag, OUT: ClassTag](clazz: Class[_ <: ProcessStub[IN, OUT]],
+														params: Map[String, Any] = Map.empty,
+														factory: Option[ProcessFactory] = None)
+	extends GenericPassableProcessParam[IN, OUT, ProcessStub[IN, OUT]](clazz, params, factory)

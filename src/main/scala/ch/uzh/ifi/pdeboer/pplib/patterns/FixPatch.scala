@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectionWithSigmaPruning
-import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{DefaultParameters, PassableProcessParam, Patch, ProcessParameter}
+import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
@@ -48,10 +47,10 @@ class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
 		logger.info(s"Fixing patch $patch")
 
 		val memPrefixInParams: String = process.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
 		val higherPriorityParams = Map(
-			ProcessStub.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess")
+			DefaultParameters.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess")
 		)
 
 		val fixProcess = process.create(higherPrioParams = higherPriorityParams)
@@ -65,7 +64,7 @@ object FixVerifyFPDriver {
 
 	val DEFAULT_BEFORE_AFTER_HANDLER = None // beforeAfterInstructions()
 
-	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = CollectionWithSigmaPruning.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
+	def beforeAfterInstructions(targetNameSingular: String = "sentence", targetNamePlural: String = "sentences", joiner: String = ". ", targetField: ProcessParameter[Option[NodeSeq]] = DefaultParameters.QUESTION_AUX) = Some((p: ProcessStub[Patch, Patch], before: List[Patch], after: List[Patch]) => {
 		val beforeXML = <before>
 			<p>The following information is just provided such that you get a better feel for the whole. Please
 				<b>do not</b>

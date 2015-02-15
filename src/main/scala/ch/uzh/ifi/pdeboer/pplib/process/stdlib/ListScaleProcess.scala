@@ -1,12 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.{ProcessParameter, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.process.{PPLibProcess, CreateProcess}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{IndexedPatch, PassableProcessParam, Patch, ProcessParameter}
 
 /**
  * Created by pdeboer on 14/12/14.
  */
-class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends ProcessStubWithHCompPortalAccess[List[IndexedPatch], List[IndexedPatch]](_params) {
+@PPLibProcess
+class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](_params) {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListScaleProcess._
 

@@ -2,12 +2,32 @@ package ch.uzh.ifi.pdeboer.pplib.process
 
 import java.lang.reflect.Constructor
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{CostCountingEnabledHCompPortal, HCompInstructionsWithTuple}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
+
+trait IParametrizable {
+
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+
+	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
+
+	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
+
+	def combineParameterLists(paramsToAdd: List[ProcessParameter[_]], existingParameters: List[ProcessParameter[_]]): List[ProcessParameter[_]] = {
+		val existingKeys: List[String] = existingParameters.map(_.key)
+		val nonExisting = paramsToAdd.filterNot(p => existingKeys.contains(p.key))
+		nonExisting ::: existingParameters
+	}
+}
 
 /**
  * Created by pdeboer on 09/10/14.
@@ -16,9 +36,9 @@ import scala.reflect.runtime.{universe => ru}
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with Serializable {
+@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with IParametrizable with Serializable {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStub._
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 
 	implicit val processStub = this
 
@@ -58,19 +78,6 @@ import scala.reflect.runtime.{universe => ru}
 
 	protected def run(data: INPUT): OUTPUT
 
-	/**
-	 * override this method to ensure the definition of some parameters.
-	 * Expected parameters of type "Option" will default to NONE if checked against.
-	 * @return
-	 */
-	def expectedParametersOnConstruction: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def expectedParametersBeforeRun: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def optionalParameters: List[ProcessParameter[_]] = List.empty[ProcessParameter[_]]
-
-	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
-
 	protected def processCategoryNames: List[String] = Nil
 
 	final def processCategories: List[RecombinationCategory] = {
@@ -78,11 +85,7 @@ import scala.reflect.runtime.{universe => ru}
 			if (processCategoryNames == null)
 				Nil
 			else processCategoryNames
-		val annotation =
-			if (this.getClass.isAnnotationPresent(classOf[PPLibProcess]))
-				this.getClass.getAnnotation(classOf[PPLibProcess]).value()
-			else ""
-		(annotation :: names).map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
+		names.map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
 	}
 
 
@@ -98,7 +101,8 @@ import scala.reflect.runtime.{universe => ru}
 	}
 
 	def allParams: List[ProcessParameter[_]] = {
-		expectedParametersOnConstruction ::: expectedParametersBeforeRun ::: optionalParameters ::: defaultParameters
+		expectedParametersOnConstruction ::: expectedParametersBeforeRun :::
+			optionalParameters ::: defaultParameters
 	}
 
 	def allParameterTypesCorrect: Boolean = {
@@ -141,13 +145,6 @@ import scala.reflect.runtime.{universe => ru}
 		<OutputClass>
 			{outputType.runtimeClass.getCanonicalName}
 		</OutputClass>
-		<Categories>
-			{processCategories.map(c => {
-			<Category>
-				{c.path}
-			</Category>
-		})}
-		</Categories>
 		<Parameters>
 			{allParams.map(p => {
 			<Parameter>
@@ -167,6 +164,10 @@ import scala.reflect.runtime.{universe => ru}
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 	processCategories.foreach(c => ProcessDB.put(c, this))
+	if (allParams.map(_.key).toSet.size
+		!= allParams.map(_.key).size) {
+		println("bad")
+	}
 	assert(allParams.map(_.key).toSet.size
 		== allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
 
@@ -193,9 +194,6 @@ import scala.reflect.runtime.{universe => ru}
 }
 
 object ProcessStub {
-	val STORE_EXECUTION_RESULTS = new ProcessParameter[Boolean]("storeExecutionResults", Some(List(true)))
-	val MEMOIZER_NAME = new ProcessParameter[Option[String]]("memoizerName", Some(List(None)))
-
 	def create[IN: ClassTag, OUT: ClassTag](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None) = {
 		if (factory.isDefined) {
 			factory.get.buildProcess[IN, OUT](params)
@@ -212,6 +210,10 @@ object ProcessStub {
 		}
 	}
 }
+
+abstract class CreateProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
+
+abstract class DecideProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
 
 trait ProcessFactory {
 	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
@@ -231,24 +233,62 @@ class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends Pr
 	}
 }
 
-abstract class ProcessStubWithHCompPortalAccess[INPUT: ClassTag, OUTPUT: ClassTag](_params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](_params) {
+trait HCompPortalAccess extends IParametrizable {
+	self: ProcessStub[_, _] =>
 
-	import ch.uzh.ifi.pdeboer.pplib.process.ProcessStubWithHCompPortalAccess._
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	lazy val portal = new CostCountingEnabledHCompPortal(PORTAL_PARAMETER.get)
+	lazy val portal = new CostCountingEnabledHCompPortal(self.getParam(DefaultParameters.PORTAL_PARAMETER))
 
-	def
-	getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
+	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
 		(1 to workerCount).view.mpar
 	}
 
-	def isParallel = PARALLEL_EXECUTION_PARAMETER.get
-
-	override def defaultParameters: List[ProcessParameter[_]] = List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER) ::: super.defaultParameters
+	override def defaultParameters: List[ProcessParameter[_]] = combineParameterLists(List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER), super.defaultParameters)
 }
 
-object ProcessStubWithHCompPortalAccess {
-	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
-	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
+trait InstructionHandler extends IParametrizable {
+	self: ProcessStub[_, _] =>
+
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
+
+	def instructions: HCompInstructionsWithTuple =
+		instructionGenerator.generateQuestion(self.getParam(INSTRUCTIONS))
+
+	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))
+
+	def instructionGenerator: InstructionGenerator = {
+		val generator = self.getParamOption(OVERRIDE_INSTRUCTION_GENERATOR) match {
+			case None => defaultInstructionGenerator.get //TODO yep, this is horrible
+			case Some(x: InstructionGenerator) => x
+		}
+		generator
+	}
+
+	def defaultInstructionGenerator: Option[InstructionGenerator] = self match {
+		case x: CreateProcess[_, _] => Some(new SimpleInstructionGeneratorCreate())
+		case x: DecideProcess[_, _] => Some(new SimpleInstructionGeneratorDecide())
+		case _ => None
+	}
+
+	override def defaultParameters: List[ProcessParameter[_]] = {
+		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE), super.defaultParameters)
+	}
+
+	override def optionalParameters: List[ProcessParameter[_]] = {
+		val superParam: List[ProcessParameter[_]] = try {
+			super.optionalParameters
+		}
+		catch {
+			case e: AbstractMethodError => Nil
+
+			/**
+			 * AbstractMethodError occurs if class extends existing class with this trait, hence
+			 * trait is applied multiple times in a row
+			 */
+		}
+		combineParameterLists(List(INSTRUCTIONS), superParam)
+	}
 }
+

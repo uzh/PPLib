@@ -2,18 +2,18 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.{Patch, ProcessParameter}
 import ch.uzh.ifi.pdeboer.pplib.util.{MonteCarlo, U}
 
 import scala.util.Random
-import scala.xml.NodeSeq
 
 /**
  * Created by pdeboer on 03/11/14.
  */
-@PPLibProcess("decide.consensus.contestWithConfidence")
-class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ProcessStubWithHCompPortalAccess[List[Patch], Patch](params) {
+@PPLibProcess
+class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
 
+	import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess._
 
 	protected val MONTECARLO_ITERATIONS: Int = 100000
@@ -31,7 +31,7 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 				iteration += 1
 				val choice: String = memoizer.mem("it" + iteration)(castVote(stringData, iteration))
 				votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
-			} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_VOTES.get)
+			} while (minVotesForAgreement(stringData).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_ITERATIONS.get)
 
 			val winner = itemWithMostVotes._1
 			logger.info(s"contest with statistical reduction finished after $iteration rounds. Winner: $winner")
@@ -48,17 +48,14 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 	}
 
 	def castVote(choices: List[String], iteration: Int): String = {
-		val instructions = QUESTION.get
-		val auxString = INSTRUCTION_ITALIC.get
-		val title = TITLE_PARAMETER.get
 		val alternatives = if (SHUFFLE_CHOICES.get) Random.shuffle(choices) else choices
 
 		U.retry(3) {
 			portal.sendQueryAndAwaitResult(
 				MultipleChoiceQuery(
-					instructions.getInstructions(auxString, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
-					alternatives, 1, 1, title + iteration + "_" + Math.abs(Random.nextInt())),
-				PRICE_PER_VOTE.get
+					instructions.getInstructions(INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)),
+					alternatives, 1, 1, instructionTitle),
+				QUESTION_PRICE.get
 
 			) match {
 				case Some(a: MultipleChoiceAnswer) => a.selectedAnswer
@@ -76,16 +73,9 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(INSTRUCTION_ITALIC, QUESTION_AUX, PRICE_PER_VOTE, TITLE_PARAMETER, CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, QUESTION, MAX_VOTES) ::: super.optionalParameters
+		List(CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, MAX_ITERATIONS) ::: super.optionalParameters
 }
 
 object ContestWithStatisticalReductionProcess {
-	val QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("question", Some(List(HCompInstructionsWithTupleStringified("Please select the sentence that fits best in terms of writing style, grammar and low mistake count"))))
-	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
-	val INSTRUCTION_ITALIC = new ProcessParameter[String]("auxString", Some(List("")))
-	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
-	val TITLE_PARAMETER = new ProcessParameter[String]("title", Some(List("Please select the sentence that fits best ")))
-	val MAX_VOTES = new ProcessParameter[Int]("maxVotes", Some(List(20)))
 	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
-	val PRICE_PER_VOTE = new ProcessParameter[HCompQueryProperties]("pricePerVote", Some(List(HCompQueryProperties(3))))
 }

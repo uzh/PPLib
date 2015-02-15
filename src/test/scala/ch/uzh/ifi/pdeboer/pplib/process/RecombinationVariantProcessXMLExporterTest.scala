@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.PassableProcessParam
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.PassableProcessParam
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationVariant, RecombinationVariantProcessXMLExporter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
@@ -88,7 +88,7 @@ class RecombinationVariantProcessXMLExporterTest {
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Categories><Category></Category></Categories><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
+		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
 	private class PassableProcessWithRuns[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends PassableProcessParam[IN, OUT](classOf[TestProcess[IN, OUT]]) {

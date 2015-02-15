@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithBeatByKVotingProcess$}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.DefaultParameters
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess
 import org.junit.{Assert, Test}
 
 /**
@@ -45,7 +46,7 @@ class ContestWithBeatByKVotingProcessTest {
 
 	@Test
 	def testMaxIterationsExceeded: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, MAX_VOTES.key -> 10))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 10))
 		p.setVotes(Map("a" -> 4, "b" -> 2))
 		Assert.assertTrue(p.shouldStartAnotherIteration)
 
@@ -58,7 +59,7 @@ class ContestWithBeatByKVotingProcessTest {
 
 	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ContestWithBeatByKVotingProcess(params) {
 		def setVotes(v: Map[String, Int]): Unit = {
-			votes = votes ++ v
+			votes ++= v
 		}
 	}
 

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.Patch
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.Patch
 import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 

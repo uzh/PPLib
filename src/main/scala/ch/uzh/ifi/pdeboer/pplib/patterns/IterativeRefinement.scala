@@ -5,9 +5,8 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IRDefaultHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{Contest}
-import ch.uzh.ifi.pdeboer.pplib.process.{NoProcessMemoizer, ProcessMemoizer, ProcessStub, ProcessStubWithHCompPortalAccess}
+import ch.uzh.ifi.pdeboer.pplib.process.parameter._
+import ch.uzh.ifi.pdeboer.pplib.process.{CreateProcess, NoProcessMemoizer, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.xml.NodeSeq
@@ -57,7 +56,7 @@ trait IterativeRefinementDriver[T] {
 	def selectBestRefinement(candidates: List[T]): String
 }
 
-class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTupleStringified = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: PassableProcessParam[List[Patch], Patch] = DEFAULT_VOTING_PROCESS, questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
+class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: GenericPassableProcessParam[List[Patch], Patch, CreateProcess[List[Patch], Patch]], questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
 		val q = FreetextQuery(
 			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState, questionAux.getOrElse(Nil)), "", titleForRefinementQuestion + iterationId)
@@ -69,10 +68,10 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 		val candidatesDistinct = candidates.distinct
 
 		val memPrefixInParams: String = votingProcessParam.getParam[Option[String]](
-			ProcessStub.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
-		val lowerPriorityParams = Map(ProcessStubWithHCompPortalAccess.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(ProcessStub.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
+		val lowerPriorityParams = Map(DefaultParameters.PORTAL_PARAMETER.key -> portal)
+		val higherPriorityParams = Map(DefaultParameters.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
 		votingProcess.process(candidatesDistinct.map(c => new Patch(c))).value
@@ -85,12 +84,6 @@ object IRDefaultHCompDriver {
 	val DEFAULT_QUESTION_FOR_VOTING = HCompInstructionsWithTupleStringified("Other crowd workers have written the following refinements to the sentence below. Please select the one you like the best. If there are multiple sentences in one item, please ensure to NOT pick that one as there should be only one", questionAfterTuples = "We will only accept your first HIT in this group.")
 	val DEFAULT_TITLE_FOR_VOTING = "Choose the best sentence"
 	val DEFAULT_WORKER_COUNT_FOR_VOTING = 3
-	val DEFAULT_VOTING_PROCESS_PARAMS = Map(
-		Contest.QUESTION.key -> DEFAULT_QUESTION_FOR_VOTING,
-		Contest.TITLE.key -> DEFAULT_TITLE_FOR_VOTING,
-		Contest.WORKER_COUNT.key -> DEFAULT_WORKER_COUNT_FOR_VOTING,
-		ProcessStub.MEMOIZER_NAME.key -> Some("IR_voting")
-	)
-	val DEFAULT_VOTING_PROCESS = new PassableProcessParam(classOf[Contest], DEFAULT_VOTING_PROCESS_PARAMS)
+
 	val DEFAULT_QUESTION_PRICE = HCompQueryProperties()
 }

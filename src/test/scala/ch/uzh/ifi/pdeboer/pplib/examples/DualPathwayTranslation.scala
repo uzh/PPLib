@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HComp, HCompInstructionsWithTupleStringified$}
 import ch.uzh.ifi.pdeboer.pplib.patterns.DPHCompDriverDefaultComparisonInstructionsConfig
-import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
+import ch.uzh.ifi.pdeboer.pplib.process.parameter.IndexedPatch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
 
 /**
