@@ -9,9 +9,16 @@ import scala.util.Random
  */
 @HCompPortal(builder = classOf[RandomPortalBuilder], autoInit = true)
 class RandomHCompPortal(val param: String) extends HCompPortalAdapter {
+	var answerPool: List[String] = Nil
+
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		query match {
-			case x: FreetextQuery => Some(FreetextAnswer(x, query.hashCode() + ""))
+			case x: FreetextQuery =>
+				val answer: String = if (answerPool.size == 0) query.hashCode() + ""
+				else {
+					answerPool(Math.abs(answerPool.length * Random.nextDouble()).toInt)
+				}
+				Some(FreetextAnswer(x, answer))
 			case x: MultipleChoiceQuery => {
 				val upperBound = if (x.maxNumberOfResults < 1) x.options.length else x.maxNumberOfResults
 				val numberToSelect = Random.nextDouble() * (upperBound - x.minNumberOfResults)
