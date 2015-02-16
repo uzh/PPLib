@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.MechanicalTurkPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortal
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.ConfigFactory
 
@@ -30,6 +31,8 @@ object HComp extends LazyLogger {
 	def crowdFlower: CrowdFlowerPortalAdapter = portals.get(CrowdFlowerPortalAdapter.PORTAL_KEY).get.asInstanceOf[CrowdFlowerPortalAdapter]
 
 	def mechanicalTurk: MechanicalTurkPortalAdapter = portals.get(MechanicalTurkPortalAdapter.PORTAL_KEY).get.asInstanceOf[MechanicalTurkPortalAdapter]
+
+	def randomPortal: RandomHCompPortal = portals.get(RandomHCompPortal.PORTAL_KEY).get.asInstanceOf[RandomHCompPortal]
 
 	protected def autoloadConfiguredPortals() {
 		val config = ConfigFactory.load()
