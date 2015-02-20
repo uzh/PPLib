@@ -57,7 +57,7 @@ trait InstructionHandler extends IParametrizable {
 	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))
 
 	def instructionGenerator: InstructionGenerator = {
-		val generator = self.getParamOption(OVERRIDE_INSTRUCTION_GENERATOR) match {
+		val generator = self.getParam(OVERRIDE_INSTRUCTION_GENERATOR) match {
 			case None => defaultInstructionGenerator.get //TODO yep, this is horrible
 			case Some(x: InstructionGenerator) => x
 		}
@@ -93,8 +93,11 @@ trait InstructionHandler extends IParametrizable {
 trait QueryInjection extends IParametrizable {
 	self: ProcessStub[_, _] =>
 
-	def createComposite(baseQuery: List[HCompQuery]): CompositeQuery = CompositeQuery(baseQuery ::: INJECT_QUERIES.get.values.toList,
-		"", baseQuery.find(_.title != "").map(_.title).getOrElse(""))
+	def createComposite(baseQuery: List[HCompQuery]): CompositeQuery = {
+		val main = baseQuery(0)
+		CompositeQuery(baseQuery ::: INJECT_QUERIES.get.values.toList,
+			main.question, main.title)
+	}
 
 	def createComposite(baseQuery: HCompQuery): CompositeQuery = createComposite(List(baseQuery))
 

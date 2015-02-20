@@ -19,7 +19,7 @@ object DefaultParameters {
 	val QUESTION_AUX = new ProcessParameter[Option[NodeSeq]]("questionAux", Some(List(None)))
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", Some(List(HCompQueryProperties())))
-	val OVERRIDE_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("instructionGenerator", None)
+	val OVERRIDE_INSTRUCTION_GENERATOR = new ProcessParameter[Option[InstructionGenerator]]("instructionGenerator", Some(List(None)))
 
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
 
