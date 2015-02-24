@@ -11,4 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface PPLibProcess {
+	boolean autoInit() default true;
+	//Class<? extends ProcessFactory> builder();
 }
