@@ -23,19 +23,19 @@ class CollectDecideProcessTest {
 	def testEachProcessIsCalled: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
 		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
-		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
-		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
+		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 
 	@Test
 	def testDefaultParam: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
 		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
-		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
-		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
+		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 
-	def collectProcess = new PassableProcessParam[Patch, List[Patch]](classOf[SignalingProcess[Patch, List[Patch]]], Map(SignalingProcess.OUTPUT.key -> List("a", "b").map(l => new Patch(l))), Some(new SignalingProcessFactory()))
+	def collectProcess = new PassableProcessParam[CreateSignalingProcess[Patch, List[Patch]]](Map(CreateSignalingProcess.OUTPUT.key -> List("a", "b").map(l => new Patch(l))), Some(new CreateSignalingProcessFactory()))
 
-	def decideProcess = new PassableProcessParam[List[Patch], Patch](classOf[SignalingProcess[List[Patch], Patch]], Map(SignalingProcess.OUTPUT.key -> new Patch("a")), Some(new SignalingProcessFactory()))
+	def decideProcess = new PassableProcessParam[CreateSignalingProcess[List[Patch], Patch]](Map(CreateSignalingProcess.OUTPUT.key -> new Patch("a")), Some(new CreateSignalingProcessFactory()))
 }

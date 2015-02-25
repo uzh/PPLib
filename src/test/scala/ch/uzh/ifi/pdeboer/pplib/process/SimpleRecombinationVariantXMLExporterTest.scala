@@ -36,8 +36,8 @@ class SimpleRecombinationVariantXMLExporterTest {
 		Assert.assertEquals(6, (res \\ "Key").length)
 	}
 
-	def createNestedPassableProcess(children: Int): PassableProcessParam[Int, Int] = {
-		new PassableProcessParam[Int, Int](classOf[ProcessStub[Int, Int]], Map(("subprocess",
+	def createNestedPassableProcess(children: Int): PassableProcessParam[ProcessStub[Int, Int]] = {
+		new PassableProcessParam[ProcessStub[Int, Int]](Map(("subprocess",
 			if (children > 0) createNestedPassableProcess(children - 1) else "naaah")
 		))
 	}

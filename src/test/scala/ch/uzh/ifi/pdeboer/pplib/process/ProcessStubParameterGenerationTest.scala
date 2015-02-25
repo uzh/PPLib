@@ -72,7 +72,7 @@ class ProcessStubParameterGenerationTest {
 
 		val passables = gen.generatePassableProcesses()
 		Assert.assertEquals(expectedParamVariations.length, passables.length)
-		Assert.assertTrue("class correct", passables.forall(i => i.getClass == classOf[PassableProcessParam[_, _]]))
+		Assert.assertTrue("class correct", passables.forall(i => i.getClass == classOf[PassableProcessParam[TestProcessStub]]))
 	}
 
 	@Test

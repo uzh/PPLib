@@ -12,5 +12,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface PPLibProcess {
 	boolean autoInit() default true;
-	//Class<? extends ProcessFactory> builder();
+
+	Class<? extends ProcessFactory<?>> builder() default JavaAnnotationCompatibleDefaultProcessFactoryWrapper.class;
 }

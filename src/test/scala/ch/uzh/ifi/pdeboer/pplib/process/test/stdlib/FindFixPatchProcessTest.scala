@@ -15,14 +15,14 @@ class FindFixPatchProcessTest {
 		val dataReturnedByFinder = allData.take(3)
 		val dataReturnedByFixer = dataReturnedByFinder.map(d => d.duplicate(d.value + "1"))
 
-		val findProc = new PassableProcessParam[List[IndexedPatch], List[IndexedPatch]](classOf[SignalingProcess[List[IndexedPatch], List[IndexedPatch]]], Map(SignalingProcess.OUTPUT.key -> dataReturnedByFinder), Some(new SignalingProcessFactory()))
-		val fixProc = new PassableProcessParam[List[IndexedPatch], List[IndexedPatch]](classOf[SignalingProcess[List[IndexedPatch], List[IndexedPatch]]], Map(SignalingProcess.OUTPUT.key -> dataReturnedByFixer), Some(new SignalingProcessFactory()))
+		val findProc = new PassableProcessParam[DecideSignalingProcess[List[IndexedPatch], List[IndexedPatch]]](Map(DecideSignalingProcess.OUTPUT.key -> dataReturnedByFinder), Some(new DecideSignalingProcessFactory()))
+		val fixProc = new PassableProcessParam[CreateSignalingProcess[List[IndexedPatch], List[IndexedPatch]]](Map(CreateSignalingProcess.OUTPUT.key -> dataReturnedByFixer), Some(new CreateSignalingProcessFactory()))
 		val ffp = new FindFixPatchProcess(Map(FindFixPatchProcess.FIND_PROCESS.key -> findProc, FindFixPatchProcess.FIX_PROCESS.key -> fixProc))
 
 		Assert.assertEquals(dataReturnedByFixer ::: allData.takeRight(2), ffp.process(allData))
 		Assert.assertEquals(1, findProc.createdProcesses.size)
 		Assert.assertEquals(1, fixProc.createdProcesses.size)
-		Assert.assertTrue(findProc.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
-		Assert.assertTrue(fixProc.createdProcesses(0).asInstanceOf[SignalingProcess[_, _]].called)
+		Assert.assertTrue(findProc.createdProcesses(0).asInstanceOf[DecideSignalingProcess[_, _]].called)
+		Assert.assertTrue(fixProc.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 }

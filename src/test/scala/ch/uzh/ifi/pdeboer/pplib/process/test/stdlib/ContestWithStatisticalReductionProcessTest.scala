@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, MockHCompPortal}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithTupleStringified}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
@@ -25,7 +25,6 @@ class ContestWithStatisticalReductionProcessTest {
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
 				DefaultParameters.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				DefaultParameters.SHUFFLE_CHOICES.key -> false
-
 			))
 
 		Assert.assertEquals(new Patch("2"), subject.process(data))

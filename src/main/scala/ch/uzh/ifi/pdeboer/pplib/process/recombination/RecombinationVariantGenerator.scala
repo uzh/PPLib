@@ -1,8 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import java.lang.reflect.Constructor
-
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, ProcessParameter, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessParameter, ProcessStub}
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
@@ -10,18 +8,16 @@ import scala.reflect.ClassTag
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessParam[_, _]]]) {
+class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessParam[_ <: ProcessStub[_, _]]]]) {
 	lazy val variants = {
-		val listOfTupleLists: List[List[(String, PassableProcessParam[_, _])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
+		val listOfTupleLists: List[List[(String, PassableProcessParam[_ <: ProcessStub[_, _]])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			new RecombinationVariant(k.asInstanceOf[List[(String, PassableProcessParam[_, _])]].toMap)
+			new RecombinationVariant(k.asInstanceOf[List[(String, PassableProcessParam[_ <: ProcessStub[_, _]])]].toMap)
 		})
 	}
 }
 
-abstract class ParameterVariantGenerator[T: ClassTag] {
-	protected def targetConstructor: Constructor[_]
-
+abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit baseCls: ClassTag[T]) {
 	protected def base: ProcessStub[_, _]
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
@@ -54,31 +50,25 @@ abstract class ParameterVariantGenerator[T: ClassTag] {
 		})
 	}
 
-	def generatePassableProcesses[IN: ClassTag, OUT: ClassTag](): List[PassableProcessParam[_, _]] =
+	def generatePassableProcesses(): List[PassableProcessParam[T]] =
 		generateParameterVariations().map(params => {
-			new PassableProcessParam[IN, OUT](base.asInstanceOf[ProcessStub[IN, OUT]].getClass, params)
+			new PassableProcessParam[T](params)
 		})
 
 	def generateVariationsAndInstanciate(): List[T] =
 		generateParameterVariations()
-			.map(params => ProcessStub.typelessCreate(base.getClass, params))
+			.map(params => ProcessStub.create[T](params))
 			.asInstanceOf[List[T]]
 }
 
-class InstanciatedParameterVariantGenerator[T: ClassTag](_base: T, initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
+class InstanciatedParameterVariantGenerator[T <: ProcessStub[_, _]](_base: T, initWithDefaults: Boolean = false)(implicit baseClass: ClassTag[T]) extends ParameterVariantGenerator[T] {
 	override protected def base: ProcessStub[_, _] = _base.asInstanceOf[ProcessStub[_, _]]
-
-	override protected def targetConstructor: Constructor[_] = base.getClass.getConstructor(classOf[Map[String, Any]])
 
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
 
-class TypedParameterVariantGenerator[T: ClassTag](initWithDefaults: Boolean = false) extends ParameterVariantGenerator[T] {
-	val clazz = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[ProcessStub[_, _]]]
-	val declaredConstructors = clazz.getDeclaredConstructors
-	protected val targetConstructor: Constructor[_] = clazz.getDeclaredConstructor(classOf[Map[String, Any]])
-	protected val base: ProcessStub[_, _] = ProcessStub.typelessCreate(clazz, Map.empty) //TODO change me to typeful creation
-
+class TypedParameterVariantGenerator[T <: ProcessStub[_, _]](initWithDefaults: Boolean = false)(implicit classTag: ClassTag[T]) extends ParameterVariantGenerator[T] {
+	protected val base = ProcessStub.create[T](Map.empty[String, Any])
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
 

@@ -8,20 +8,19 @@ import scala.reflect.ClassTag
  * Created by pdeboer on 13/02/15.
  */
 object ProcessStub {
-	def create[IN: ClassTag, OUT: ClassTag](baseClass: Class[_ <: ProcessStub[IN, OUT]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None) = {
-		if (factory.isDefined) {
-			factory.get.buildProcess[IN, OUT](params)
-		} else {
-			new DefaultProcessFactory(baseClass).buildProcess[IN, OUT](params)
+	def create[BASE <: ProcessStub[_, _]](params: Map[String, Any])(implicit cls: ClassTag[BASE]): BASE = {
+		val clazz = cls.runtimeClass
+		val annotation: PPLibProcess = clazz.getAnnotation(classOf[PPLibProcess])
+		val factory = if (annotation != null) annotation.builder().newInstance()
+		else {
+			classOf[DefaultProcessFactory[BASE]].getConstructors()(0).newInstance(cls)
 		}
+		create[BASE](params, factory.asInstanceOf[ProcessFactory[BASE]])
 	}
 
-	def typelessCreate(baseClass: Class[_ <: ProcessStub[_, _]], params: Map[String, Any] = Map.empty, factory: Option[ProcessFactory] = None): ProcessStub[_, _] = {
-		if (factory.isDefined) {
-			factory.get.typelessBuildProcess(params)
-		} else {
-			new DefaultProcessFactory(baseClass).buildProcess(params)
-		}
+	def create[BASE <: ProcessStub[_, _]](params: Map[String, Any], factory: ProcessFactory[BASE])(implicit cls: ClassTag[BASE]): BASE = {
+		val finalFactory = if (factory.isInstanceOf[JavaAnnotationCompatibleDefaultProcessFactoryWrapper]) new DefaultProcessFactory[BASE]() else factory
+		finalFactory.buildProcess(params)
 	}
 }
 

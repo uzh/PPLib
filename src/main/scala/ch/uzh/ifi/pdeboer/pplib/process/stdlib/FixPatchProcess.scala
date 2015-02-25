@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.patterns.{FixPatchExecuter, FixVerifyFPDriver}
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
@@ -19,7 +18,7 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends CreateProces
 
 		val indicesToFix: List[Int] = allData.zipWithIndex.filter(d => dataToFix.contains(d._1)).map(_._2)
 
-		val fixerProcess: PassableProcessParam[Patch, Patch] = FIXER_PROCESS.get
+		val fixerProcess = FIXER_PROCESS.get
 		val targetParamToPassAllData = TARGET_PARAMETER_TO_PASS_ALL_DATA.get
 		if (targetParamToPassAllData.isDefined) {
 			fixerProcess.params += targetParamToPassAllData.get.key -> ALL_DATA.get
@@ -40,6 +39,6 @@ object FixPatchProcess {
 	val ALL_DATA = new ProcessParameter[List[Patch]]("allData", Some(List(Nil)))
 	val TARGET_PARAMETER_TO_PASS_ALL_DATA = new ProcessParameter[Option[ProcessParameter[List[Patch]]]]("targetParamToPassPatchesAllData", Some(List(Some(FixPatchProcess.ALL_DATA))))
 	val PATCHES_TO_INCLUDE_BEFORE_AND_AFTER_MAIN = new ProcessParameter[(Int, Int)]("patchesToIncludeBeforeAndAfterMain", Some(List((1, 1))))
-	val FIXER_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("fixerProcess", None)
+	val FIXER_PROCESS = new ProcessParameter[PassableProcessParam[CreateProcess[Patch, Patch]]]("fixerProcess", None)
 	val FIXER_BEFORE_AFTER_HANDLER = new ProcessParameter[FixVerifyFPDriver.FVFPDBeforeAfterHandler]("beforeAfterHandler", Some(List(FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER)))
 }

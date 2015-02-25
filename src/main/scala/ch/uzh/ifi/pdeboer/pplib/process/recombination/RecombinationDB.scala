@@ -7,9 +7,9 @@ import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
  * Created by pdeboer on 17/02/15.
  */
 class RecombinationDB {
-	private var classes = collection.mutable.HashSet.empty[Class[_ >: ProcessStub[_, _]]]
+	private var classes = collection.mutable.HashSet.empty[Class[_ <: ProcessStub[_, _]]]
 
-	def addClass(cls: Class[_ >: ProcessStub[_, _]]): Unit = {
+	def addClass(cls: Class[_ <: ProcessStub[_, _]]): Unit = {
 		classes += cls
 	}
 }

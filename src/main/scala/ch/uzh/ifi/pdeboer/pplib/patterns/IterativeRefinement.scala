@@ -55,7 +55,7 @@ trait IterativeRefinementDriver[T] {
 	def selectBestRefinement(candidates: List[T]): String
 }
 
-class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: GenericPassableProcessParam[List[Patch], Patch, CreateProcess[List[Patch], Patch]], questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
+class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: PassableProcessParam[DecideProcess[List[Patch], Patch]], questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
 	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
 		val q = FreetextQuery(
 			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState, questionAux.getOrElse(Nil)), "", titleForRefinementQuestion + iterationId)

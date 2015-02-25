@@ -13,21 +13,29 @@ abstract class CreateProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[Stri
 
 abstract class DecideProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
 
-trait ProcessFactory {
-	def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
+trait ProcessFactory[BASE <: ProcessStub[_, _]] {
+	def buildProcess(params: Map[String, Any] = Map.empty): BASE = typelessBuildProcess(params).asInstanceOf[BASE]
 
 	def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _]
 }
 
-class DefaultProcessFactory(baseClass: Class[_ <: ProcessStub[_, _]]) extends ProcessFactory {
-	override def buildProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any]): ProcessStub[IN, OUT] = {
-		//println(baseClass.getDeclaredConstructors.mkString(","))
-		typelessBuildProcess(params).asInstanceOf[ProcessStub[IN, OUT]]
+class DefaultProcessFactory[BASE <: ProcessStub[_, _]]()(implicit cls: ClassTag[BASE]) extends ProcessFactory[BASE] {
+	val baseClass = cls.runtimeClass
+
+	override def buildProcess(params: Map[String, Any]): BASE = {
+		typelessBuildProcess(params).asInstanceOf[BASE]
 	}
 
 	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
 		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
 		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[_, _]]
+	}
+}
+
+class JavaAnnotationCompatibleDefaultProcessFactoryWrapper extends ProcessFactory[ProcessStub[_, _]] {
+	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
+		throw new IllegalAccessException("Please call me through ProcessStub.create()")
+		???
 	}
 }
 

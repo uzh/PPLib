@@ -25,5 +25,5 @@ class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends CreateProc
 }
 
 object ListScaleProcess {
-	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[Patch, Patch]]("childProcess", None)
+	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[CreateProcess[Patch, Patch]]]("childProcess", None)
 }

@@ -8,14 +8,14 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 09/10/14.
  */
-class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
+class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_]]) {
 	var name: Option[String] = None
 	private var procs: List[(String, ProcessStub[_, _])] = Nil
 
 	def created = procs
 
 	def createProcess[IN, OUT](key: String): ProcessStub[IN, OUT] = {
-		val p = stubs(key).asInstanceOf[PassableProcessParam[IN, OUT]].create()
+		val p = stubs(key).create().asInstanceOf[ProcessStub[IN, OUT]]
 		stubs.synchronized {
 			procs = (key, p) :: procs
 		}
@@ -24,7 +24,7 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_, _]]) {
 }
 
 class SimpleRecombinationVariantXMLExporter(val variant: RecombinationVariant) {
-	def passableToXML(passableProcessParam: PassableProcessParam[_, _], maxRecursions: Int = 4): NodeSeq =
+	def passableToXML(passableProcessParam: PassableProcessParam[_], maxRecursions: Int = 4): NodeSeq =
 		<ProcessDef>
 			<Class>
 				{passableProcessParam.clazz}
@@ -36,7 +36,7 @@ class SimpleRecombinationVariantXMLExporter(val variant: RecombinationVariant) {
 						{param._1}
 					</Key> <Value>
 					{param._2 match {
-						case pa: PassableProcessParam[_, _] if maxRecursions > 0 => passableToXML(pa, maxRecursions - 1)
+						case pa: PassableProcessParam[_] if maxRecursions > 0 => passableToXML(pa, maxRecursions - 1)
 						case o => o
 					}}
 				</Value>

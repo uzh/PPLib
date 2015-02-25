@@ -13,13 +13,13 @@ class InstructionHandlerTest {
 	@Test
 	def testOverridingInstructionHandler(): Unit = {
 		val expectedInstructions: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("blupp")
-		val collector = new PassableProcessParam[Patch, List[Patch]](classOf[Collection], Map(
+		val collector = new PassableProcessParam[Collection](Map(
 			WORKER_COUNT.key -> 1,
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 20),
 			OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(expectedInstructions, "blupp2")),
 			MEMOIZER_NAME.key -> Some("implementedBefore")
 		))
-		val coll = collector.create().asInstanceOf[ProcessStub[Patch, List[Patch]] with InstructionHandler]
+		val coll = collector.create()
 		Assert.assertEquals(expectedInstructions, coll.instructions)
 	}
 }

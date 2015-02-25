@@ -36,7 +36,7 @@ class RecombinationVariantGeneratorTest {
 		a.forall(b.contains(_)) && b.forall(a.contains(_))
 	}
 
-	private class TestProcessPassable(val id: Int) extends PassableProcessParam[Integer, Integer](classOf[TestProcessStub])
+	private class TestProcessPassable(val id: Int) extends PassableProcessParam[TestProcessStub]()
 
 	private class TestProcessStub(_params: Map[String, Any]) extends ProcessStub[Integer, Integer](Map.empty) {
 		override def run(data: Integer): Integer = data.asInstanceOf[Integer]

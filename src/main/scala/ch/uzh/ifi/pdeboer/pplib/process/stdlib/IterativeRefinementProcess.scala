@@ -2,7 +2,6 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.patterns.IterativeRefinementExecutor._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{IRDefaultHCompDriver, IterativeRefinementExecutor}
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
@@ -29,7 +28,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends C
 }
 
 object IterativeRefinementProcess {
-	val VOTING_PROCESS_TYPE = new ProcessParameter[GenericPassableProcessParam[List[Patch], Patch, CreateProcess[List[Patch], Patch]]]("votingProcess", None)
+	val VOTING_PROCESS_TYPE = new ProcessParameter[PassableProcessParam[DecideProcess[List[Patch], Patch]]]("votingProcess", None)
 	val STRING_DIFFERENCE_THRESHOLD = new ProcessParameter[Int]("iterationStringDifferenceThreshold", Some(List(DEFAULT_STRING_DIFFERENCE_THRESHOLD)))
 	val TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD = new ProcessParameter[Int]("toleratedNumberOfIterationsBelowThreshold", Some(List(DEFAULT_TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)))
 }

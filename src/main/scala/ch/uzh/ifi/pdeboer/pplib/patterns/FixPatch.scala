@@ -39,7 +39,7 @@ trait FixPatchDriver {
 	def fix(patch: Patch, patchesBefore: List[Patch] = Nil, patchesAfterwards: List[Patch] = Nil): Patch
 }
 
-class FixVerifyFPDriver(val process: PassableProcessParam[Patch, Patch],
+class FixVerifyFPDriver(val process: PassableProcessParam[CreateProcess[Patch, Patch]],
 						val beforeAfterHandler: FixVerifyFPDriver.FVFPDBeforeAfterHandler = FixVerifyFPDriver.DEFAULT_BEFORE_AFTER_HANDLER) extends FixPatchDriver with LazyLogger {
 
 	override def fix(patch: Patch, patchesBefore: List[Patch], patchesAfterwards: List[Patch]): Patch = {

@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
@@ -39,8 +38,8 @@ class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends Create
 object CollectDecideProcess {
 	val FORWARD_PARAMS_TO_COLLECT = new ProcessParameter[Boolean]("forwardParamsToCollect", Some(List(true)))
 	val FORWARD_PARAMS_TO_DECIDE = new ProcessParameter[Boolean]("forwardParamsToDecide", Some(List(true)))
-	val COLLECT = new ProcessParameter[PassableProcessParam[Patch, List[Patch]]]("collect", None)
-	val DECIDE = new ProcessParameter[PassableProcessParam[List[Patch], Patch]]("decide", None)
+	val COLLECT = new ProcessParameter[PassableProcessParam[CreateProcess[Patch, List[Patch]]]]("collect", None)
+	val DECIDE = new ProcessParameter[PassableProcessParam[DecideProcess[List[Patch], Patch]]]("decide", None)
 	val FORWARD_PATCH_TO_DECIDE_PARAMETER = new ProcessParameter[Option[ProcessParameter[String]]]("forwardPatchToDecideParameter", Some(List(None)))
 	val FORWARD_PATCH_TO_DECIDE_MESSAGE = new ProcessParameter[PatchEmbeddedInString]("forwardPatchToDecideMessage", Some(List(new PatchEmbeddedInString("The original sentence was: "))))
 }

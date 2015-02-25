@@ -1,20 +1,21 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessFactory
-
 import scala.reflect.ClassTag
 
 /**
  * Created by pdeboer on 14/12/14.
  */
-class GenericPassableProcessParam[IN: ClassTag, OUT: ClassTag, Base <: ProcessStub[IN, OUT]](val clazz: Class[_ <: Base],
-														var params: Map[String, Any] = Map.empty,
-														val factory: Option[ProcessFactory] = None) {
-	protected var _createdProcesses = List.empty[ProcessStub[IN, OUT]]
+class PassableProcessParam[Base <: ProcessStub[_, _]](var params: Map[String, Any] = Map.empty,
+													  val factory: Option[ProcessFactory[Base]] = None)(implicit baseCls: ClassTag[Base]) {
+	val clazz = baseCls.runtimeClass
+	protected var _createdProcesses = List.empty[Base]
 
 	def create(lowerPrioParams: Map[String, Any] = Map.empty,
-			   higherPrioParams: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = {
-		val res = ProcessStub.create[IN, OUT](clazz, (lowerPrioParams ++ params) ++ higherPrioParams, factory)
+			   higherPrioParams: Map[String, Any] = Map.empty): Base = {
+		val paramsToUse: Map[String, Any] = (lowerPrioParams ++ params) ++ higherPrioParams
+		val res = if (factory.isDefined) {
+			ProcessStub.create(paramsToUse, factory.get)
+		} else ProcessStub.create(paramsToUse)
 		_createdProcesses = res :: _createdProcesses
 		res
 	}
@@ -30,8 +31,3 @@ class GenericPassableProcessParam[IN: ClassTag, OUT: ClassTag, Base <: ProcessSt
 
 	def getParam[T](key: String) = params.get(key).asInstanceOf[Option[T]]
 }
-
-class PassableProcessParam[IN: ClassTag, OUT: ClassTag](clazz: Class[_ <: ProcessStub[IN, OUT]],
-														params: Map[String, Any] = Map.empty,
-														factory: Option[ProcessFactory] = None)
-	extends GenericPassableProcessParam[IN, OUT, ProcessStub[IN, OUT]](clazz, params, factory)

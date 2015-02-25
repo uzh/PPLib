@@ -91,8 +91,8 @@ class RecombinationVariantProcessXMLExporterTest {
 		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
-	private class PassableProcessWithRuns[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends PassableProcessParam[IN, OUT](classOf[TestProcess[IN, OUT]]) {
-		override def create(lowerPrioParams: Map[String, Any], higherPrioParams: Map[String, Any]): ProcessStub[IN, OUT] = {
+	private class PassableProcessWithRuns[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends PassableProcessParam[TestProcess[IN, OUT]]() {
+		override def create(lowerPrioParams: Map[String, Any], higherPrioParams: Map[String, Any]): TestProcess[IN, OUT] = {
 			new TestProcess[IN, OUT](runs)
 		}
 	}
