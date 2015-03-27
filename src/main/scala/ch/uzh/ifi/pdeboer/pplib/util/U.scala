@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.util
 import java.lang.annotation
 import java.util.concurrent.atomic.AtomicReference
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
 import com.typesafe.config.{Config, ConfigFactory}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
@@ -11,6 +12,7 @@ import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilde
 import scala.collection.JavaConversions._
 import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
 import scala.concurrent.forkjoin.ForkJoinPool
+import scala.reflect.ClassTag
 
 /**
  * Created by pdeboer on 15/10/14.
@@ -114,4 +116,24 @@ object U extends LazyLogger {
 			p.tryFailure(new CancellationException)
 		})
 	}
+
+	def getAncestorsOfClass(clazz: Class[_], children: Set[Class[_]] = Set()): Set[Class[_]] = {
+		if (clazz.getSuperclass == classOf[Any]) {
+			children
+		} else {
+			val childrenToUse: Set[Class[_]] = if (children.size == 0) Set(clazz) else children
+			getAncestorsOfClass(clazz.getSuperclass, childrenToUse.+(clazz.getSuperclass))
+		}
+	}
+}
+
+
+/**
+ * this is pretty much the most horrible thing you'll see in this code :( but we haven't
+ * found another way of easily manipulating runtimeClass of a ClassTag that's handed
+ * over to a method/class.
+ * @param clazz
+ */
+class SimpleClassTag[IN, OUT](clazz: Class[_]) extends ClassTag[ProcessStub[IN, OUT]] {
+	override def runtimeClass: Class[_] = clazz
 }

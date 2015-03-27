@@ -29,5 +29,5 @@ class PassableProcessParam[Base <: ProcessStub[_, _]](var params: Map[String, An
 
 	def createdProcesses = _createdProcesses
 
-	def getParam[T](key: String) = params.get(key).asInstanceOf[Option[T]]
+	def getParam[T](key: String): Option[T] = params.get(key).asInstanceOf[Option[T]]
 }

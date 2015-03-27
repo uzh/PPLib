@@ -35,3 +35,4 @@ src/test/resources/application.conf
 /build.sbt~
 
 state
+atlassian-ide-plugin.xml

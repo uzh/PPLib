@@ -30,11 +30,13 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit base
 	def addParameterVariations(paramKey: String, values: Iterable[Any]) = {
 		var cur = parameterValues.getOrElse(paramKey, mutable.HashSet.empty[Any])
 		values.foreach(k => {
-			if (base.isParameterTypeCorrect(paramKey, k))
-				cur += k
+			//TODO find problem
+			//if (base.isParameterTypeCorrect(paramKey, k))
+			cur += k
+			/*
 			else {
 				throw new IllegalArgumentException("Parameter type incorrect for " + paramKey)
-			}
+			 }*/
 		})
 		parameterValues += (paramKey -> cur)
 		this
