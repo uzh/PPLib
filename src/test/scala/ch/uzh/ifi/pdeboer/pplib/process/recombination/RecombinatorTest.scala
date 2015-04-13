@@ -18,7 +18,7 @@ class RecombinatorTest {
 	@Test
 	def testTrivialMaterialize: Unit = {
 		val db = newDB
-		val r = new Recombinator[Patch, List[Patch]](db)
+		val r = new Recombinator[Patch, List[Patch]](db = db, inputType = db)
 		val materialized = r.materialize
 
 		val processClasses = materialized.map(_.clazz).toSet
@@ -31,7 +31,7 @@ class RecombinatorTest {
 		db.addClass(classOf[Contest])
 		val tc = new TypeRecombinationHint[DecideProcess[List[Patch], Patch]]()
 
-		val r = new Recombinator[List[Patch], Patch](db).addHint(tc)
+		val r = new Recombinator[List[Patch], Patch](db = db, inputType = db).addHint(tc)
 		val materialized = r.materialize
 
 		val processClasses = materialized.map(_.clazz).toSet
@@ -46,7 +46,7 @@ class RecombinatorTest {
 		val tc = new OptionalParameterRecombinationHint[String](DefaultParameters.INSTRUCTIONS_ITALIC, List(possibleValue1, possibleValue2))
 		val db = newDB
 
-		val r = new Recombinator[Patch, List[Patch]](db).addHint(tc)
+		val r = new Recombinator[Patch, List[Patch]](db = db, inputType = db).addHint(tc)
 		val materialized = r.materialize
 
 		Assert.assertTrue(materialized.forall(p => {
