@@ -8,7 +8,7 @@ import org.junit.{Assert, Test}
 class ClassAncestorTest {
 	@Test
 	def trivial: Unit = {
-		Assert.assertEquals(Set(classOf[A], classOf[B]), U.getAncestorsOfClass(classOf[C]))
+		Assert.assertEquals(Set(classOf[A], classOf[B], classOf[C]), U.getAncestorsOfClass(classOf[C]))
 	}
 
 	private class A
