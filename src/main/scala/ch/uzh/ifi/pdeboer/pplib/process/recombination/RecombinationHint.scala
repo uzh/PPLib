@@ -11,27 +11,29 @@ import scala.reflect.ClassTag
 trait RecombinationHint {
 	def filter[T <: ProcessStub[_, _]](clazz: Class[T]): Boolean
 
-	def constructionParameters: Map[String, Iterable[Any]]
+	def processConstructionParameter: Map[String, Iterable[Any]]
 }
 
-class TypeRecombinationHint[T <: ProcessStub[_, _]]()(implicit baseClass: ClassTag[T]) extends RecombinationHint {
-	val base = baseClass.runtimeClass
+class TypeRecombinationHint[T <: ProcessStub[_, _]]()(implicit baseClass: ClassTag[T]) extends TypeUnsafeRecombinationHint(baseClass.runtimeClass.asInstanceOf[Class[ProcessStub[_, _]]]) {}
 
+class TypeUnsafeRecombinationHint(base: Class[ProcessStub[_, _]]) extends RecombinationHint {
 	override def filter[T <: ProcessStub[_, _]](candidateClass: Class[T]): Boolean = {
 		val allowedClasses = U.getAncestorsOfClass(candidateClass)
 		allowedClasses.contains(base)
 	}
 
-	override def constructionParameters: Map[String, Iterable[Any]] = Map.empty
+	override def processConstructionParameter: Map[String, Iterable[Any]] = Map.empty
 }
 
 class OptionalParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
 	override def filter[BASE <: ProcessStub[_, _]](candidateClass: Class[BASE]): Boolean = true
 
-	override def constructionParameters: Map[String, Iterable[Any]] =
+	override def processConstructionParameter: Map[String, Iterable[Any]] =
 		Map(param.key -> values)
 }
 
 trait RecombinationHintGenerator {
 	def createHints(): Iterable[RecombinationHint]
 }
+
+class RecombinationHintGroup(val classUnderRecombination: Option[Class[ProcessStub[_, _]]], val hints: List[RecombinationHint]) {}

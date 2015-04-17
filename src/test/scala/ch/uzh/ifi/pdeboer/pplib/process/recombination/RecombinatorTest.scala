@@ -19,7 +19,7 @@ class RecombinatorTest {
 	def testTrivialMaterialize: Unit = {
 		val db = newDB
 		val r = new Recombinator[Patch, List[Patch]](db = db)
-		val materialized = r.materialize
+		val materialized = r.materialize()
 
 		val processClasses = materialized.map(_.clazz).toSet
 		Assert.assertEquals(Set(classOf[Collection], classOf[CollectionWithSigmaPruning]), processClasses)
@@ -31,8 +31,8 @@ class RecombinatorTest {
 		db.addClass(classOf[Contest])
 		val tc = new TypeRecombinationHint[DecideProcess[List[Patch], Patch]]()
 
-		val r = new Recombinator[List[Patch], Patch](db = db).addHint(tc)
-		val materialized = r.materialize
+		val r = new Recombinator[List[Patch], Patch](List(new RecombinationHintGroup(None, List(tc))), db)
+		val materialized = r.materialize()
 
 		val processClasses = materialized.map(_.clazz).toSet
 		Assert.assertEquals(Set(classOf[Contest]), processClasses)
@@ -46,8 +46,8 @@ class RecombinatorTest {
 		val tc = new OptionalParameterRecombinationHint[String](DefaultParameters.INSTRUCTIONS_ITALIC, List(possibleValue1, possibleValue2))
 		val db = newDB
 
-		val r = new Recombinator[Patch, List[Patch]](db = db).addHint(tc)
-		val materialized = r.materialize
+		val r = new Recombinator[Patch, List[Patch]](List(new RecombinationHintGroup(None, List(tc))), db)
+		val materialized = r.materialize()
 
 		Assert.assertTrue(materialized.forall(p => {
 			val thisParam = p.getParam(tc.param.key)

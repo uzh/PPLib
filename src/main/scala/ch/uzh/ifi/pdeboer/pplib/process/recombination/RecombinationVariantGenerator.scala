@@ -57,12 +57,11 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit base
 			new PassableProcessParam[T](params)
 		})
 
-	def uncoveredParameterThatAreExpected = {
-		val expected = base.expectedParametersBeforeRun ::: base.expectedParametersOnConstruction
+	def uncoveredParameterThatAreExpected: Set[ProcessParameter[_]] = {
+		val expected: List[ProcessParameter[_]] = base.expectedParametersBeforeRun ::: base.expectedParametersOnConstruction
 		val keysOfMissingParameters = expected.map(_.key).toSet.diff(parameterValues.map(_._1).toSet)
-		//val expectedParameterAsDictionary = expected.map(e => (e.key -> e)).toMap
-		//keysOfMissingParameters.map(k => expectedParameterAsDictionary(k))
-		Nil
+		val expectedParameterAsDictionary: Map[String, ProcessParameter[_]] = expected.map(e => (e.key, e)).toMap
+		keysOfMissingParameters.map(k => expectedParameterAsDictionary(k))
 	}
 
 	def generateVariationsAndInstanciate(): List[T] =

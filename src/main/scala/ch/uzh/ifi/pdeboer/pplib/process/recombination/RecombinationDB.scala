@@ -13,7 +13,13 @@ class RecombinationDB {
 		_classes += cls
 	}
 
-	def classes = _classes
+	def classes: Set[Class[_ <: ProcessStub[_, _]]] = _classes.toSet
+
+	def copy: RecombinationDB = {
+		val db = new RecombinationDB
+		db._classes = collection.mutable.HashSet.empty[Class[_ <: ProcessStub[_, _]]] ++ _classes
+		db
+	}
 }
 
 class PPLibAnnotationLoader(target: RecombinationDB = RecombinationDB.DEFAULT) extends LazyLogger {
