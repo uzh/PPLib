@@ -13,22 +13,29 @@ class Recombinator[INPUT_TYPE, OUTPUT_TYPE](hints: Iterable[RecombinationHintGro
 		val defaultHints: List[RecombinationHint] = getHintsToUse(hintsToUse)
 		val targetClasses = db.classes.filter(t => defaultHints.forall(c => c.filter(t)))
 		targetClasses.map(cls => {
+			logger.info(s"found target class $cls")
 			val gen = new TypedParameterVariantGenerator[ProcessStub[INPUT_TYPE, OUTPUT_TYPE]]()(new SimpleClassTag[INPUT_TYPE, OUTPUT_TYPE](cls))
 			defaultHints.foreach(hint => {
 				hint.processConstructionParameter.foreach {
 					case (parameterKey, parameterValue) => gen.addParameterVariations(parameterKey, parameterValue)
 				}
 			})
-			gen.uncoveredParameterThatAreExpected.foreach(p => {
-				if (p.clazz.isInstanceOf[PassableProcessParam[_]]) {
-					logger.info(s"recursively recombining $p..")
-					val pr = p.clazz.asInstanceOf[Class[ProcessStub[_, _]]]
-					var hintsMap = hints.groupBy(_.classUnderRecombination)
-					val currentHintsLineForThisClass = hintsMap.get(Some(pr)).map(g => g.toList.head).map(_.hints).getOrElse(List())
-					val newHintsToUseForThisClass = new RecombinationHintGroup(Some(pr), new TypeUnsafeRecombinationHint(pr) :: currentHintsLineForThisClass)
-					hintsMap += Some(pr) -> List(newHintsToUseForThisClass)
 
-					gen.addParameterVariations(p.key, new Recombinator[Any, Any](hintsMap.values.flatten, db).materialize(Some(pr)))
+			gen.uncoveredParameterThatAreExpected.foreach(p => {
+				p.clazz match {
+					case passable: Class[PassableProcessParam[_]] => {
+						logger.info(s"  recursively recombining $p..")
+						val pr = passable.newInstance().clazz.asInstanceOf[Class[ProcessStub[_, _]]]
+						var hintsMap = hints.groupBy(_.classUnderRecombination)
+						val currentHintsLineForThisClass = hintsMap.get(Some(pr)).map(g => g.toList.head).map(_.hints).getOrElse(List())
+						val newHintsToUseForThisClass = new RecombinationHintGroup(Some(pr), new TypeUnsafeRecombinationHint(pr) :: currentHintsLineForThisClass)
+						hintsMap += Some(pr) -> List(newHintsToUseForThisClass)
+
+						val recombinationsOfThisProcess = new Recombinator[Any, Any](hintsMap.values.flatten, db).materialize(Some(pr))
+						logger.info(s" recursively recombined $p. found ${recombinationsOfThisProcess.size} recombinations")
+						gen.addParameterVariations(p.key, recombinationsOfThisProcess)
+					}
+					case _ => {}
 				}
 
 				//int, String etc

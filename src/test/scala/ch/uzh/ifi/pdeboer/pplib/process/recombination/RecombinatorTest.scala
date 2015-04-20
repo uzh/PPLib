@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{DecideProcess, DefaultParameters, Patch}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{Collection, CollectionWithSigmaPruning, Contest}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import org.junit.{Assert, Test}
 
 /**
@@ -55,5 +55,20 @@ class RecombinatorTest {
 			valueIsSet && p.params.size == 1
 		}))
 		Assert.assertEquals(4, materialized.length)
+	}
+
+	@Test
+	def testCollectDecideProcessRecombinationWithSimpleDB: Unit = {
+		val db = newDB
+		db.addClass(classOf[Contest])
+		db.addClass(classOf[ContestWithBeatByKVotingProcess])
+		db.addClass(classOf[CollectDecideProcess])
+		val tc = new TypeRecombinationHint[CollectDecideProcess]()
+
+		val r = new Recombinator[Patch, Patch](List(new RecombinationHintGroup(None, List(tc))), db)
+		val materialized = r.materialize()
+
+		val processClasses = materialized.map(_.clazz).toSet
+		Assert.assertEquals(4, processClasses.size)
 	}
 }
