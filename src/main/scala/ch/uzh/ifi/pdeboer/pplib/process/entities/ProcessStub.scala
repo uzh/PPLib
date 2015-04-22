@@ -10,28 +10,29 @@ import scala.reflect.runtime.universe._
  * Created by pdeboer on 13/02/15.
  */
 object ProcessStub {
-	def createFromBlueprint[P <: ProcessStub[_, _]](clazz: Class[P], params: Map[String, Any]): Unit = {
+	def createFromBlueprint[P <: ProcessStub[_, _]](clazz: Class[P], params: Map[String, Any], factory: ProcessFactory[P]): P = {
+		//if Java Annotation factory was used --> convert to default
+		val finalFactory = if (factory.isInstanceOf[JavaAnnotationCompatibleDefaultProcessFactoryWrapper])
+			new DefaultProcessFactory[P](clazz)
+		else factory
+		finalFactory.buildProcess(params)
+	}
+
+	def createFromBlueprint[P <: ProcessStub[_, _]](clazz: Class[P], params: Map[String, Any]): P = {
 		val annotation: PPLibProcess = clazz.getAnnotation(classOf[PPLibProcess])
-		val factory = if (annotation != null) annotation.builder().newInstance()
+		val factory = if (annotation != null) annotation.builder().newInstance().asInstanceOf[ProcessFactory[P]]
 		else {
-			classOf[DefaultProcessFactory[P]].getConstructors()(0).newInstance(clazz)
+			new DefaultProcessFactory[P](clazz)
 		}
-		//create[BASE](params, factory.asInstanceOf[ProcessFactory[BASE]])
+		createFromBlueprint[P](clazz, params, factory)
 	}
 
 	def create[BASE <: ProcessStub[_, _]](params: Map[String, Any])(implicit cls: ClassTag[BASE]): BASE = {
-		val clazz = cls.runtimeClass
-		val annotation: PPLibProcess = clazz.getAnnotation(classOf[PPLibProcess])
-		val factory = if (annotation != null) annotation.builder().newInstance()
-		else {
-			classOf[DefaultProcessFactory[BASE]].getConstructors()(0).newInstance(clazz)
-		}
-		create[BASE](params, factory.asInstanceOf[ProcessFactory[BASE]])
+		createFromBlueprint[BASE](cls.runtimeClass.asInstanceOf[Class[BASE]], params)
 	}
 
 	def create[BASE <: ProcessStub[_, _]](params: Map[String, Any], factory: ProcessFactory[BASE])(implicit cls: ClassTag[BASE]): BASE = {
-		val finalFactory = if (factory.isInstanceOf[JavaAnnotationCompatibleDefaultProcessFactoryWrapper]) new DefaultProcessFactory[BASE]() else factory
-		finalFactory.buildProcess(params)
+		createFromBlueprint[BASE](cls.runtimeClass.asInstanceOf[Class[BASE]], params, factory)
 	}
 }
 

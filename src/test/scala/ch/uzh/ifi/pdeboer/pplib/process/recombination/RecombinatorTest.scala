@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{DecideProcess, DefaultParameters, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import org.junit.{Assert, Test}
 
@@ -25,19 +25,20 @@ class RecombinatorTest {
 		Assert.assertEquals(Set(classOf[Collection], classOf[CollectionWithSigmaPruning]), processClasses)
 	}
 
-	@Test
-	def testTypeConstrainedMaterialize: Unit = {
-		val db = newDB
-		db.addClass(classOf[Contest])
-		val tc = new TypeRecombinationHint[DecideProcess[List[Patch], Patch]]()
+	/*
+		@Test
+		def testTypeConstrainedMaterialize: Unit = {
+			val db = newDB
+			db.addClass(classOf[Contest])
+			val tc = new TypeRecombinationHint[DecideProcess[List[Patch], Patch]]()
 
-		val r = new Recombinator[List[Patch], Patch](List(new RecombinationHintGroup(None, List(tc))), db)
-		val materialized = r.materialize()
+			val r = new Recombinator[List[Patch], Patch](List(new RecombinationHintGroup(None, List(tc))), db)
+			val materialized = r.materialize()
 
-		val processClasses = materialized.map(_.clazz).toSet
-		Assert.assertEquals(Set(classOf[Contest]), processClasses)
-	}
-
+			val processClasses = materialized.map(_.clazz).toSet
+			Assert.assertEquals(Set(classOf[Contest]), processClasses)
+		}
+	*/
 
 	@Test
 	def testParameterSupplyingConstraints: Unit = {
@@ -57,18 +58,20 @@ class RecombinatorTest {
 		Assert.assertEquals(4, materialized.length)
 	}
 
-	@Test
-	def testCollectDecideProcessRecombinationWithSimpleDB: Unit = {
-		val db = newDB
-		db.addClass(classOf[Contest])
-		db.addClass(classOf[ContestWithBeatByKVotingProcess])
-		db.addClass(classOf[CollectDecideProcess])
-		val tc = new TypeRecombinationHint[CollectDecideProcess]()
+	/*
+		@Test
+		def testCollectDecideProcessRecombinationWithSimpleDB: Unit = {
+			val db = newDB
+			db.addClass(classOf[Contest])
+			db.addClass(classOf[ContestWithBeatByKVotingProcess])
+			db.addClass(classOf[CollectDecideProcess])
+			val tc = new TypeRecombinationHint[CollectDecideProcess]()
 
-		val r = new Recombinator[Patch, Patch](List(new RecombinationHintGroup(None, List(tc))), db)
-		val materialized = r.materialize()
+			val r = new Recombinator[Patch, Patch](List(new RecombinationHintGroup(None, List(tc))), db)
+			val materialized = r.materialize()
 
-		val processClasses = materialized.map(_.clazz).toSet
-		Assert.assertEquals(4, processClasses.size)
-	}
+			val processClasses = materialized.map(_.clazz).toSet
+			Assert.assertEquals(4, processClasses.size)
+		}
+		*/
 }

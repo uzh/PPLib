@@ -2,7 +2,6 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PPLibProcess, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
-import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 17/02/15.
  */
@@ -15,9 +14,7 @@ class RecombinationDB {
 
 	def classes: Set[Class[_ <: ProcessStub[_, _]]] = _classes.toSet
 
-	def types = _classes.map(c => {
-		(runtimeMirror(c.getClassLoader).classSymbol(c).toType.typeArgs.head, c)
-	}).toList
+	def types = _classes.map(c => (U.getTypeFromClass(c), c)).toList
 
 	def copy: RecombinationDB = {
 		val db = new RecombinationDB

@@ -20,20 +20,20 @@ trait ProcessFactory[BASE <: ProcessStub[_, _]] {
 	def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _]
 }
 
-class DefaultProcessFactory[BASE <: ProcessStub[_, _]]()(implicit cls: ClassTag[BASE]) extends ProcessFactory[BASE] {
-	val baseClass = cls.runtimeClass
+class GenericsEnabledProcessFactory[BASE <: ProcessStub[_, _]]()(implicit cls: ClassTag[BASE]) extends DefaultProcessFactory[BASE](null) {
+	override def clazz = cls.runtimeClass.asInstanceOf[Class[BASE]]
+}
 
-	override def buildProcess(params: Map[String, Any]): BASE = {
-		typelessBuildProcess(params).asInstanceOf[BASE]
-	}
+class DefaultProcessFactory[BASE <: ProcessStub[_, _]](_clazz: Class[BASE]) extends ProcessFactory[BASE] {
+	def clazz: Class[BASE] = _clazz
 
 	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
-		val targetConstructor: Constructor[_] = baseClass.getDeclaredConstructor(classOf[Map[String, Any]])
+		val targetConstructor: Constructor[_] = clazz.getDeclaredConstructor(classOf[Map[String, Any]])
 		targetConstructor.newInstance(params).asInstanceOf[ProcessStub[_, _]]
 	}
 }
 
-class JavaAnnotationCompatibleDefaultProcessFactoryWrapper extends ProcessFactory[ProcessStub[_, _]] {
+final class JavaAnnotationCompatibleDefaultProcessFactoryWrapper extends ProcessFactory[ProcessStub[_, _]] {
 	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
 		throw new IllegalAccessException("Please call me through ProcessStub.create()")
 		???

@@ -13,6 +13,7 @@ import scala.collection.JavaConversions._
 import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
 import scala.concurrent.forkjoin.ForkJoinPool
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 /**
  * Created by pdeboer on 15/10/14.
@@ -125,8 +126,11 @@ object U extends LazyLogger {
 			getAncestorsOfClass(clazz.getSuperclass, childrenToUse.+(clazz.getSuperclass))
 		}
 	}
-}
 
+	def getTypeFromClass(c: Class[_]) =
+		if (c == null) null else runtimeMirror(c.getClassLoader).classSymbol(c).toType
+
+}
 
 /**
  * this is pretty much the most horrible thing you'll see in this code :( but we haven't
