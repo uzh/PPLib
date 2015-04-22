@@ -87,10 +87,10 @@ class RecombinationVariantProcessXMLExporter(val variant: RecombinationVariant, 
 			case (input, output) => {
 				<Result>
 					<Input>
-						{transformDataWithExporter(process, process.inputType.runtimeClass, input)}
+						{transformDataWithExporter(process, process.inputClass.runtimeClass, input)}
 					</Input>
 					<Output>
-						{transformDataWithExporter(process, process.outputType.runtimeClass, output)}
+						{transformDataWithExporter(process, process.outputClass.runtimeClass, output)}
 					</Output>
 				</Result>
 			}

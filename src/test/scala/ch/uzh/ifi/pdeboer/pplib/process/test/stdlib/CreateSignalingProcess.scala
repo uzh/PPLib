@@ -8,7 +8,10 @@ import scala.reflect.ClassTag
  * Created by pdeboer on 05/12/14.
  */
 
-class CreateSignalingProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty) extends CreateProcess[IN, OUT](params) {
+import scala.reflect.runtime.universe._
+
+
+class CreateSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends CreateProcess[IN, OUT](params) {
 	var called: Boolean = false
 
 	override protected def run(data: IN): OUT = {
@@ -23,7 +26,7 @@ object CreateSignalingProcess {
 	val OUTPUT = new ProcessParameter[AnyRef]("out", None)
 }
 
-class CreateSignalingProcessFactory[IN: ClassTag, OUT: ClassTag] extends ProcessFactory[CreateSignalingProcess[IN, OUT]] {
+class CreateSignalingProcessFactory[IN, OUT]()(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends ProcessFactory[CreateSignalingProcess[IN, OUT]] {
 	override def buildProcess(params: Map[String, Any]) =
 		new CreateSignalingProcess[IN, OUT](params)
 
@@ -32,7 +35,7 @@ class CreateSignalingProcessFactory[IN: ClassTag, OUT: ClassTag] extends Process
 	}
 }
 
-class DecideSignalingProcess[IN: ClassTag, OUT: ClassTag](params: Map[String, Any] = Map.empty) extends DecideProcess[IN, OUT](params) {
+class DecideSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends DecideProcess[IN, OUT](params) {
 	var called: Boolean = false
 
 	override protected def run(data: IN): OUT = {
@@ -47,7 +50,7 @@ object DecideSignalingProcess {
 	val OUTPUT = new ProcessParameter[AnyRef]("out", None)
 }
 
-class DecideSignalingProcessFactory[IN: ClassTag, OUT: ClassTag] extends ProcessFactory[DecideSignalingProcess[IN, OUT]] {
+class DecideSignalingProcessFactory[IN, OUT]()(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends ProcessFactory[DecideSignalingProcess[IN, OUT]] {
 	override def buildProcess(params: Map[String, Any]) =
 		new DecideSignalingProcess[IN, OUT](params)
 

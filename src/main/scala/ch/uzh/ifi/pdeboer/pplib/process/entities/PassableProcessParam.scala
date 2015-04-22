@@ -1,12 +1,12 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import scala.reflect.ClassTag
-
+import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 14/12/14.
  */
 class PassableProcessParam[Base <: ProcessStub[_, _]](var params: Map[String, Any] = Map.empty,
-													  val factory: Option[ProcessFactory[Base]] = None)(implicit baseCls: ClassTag[Base]) {
+													  val factory: Option[ProcessFactory[Base]] = None)(implicit baseCls: ClassTag[Base], val baseType: TypeTag[Base]) {
 	val clazz = baseCls.runtimeClass
 	protected var _createdProcesses = List.empty[Base]
 

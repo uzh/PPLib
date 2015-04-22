@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.{MonteCarlo, U}
 
@@ -68,9 +67,6 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 	}
 
 	protected def confidence = CONFIDENCE_PARAMETER.get
-
-	override val processCategoryNames: List[String] = List("selectbest.statistical")
-
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, MAX_ITERATIONS) ::: super.optionalParameters

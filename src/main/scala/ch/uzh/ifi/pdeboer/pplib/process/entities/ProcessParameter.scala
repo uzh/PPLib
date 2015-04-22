@@ -3,16 +3,15 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
 
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 /**
  * Created by pdeboer on 28/11/14.
  */
-@SerialVersionUID(1l) class ProcessParameter[T: ClassTag](keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None) extends Serializable {
+@SerialVersionUID(1l) class ProcessParameter[T](keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None)(implicit baseClass: ClassTag[T], val baseType: TypeTag[T]) extends Serializable {
 	def key = keyPostfix
 
-	def clazz: Class[_] = implicitly[ClassTag[T]].runtimeClass
-
-	def t = implicitly[ClassTag[T]]
+	def clazz: Class[_] = baseClass.runtimeClass
 
 	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
 

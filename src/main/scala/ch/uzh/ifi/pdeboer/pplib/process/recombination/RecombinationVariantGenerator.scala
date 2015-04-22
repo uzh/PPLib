@@ -4,6 +4,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessP
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
+
 
 /**
  * Created by pdeboer on 09/10/14.
@@ -17,7 +19,7 @@ class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessPar
 	}
 }
 
-abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit baseCls: ClassTag[T]) {
+abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit baseCls: ClassTag[T], baseType: TypeTag[T]) {
 	protected def base: ProcessStub[_, _]
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
@@ -70,13 +72,13 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit base
 			.asInstanceOf[List[T]]
 }
 
-class InstanciatedParameterVariantGenerator[T <: ProcessStub[_, _]](_base: T, initWithDefaults: Boolean = false)(implicit baseClass: ClassTag[T]) extends ParameterVariantGenerator[T] {
+class InstanciatedParameterVariantGenerator[T <: ProcessStub[_, _]](_base: T, initWithDefaults: Boolean = false)(implicit baseClass: ClassTag[T], baseType: TypeTag[T]) extends ParameterVariantGenerator[T] {
 	override protected def base: ProcessStub[_, _] = _base.asInstanceOf[ProcessStub[_, _]]
 
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
 
-class TypedParameterVariantGenerator[T <: ProcessStub[_, _]](initWithDefaults: Boolean = false)(implicit classTag: ClassTag[T]) extends ParameterVariantGenerator[T] {
+class TypedParameterVariantGenerator[T <: ProcessStub[_, _]](initWithDefaults: Boolean = false)(implicit classTag: ClassTag[T], typeTag: TypeTag[T]) extends ParameterVariantGenerator[T] {
 	protected val base = ProcessStub.create[T](Map.empty[String, Any])
 	if (initWithDefaults) initAllParamsWithCandidates()
 }

@@ -3,17 +3,28 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
+
 
 /**
  * Created by pdeboer on 13/02/15.
  */
 object ProcessStub {
+	def createFromBlueprint[P <: ProcessStub[_, _]](clazz: Class[P], params: Map[String, Any]): Unit = {
+		val annotation: PPLibProcess = clazz.getAnnotation(classOf[PPLibProcess])
+		val factory = if (annotation != null) annotation.builder().newInstance()
+		else {
+			classOf[DefaultProcessFactory[P]].getConstructors()(0).newInstance(clazz)
+		}
+		//create[BASE](params, factory.asInstanceOf[ProcessFactory[BASE]])
+	}
+
 	def create[BASE <: ProcessStub[_, _]](params: Map[String, Any])(implicit cls: ClassTag[BASE]): BASE = {
 		val clazz = cls.runtimeClass
 		val annotation: PPLibProcess = clazz.getAnnotation(classOf[PPLibProcess])
 		val factory = if (annotation != null) annotation.builder().newInstance()
 		else {
-			classOf[DefaultProcessFactory[BASE]].getConstructors()(0).newInstance(cls)
+			classOf[DefaultProcessFactory[BASE]].getConstructors()(0).newInstance(clazz)
 		}
 		create[BASE](params, factory.asInstanceOf[ProcessFactory[BASE]])
 	}
@@ -31,7 +42,7 @@ object ProcessStub {
  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
  */
-@SerialVersionUID(1l) abstract class ProcessStub[INPUT: ClassTag, OUTPUT: ClassTag](var params: Map[String, Any]) extends LazyLogger with IParametrizable with Serializable {
+@SerialVersionUID(1l) abstract class ProcessStub[INPUT, OUTPUT](var params: Map[String, Any])(implicit val inputClass: ClassTag[INPUT], val outputClass: ClassTag[OUTPUT], val inputType: TypeTag[INPUT], val outputType: TypeTag[OUTPUT]) extends LazyLogger with IParametrizable with Serializable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
@@ -49,9 +60,6 @@ object ProcessStub {
 	protected var _results = collection.mutable.HashMap.empty[INPUT, OUTPUT]
 
 	def results: Map[INPUT, OUTPUT] = _results.toMap
-
-	lazy val inputType = implicitly[ClassTag[INPUT]]
-	lazy val outputType = implicitly[ClassTag[OUTPUT]]
 
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
@@ -72,17 +80,6 @@ object ProcessStub {
 	}
 
 	protected def run(data: INPUT): OUTPUT
-
-	protected def processCategoryNames: List[String] = Nil
-
-	final def processCategories: List[RecombinationCategory] = {
-		val names: List[String] =
-			if (processCategoryNames == null)
-				Nil
-			else processCategoryNames
-		names.map(n => RecombinationCategory.get[INPUT, OUTPUT](n))
-	}
-
 
 	final def isParameterTypeCorrect(key: String, value: Any): Boolean = {
 		val e = allParams.find(_.key.equals(key))
@@ -135,10 +132,10 @@ object ProcessStub {
 			{getClass.getName}
 		</Class>
 		<InputClass>
-			{inputType.runtimeClass.getCanonicalName}
+			{inputClass.runtimeClass.getCanonicalName}
 		</InputClass>
 		<OutputClass>
-			{outputType.runtimeClass.getCanonicalName}
+			{outputClass.runtimeClass.getCanonicalName}
 		</OutputClass>
 		<Parameters>
 			{allParams.map(p => {
@@ -158,7 +155,6 @@ object ProcessStub {
 	</Process>
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
-	processCategories.foreach(c => ProcessDB.put(c, this))
 	if (allParams.map(_.key).toSet.size
 		!= allParams.map(_.key).size) {
 		println("bad")

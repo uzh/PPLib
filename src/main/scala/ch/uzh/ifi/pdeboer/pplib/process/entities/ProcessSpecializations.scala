@@ -7,11 +7,12 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
 import scala.collection.parallel.ParSeq
 import scala.reflect.ClassTag
-import scala.reflect.runtime.{universe => ru}
+import scala.reflect.runtime.universe._
 
-abstract class CreateProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
 
-abstract class DecideProcess[INPUT: ClassTag, OUTPUT: ClassTag](params: Map[String, Any]) extends ProcessStub[INPUT, OUTPUT](params)
+abstract class CreateProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params)
+
+abstract class DecideProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params)
 
 trait ProcessFactory[BASE <: ProcessStub[_, _]] {
 	def buildProcess(params: Map[String, Any] = Map.empty): BASE = typelessBuildProcess(params).asInstanceOf[BASE]

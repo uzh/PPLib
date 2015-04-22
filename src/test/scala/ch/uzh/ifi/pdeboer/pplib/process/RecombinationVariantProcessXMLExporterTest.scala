@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
 
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 /**
  * Created by pdeboer on 28/11/14.
@@ -20,12 +21,12 @@ class RecombinationVariantProcessXMLExporterTest {
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
+		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<List><Item>test1</Item><Item>test2</Item></List>",
 			U.removeWhitespaces(xmlExport.toString))
 
-		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputType.runtimeClass, outputDataProcess))
+		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputClass.runtimeClass, outputDataProcess))
 	}
 
 	@Test
@@ -36,12 +37,12 @@ class RecombinationVariantProcessXMLExporterTest {
 		val variant = new RecombinationVariant(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
+		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<Set><Item>test1</Item><Item>test2</Item></Set>",
 			U.removeWhitespaces(xmlExport.toString))
 
-		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputType.runtimeClass, outputDataProcess))
+		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputClass.runtimeClass, outputDataProcess))
 	}
 
 	@Test
@@ -53,12 +54,12 @@ class RecombinationVariantProcessXMLExporterTest {
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
+		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<List><Item>1</Item><Item>2</Item><Item>3</Item></List>",
 			U.removeWhitespaces(xmlExport.toString))
 
-		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputType.runtimeClass, outputDataProcess))
+		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputClass.runtimeClass, outputDataProcess))
 	}
 
 
@@ -71,12 +72,12 @@ class RecombinationVariantProcessXMLExporterTest {
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		val xmlExport = exporter.transformDataWithExporter(process, process.inputType.runtimeClass, inputDataProcess)
+		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
 
 		Assert.assertEquals("<Map><Item><Key>key1</Key><Value>value1</Value></Item><Item><Key>key2</Key><Value>value2</Value></Item></Map>",
 			U.removeWhitespaces(xmlExport.toString))
 
-		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputType.runtimeClass, outputDataProcess))
+		Assert.assertEquals(outputDataProcess, exporter.transformDataWithExporter(process, process.outputClass.runtimeClass, outputDataProcess))
 	}
 
 	@Test
@@ -91,13 +92,13 @@ class RecombinationVariantProcessXMLExporterTest {
 		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
-	private class PassableProcessWithRuns[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends PassableProcessParam[TestProcess[IN, OUT]]() {
+	private class PassableProcessWithRuns[IN, OUT](val runs: Map[IN, OUT])(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends PassableProcessParam[TestProcess[IN, OUT]]() {
 		override def create(lowerPrioParams: Map[String, Any], higherPrioParams: Map[String, Any]): TestProcess[IN, OUT] = {
 			new TestProcess[IN, OUT](runs)
 		}
 	}
 
-	private class TestProcess[IN: ClassTag, OUT: ClassTag](val runs: Map[IN, OUT]) extends ProcessStub[IN, OUT](Map.empty) {
+	private class TestProcess[IN, OUT](val runs: Map[IN, OUT])(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends ProcessStub[IN, OUT](Map.empty) {
 		//not needed. Yes, it's ugly
 		override protected def run(data: IN): OUT = ???
 
