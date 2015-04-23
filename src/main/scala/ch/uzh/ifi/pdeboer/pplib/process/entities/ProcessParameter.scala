@@ -11,7 +11,7 @@ import scala.reflect.runtime.universe._
 @SerialVersionUID(1l) class ProcessParameter[T](keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None)(implicit baseClass: ClassTag[T], val baseType: TypeTag[T]) extends Serializable {
 	def key = keyPostfix
 
-	def clazz: Class[_] = baseClass.runtimeClass
+	def clazz: Class[_ <: ProcessStub[_, _]] = baseClass.runtimeClass.asInstanceOf[Class[ProcessStub[_, _]]]
 
 	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
 

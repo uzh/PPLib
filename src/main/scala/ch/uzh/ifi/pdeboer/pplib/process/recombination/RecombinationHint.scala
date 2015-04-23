@@ -10,16 +10,18 @@ import scala.reflect.runtime.universe._
  * Created by pdeboer on 10/04/15.
  */
 trait RecombinationHint {
-	def filter[T <: ProcessStub[_, _]](clazz: Class[T]): Boolean
+	def processConstructionParameter: Map[String, Iterable[Any]] = Map.empty
 
-	def processConstructionParameter: Map[String, Iterable[Any]]
+	def runComplexParameterRecombinationOn(processParameter: String): Option[Boolean] = None
 }
 
-class OptionalParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
-	override def filter[BASE <: ProcessStub[_, _]](candidateClass: Class[BASE]): Boolean = true
-
+class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
 	override def processConstructionParameter: Map[String, Iterable[Any]] =
 		Map(param.key -> values)
+}
+
+class SettingsOnParamsRecombinationHint(val targetParamKey: String, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true)) extends RecombinationHint {
+	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (processParameterKey == targetParamKey) runComplexParameterRecombinationOnThisParam else None
 }
 
 class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[RecombinationHint]] = Map.empty) {
@@ -49,7 +51,16 @@ class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[R
 	}
 
 	def hintsForType(t: Type = null) = {
-		_hints.getOrElse(Option(t), _hints.getOrElse(None, Nil))
+		defaultHints ::: (if (t == null) Nil else _hints.getOrElse(Option(t), Nil))
+	}
+
+	def defaultHints: List[RecombinationHint] = {
+		_hints.getOrElse(None, Nil)
+	}
+
+	def singleValueHint[T](t: Type = null, paramKey: String, function: (RecombinationHint, String) => Option[T]): Option[T] = {
+		val allPossibleValues = hintsForType(t).map(h => function(h, paramKey))
+		allPossibleValues.foldLeft(allPossibleValues.headOption)((prev, newItem) => Option(newItem)).asInstanceOf[Option[T]]
 	}
 }
 

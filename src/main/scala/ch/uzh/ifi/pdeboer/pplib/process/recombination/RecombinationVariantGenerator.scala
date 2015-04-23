@@ -1,9 +1,11 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
-import scala.reflect.ClassTag
+import scala.reflect.{api, ClassTag}
+import scala.reflect.api.Universe
 import scala.reflect.runtime.universe._
 
 
@@ -19,8 +21,12 @@ class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessPar
 	}
 }
 
-abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit baseCls: ClassTag[T], baseType: TypeTag[T]) {
+abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]() {
 	protected def base: ProcessStub[_, _]
+
+	def baseClassTag: ClassTag[T]
+
+	def baseTypeTag: TypeTag[T]
 
 	protected var parameterValues = new mutable.HashMap[String, mutable.Set[Any]]()
 
@@ -56,7 +62,7 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit base
 
 	def generatePassableProcesses(): List[PassableProcessParam[T]] =
 		generateParameterVariations().map(params => {
-			new PassableProcessParam[T](params)
+			new PassableProcessParam[T](params)(baseClassTag, baseTypeTag)
 		})
 
 	def uncoveredParameterThatAreExpected: Set[ProcessParameter[_]] = {
@@ -68,17 +74,27 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]()(implicit base
 
 	def generateVariationsAndInstanciate(): List[T] =
 		generateParameterVariations()
-			.map(params => ProcessStub.create[T](params))
+			.map(params => ProcessStub.create[T](params)(baseClassTag))
 			.asInstanceOf[List[T]]
 }
 
-class InstanciatedParameterVariantGenerator[T <: ProcessStub[_, _]](_base: T, initWithDefaults: Boolean = false)(implicit baseClass: ClassTag[T], baseType: TypeTag[T]) extends ParameterVariantGenerator[T] {
+class InstanciatedParameterVariantGenerator[T <: ProcessStub[_, _]](_base: T, initWithDefaults: Boolean = false, _baseClass: Class[T] = null, _baseType: Type = null) extends ParameterVariantGenerator[T] {
 	override protected def base: ProcessStub[_, _] = _base.asInstanceOf[ProcessStub[_, _]]
+
+	override val baseClassTag: ClassTag[T] = ClassTag(Option(_baseClass).getOrElse(base.getClass))
+
+	class MyTypeTag[TPE] private[InstanciatedParameterVariantGenerator](clazz: Class[_], val tpe: Type) extends TypeTag[TPE] {
+		override val mirror = runtimeMirror(clazz.getClassLoader)
+
+		override def in[U <: Universe with Singleton](otherMirror: api.Mirror[U]): U#TypeTag[TPE] = throw new IllegalAccessException("this shouldn't happen")
+	}
+
+	override val baseTypeTag = new MyTypeTag[T](baseClassTag.runtimeClass, Option(_baseType).getOrElse(U.getTypeFromClass(baseClassTag.runtimeClass)))
 
 	if (initWithDefaults) initAllParamsWithCandidates()
 }
 
-class TypedParameterVariantGenerator[T <: ProcessStub[_, _]](initWithDefaults: Boolean = false)(implicit classTag: ClassTag[T], typeTag: TypeTag[T]) extends ParameterVariantGenerator[T] {
+class TypedParameterVariantGenerator[T <: ProcessStub[_, _]](initWithDefaults: Boolean = false)(implicit val baseClassTag: ClassTag[T], val baseTypeTag: TypeTag[T]) extends ParameterVariantGenerator[T] {
 	protected val base = ProcessStub.create[T](Map.empty[String, Any])
 	if (initWithDefaults) initAllParamsWithCandidates()
 }

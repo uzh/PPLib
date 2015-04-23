@@ -1,49 +1,51 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessStub}
-import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, SimpleClassTag}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
+import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 
 /**
  * Created by pdeboer on 27/03/15.
  */
-class Recombinator[INPUT_TYPE, OUTPUT_TYPE](hints: RecombinationHints, db: RecombinationDB = RecombinationDB.DEFAULT)(implicit inputClass: TypeTag[INPUT_TYPE], outputType: TypeTag[OUTPUT_TYPE]) extends LazyLogger {
-	def processRecombination(baseType: Type): List[PassableProcessParam[ProcessStub[INPUT_TYPE, OUTPUT_TYPE]]] = {
-		val applicableTypes: List[Class[_ <: ProcessStub[_, _]]] = db.types.filter(dbType => dbType._1 <:< baseType).map(_._2)
-		val recombinationsOfTheseTypes = applicableTypes.map(t => {
-			materialize(hints.hintsForType(baseType))
-		})
-		Nil
+class Recombinator(hints: RecombinationHints, db: RecombinationDB = RecombinationDB.DEFAULT) extends LazyLogger {
+	def materialize[BASE <: ProcessStub[_, _]]()(implicit baseType: TypeTag[BASE], baseClass: ClassTag[BASE]): List[PassableProcessParam[BASE]] = {
+		processRecombination(baseType.tpe, baseClass.runtimeClass.asInstanceOf[Class[BASE]]).asInstanceOf[List[PassableProcessParam[BASE]]]
 	}
 
+	def processRecombination(baseType: Type, baseClass: Class[_ <: ProcessStub[_, _]]): List[PassableProcessParam[ProcessStub[_, _]]] = {
+		val applicableTypes = getApplicableTypesInDB(baseType)
+		val recombinationsOfTheseTypes = applicableTypes.map { case (processType, processClass) => {
+			val baseProcess: ProcessStub[_, _] = ProcessStub.createFromBlueprint(processClass, Map.empty)
 
-	private def getHintsToUse(baseClassFilter: Option[Class[ProcessStub[_, _]]]): List[RecombinationHint] = {
-		hints.find(h => h.classUnderRecombination == baseClassFilter).map(_.hints).getOrElse(Nil)
+			val variantGenerator = new InstanciatedParameterVariantGenerator[ProcessStub[_, _]](baseProcess)
+			baseProcess.allParams.foreach(p =>
+				variantGenerator.addVariation(p, generateCandidatesForParameter(baseProcess, processType, p))
+			)
+			variantGenerator.generatePassableProcesses()
+		}
+		}.flatten
+
+		recombinationsOfTheseTypes
 	}
-}
 
-object MyTest extends App {
+	protected def generateCandidatesForParameter[T <: ProcessStub[_, _]](containerClass: T, containerType: Type, param: ProcessParameter[_]): List[Any] = {
+		val allParamsAddedInHints = hints(containerClass.getClass).map(_.processConstructionParameter.getOrElse(param.key, List.empty[T])).flatten
+		val allDefaultParamsInProcess = param.candidateDefinitions.getOrElse(Nil).toList
 
-	class A
+		val shouldRunComplexParamRecombination = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.runComplexParameterRecombinationOn(k)).getOrElse(true)
+		val recursiveProcessParams = if (shouldRunComplexParamRecombination && param.baseType.tpe <:< typeOf[ProcessStub[_, _]]) {
+			processRecombination(param.baseType.tpe, param.clazz)
+		} else Nil
 
-	class B extends A
+		allParamsAddedInHints ::: allDefaultParamsInProcess ::: recursiveProcessParams
+	}
 
-	class C
-
-	val t = typeOf[Class[A]]
-	val t2 = typeOf[B]
-	val t3 = typeOf[C]
-	println("A is parent of B " + (t2 <:< t.typeArgs.head)) //true
-	println("B is parent of A " + (t.typeArgs.head <:< t2)) //true
-	println("C is related to B" + (t3 <:< t.typeArgs.head))
-	//false
-
-	val classOfA = classOf[A]
-	val typeOfA = runtimeMirror(classOfA.getClassLoader).classSymbol(classOfA).toType
-	println(t3 <:< typeOfA)
-
+	protected def getApplicableTypesInDB(baseType: Type) = {
+		db.types.filter(dbType => dbType._1 <:< baseType)
+	}
 }
 
 /*
