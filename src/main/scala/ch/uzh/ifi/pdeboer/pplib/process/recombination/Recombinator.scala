@@ -33,10 +33,12 @@ class Recombinator(hints: RecombinationHints, db: RecombinationDB = Recombinatio
 	}
 
 	protected def generateCandidatesForParameter[T <: ProcessStub[_, _]](containerClass: T, containerType: Type, param: ProcessParameter[_]): List[Any] = {
-		val allParamsAddedInHints = hints(containerClass.getClass).map(_.processConstructionParameter.getOrElse(param.key, List.empty[T])).flatten
-		val allDefaultParamsInProcess = param.candidateDefinitions.getOrElse(Nil).toList
+		val allParamsAddedInHints = hints(containerClass.getClass).map(_.processConstructionParameter.getOrElse(param.key, Nil)).flatten
+		val isAllowedToAddDefaultParams = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.addDefaultValuesFromParamDefinition(k)).getOrElse(true)
+		val allDefaultParamsInProcess = if (isAllowedToAddDefaultParams) param.candidateDefinitions.getOrElse(Nil).toList else Nil
 
-		val shouldRunComplexParamRecombination = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.runComplexParameterRecombinationOn(k)).getOrElse(true)
+		val shouldRunComplexParamRecombination = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.runComplexParameterRecombinationOn(k))
+			.getOrElse(true)
 		val recursiveProcessParams = if (shouldRunComplexParamRecombination && param.baseType.tpe <:< typeOf[ProcessStub[_, _]]) {
 			processRecombination(param.baseType.tpe, param.clazz)
 		} else Nil

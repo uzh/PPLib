@@ -13,6 +13,8 @@ trait RecombinationHint {
 	def processConstructionParameter: Map[String, Iterable[Any]] = Map.empty
 
 	def runComplexParameterRecombinationOn(processParameter: String): Option[Boolean] = None
+
+	def addDefaultValuesFromParamDefinition(processParameter: String): Option[Boolean] = None
 }
 
 class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
@@ -20,8 +22,14 @@ class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T
 		Map(param.key -> values)
 }
 
-class SettingsOnParamsRecombinationHint(val targetParamKey: String, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true)) extends RecombinationHint {
-	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (processParameterKey == targetParamKey) runComplexParameterRecombinationOnThisParam else None
+class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true), val addDefaultValuesForParam: Option[Boolean] = Some(true)) extends RecombinationHint {
+	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (IsParamTargetParam(processParameterKey)) runComplexParameterRecombinationOnThisParam else None
+
+	override def addDefaultValuesFromParamDefinition(processParameterKey: String): Option[Boolean] = if (IsParamTargetParam(processParameterKey)) addDefaultValuesForParam else None
+
+	private def IsParamTargetParam(processParameterKey: String): Boolean = {
+		targetParams.size == 0 || targetParams.contains(processParameterKey)
+	}
 }
 
 class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[RecombinationHint]] = Map.empty) {
@@ -59,8 +67,8 @@ class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[R
 	}
 
 	def singleValueHint[T](t: Type = null, paramKey: String, function: (RecombinationHint, String) => Option[T]): Option[T] = {
-		val allPossibleValues = hintsForType(t).map(h => function(h, paramKey))
-		allPossibleValues.foldLeft(allPossibleValues.headOption)((prev, newItem) => Option(newItem)).asInstanceOf[Option[T]]
+		val allPossibleValues: List[Option[T]] = hintsForType(t).map(h => function(h, paramKey))
+		allPossibleValues.foldLeft(allPossibleValues.headOption.getOrElse(None))((prev, newItem) => newItem)
 	}
 }
 

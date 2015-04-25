@@ -4,9 +4,9 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessP
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.collection.mutable
-import scala.reflect.{api, ClassTag}
 import scala.reflect.api.Universe
 import scala.reflect.runtime.universe._
+import scala.reflect.{ClassTag, api}
 
 
 /**
@@ -106,9 +106,11 @@ object CombinationGenerator {
 	 * @param x
 	 * @return
 	 */
-	def generate(x: List[List[AnyRef]]): List[List[AnyRef]] =
-		x match {
+	def generate[T](x: List[List[T]]): List[List[T]] = {
+		val listWithoutEmptyLists = x.filter(_.length > 0)
+		listWithoutEmptyLists match {
 			case Nil => List(Nil)
 			case h :: t => for (j <- generate(t); i <- h) yield i :: j
 		}
+	}
 }
