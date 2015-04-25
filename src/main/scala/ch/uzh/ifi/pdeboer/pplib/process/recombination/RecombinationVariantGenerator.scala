@@ -55,9 +55,7 @@ abstract class ParameterVariantGenerator[T <: ProcessStub[_, _]]() {
 
 	def generateParameterVariations(): List[Map[String, Any]] = {
 		val listOfTupleLists = parameterValues.map(k => k._2.map(r => (k._1, r)).toList).toList
-		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			k.asInstanceOf[List[(String, Any)]].toMap
-		})
+		CombinationGenerator.generate(listOfTupleLists).map(_.toMap)
 	}
 
 	def generatePassableProcesses(): List[PassableProcessParam[T]] =
