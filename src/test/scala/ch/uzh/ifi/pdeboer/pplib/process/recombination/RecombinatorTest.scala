@@ -57,19 +57,18 @@ class RecombinatorTest {
 		Assert.assertEquals(4, materialized.length)
 	}
 
-	/*
-		@Test
-		def testCollectDecideProcessRecombinationWithSimpleDB: Unit = {
-			val db = newDB
-			db.addClass(classOf[Contest])
-			db.addClass(classOf[ContestWithBeatByKVotingProcess])
-			db.addClass(classOf[CollectDecideProcess])
+	@Test
+	def testCollectDecideProcessRecombinationWithSimpleDB: Unit = {
+		val db = newDB
+		db.addClass(classOf[Contest])
+		db.addClass(classOf[ContestWithBeatByKVotingProcess])
+		db.addClass(classOf[CollectDecideProcess])
 
-			val r = new Recombinator(RecombinationHints.create(Map()), db)
-			val materialized = r.materialize[CollectDecideProcess]
+		val parametersToDisableDefaultValues: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(
+			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addDefaultValuesForParam = Some(false))))
+		val r = new Recombinator(RecombinationHints.create(parametersToDisableDefaultValues), db)
+		val materialized = r.materialize[CollectDecideProcess]
 
-			val processClasses = materialized.map(_.clazz).toSet
-			Assert.assertEquals(4, processClasses.size)
-		}
-		*/
+		Assert.assertEquals(4, materialized.size)
+	}
 }

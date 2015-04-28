@@ -39,8 +39,12 @@ class Recombinator(hints: RecombinationHints, db: RecombinationDB = Recombinatio
 
 		val shouldRunComplexParamRecombination = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.runComplexParameterRecombinationOn(k))
 			.getOrElse(true)
-		val recursiveProcessParams = if (shouldRunComplexParamRecombination && param.baseType.tpe <:< typeOf[ProcessStub[_, _]]) {
-			processRecombination(param.baseType.tpe, param.clazz)
+		val recursiveProcessParams = if (shouldRunComplexParamRecombination && param.baseType.tpe <:< typeOf[PassableProcessParam[_]]) {
+			//process-parameters are encapsulated within PassableProcessParam --> need to extract type from generics argument
+			val encapsulatedType: Type = param.baseType.tpe.typeArgs.head
+			val encapsulatedClass: ClassSymbol = encapsulatedType.baseClasses.head.asClass
+			val clazz: RuntimeClass = runtimeMirror(encapsulatedClass.getClass.getClassLoader).runtimeClass(encapsulatedClass)
+			processRecombination(encapsulatedType, clazz.asInstanceOf[Class[_ <: ProcessStub[_, _]]])
 		} else Nil
 
 		allParamsAddedInHints ::: allDefaultParamsInProcess ::: recursiveProcessParams

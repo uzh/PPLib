@@ -73,7 +73,7 @@ class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[R
 }
 
 object RecombinationHints {
-	def create(hints: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]]) = {
+	def create(hints: Map[Class[_ <: ProcessStub[_, _]], List[_ <: RecombinationHint]]) = {
 		val hintsToUse = hints.map(h => {
 			val key = if (h._1 == classOf[DefaultHintProcessStub]) None else Some(h._1)
 			(key.asInstanceOf[Option[Class[ProcessStub[_, _]]]], h._2)
