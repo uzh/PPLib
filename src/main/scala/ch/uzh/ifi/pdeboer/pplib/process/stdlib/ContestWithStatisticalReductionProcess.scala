@@ -73,5 +73,5 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 }
 
 object ContestWithStatisticalReductionProcess {
-	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", Some(List(0.9d, 0.95d, 0.99d)))
+	val CONFIDENCE_PARAMETER = new ProcessParameter[Double]("confidence", Some(List(0.9d)))
 }

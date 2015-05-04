@@ -39,7 +39,7 @@ class ExplicitInstructionGenerator(question: HCompInstructionsWithTuple, title: 
 
 class SimpleInstructionGeneratorCreate extends InstructionGenerator {
 	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
-		generateQuestionTitle(base) + "in terms of " + base.detailedDescription, base.evaluation)
+		generateQuestionTitle(base) + ". Please pay special attention to " + base.detailedDescription, base.evaluation)
 
 	override def generateQuestionTitle(base: InstructionData): String = "Please " + base.actionName
 }

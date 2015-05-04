@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import org.junit.{Assert, Test}
@@ -70,5 +71,27 @@ class RecombinatorTest {
 		val materialized = r.materialize[CollectDecideProcess]
 
 		Assert.assertEquals(4, materialized.size)
+	}
+
+	@Test
+	def testTurningDefaultOffAndForceParamSetting: Unit = {
+		val materialized = new TextShorteningRecombinationTest().candidates
+
+		def containsSubProcessWithPortal(process: PassableProcessParam[_], targetPortal: HCompPortalAdapter): Boolean = {
+			val OneOfChildrenContainsPortal = process.params.values.exists {
+				case proc: PassableProcessParam[_] =>
+					containsSubProcessWithPortal(proc, targetPortal)
+				case _ => false
+			}
+
+			val thisProcessContainsPortal = process.getParam(DefaultParameters.PORTAL_PARAMETER) == Some(targetPortal)
+
+			thisProcessContainsPortal && OneOfChildrenContainsPortal
+		}
+		val otherPortals = HComp.allDefinedPortals.toSet - HComp.mechanicalTurk
+		if (otherPortals.size == 0) println(Thread.currentThread().getStackTrace()(1) + ": This test will only work if you have defined more than 1 portal.")
+
+		Assert.assertFalse("no crowd flower must be used, only mturk", materialized.exists(p =>
+			otherPortals.exists(portal => containsSubProcessWithPortal(p, portal))))
 	}
 }

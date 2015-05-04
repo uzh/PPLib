@@ -23,11 +23,11 @@ class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T
 }
 
 class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true), val addDefaultValuesForParam: Option[Boolean] = Some(true)) extends RecombinationHint {
-	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (IsParamTargetParam(processParameterKey)) runComplexParameterRecombinationOnThisParam else None
+	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) runComplexParameterRecombinationOnThisParam else None
 
-	override def addDefaultValuesFromParamDefinition(processParameterKey: String): Option[Boolean] = if (IsParamTargetParam(processParameterKey)) addDefaultValuesForParam else None
+	override def addDefaultValuesFromParamDefinition(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) addDefaultValuesForParam else None
 
-	private def IsParamTargetParam(processParameterKey: String): Boolean = {
+	private def isParamTargetParam(processParameterKey: String): Boolean = {
 		targetParams.size == 0 || targetParams.contains(processParameterKey)
 	}
 }
@@ -68,7 +68,7 @@ class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[R
 
 	def singleValueHint[T](t: Type = null, paramKey: String, function: (RecombinationHint, String) => Option[T]): Option[T] = {
 		val allPossibleValues: List[Option[T]] = hintsForType(t).map(h => function(h, paramKey))
-		allPossibleValues.foldLeft(allPossibleValues.headOption.getOrElse(None))((prev, newItem) => newItem)
+		allPossibleValues.foldLeft(allPossibleValues.headOption.getOrElse(None))((prev, newItem) => if (newItem.isDefined) newItem else prev)
 	}
 }
 
