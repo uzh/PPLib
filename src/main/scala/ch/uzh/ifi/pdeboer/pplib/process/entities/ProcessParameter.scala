@@ -29,6 +29,24 @@ class InstructionData(
 						 val actionName: String = "refine the following paragraph",
 						 val detailedDescription: String = "grammar (e.g. tenses), coherence and text-sophistication",
 						 val evaluation: String = "Malicious/unchanged answers will get rejected. Your answer will be evaluated by other crowd workers.") {
+
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[InstructionData]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: InstructionData =>
+			(that canEqual this) &&
+				objectName == that.objectName &&
+				actionName == that.actionName &&
+				detailedDescription == that.detailedDescription &&
+				evaluation == that.evaluation
+		case _ => false
+	}
+
+	override def hashCode(): Int = {
+		val state = Seq(objectName, actionName, detailedDescription, evaluation)
+		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+	}
 }
 
 class ExplicitInstructionGenerator(question: HCompInstructionsWithTuple, title: String) extends InstructionGenerator {

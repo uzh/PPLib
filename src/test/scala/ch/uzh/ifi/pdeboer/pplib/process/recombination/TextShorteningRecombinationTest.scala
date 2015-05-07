@@ -2,7 +2,10 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
+import ch.uzh.ifi.pdeboer.pplib.util.RecursiveProcessPrinter
 import org.junit.{Assert, Test}
+
+import scala.reflect.io.File
 
 /**
  * Created by pdeboer on 04/05/15.
@@ -10,7 +13,16 @@ import org.junit.{Assert, Test}
 class TextShorteningRecombinationTest {
 	@Test
 	def generateTextShorteningRecombinations: Unit = {
-		Assert.assertEquals("We should have 63 recombinations", 63, candidates.size)
+		val toStore = <Data>
+			{candidates.map(c => {
+				new RecursiveProcessPrinter(c, None).lines
+			})}
+		</Data>
+
+		File("test.xml").writeAll(toStore + "")
+
+
+		Assert.assertEquals("We should have 9 recombinations", 9, candidates.size)
 	}
 
 	lazy val candidates: List[PassableProcessParam[CreateProcess[Patch, Patch]]] = {
@@ -20,8 +32,8 @@ class TextShorteningRecombinationTest {
 				new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)),
 				new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, List(HComp.mechanicalTurk)),
 
-				//other params
-				new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, List(3)),
+				//disable default values for instruction values
+				new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
 				new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
 					new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
 			)
