@@ -15,7 +15,7 @@ class TextShorteningRecombinationTest {
 	def generateTextShorteningRecombinations: Unit = {
 		val toStore = <Data>
 			{candidates.map(c => {
-				new RecursiveProcessPrinter(c, None).lines
+				new RecursiveProcessPrinter(c, Some(Nil)).lines
 			})}
 		</Data>
 
@@ -25,7 +25,7 @@ class TextShorteningRecombinationTest {
 		Assert.assertEquals("We should have 9 recombinations", 9, candidates.size)
 	}
 
-	lazy val candidates: List[PassableProcessParam[CreateProcess[Patch, Patch]]] = {
+	lazy val candidates: List[PassableProcessParam[CreateProcess[List[Patch], List[Patch]]]] = {
 		val r = new Recombinator(RecombinationHints.create(Map(
 			RecombinationHints.DEFAULT_HINTS -> List(
 				//disable using all portals as targets. only use MTurk
@@ -38,6 +38,6 @@ class TextShorteningRecombinationTest {
 					new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
 			)
 		)))
-		r.materialize[CreateProcess[Patch, Patch]]
+		r.materialize[CreateProcess[List[Patch], List[Patch]]]
 	}
 }

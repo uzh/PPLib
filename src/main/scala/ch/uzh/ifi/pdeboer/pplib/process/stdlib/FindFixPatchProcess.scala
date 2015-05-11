@@ -16,7 +16,7 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateP
 		val find = FIND_PROCESS.get.create(higherPrioParams = Map(DefaultParameters.MEMOIZER_NAME.key -> getMemoizerForProcess(FIND_PROCESS.get, "finder")))
 		val fixer = FIX_PROCESS.get.create(Map(FixPatchProcess.ALL_DATA.key -> data), Map(DefaultParameters.MEMOIZER_NAME.key -> getMemoizerForProcess(FIX_PROCESS.get, "fixer")))
 
-		val found: List[Patch] = memoizer.mem("find")(find.process(data))
+		val found = memoizer.mem("find")(find.process(data))
 		val fixed: Map[Int, IndexedPatch] = memoizer.mem("fix")(
 			fixer.process(found)).asInstanceOf[List[IndexedPatch]]
 			.map(f => (f.index, f)).toMap
@@ -24,7 +24,7 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateP
 		data.map(d => fixed.get(d.index).getOrElse(d))
 	}
 
-	def getMemoizerForProcess(process: PassableProcessParam[_ <: ProcessStub[List[Patch], List[Patch]]], suffix: String = "") = {
+	def getMemoizerForProcess(process: PassableProcessParam[_ <: ProcessStub[_, _]], suffix: String = "") = {
 		if (getProcessMemoizer("").isDefined) {
 			val memPrefixInParams = process.getParam[Option[String]](
 				DefaultParameters.MEMOIZER_NAME.key).flatten

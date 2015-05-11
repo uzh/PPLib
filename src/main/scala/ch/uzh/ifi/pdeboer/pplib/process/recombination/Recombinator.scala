@@ -50,7 +50,10 @@ class Recombinator(hints: RecombinationHints, db: RecombinationDB = Recombinatio
 		allParamsAddedInHints ::: allDefaultParamsInProcess ::: recursiveProcessParams
 	}
 
-	protected def getApplicableTypesInDB(baseType: Type) = {
-		db.types.filter(dbType => dbType._1 <:< baseType)
+	def getApplicableTypesInDB(baseType: Type) = {
+		val directSpecializations = db.types.filter(dbType => dbType._1 <:< baseType)
+		val specializationsInGenericsHierarchy = Nil
+
+		directSpecializations ::: specializationsInGenericsHierarchy
 	}
 }

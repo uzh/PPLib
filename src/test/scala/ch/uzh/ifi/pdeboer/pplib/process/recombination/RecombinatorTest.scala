@@ -4,7 +4,7 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import org.junit.{Assert, Test}
-
+import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 27/03/15.
  */
@@ -14,6 +14,17 @@ class RecombinatorTest {
 		db.addClass(classOf[Collection])
 		db.addClass(classOf[CollectionWithSigmaPruning])
 		db
+	}
+
+	@Test
+	def testApplicableTypes: Unit = {
+		val db = new RecombinationDB
+		db.addClass(classOf[IndexedPatchListScaleProcess]) // is a CreateProcess[List[IndexedPatch], List[IndexedPatch]]
+
+		val recombinator = new Recombinator(RecombinationHints.create(Map.empty), db)
+
+		Assert.assertEquals("default case", 1, recombinator.getApplicableTypesInDB(typeOf[CreateProcess[List[IndexedPatch], List[IndexedPatch]]]).size)
+		Assert.assertEquals("generic superclass", 1, recombinator.getApplicableTypesInDB(typeOf[CreateProcess[_ <: List[Patch], _ <: List[Patch]]]).size)
 	}
 
 	@Test

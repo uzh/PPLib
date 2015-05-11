@@ -6,9 +6,9 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities._
  * Created by pdeboer on 14/12/14.
  */
 @PPLibProcess
-class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](_params) {
+class IndexedPatchListScaleProcess(_params: Map[String, Any] = Map.empty) extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](_params) {
 
-	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ListScaleProcess._
+	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.IndexedPatchListScaleProcess._
 
 	override protected def run(data: List[IndexedPatch]): List[IndexedPatch] = {
 		val processType = CHILD_PROCESS.get
@@ -17,13 +17,13 @@ class ListScaleProcess(_params: Map[String, Any] = Map.empty) extends CreateProc
 
 		data.map(d => {
 			val process = processType.create(lowerPriorityParams)
-			process.process(d).asInstanceOf[IndexedPatch]
+			process.process(d)
 		})
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(CHILD_PROCESS)
 }
 
-object ListScaleProcess {
-	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[CreateProcess[Patch, Patch]]]("childProcess", None)
+object IndexedPatchListScaleProcess {
+	val CHILD_PROCESS = new ProcessParameter[PassableProcessParam[CreateProcess[IndexedPatch, IndexedPatch]]]("childProcess", None)
 }
