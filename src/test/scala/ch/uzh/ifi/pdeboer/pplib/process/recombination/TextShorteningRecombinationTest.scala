@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.RecursiveProcessPrinter
 import org.junit.{Assert, Test}
@@ -26,18 +25,7 @@ class TextShorteningRecombinationTest {
 	}
 
 	lazy val candidates: List[PassableProcessParam[CreateProcess[List[Patch], List[Patch]]]] = {
-		val r = new Recombinator(RecombinationHints.create(Map(
-			RecombinationHints.DEFAULT_HINTS -> List(
-				//disable using all portals as targets. only use MTurk
-				new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)),
-				new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, List(HComp.mechanicalTurk)),
-
-				//disable default values for instruction values
-				new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
-				new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
-					new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
-			)
-		)))
+		val r = new Recombinator(RecombinationHints.create(RecombinatorTest.DEFAULT_TESTING_HINTS))
 		r.materialize[CreateProcess[List[Patch], List[Patch]]]
 	}
 }

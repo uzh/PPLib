@@ -4,7 +4,9 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import org.junit.{Assert, Test}
+
 import scala.reflect.runtime.universe._
+
 /**
  * Created by pdeboer on 27/03/15.
  */
@@ -14,6 +16,22 @@ class RecombinatorTest {
 		db.addClass(classOf[Collection])
 		db.addClass(classOf[CollectionWithSigmaPruning])
 		db
+	}
+
+	@Test
+	def testFixProcessRecombination: Unit = {
+		val db = new RecombinationDB
+		db.addClass(classOf[FixPatchProcess])
+		db.addClass(classOf[FindFixPatchProcess])
+		db.addClass(classOf[Collection])
+		db.addClass(classOf[ContestWithMultipleEqualWinnersProcess])
+		db.addClass(classOf[CollectDecideProcess])
+		db.addClass(classOf[Contest])
+
+		val recombinator = new Recombinator(RecombinationHints.create(RecombinatorTest.DEFAULT_TESTING_HINTS), db)
+		val results = recombinator.materialize[FindFixPatchProcess]
+
+		Assert.assertEquals(1, results.size)
 	}
 
 	@Test
@@ -105,4 +123,17 @@ class RecombinatorTest {
 		Assert.assertFalse("no crowd flower must be used, only mturk", materialized.exists(p =>
 			otherPortals.exists(portal => containsSubProcessWithPortal(p, portal))))
 	}
+}
+
+object RecombinatorTest {
+	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> List(
+		//disable using all portals as targets. only use MTurk
+		new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)),
+		new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, List(HComp.mechanicalTurk)),
+
+		//disable default values for instruction values
+		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
+		new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
+			new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
+	))
 }
