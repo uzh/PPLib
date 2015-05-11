@@ -37,7 +37,10 @@ class RecombinatorTest {
 	@Test
 	def testApplicableTypes: Unit = {
 		val db = new RecombinationDB
-		db.addClass(classOf[IndexedPatchListScaleProcess]) // is a CreateProcess[List[IndexedPatch], List[IndexedPatch]]
+		class ApplicableType extends CreateProcess[List[IndexedPatch], List[IndexedPatch]](Map.empty) {
+			override protected def run(data: List[IndexedPatch]): List[IndexedPatch] = Nil
+		}
+		db.addClass(classOf[ApplicableType])
 
 		val recombinator = new Recombinator(RecombinationHints.create(Map.empty), db)
 

@@ -20,12 +20,11 @@ class TextShorteningRecombinationTest {
 
 		File("test.xml").writeAll(toStore + "")
 
-
-		Assert.assertEquals("We should have 9 recombinations", 9, candidates.size)
+		Assert.assertEquals("We should have 37 recombinations", 37, candidates.size)
 	}
 
-	lazy val candidates: List[PassableProcessParam[CreateProcess[List[Patch], List[Patch]]]] = {
+	lazy val candidates = {
 		val r = new Recombinator(RecombinationHints.create(RecombinatorTest.DEFAULT_TESTING_HINTS))
-		r.materialize[CreateProcess[List[Patch], List[Patch]]]
+		r.materialize[CreateProcess[_ <: List[Patch], _ <: List[Patch]]]
 	}
 }
