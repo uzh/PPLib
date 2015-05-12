@@ -9,6 +9,8 @@ import org.junit.Test
  * Created by pdeboer on 23/12/14.
  */
 class FindFixPatchProcessTest {
+
+
 	@Test
 	def testPatchTogether: Unit = {
 		val allData = List("a", "b", "c", "d", "e").zipWithIndex.map(i => new IndexedPatch(i))
@@ -16,13 +18,13 @@ class FindFixPatchProcessTest {
 		val dataReturnedByFixer = dataReturnedByFinder.map(d => d.duplicate(d.value + "1"))
 
 		val findProc = new PassableProcessParam[DecideSignalingProcess[List[IndexedPatch], List[IndexedPatch]]](Map(DecideSignalingProcess.OUTPUT.key -> dataReturnedByFinder), Some(new DecideSignalingProcessFactory()))
-		val fixProc = new PassableProcessParam[CreateSignalingProcess[List[IndexedPatch], List[IndexedPatch]]](Map(CreateSignalingProcess.OUTPUT.key -> dataReturnedByFixer), Some(new CreateSignalingProcessFactory()))
+		val fixProc = new PassableProcessParam[FixSignalingProcess](Map(FixSignalingProcess.OUTPUT.key -> dataReturnedByFixer), Some(new FixSignalingProcessFactory()))
 		val ffp = new FindFixPatchProcess(Map(FindFixPatchProcess.FIND_PROCESS.key -> findProc, FindFixPatchProcess.FIX_PROCESS.key -> fixProc))
 
 		Assert.assertEquals(dataReturnedByFixer ::: allData.takeRight(2), ffp.process(allData))
 		Assert.assertEquals(1, findProc.createdProcesses.size)
 		Assert.assertEquals(1, fixProc.createdProcesses.size)
-		Assert.assertTrue(findProc.createdProcesses(0).asInstanceOf[DecideSignalingProcess[_, _]].called)
-		Assert.assertTrue(fixProc.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(findProc.createdProcesses.head.asInstanceOf[DecideSignalingProcess[_, _]].called)
+		Assert.assertTrue(fixProc.createdProcesses.head.called)
 	}
 }

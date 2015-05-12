@@ -20,7 +20,7 @@ class TextShorteningRecombinationTest {
 
 		File("test.xml").writeAll(toStore + "")
 
-		Assert.assertEquals("We should have 37 recombinations", 37, candidates.size)
+		Assert.assertEquals("We should have 19 recombinations", 19, candidates.size)
 	}
 
 	lazy val candidates = {

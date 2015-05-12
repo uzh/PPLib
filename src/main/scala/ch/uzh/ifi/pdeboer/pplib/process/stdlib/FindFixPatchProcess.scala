@@ -37,5 +37,5 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateP
 
 object FindFixPatchProcess {
 	val FIND_PROCESS = new ProcessParameter[PassableProcessParam[DecideProcess[List[Patch], List[Patch]]]]("findProcess", None)
-	val FIX_PROCESS = new ProcessParameter[PassableProcessParam[CreateProcess[List[Patch], List[Patch]]]]("fixProcess", None)
+	val FIX_PROCESS = new ProcessParameter[PassableProcessParam[FixPatchProcess]]("fixProcess", None)
 }

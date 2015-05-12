@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
 
 import scala.reflect.ClassTag
 
@@ -53,6 +54,32 @@ object DecideSignalingProcess {
 class DecideSignalingProcessFactory[IN, OUT]()(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends ProcessFactory[DecideSignalingProcess[IN, OUT]] {
 	override def buildProcess(params: Map[String, Any]) =
 		new DecideSignalingProcess[IN, OUT](params)
+
+	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
+		throw new IllegalArgumentException("cant touch this")
+	}
+}
+
+class FixSignalingProcess(params: Map[String, Any] = Map.empty) extends FixPatchProcess(params) {
+	var called: Boolean = false
+
+
+	override protected def run(data: List[Patch]): List[Patch] = {
+		called = true
+		FixSignalingProcess.OUTPUT.get
+	}
+
+
+	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(FixSignalingProcess.OUTPUT)
+}
+
+object FixSignalingProcess {
+	val OUTPUT = new ProcessParameter[List[IndexedPatch]]("out", None)
+}
+
+class FixSignalingProcessFactory() extends ProcessFactory[FixSignalingProcess] {
+	override def buildProcess(params: Map[String, Any]) =
+		new FixSignalingProcess(params)
 
 	override def typelessBuildProcess(params: Map[String, Any]): ProcessStub[_, _] = {
 		throw new IllegalArgumentException("cant touch this")
