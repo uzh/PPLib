@@ -129,14 +129,10 @@ class RecombinatorTest {
 }
 
 object RecombinatorTest {
-	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> List(
-		//disable using all portals as targets. only use MTurk
-		new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)),
-		new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, List(HComp.mechanicalTurk)),
-
+	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> (List(
 		//disable default values for instruction values
 		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
 		new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
 			new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
-	))
+	) ::: RecombinationHints.hcompPlatform(List(HComp.mechanicalTurk))))
 }

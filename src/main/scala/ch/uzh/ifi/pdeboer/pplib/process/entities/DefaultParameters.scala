@@ -23,7 +23,7 @@ object DefaultParameters {
 
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
 
-	val MAX_ITERATIONS = new ProcessParameter[Int]("maxIterations", Some(List(20)))
+	val MAX_ITERATIONS = new ProcessParameter[Int]("maxIterations", Some(List(10)))
 
 	val INJECT_QUERIES = new ProcessParameter[Map[String, HCompQuery]]("injectQuery", Some(List(Map.empty[String, HCompQuery])))
 }

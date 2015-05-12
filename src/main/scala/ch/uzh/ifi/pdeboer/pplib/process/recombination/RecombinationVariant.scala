@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{HCompPortalAccess, ProcessStub, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{HCompPortalAccess, PassableProcessParam, ProcessStub}
 
 import scala.reflect.ClassTag
 import scala.xml.NodeSeq
@@ -14,8 +14,9 @@ class RecombinationVariant(val stubs: Map[String, PassableProcessParam[_]]) {
 
 	def created = procs
 
-	def createProcess[IN, OUT](key: String): ProcessStub[IN, OUT] = {
-		val p = stubs(key).create().asInstanceOf[ProcessStub[IN, OUT]]
+	def createProcess[IN, OUT](key: String, lowerPrioParams: Map[String, Any] = Map.empty,
+							   higherPrioParams: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = {
+		val p = stubs(key).create(lowerPrioParams, higherPrioParams).asInstanceOf[ProcessStub[IN, OUT]]
 		stubs.synchronized {
 			procs = (key, p) :: procs
 		}

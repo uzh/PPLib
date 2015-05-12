@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, DefaultParameters, ProcessParameter, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.reflect.ClassTag
@@ -20,6 +21,9 @@ trait RecombinationHint {
 class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
 	override def processConstructionParameter: Map[String, Iterable[Any]] =
 		Map(param.key -> values)
+
+
+	override def toString = s"AddedParameterRecombinationHint($param, $values)"
 }
 
 class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true), val addDefaultValuesForParam: Option[Boolean] = Some(true)) extends RecombinationHint {
@@ -30,6 +34,9 @@ class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, va
 	private def isParamTargetParam(processParameterKey: String): Boolean = {
 		targetParams.size == 0 || targetParams.contains(processParameterKey)
 	}
+
+
+	override def toString = s"SettingsOnParamsRecombinationHint($targetParams, $runComplexParameterRecombinationOnThisParam, $addDefaultValuesForParam)"
 }
 
 class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[RecombinationHint]] = Map.empty) {
@@ -41,6 +48,12 @@ class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[R
 		(key, h._2)
 	})
 
+	override def toString = {
+		_hints.map {
+			case (targetClass, hintsList) => targetClass + "-> [" + hintsList.mkString(",") + "]"
+		}.mkString(" || ")
+
+	}
 
 	def +=(hint: List[RecombinationHint]): RecombinationHints =
 		addHint(hint, null)
@@ -82,6 +95,10 @@ object RecombinationHints {
 	}
 
 	val DEFAULT_HINTS = classOf[DefaultHintProcessStub]
+
+	def hcompPlatform(l: List[HCompPortalAdapter]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, l))
+
+	def instructions(l: List[InstructionData]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, l))
 
 	class DefaultHintProcessStub private[RecombinationHints]() extends ProcessStub[String, String](Map.empty) {
 		override protected def run(data: String): String = data

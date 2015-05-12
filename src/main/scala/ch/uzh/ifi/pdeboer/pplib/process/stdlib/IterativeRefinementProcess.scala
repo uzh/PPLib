@@ -24,7 +24,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends C
 		data.duplicate(exec.refinedText)
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(VOTING_PROCESS_TYPE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD)
+	override def optionalParameters: List[ProcessParameter[_]] = List(VOTING_PROCESS_TYPE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD, MAX_ITERATIONS)
 }
 
 object IterativeRefinementProcess {

@@ -12,7 +12,9 @@ import scala.reflect.runtime.universe._
  */
 class Recombinator(hints: RecombinationHints, db: RecombinationDB = RecombinationDB.DEFAULT) extends LazyLogger {
 	def materialize[BASE <: ProcessStub[_, _]]()(implicit baseType: TypeTag[BASE], baseClass: ClassTag[BASE]): List[PassableProcessParam[BASE]] = {
-		processRecombination(baseType.tpe, baseClass.runtimeClass.asInstanceOf[Class[BASE]]).asInstanceOf[List[PassableProcessParam[BASE]]]
+		val result: List[PassableProcessParam[BASE]] = processRecombination(baseType.tpe, baseClass.runtimeClass.asInstanceOf[Class[BASE]]).asInstanceOf[List[PassableProcessParam[BASE]]]
+		logger.info(s"generated ${result.size} candidates for base type $baseType matching $hints")
+		result
 	}
 
 	def processRecombination(baseType: Type, baseClass: Class[_ <: ProcessStub[_, _]]): List[PassableProcessParam[ProcessStub[_, _]]] = {

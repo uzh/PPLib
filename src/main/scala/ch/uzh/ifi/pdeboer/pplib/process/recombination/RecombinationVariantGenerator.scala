@@ -16,7 +16,7 @@ class RecombinationVariantGenerator(configs: Map[String, List[PassableProcessPar
 	lazy val variants = {
 		val listOfTupleLists: List[List[(String, PassableProcessParam[_ <: ProcessStub[_, _]])]] = configs.map(k => k._2.map(r => (k._1, r)).toList).toList
 		CombinationGenerator.generate(listOfTupleLists).map(k => {
-			new RecombinationVariant(k.asInstanceOf[List[(String, PassableProcessParam[_ <: ProcessStub[_, _]])]].toMap)
+			new RecombinationVariant(k.toMap)
 		})
 	}
 }

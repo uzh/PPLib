@@ -9,8 +9,6 @@ import org.junit.Test
  * Created by pdeboer on 23/12/14.
  */
 class FindFixPatchProcessTest {
-
-
 	@Test
 	def testPatchTogether: Unit = {
 		val allData = List("a", "b", "c", "d", "e").zipWithIndex.map(i => new IndexedPatch(i))
