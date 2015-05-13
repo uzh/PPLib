@@ -21,7 +21,7 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 			val memoizer: ProcessMemoizer = getProcessMemoizer(alternatives.hashCode() + "").getOrElse(new NoProcessMemoizer())
 
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
-				memoizer.mem("it" + w)(
+				memoizer.mem("contestit" + w)(
 					U.retry(2) {
 						val baseQuery: MultipleChoiceQuery = createMultipleChoiceQuestion(alternatives.map(_.toString).toSet.toList)
 						portal.sendQueryAndAwaitResult(

@@ -19,7 +19,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends C
 		logger.info("started refinement process for patch " + data)
 		VOTING_PROCESS_TYPE.get.setParams(params, replace = false)
 
-		val driver = new IRDefaultHCompDriver(portal, instructionTitle, instructions, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, QUESTION_AUX.get, data.hashCode.toString)
+		val driver = new IRDefaultHCompDriver(portal, instructionTitle, instructions, VOTING_PROCESS_TYPE.get, QUESTION_PRICE.get, QUESTION_AUX.get, MEMOIZER_NAME.get.map(m => data.hashCode().toString))
 		val exec = new IterativeRefinementExecutor(data.value, driver, MAX_ITERATIONS.get, memoizer, data.hashCode.toString)
 		data.duplicate(exec.refinedText)
 	}

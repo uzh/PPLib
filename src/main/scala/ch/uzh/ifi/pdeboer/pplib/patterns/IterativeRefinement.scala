@@ -55,7 +55,7 @@ trait IterativeRefinementDriver[T] {
 	def selectBestRefinement(candidates: List[T]): String
 }
 
-class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: PassableProcessParam[DecideProcess[List[Patch], Patch]], questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: String = "") extends IterativeRefinementDriver[String] {
+class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestion: String = DEFAULT_TITLE_FOR_REFINEMENT, questionForRefinement: HCompInstructionsWithTuple = DEFAULT_QUESTION_FOR_REFINEMENT, votingProcessParam: PassableProcessParam[DecideProcess[List[Patch], Patch]], questionPricing: HCompQueryProperties = DEFAULT_QUESTION_PRICE, questionAux: Option[NodeSeq] = None, memoizerPrefix: Option[String] = None) extends IterativeRefinementDriver[String] {
 	override def refine(originalTextToRefine: String, currentRefinementState: String, iterationId: Int): String = {
 		val q = FreetextQuery(
 			questionForRefinement.getInstructions(originalTextToRefine, currentRefinementState, questionAux.getOrElse(Nil)), "", titleForRefinementQuestion + iterationId)
@@ -70,7 +70,7 @@ class IRDefaultHCompDriver(portal: HCompPortalAdapter, titleForRefinementQuestio
 			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
 
 		val lowerPriorityParams = Map(DefaultParameters.PORTAL_PARAMETER.key -> portal)
-		val higherPriorityParams = Map(DefaultParameters.MEMOIZER_NAME.key -> Some(memoizerPrefix.hashCode + "selectbest" + memPrefixInParams))
+		val higherPriorityParams = Map(DefaultParameters.MEMOIZER_NAME.key -> memoizerPrefix.map(m => m.hashCode + "selectbest" + memPrefixInParams))
 
 		val votingProcess = votingProcessParam.create(lowerPriorityParams, higherPriorityParams)
 		votingProcess.process(candidatesDistinct.map(c => new Patch(c))).value

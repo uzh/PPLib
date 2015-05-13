@@ -45,11 +45,11 @@ class FixVerifyFPDriver(val process: PassableProcessParam[CreateProcess[Patch, P
 	override def fix(patch: Patch, patchesBefore: List[Patch], patchesAfterwards: List[Patch]): Patch = {
 		logger.info(s"Fixing patch $patch")
 
-		val memPrefixInParams: String = process.getParam[Option[String]](
-			DefaultParameters.MEMOIZER_NAME.key).getOrElse(Some("")).getOrElse("")
+		val memPrefixInParams: Option[String] = process.getParam[Option[String]](
+			DefaultParameters.MEMOIZER_NAME.key).flatten
 
 		val higherPriorityParams = Map(
-			DefaultParameters.MEMOIZER_NAME.key -> Some(memPrefixInParams.hashCode + "fixprocess")
+			DefaultParameters.MEMOIZER_NAME.key -> memPrefixInParams.map(m => m.hashCode + "fixprocess")
 		)
 
 		val fixProcess = process.create(higherPrioParams = higherPriorityParams)
