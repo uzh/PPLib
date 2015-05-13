@@ -39,7 +39,7 @@ object HComp extends LazyLogger {
 
 		val classes = U.findClassesInPackageWithProcessAnnotation("ch.uzh.ifi.pdeboer.pplib.hcomp", classOf[HCompPortal])
 			.asInstanceOf[Set[Class[HCompPortalAdapter]]]
-		val annotations = classes.map(_.getAnnotation(classOf[HCompPortal])).filter(_.autoInit)
+		val annotations = classes.map(_.getAnnotation(classOf[HCompPortal])).filter(a => a != null && a.autoInit)
 		val builders = annotations.map(_.builder().newInstance())
 		builders.foreach(b => {
 			try {

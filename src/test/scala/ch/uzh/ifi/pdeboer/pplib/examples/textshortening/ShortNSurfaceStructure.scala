@@ -14,7 +14,7 @@ class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[Str
 
 		val generatedShorteningProcess = generatedRecombinationVariants.createProcess[List[Patch], List[Patch]](
 			"shortener", higherPrioParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)) //TODO add syntactic sugar here
-		val result = generatedShorteningProcess.process(paragraphs)
+		val result: List[Patch] = generatedShorteningProcess.process(paragraphs)
 
 		result.mkString("\n")
 	}
