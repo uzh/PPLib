@@ -21,7 +21,6 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				DefaultParameters.INSTRUCTIONS.key -> HCompInstructionsWithTupleStringified(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.9,
 				DefaultParameters.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				DefaultParameters.SHUFFLE_CHOICES.key -> false
