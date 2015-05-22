@@ -25,5 +25,8 @@ object ShortNText extends App {
 		(variant, surfaceStructure.runRecombinedVariant(variant))
 	})
 
+	println(s"shortest result: ${results.minBy(_._2.length)}")
+
+	println("all results")
 	println(results)
 }
