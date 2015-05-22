@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
 import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortalWithDefinedCandidates
 
 /**
@@ -34,4 +35,8 @@ class ShortNTestDataInitializer {
 				"The third one too - very much so.",
 				"The third one too - indeed."
 			)))
+
+	def initializePortal(): Unit = {
+		HComp.addPortal("testDataPortal", hcompPortalWithMockAnswers)
+	}
 }

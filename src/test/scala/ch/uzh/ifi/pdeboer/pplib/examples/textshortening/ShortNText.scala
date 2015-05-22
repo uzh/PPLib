@@ -1,6 +1,5 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationHints, RecombinationVariantGenerator, Recombinator}
 
@@ -8,8 +7,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationHints, Recom
  * Created by pdeboer on 12/05/15.
  */
 object ShortNText extends App {
-	val testData = new ShortNTestDataInitializer
-	HComp.addPortal("testDataPortal", testData.hcompPortalWithMockAnswers)
+	val testData = new ShortNTestDataInitializer()
+	testData.initializePortal()
 
 	val recombinator = new Recombinator(RecombinationHints.create(Map(
 		RecombinationHints.DEFAULT_HINTS -> {
