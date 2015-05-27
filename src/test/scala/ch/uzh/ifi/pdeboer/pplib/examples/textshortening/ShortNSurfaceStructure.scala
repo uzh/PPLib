@@ -1,7 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{CreateProcess, IndexedPatch, Patch, ProcessStub}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationVariant}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HComp
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationProcessDefinition, RecombinationVariant}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
 import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
 
@@ -13,12 +14,21 @@ class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[Str
 		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
 
 		val generatedShorteningProcess = generatedRecombinationVariants.createProcess[List[Patch], List[Patch]](
-			"shortener", higherPrioParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)) //TODO add syntactic sugar here
+			"shortener", higherPrioParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)
+		)
 		val result: List[Patch] = generatedShorteningProcess.process(paragraphs)
 
 		result.mkString("\n")
 	}
 
-	override def requiredProcessDefinitions: Map[String, Class[_ <: ProcessStub[_, _]]] =
-		Map("shortener" -> classOf[CreateProcess[_ <: List[Patch], _ <: List[Patch]]])
+	override def requiredProcessDefinitions: Map[String, RecombinationProcessDefinition[_]] =
+		Map("shortener" -> RecombinationProcessDefinition[CreateProcess[_ <: List[Patch], _ <: List[Patch]]](
+			RecombinationHints.create(Map(
+				RecombinationHints.DEFAULT_HINTS -> {
+					RecombinationHints.hcompPlatform(List(HComp(ShortNTestDataInitializer.TEST_PORTAL_KEY))) :::
+						RecombinationHints.instructions(List(
+							new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
+				})
+			)
+		))
 }

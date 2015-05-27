@@ -37,6 +37,10 @@ class ShortNTestDataInitializer {
 			)))
 
 	def initializePortal(): Unit = {
-		HComp.addPortal("testDataPortal", hcompPortalWithMockAnswers)
+		HComp.addPortal(ShortNTestDataInitializer.TEST_PORTAL_KEY, hcompPortalWithMockAnswers)
 	}
+}
+
+object ShortNTestDataInitializer {
+	val TEST_PORTAL_KEY = "testportal"
 }

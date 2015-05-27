@@ -24,7 +24,7 @@ class TextShorteningRecombinationTest {
 	}
 
 	lazy val candidates = {
-		val r = new Recombinator(RecombinationHints.create(RecombinatorTest.DEFAULT_TESTING_HINTS))
+		val r = new TypeRecombinator(RecombinationHints.create(TypeRecombinatorTest.DEFAULT_TESTING_HINTS))
 		r.materialize[CreateProcess[_ <: List[Patch], _ <: List[Patch]]]
 	}
 }

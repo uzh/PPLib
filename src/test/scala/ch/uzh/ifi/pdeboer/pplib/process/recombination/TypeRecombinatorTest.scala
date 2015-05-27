@@ -10,7 +10,7 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 27/03/15.
  */
-class RecombinatorTest {
+class TypeRecombinatorTest {
 	def newDB = {
 		val db = new RecombinationDB
 		db.addClass(classOf[Collection])
@@ -28,7 +28,7 @@ class RecombinatorTest {
 		db.addClass(classOf[CollectDecideProcess])
 		db.addClass(classOf[Contest])
 
-		val recombinator = new Recombinator(RecombinationHints.create(RecombinatorTest.DEFAULT_TESTING_HINTS), db)
+		val recombinator = new TypeRecombinator(RecombinationHints.create(TypeRecombinatorTest.DEFAULT_TESTING_HINTS), db)
 		val results = recombinator.materialize[FindFixPatchProcess]
 
 		Assert.assertEquals(1, results.size)
@@ -42,7 +42,7 @@ class RecombinatorTest {
 		}
 		db.addClass(classOf[ApplicableType])
 
-		val recombinator = new Recombinator(RecombinationHints.create(Map.empty), db)
+		val recombinator = new TypeRecombinator(RecombinationHints.create(Map.empty), db)
 
 		Assert.assertEquals("default case", 1, recombinator.getApplicableTypesInDB(typeOf[CreateProcess[List[IndexedPatch], List[IndexedPatch]]]).size)
 		Assert.assertEquals("generic superclass", 1, recombinator.getApplicableTypesInDB(typeOf[CreateProcess[_ <: List[Patch], _ <: List[Patch]]]).size)
@@ -51,7 +51,7 @@ class RecombinatorTest {
 	@Test
 	def testTrivialMaterialize: Unit = {
 		val db = newDB
-		val r = new Recombinator(RecombinationHints.create(Map()), db)
+		val r = new TypeRecombinator(RecombinationHints.create(Map()), db)
 		val materialized = r.materialize[CreateProcess[Patch, List[Patch]]]
 
 		val processClasses = materialized.map(_.clazz).toSet
@@ -62,7 +62,7 @@ class RecombinatorTest {
 	def testTypeConstrainedMaterialize: Unit = {
 		val db = newDB
 		db.addClass(classOf[Contest])
-		val r = new Recombinator(RecombinationHints.create(Map()), db)
+		val r = new TypeRecombinator(RecombinationHints.create(Map()), db)
 		val materialized = r.materialize[DecideProcess[List[Patch], Patch]]
 
 		val processClasses = materialized.map(_.clazz).toSet
@@ -77,7 +77,7 @@ class RecombinatorTest {
 		val settingsHint = new SettingsOnParamsRecombinationHint(addDefaultValuesForParam = Some(false))
 		val db = newDB
 
-		val r = new Recombinator(RecombinationHints.create(Map(
+		val r = new TypeRecombinator(RecombinationHints.create(Map(
 			RecombinationHints.DEFAULT_HINTS -> List(workerCountHint, settingsHint)
 		)), db)
 		val materialized = r.materialize[ProcessStub[Patch, List[Patch]]]
@@ -99,7 +99,7 @@ class RecombinatorTest {
 
 		val parametersToDisableDefaultValues: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(
 			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addDefaultValuesForParam = Some(false))))
-		val r = new Recombinator(RecombinationHints.create(parametersToDisableDefaultValues), db)
+		val r = new TypeRecombinator(RecombinationHints.create(parametersToDisableDefaultValues), db)
 		val materialized = r.materialize[CollectDecideProcess]
 
 		Assert.assertEquals(4, materialized.size)
@@ -128,7 +128,7 @@ class RecombinatorTest {
 	}
 }
 
-object RecombinatorTest {
+object TypeRecombinatorTest {
 	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> (List(
 		//disable default values for instruction values
 		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
