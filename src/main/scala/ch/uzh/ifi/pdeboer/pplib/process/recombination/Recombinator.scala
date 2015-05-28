@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessStub}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -10,14 +10,14 @@ import scala.reflect.runtime.universe._
  */
 class Recombinator(recombinable: Recombinable[_]) {
 	def recombine() = {
-		val recombinations = recombinable.requiredProcessDefinitions.map {
+		val recombinations: Map[String, List[PassableProcessParam[ProcessStub[_, _]]]] = recombinable.requiredProcessDefinitions.par.map {
 			case (key, value) => {
 				val tpeTag = value.typeTag.asInstanceOf[TypeTag[ProcessStub[_, _]]]
 				val classTag = value.classTag.asInstanceOf[ClassTag[ProcessStub[_, _]]]
 				key -> new TypeRecombinator(value.hints)
 					.materialize[ProcessStub[_, _]]()(tpeTag, classTag)
 			}
-		}.toMap
+		}.toList.toMap //toList toMap is an ugly hack to get it to be non-parallel again
 
 		new RecombinationVariantGenerator(recombinations).variants
 	}

@@ -7,7 +7,7 @@ import scala.xml.Elem
 /**
  * Created by pdeboer on 04/05/15.
  */
-class RecursiveProcessPrinter(val root: PassableProcessParam[_], val onlyIncludeParameters: Option[List[ProcessParameter[_]]] = None) {
+class ProcessPrinter(val root: PassableProcessParam[_], val onlyIncludeParameters: Option[List[ProcessParameter[_]]] = None, val maxDepth: Int = 10) {
 	private val parameterKeys = onlyIncludeParameters.map(l => l.map(_.key).toSet).getOrElse(Set.empty)
 
 	override def toString = {
@@ -28,7 +28,7 @@ class RecursiveProcessPrinter(val root: PassableProcessParam[_], val onlyInclude
 						{value match {
 						case childProcess: PassableProcessParam[_] =>
 							<SubProcess>
-								{new RecursiveProcessPrinter(childProcess, onlyIncludeParameters).lines}
+								{if (maxDepth > 0) new ProcessPrinter(childProcess, onlyIncludeParameters, maxDepth - 1).lines else "..."}
 							</SubProcess>
 						case _ =>
 							value

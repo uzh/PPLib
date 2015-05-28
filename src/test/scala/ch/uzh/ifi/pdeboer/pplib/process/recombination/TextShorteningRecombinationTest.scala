@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.util.RecursiveProcessPrinter
+import ch.uzh.ifi.pdeboer.pplib.util.ProcessPrinter
 import org.junit.{Assert, Test}
 
 import scala.reflect.io.File
@@ -14,7 +14,7 @@ class TextShorteningRecombinationTest {
 	def generateTextShorteningRecombinations: Unit = {
 		val toStore = <Data>
 			{candidates.map(c => {
-				new RecursiveProcessPrinter(c, Some(Nil)).lines
+				new ProcessPrinter(c, Some(Nil)).lines
 			})}
 		</Data>
 

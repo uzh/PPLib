@@ -2,6 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.util
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import scalacache.ScalaCache
+import scalacache.guava.GuavaCache
 
 /**
  * Created by pdeboer on 03/11/14.
@@ -9,7 +11,6 @@ import scala.util.Random
  * Automan. Check out their awesome project here: https://github.com/dbarowy/AutoMan
  */
 class MonteCarlo {
-
 	private case class Simulation(choices: Int, trials: Int, confidence: Double, iterations: Int, occurrences: ArrayBuffer[Int], var done: Boolean)
 
 	private var simulation: Option[Simulation] = None
@@ -81,6 +82,11 @@ class MonteCarlo {
 }
 
 object MonteCarlo {
+
+	import scalacache.memoization._
+
+	implicit val scalaCache = ScalaCache(GuavaCache())
+
 	/**
 	 * Calculates the minimum number of tasks the schedule to allow for the provided confidence level to result
 	 * @param choices - the number of choice for the multiplce choice question
@@ -90,7 +96,7 @@ object MonteCarlo {
 	 * @param max_agreement - the maximum agreement among the already completed trials (nominally)
 	 * @return
 	 */
-	def minTasksRequired(choices: Int, completed_trials: Int, confidence: Double, iterations: Int, max_agreement: Int): Int = {
+	def minTasksRequired(choices: Int, completed_trials: Int, confidence: Double, iterations: Int, max_agreement: Int): Int = memoize {
 		var to_run = 0
 		var done = false
 		val mc = new MonteCarlo
@@ -115,7 +121,7 @@ object MonteCarlo {
 	 * @param iterations - how often to repeat the simulation of the outcome for an estimation
 	 * @return the minimum number of workers that have to agree, or None if the completed number of trials are not enough suffice
 	 */
-	def minAgreementRequired(choices: Int, completed_trials: Int, confidence: Double, iterations: Int): Option[Int] = {
+	def minAgreementRequired(choices: Int, completed_trials: Int, confidence: Double, iterations: Int): Option[Int] = memoize {
 		val mc = new MonteCarlo
 		mc.simulate(choices, completed_trials, confidence, iterations)
 		mc.calculateRequiredAgreement

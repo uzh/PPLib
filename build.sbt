@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
 	"org.slf4j" % "slf4j-log4j12" % "1.7.5",
 	"org.apache.commons" % "commons-vfs2" % "2.0",
 	"org.apache.httpcomponents" % "httpclient" % "4.3.5" % "provided",
-	"org.scala-lang.modules" %% "scala-xml" % "1.0.2" % "provided"
+	"org.scala-lang.modules" %% "scala-xml" % "1.0.2" % "provided",
+	"com.github.cb372" %% "scalacache-guava" % "0.6.3"
 )
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
