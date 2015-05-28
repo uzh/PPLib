@@ -19,7 +19,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
 		try {
-			(1 to 100000).view.foreach(i => {
+			(1 to 1000000).view.foreach(i => {
 				answer = poll()
 				if (cancelled || answer.isDefined) throw new Exception("I'm actually not an Exception")
 				timer.waitTime
