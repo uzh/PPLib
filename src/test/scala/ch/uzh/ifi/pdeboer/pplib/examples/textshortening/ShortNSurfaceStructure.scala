@@ -12,7 +12,6 @@ import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
 class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[String] {
 	override def runRecombinedVariant(generatedRecombinationVariants: RecombinationVariant): String = {
 		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
-		//generatedRecombinationVariants.stubs.exists(s => new ProcessPrinter(s._2).toString.contains("IterativeRefinement"))
 		val generatedShorteningProcess = generatedRecombinationVariants.createProcess[List[Patch], List[Patch]](
 			"shortener", higherPrioParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)
 		)
