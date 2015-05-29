@@ -10,7 +10,7 @@ import scala.reflect.runtime.universe._
  */
 class Recombinator(recombinable: Recombinable[_]) {
 	def recombine() = {
-		val recombinations = recombinable.requiredProcessDefinitions.par.map {
+		val recombinations = recombinable.defineRecombinationSearchSpace.par.map {
 			case (key, value) => {
 				val tpeTag = value.typeTag.asInstanceOf[TypeTag[ProcessStub[_, _]]]
 				val classTag = value.classTag.asInstanceOf[ClassTag[ProcessStub[_, _]]]

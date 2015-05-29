@@ -8,4 +8,4 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 27/05/15.
  */
-case class RecombinationProcessDefinition[T <: ProcessStub[_, _]](hints: RecombinationHints)(implicit val classTag: ClassTag[T], val typeTag: TypeTag[T])
+case class RecombinationSearchSpaceDefinition[T <: ProcessStub[_, _]](hints: RecombinationHints)(implicit val classTag: ClassTag[T], val typeTag: TypeTag[T])

@@ -6,7 +6,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 trait Recombinable[T] {
 	def runRecombinedVariant(processes: RecombinationVariant): T
 
-	def requiredProcessDefinitions: Map[String, RecombinationProcessDefinition[_]]
+	def defineRecombinationSearchSpace: Map[String, RecombinationSearchSpaceDefinition[_]]
 }
 
 
