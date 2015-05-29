@@ -27,7 +27,16 @@ object ShortNText extends App {
 
 	val lines = results.flatMap {
 		case (variant, result) => variant.stubs.map {
-			case (stubKey, process) => s"$stubKey => ${new ProcessPrinter(process, Some(Nil))}"
+			case (stubKey, process) => <Variant>
+				<Key>
+					{stubKey}
+				</Key> <Process>
+					{new ProcessPrinter(process, Some(Nil)).lines}
+				</Process>
+				<Result>
+					{result}
+				</Result>
+			</Variant>
 		}
 	}
 	println("writing generated recombinations and their results into an XML..")

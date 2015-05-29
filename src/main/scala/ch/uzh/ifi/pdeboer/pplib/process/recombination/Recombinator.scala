@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -10,7 +10,7 @@ import scala.reflect.runtime.universe._
  */
 class Recombinator(recombinable: Recombinable[_]) {
 	def recombine() = {
-		val recombinations: Map[String, List[PassableProcessParam[ProcessStub[_, _]]]] = recombinable.requiredProcessDefinitions.par.map {
+		val recombinations = recombinable.requiredProcessDefinitions.par.map {
 			case (key, value) => {
 				val tpeTag = value.typeTag.asInstanceOf[TypeTag[ProcessStub[_, _]]]
 				val classTag = value.classTag.asInstanceOf[ClassTag[ProcessStub[_, _]]]
