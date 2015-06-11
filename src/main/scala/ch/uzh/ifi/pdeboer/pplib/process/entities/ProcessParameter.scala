@@ -64,7 +64,7 @@ class SimpleInstructionGeneratorCreate extends InstructionGenerator {
 
 class SimpleInstructionGeneratorDecide extends InstructionGenerator {
 	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
-		"Before, crowd workers were asked to " + base.actionName, "Please select the one you like best in terms of " + base.detailedDescription
+		"Before, crowd workers were asked to " + base.actionName, "Please select the answer you like best in terms of " + base.detailedDescription
 	)
 
 	override def generateQuestionTitle(base: InstructionData): String = s"Please select the ${base.objectName} you like best"
