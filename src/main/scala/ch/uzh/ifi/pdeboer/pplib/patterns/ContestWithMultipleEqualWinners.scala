@@ -12,7 +12,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 05/12/14.
  */
-@SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: HCompInstructionsWithTuple,
+@SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: QuestionRenderer,
 															title: String, findersPerItem: Int, shuffle: Boolean,
 															@transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
 															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None, pricePerVote: HCompQueryProperties = new HCompQueryProperties()

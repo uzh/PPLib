@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTuple, HCompInstructionsWithTupleStringified}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{QuestionRenderer, HCompInstructionsWithTupleStringified}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -19,7 +19,7 @@ import scala.reflect.runtime.universe._
 }
 
 trait InstructionGenerator {
-	def generateQuestion(base: InstructionData): HCompInstructionsWithTuple
+	def generateQuestion(base: InstructionData): QuestionRenderer
 
 	def generateQuestionTitle(base: InstructionData): String
 }
@@ -49,21 +49,21 @@ class InstructionData(
 	}
 }
 
-class ExplicitInstructionGenerator(question: HCompInstructionsWithTuple, title: String) extends InstructionGenerator {
-	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = question
+class ExplicitInstructionGenerator(question: QuestionRenderer, title: String) extends InstructionGenerator {
+	override def generateQuestion(base: InstructionData): QuestionRenderer = question
 
 	override def generateQuestionTitle(base: InstructionData): String = title
 }
 
 class SimpleInstructionGeneratorCreate extends InstructionGenerator {
-	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new HCompInstructionsWithTupleStringified(
 		generateQuestionTitle(base) + ". Please pay special attention to " + base.detailedDescription, base.evaluation)
 
 	override def generateQuestionTitle(base: InstructionData): String = "Please " + base.actionName
 }
 
 class SimpleInstructionGeneratorDecide extends InstructionGenerator {
-	override def generateQuestion(base: InstructionData): HCompInstructionsWithTuple = new HCompInstructionsWithTupleStringified(
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new HCompInstructionsWithTupleStringified(
 		"Before, crowd workers were asked to " + base.actionName, "Please select the answer you like best in terms of " + base.detailedDescription
 	)
 

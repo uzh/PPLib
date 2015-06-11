@@ -60,7 +60,7 @@ trait InstructionHandler extends IParametrizable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
-	def instructions: HCompInstructionsWithTuple =
+	def instructions: QuestionRenderer =
 		instructionGenerator.generateQuestion(self.getParam(INSTRUCTIONS))
 
 	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))

@@ -190,7 +190,12 @@ trait HCompAnswer extends Serializable with Prunable {
 }
 
 @SerialVersionUID(1l)
-class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questionBetweenTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _questionAfterTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _enableSecondDataFieldIfAvailable: Boolean = true) extends Serializable {
+trait QuestionRenderer extends Serializable {
+	def getInstructions(data1: String, data2: String = "", htmlData: NodeSeq = Nil): String
+}
+
+@SerialVersionUID(1l)
+class BasicQuestionRenderer(val _questionBeforeTuples: NodeSeq, val _questionBetweenTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _questionAfterTuples: NodeSeq = NodeSeq.fromSeq(Nil), val _enableSecondDataFieldIfAvailable: Boolean = true) extends QuestionRenderer with Serializable {
 	def getInstructions(data1: String, data2: String = "", htmlData: NodeSeq = Nil) =
 		NodeSeq.fromSeq(<placeholder>
 			<p>
@@ -216,7 +221,7 @@ class HCompInstructionsWithTuple(val _questionBeforeTuples: NodeSeq, val _questi
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
 
 @SerialVersionUID(1l)
-case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends HCompInstructionsWithTuple(
+case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends BasicQuestionRenderer(
 	prep(questionBeforeTuples), if (questionBetweenTuples == "") Nil
 	else <p>
 		{questionBetweenTuples}

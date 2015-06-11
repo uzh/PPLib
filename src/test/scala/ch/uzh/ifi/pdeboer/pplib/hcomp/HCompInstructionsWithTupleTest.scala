@@ -15,7 +15,7 @@ class HCompInstructionsWithTupleTest {
 
 	@Test
 	def testHTMLRenderingAllowedInNormal: Unit = {
-		val res = new HCompInstructionsWithTuple(<asdf>question?</asdf>)
+		val res = new BasicQuestionRenderer(<asdf>question?</asdf>)
 		Assert.assertEquals("<p><asdf>question?</asdf></p>", U.removeWhitespaces(res.getInstructions("")))
 	}
 }
