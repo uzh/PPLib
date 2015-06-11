@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified
+import ch.uzh.ifi.pdeboer.pplib.hcomp.StringQuestionRenderer
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
 import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
@@ -43,8 +43,8 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 
 object DualPathwayProcess {
 	//TODO improve
-	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_old_el", Some(List(HCompInstructionsWithTupleStringified("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
-	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[HCompInstructionsWithTupleStringified]("_new_el", Some(List(HCompInstructionsWithTupleStringified("Please refine the following sentence"))))
+	val QUESTION_OLD_PROCESSED_ELEMENT = new ProcessParameter[StringQuestionRenderer]("_old_el", Some(List(StringQuestionRenderer("Other crowd workers have been given this sentence:", "And refined it to this state:", "Please check their work and add any refinements you think are necessary"))))
+	val QUESTION_NEW_PROCESSED_ELEMENT = new ProcessParameter[StringQuestionRenderer]("_new_el", Some(List(StringQuestionRenderer("Please refine the following sentence"))))
 	val QUESTION_PER_PROCESSING_TASK = new ProcessParameter[String]("proc_task", Some(List("Please fix up the following sentences")))
 	val QUESTION_PER_COMPARISON_TASK = new ProcessParameter[DPHCompDriverDefaultComparisonInstructionsConfig]("question_comp_task", Some(List(new DPHCompDriverDefaultComparisonInstructionsConfig())))
 	val TIMEOUT = new ProcessParameter[Duration]("timeout", Some(List(14 days)))

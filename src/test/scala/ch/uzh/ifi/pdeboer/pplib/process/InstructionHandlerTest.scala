@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{StringQuestionRenderer, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
@@ -12,7 +12,7 @@ import org.junit.{Assert, Test}
 class InstructionHandlerTest {
 	@Test
 	def testOverridingInstructionHandler(): Unit = {
-		val expectedInstructions: HCompInstructionsWithTupleStringified = HCompInstructionsWithTupleStringified("blupp")
+		val expectedInstructions: StringQuestionRenderer = StringQuestionRenderer("blupp")
 		val collector = new PassableProcessParam[Collection](Map(
 			WORKER_COUNT.key -> 1,
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 20),

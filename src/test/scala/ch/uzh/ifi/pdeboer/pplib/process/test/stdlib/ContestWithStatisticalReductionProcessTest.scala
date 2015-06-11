@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, HCompInstructionsWithTupleStringified}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{MockHCompPortal, StringQuestionRenderer}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithStatisticalReductionProcess
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
@@ -44,7 +44,7 @@ class ContestWithStatisticalReductionProcessTest {
 		val subject = new ContestWithStatisticalReductionProcessTestMasterPlan(
 			dataMasterPlanWithVotes,
 			Map(
-				DefaultParameters.INSTRUCTIONS.key -> HCompInstructionsWithTupleStringified(""),
+				DefaultParameters.INSTRUCTIONS.key -> StringQuestionRenderer(""),
 				ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER.key -> 0.95,
 				DefaultParameters.PORTAL_PARAMETER.key -> new MockHCompPortal(),
 				DefaultParameters.SHUFFLE_CHOICES.key -> false

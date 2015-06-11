@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{QuestionRenderer, HCompInstructionsWithTupleStringified}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{QuestionRenderer, StringQuestionRenderer}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -56,14 +56,14 @@ class ExplicitInstructionGenerator(question: QuestionRenderer, title: String) ex
 }
 
 class SimpleInstructionGeneratorCreate extends InstructionGenerator {
-	override def generateQuestion(base: InstructionData): QuestionRenderer = new HCompInstructionsWithTupleStringified(
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new StringQuestionRenderer(
 		generateQuestionTitle(base) + ". Please pay special attention to " + base.detailedDescription, base.evaluation)
 
 	override def generateQuestionTitle(base: InstructionData): String = "Please " + base.actionName
 }
 
 class SimpleInstructionGeneratorDecide extends InstructionGenerator {
-	override def generateQuestion(base: InstructionData): QuestionRenderer = new HCompInstructionsWithTupleStringified(
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new StringQuestionRenderer(
 		"Before, crowd workers were asked to " + base.actionName, "Please select the answer you like best in terms of " + base.detailedDescription
 	)
 

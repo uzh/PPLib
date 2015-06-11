@@ -1,9 +1,8 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HCompQueryProperties, HCompInstructionsWithTupleStringified$}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQueryProperties, StringQuestionRenderer}
 import ch.uzh.ifi.pdeboer.pplib.patterns.GeneticAlgorithmHCompDriver._
 import ch.uzh.ifi.pdeboer.pplib.patterns.{GAIterationLimitTerminator, GeneticAlgorithmExecutor, GeneticAlgorithmHCompDriver}
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
@@ -38,11 +37,11 @@ object GeneticAlgorithmProcess {
 	val ELITISM = new ProcessParameter[Double]("elitism", Some(List(.1d)))
 	val RECOMBINATION_FRACTION = new ProcessParameter[Double]("recombinationFraction", Some(List(.8d)))
 	val MUTATION_FRACTION = new ProcessParameter[Double]("mutationFraction", Some(List(.1d)))
-	val COMBINE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("combineQuestion", Some(List(DEFAULT_COMBINE_QUESTION)))
+	val COMBINE_QUESTION = new ProcessParameter[StringQuestionRenderer]("combineQuestion", Some(List(DEFAULT_COMBINE_QUESTION)))
 	val COMBINE_TITLE = new ProcessParameter[String]("combineTitle", Some(List(DEFAULT_COMBINE_TITLE)))
-	val MUTATE_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("mutateQuestion", Some(List(DEFAULT_MUTATE_QUESTION)))
+	val MUTATE_QUESTION = new ProcessParameter[StringQuestionRenderer]("mutateQuestion", Some(List(DEFAULT_MUTATE_QUESTION)))
 	val MUTATE_TITLE = new ProcessParameter[String]("mutateTitle", Some(List(DEFAULT_MUTATE_TITLE)))
-	val RATING_QUESTION = new ProcessParameter[HCompInstructionsWithTupleStringified]("ratingQuestion", Some(List(DEFAULT_RATING_QUESTION)))
+	val RATING_QUESTION = new ProcessParameter[StringQuestionRenderer]("ratingQuestion", Some(List(DEFAULT_RATING_QUESTION)))
 	val RATING_TITLE = new ProcessParameter[String]("ratingTitle", Some(List(DEFAULT_RATING_TITLE)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("questionPrice", Some(List(GeneticAlgorithmHCompDriver.DEFAULT_COST_PER_QUESTION)))
 }

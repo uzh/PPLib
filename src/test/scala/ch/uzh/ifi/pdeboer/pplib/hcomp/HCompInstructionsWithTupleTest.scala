@@ -9,7 +9,7 @@ import org.junit.{Assert, Test}
 class HCompInstructionsWithTupleTest {
 	@Test
 	def testHTMLElementRenderingDisabledInStringified: Unit = {
-		var res = (HCompInstructionsWithTupleStringified("<p>test</p>").getInstructions(""))
+		var res = (StringQuestionRenderer("<p>test</p>").getInstructions(""))
 		Assert.assertEquals("<p>&lt;p&gt;test&lt;/p&gt;</p>", U.removeWhitespaces(res))
 	}
 

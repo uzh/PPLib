@@ -152,8 +152,8 @@ class DPPathwayChunk(initialChunk: DPChunk) extends Serializable {
 @SerialVersionUID(1l) class DualPathWayDefaultHCompDriver(
 															 val data: List[IndexedPatch],
 															 val portal: HCompPortalAdapter,
-															 val questionPerOldProcessedElement: HCompInstructionsWithTupleStringified,
-															 val questionPerNewProcessedElement: HCompInstructionsWithTupleStringified,
+															 val questionPerOldProcessedElement: StringQuestionRenderer,
+															 val questionPerNewProcessedElement: StringQuestionRenderer,
 															 val questionPerProcessingTask: String,
 															 val questionPerComparisonTask: DPHCompDriverDefaultComparisonInstructionsConfig,
 															 val timeout: Duration = 14 days) extends DPDriver with Serializable {

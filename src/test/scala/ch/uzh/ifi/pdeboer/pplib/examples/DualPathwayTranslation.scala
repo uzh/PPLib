@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.crowdflower.CrowdFlowerPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompInstructionsWithTupleStringified, HComp, HCompInstructionsWithTupleStringified$}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{StringQuestionRenderer, HComp}
 import ch.uzh.ifi.pdeboer.pplib.patterns.DPHCompDriverDefaultComparisonInstructionsConfig
 import ch.uzh.ifi.pdeboer.pplib.process.entities.IndexedPatch
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.DualPathwayProcess
@@ -29,8 +29,8 @@ object DualPathwayTranslation extends App {
 			"Please compare the two columns below established by other crowd workers. Are they roughly equal? ",
 			questionTitle = "Original Text"),
 		QUESTION_PER_PROCESSING_TASK.key -> "Check the paragraphs below and make sure they are grammatically correct",
-		QUESTION_OLD_PROCESSED_ELEMENT.key -> HCompInstructionsWithTupleStringified("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.", "Other Crowd workers corrected the text above and turned it into the text below. Please add any corrections you'd like to make"),
-		QUESTION_NEW_PROCESSED_ELEMENT.key -> HCompInstructionsWithTupleStringified("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.")
+		QUESTION_OLD_PROCESSED_ELEMENT.key -> StringQuestionRenderer("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.", "Other Crowd workers corrected the text above and turned it into the text below. Please add any corrections you'd like to make"),
+		QUESTION_NEW_PROCESSED_ELEMENT.key -> StringQuestionRenderer("Please fix grammatical mistakes and spelling errors in the following paragraph by rewriting it into the text box below.")
 	))
 
 	val res = process.process(paragraphs)

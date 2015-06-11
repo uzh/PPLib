@@ -218,17 +218,17 @@ class BasicQuestionRenderer(val _questionBeforeTuples: NodeSeq, val _questionBet
 	//TODO write function that flattens "P"'s
 }
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompInstructionsWithTupleStringified._
+import ch.uzh.ifi.pdeboer.pplib.hcomp.StringQuestionRenderer._
 
 @SerialVersionUID(1l)
-case class HCompInstructionsWithTupleStringified(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends BasicQuestionRenderer(
+case class StringQuestionRenderer(questionBeforeTuples: String, questionBetweenTuples: String = "", questionAfterTuples: String = "", enableSecondDataFieldIfAvailable: Boolean = true) extends BasicQuestionRenderer(
 	prep(questionBeforeTuples), if (questionBetweenTuples == "") Nil
 	else <p>
 		{questionBetweenTuples}
 	</p>, prep(questionAfterTuples), enableSecondDataFieldIfAvailable) with Serializable {
 }
 
-object HCompInstructionsWithTupleStringified {
+object StringQuestionRenderer {
 	def prep(str: String): NodeSeq = if (U.removeWhitespaces(str) == "") NodeSeq.fromSeq(Nil)
 	else <p>
 		{str}
