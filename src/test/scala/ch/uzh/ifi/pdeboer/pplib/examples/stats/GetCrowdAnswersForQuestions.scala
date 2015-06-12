@@ -41,7 +41,7 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 			val q = dataMap(ans.payload.get.asInstanceOf[StringWrapper].toString)
 			val a = ans.value
 			List(q.method, q.assumption, a).mkString(",")
-		})).mkString("\n")
+		}).mkString("\n")).mkString("\n")
 
 		logger.info("storing output..")
 
