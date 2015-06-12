@@ -21,7 +21,7 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 		logger.info("constructing process")
 
 		val process = new Collection(Map(
-			DefaultParameters.PORTAL_PARAMETER.key -> HComp.mechanicalTurk,
+			DefaultParameters.PORTAL_PARAMETER.key -> HComp.randomPortal,
 			DefaultParameters.WORKER_COUNT.key -> 10,
 			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 16),
 			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "Check if 2 given terms in paragraph refer to each other"))
@@ -46,7 +46,7 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 		logger.info("storing output..")
 
 		Some(new PrintWriter("resultsStats.csv")).foreach(p => {
-			p.write(fullString);
+			p.write(fullString)
 			p.close()
 		})
 		logger.info("done")

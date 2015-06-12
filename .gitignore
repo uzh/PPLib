@@ -36,4 +36,5 @@ src/test/resources/application.conf
 
 state
 atlassian-ide-plugin.xml
-src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/stats/example.csv
+exampleQuestionData.csv
+resultsStats.csv
