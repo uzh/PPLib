@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.stats
+package ch.uzh.ifi.pdeboer.pplib.examples.statsexample
 
 import java.io.PrintWriter
 
@@ -13,7 +13,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 11/06/15.
  */
-private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) extends LazyLogger {
+private[statsexample] class GetCrowdAnswersForQuestions(data: List[QuestionData]) extends LazyLogger {
 	val dataMap: Map[String, QuestionData] = data.zipWithIndex.map(d => d._2.toString -> d._1).toMap
 
 	def getQuestionForIndex(key: String) = dataMap(key)
@@ -71,7 +71,7 @@ object GetCrowdAnswersForQuestions extends App {
 }
 
 
-private[stats] class StatsQuestionRenderer(data: Map[String, ch.uzh.ifi.pdeboer.pplib.examples.stats.QuestionData]) extends QuestionRenderer {
+private[statsexample] class StatsQuestionRenderer(data: Map[String, ch.uzh.ifi.pdeboer.pplib.examples.statsexample.QuestionData]) extends QuestionRenderer {
 	def getQuestionContents(key: String) = data(key)
 
 	//method color: orange
