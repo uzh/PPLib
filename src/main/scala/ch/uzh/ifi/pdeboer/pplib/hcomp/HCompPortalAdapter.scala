@@ -65,10 +65,10 @@ trait HCompPortalAdapter extends LazyLogger {
 			logger.debug(s"got answer for query $query after $durationMillis ms. Answer = $answer")
 
 			answer match {
-				case Some(x: HCompAnswer) => {
+				case Some(x: HCompAnswer) =>
 					x.postTime = timeBefore
 					x.receivedTime = timeAfter
-				}
+				case None =>
 			}
 
 			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
@@ -173,9 +173,13 @@ trait HCompQuery extends Serializable {
 	def valueIsRequired: Boolean = true
 }
 
+trait HCompWorker {}
+
 @SerialVersionUID(1l)
 trait HCompAnswer extends Serializable with Prunable {
 	def query: HCompQuery
+
+	def responsibleWorkers: List[HCompWorker]
 
 	def is[T]: T = this.asInstanceOf[T]
 
@@ -256,6 +260,9 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 		}
 	}
 
+
+	override def responsibleWorkers: List[HCompWorker] = answers.values.filter(_.isDefined).map(o => o.get.responsibleWorkers).flatten.toList
+
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
@@ -289,7 +296,7 @@ object FreetextQuery {
 }
 
 @SerialVersionUID(1l)
-case class FreetextAnswer(query: FreetextQuery, answer: String) extends HCompAnswer with Serializable {
+case class FreetextAnswer(query: FreetextQuery, answer: String, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable {
 	override def toString() = answer
 }
 
@@ -314,7 +321,7 @@ object MultipleChoiceQuery {
 }
 
 @SerialVersionUID(1l)
-case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean]) extends HCompAnswer with Serializable {
+case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, Boolean], responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable {
 	def selectedAnswers: List[String] = answer.collect({
 		case x if x._2 => x._1
 	}).toList
@@ -325,10 +332,10 @@ case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, 
 }
 
 @SerialVersionUID(1l)
-case class HCompException(query: HCompQuery, exception: Throwable) extends HCompAnswer with Serializable
+case class HCompException(query: HCompQuery, exception: Throwable, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompJobCancelled(query: HCompQuery) extends HCompAnswer with Serializable
+case class HCompJobCancelled(query: HCompQuery, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
 case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable

@@ -3,10 +3,10 @@ package ch.uzh.ifi.pdeboer.pplib.examples.stats
 import java.io.PrintWriter
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompQueryProperties, QuestionRenderer}
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, ExplicitInstructionGenerator, FileProcessMemoizer, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, StringWrapper}
-
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 import scala.xml.NodeSeq
 
 /**
@@ -20,19 +20,19 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 	def process() {
 		logger.info("constructing process")
 
-		val process = new Collection(Map(
-			DefaultParameters.PORTAL_PARAMETER.key -> HComp.randomPortal,
-			DefaultParameters.WORKER_COUNT.key -> 10,
-			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 16),
+		val process = new PassableProcessParam[Collection](Map(
+			DefaultParameters.PORTAL_PARAMETER.key -> HComp.mechanicalTurk,
+			DefaultParameters.WORKER_COUNT.key -> 1,
+			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10, qualifications = Nil),
 			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "Check if 2 given terms in paragraph refer to each other"))
 		))
 
-		val memoizer = new FileProcessMemoizer("statsanswers.mem")
+		val memoizer = new FileProcessMemoizer("statsanswers.mem", true)
 
 		logger.info("processing items..")
-		val patches: Iterable[Patch] = dataMap.keys.map(k => new Patch(k, Some(StringWrapper(k))))
-		val answers = patches.map(p => {
-			val ans = memoizer.mem(s"answersFor_$p")(process.process(p))
+		val patches = dataMap.keys.map(k => new Patch(k, Some(StringWrapper(k)))).toList
+		val answers = patches.mpar.map(p => {
+			val ans = memoizer.mem(s"answersFor_$p")(process.create().process(p))
 			logger.info(s"got answer for ${getQuestionForIndex(p.value)}: $ans")
 			ans
 		})
@@ -77,9 +77,9 @@ private[stats] class StatsQuestionRenderer(data: Map[String, ch.uzh.ifi.pdeboer.
 			</b>
 			(highlighted in orange) within this
 			<a href={qData.url}>PDF</a>
-			. (i.e. are they related somehow?). You will usually need to scroll to the middle of the
+			. (i.e. are they related somehow?). Write "YES" or "NO" into the text field below to indicate your answer. You will usually need to scroll to the middle of the
 			<a href={qData.url}>PDF</a>
-			and need to read part the (short) text between the two highlighted terms. No need to read the rest (except if you’re interested). Your answer will be evaluated by other crowd workers
+			and need to read part the (short) text between the two highlighted terms. No need to read the rest (except if you’re interested). Your answer will be evaluated by other crowd workers. Please don't accept other hits of this type
 		</p>.toString
 	}
 }
