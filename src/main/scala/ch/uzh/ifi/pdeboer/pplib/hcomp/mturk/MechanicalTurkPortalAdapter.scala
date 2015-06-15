@@ -108,7 +108,7 @@ object MechanicalTurkPortalAdapter {
 }
 
 class MechanicalTurkPortalBuilder extends HCompPortalBuilder {
-	val ACCESS_ID_KEY: String = "accessIdKey"
+	val ACCESS_ID_KEY: String = "accessKeyID"
 	val SECRET_ACCESS_KEY: String = "secretAccessKey"
 	val SANDBOX: String = "sandbox"
 

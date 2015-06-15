@@ -38,3 +38,4 @@ state
 atlassian-ide-plugin.xml
 exampleQuestionData.csv
 resultsStats.csv
+src/main/resources/application.conf
