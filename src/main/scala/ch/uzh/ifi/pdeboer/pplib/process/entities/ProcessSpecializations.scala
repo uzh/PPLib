@@ -103,7 +103,7 @@ trait QueryInjection extends IParametrizable {
 	self: ProcessStub[_, _] =>
 
 	def createComposite(baseQuery: List[HCompQuery]): CompositeQuery = {
-		val main = baseQuery(0)
+		val main = baseQuery.head
 		CompositeQuery(baseQuery ::: INJECT_QUERIES.get.values.toList,
 			main.question, main.title)
 	}
@@ -111,13 +111,13 @@ trait QueryInjection extends IParametrizable {
 	def createComposite(baseQuery: HCompQuery): CompositeQuery = createComposite(List(baseQuery))
 
 	private def getQueryAnswersFromComposite(compositeAnswer: CompositeQueryAnswer, needle: Map[String, HCompQuery]): Map[String, HCompAnswer] =
-		needle.map(q => q._1 -> compositeAnswer.get[HCompAnswer](q._2)).toMap
+		needle.map(q => q._1 -> compositeAnswer.get[HCompAnswer](q._2))
 
 	def addInjectedAnswersToPatch(patch: Patch, compositeAnswers: List[CompositeQueryAnswer], additionalQueryData: Map[String, HCompQuery] = Map.empty): Unit = {
 		val map: List[Map[String, HCompAnswer]] = compositeAnswers.map(c =>
 			getQueryAnswersFromComposite(c, INJECT_QUERIES.get) ++
 				getQueryAnswersFromComposite(c, additionalQueryData))
-		if (map.size > 0) {
+		if (map.nonEmpty) {
 			patch.auxiliaryInformation += ("answersForInjectedQueries" -> map)
 		}
 	}

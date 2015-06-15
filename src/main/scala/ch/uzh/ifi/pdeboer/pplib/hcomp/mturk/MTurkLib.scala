@@ -203,6 +203,8 @@ private[mturk] object QualificationRequirement {
 	private[mturk] object Worker_Locale
 		extends Factory[String]("00000000000000000071", "LocaleValue.Country")
 
+
+	class Custom_QualificationType(val id: String) extends IntegerValueFactory(id)
 	/**
 	 * Base class for objects that create QualificationRequirements supporting
 	 * the Exists, EqualTo and NotEqualTo comparators.
@@ -314,6 +316,17 @@ private[mturk] class MTurkService(
 		val params = simpleParams ++ qualParams
 		val result = this.makeRequest("RegisterHITType", params: _*)
 		MTurkUtil.oneText(result \ "RegisterHITTypeResult" \ "HITTypeId")
+	}
+
+	def CreateQualificationType(name: String, description: String = "Hits of this type can only be done once"): String = {
+		val basicParams = Seq("Name=" + URLEncoder.encode(name, "UTF8"), "Description=" + URLEncoder.encode(description, "UTF8"), "QualificationTypeStatus=Active", "AutoGranted=true")
+		val result = makeRequest("CreateQualificationType", basicParams: _*)
+		(result \\ "QualificationTypeId").text
+	}
+
+	def UpdateQualificationScore(qualificationTypeID: String, workerId: String, newScore: Int) {
+		val basicParams = Seq(s"QualificationTypeId=$qualificationTypeID", s"SubjectId=$workerId", s"IntegerValue=$newScore")
+		makeRequest("UpdateQualificationScore", basicParams: _*)
 	}
 
 	def CreateHIT(

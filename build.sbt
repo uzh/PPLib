@@ -25,9 +25,9 @@ resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositori
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
-//mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.recombination.translation.TranslationApp")
+mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.stats.GetCrowdAnswersForQuestions")
 
 // To Skip Tests:
-//test in assembly := {}
+test in assembly := {}
 
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)

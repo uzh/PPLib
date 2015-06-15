@@ -45,6 +45,8 @@ object QualificationType {
 
 	class QTPercentAssignmentsRejected extends ClassNameForwarder[Int]
 
+	class QTCustomQualificationType(val id: String) extends ClassNameForwarder[Int]
+
 	class QTNumberHITsApproved extends ClassNameForwarder[Int]
 
 	class QTAdult extends ClassNameForwarder[Int]

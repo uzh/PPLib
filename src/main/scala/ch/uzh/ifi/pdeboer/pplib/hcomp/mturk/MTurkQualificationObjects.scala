@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.QualificationRequirement.{Factory, IntegerValueFactory}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.mturk.QualificationRequirement.{Custom_QualificationType, Factory, IntegerValueFactory}
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{QualificationType, QueryWorkerQualification}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
@@ -16,6 +16,7 @@ object MTurkQualificationObjectConversion extends LazyLogger {
 			case e: QualificationType.QTPercentAssignmentsApproved => Some(QualificationRequirement.Worker_PercentAssignmentsApproved)
 			case e: QualificationType.QTPercentAssignmentsRejected => Some(QualificationRequirement.Worker_PercentAssignmentsRejected)
 			case e: QualificationType.QTNumberHITsApproved => Some(QualificationRequirement.Worker_NumberHITsApproved)
+			case e: QualificationType.QTCustomQualificationType => Some(new Custom_QualificationType(e.id))
 			case e: QualificationType.QTAdult => Some(QualificationRequirement.Worker_Adult)
 			case e => None
 		}

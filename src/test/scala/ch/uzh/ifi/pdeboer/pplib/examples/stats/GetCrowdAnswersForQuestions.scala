@@ -2,7 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.examples.stats
 
 import java.io.PrintWriter
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HComp, HCompQueryProperties, QuestionRenderer}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.QTCustomQualificationType
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompAnswer, HCompQueryProperties, QuestionRenderer}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, StringWrapper}
@@ -18,22 +19,30 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 	def getQuestionForIndex(key: String) = dataMap(key)
 
 	def process() {
-		logger.info("constructing process")
+		val typeID = HComp.mechanicalTurk.service.CreateQualificationType("Only accept hits of this type once")
+		logger.info(s"created new qualification type: $typeID")
 
+		logger.info("constructing process")
 		val process = new PassableProcessParam[Collection](Map(
 			DefaultParameters.PORTAL_PARAMETER.key -> HComp.mechanicalTurk,
 			DefaultParameters.WORKER_COUNT.key -> 3,
-			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
+			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10, qualifications = (new QTCustomQualificationType(typeID) > 0) :: HCompQueryProperties.DEFAULT_QUALIFICATIONS),
 			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "Check if 2 given terms in paragraph refer to each other"))
 		))
 
-		val memoizer = new FileProcessMemoizer("statsanswers.mem")
+		val memoizer = new FileProcessMemoizer("statsanswers")
 
 		logger.info("processing items..")
 		val patches = dataMap.keys.map(k => new Patch(k, Some(StringWrapper(k)))).toList
 		val answers = patches.map(p => {
-			val ans = memoizer.mem(s"answersFor_$p")(process.create().process(p))
+			val ans: List[Patch] = memoizer.mem(s"answersFor_$p")(process.create().process(p))
 			logger.info(s"got answer for ${getQuestionForIndex(p.value)}: $ans")
+
+			ans.foreach(a => {
+				val workerId = getWorkerIDFromPatch(a)
+				HComp.mechanicalTurk.service.UpdateQualificationScore(typeID, workerId, 0)
+				logger.info(s"banned user $workerId")
+			})
 
 			ans
 		})
@@ -41,8 +50,8 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 		val fullString = answers.map(p => p.map(ans => {
 			val q = dataMap(ans.payload.get.asInstanceOf[StringWrapper].toString)
 			val a = ans.value
-			val worker = ans.auxiliaryInformation("rawAnswer").asInstanceOf[HCompAnswer].responsibleWorkers.mkString("")
-			List(q.method, q.assumption, a, worker).mkString(",")
+			val worker = getWorkerIDFromPatch(ans)
+			List(q.method, q.assumption, q.url, a, worker).mkString(",")
 		}).mkString("\n")).mkString("\n")
 
 		logger.info("storing output..")
@@ -53,6 +62,8 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 		})
 		logger.info("done")
 	}
+
+	def getWorkerIDFromPatch(p: Patch) = p.auxiliaryInformation("rawAnswer").asInstanceOf[HCompAnswer].responsibleWorkers.mkString("")
 }
 
 object GetCrowdAnswersForQuestions extends App {
@@ -81,7 +92,7 @@ private[stats] class StatsQuestionRenderer(data: Map[String, ch.uzh.ifi.pdeboer.
 			<a href={qData.url}>PDF</a>
 			. (i.e. are they related somehow?). Write "YES" or "NO" into the text field below to indicate your answer. You will usually need to scroll to the middle of the
 			<a href={qData.url}>PDF</a>
-			and need to read part the (short) text between the two highlighted terms. No need to read the rest (except if you’re interested). Your answer will be evaluated by other crowd workers. Please don't accept other hits of this type
+			and need to read part the (short) text between the two highlighted terms. No need to read the rest (except if you’re interested). Your answer will be evaluated by other crowd workers. We've set up a qualification, so you can't accept other hits of this type
 		</p>.toString
 	}
 }
