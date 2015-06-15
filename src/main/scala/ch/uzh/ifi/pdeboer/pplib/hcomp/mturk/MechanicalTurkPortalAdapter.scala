@@ -126,3 +126,7 @@ class MechanicalTurkPortalBuilder extends HCompPortalBuilder {
 
 	override def expectedParameters: List[String] = List(ACCESS_ID_KEY, SECRET_ACCESS_KEY)
 }
+
+case class MTurkWorker(id: String) extends HCompWorker {
+	override def toString = id
+}

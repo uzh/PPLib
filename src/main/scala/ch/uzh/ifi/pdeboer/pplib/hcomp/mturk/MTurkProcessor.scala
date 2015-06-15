@@ -85,7 +85,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 		}
 
 		val xml = a.AnswerXML
-		val answer = MTQuery.convert(query).interpret(xml)
+		val answer = MTQuery.convert(query).interpret(xml, a.WorkerId)
 		answer.map(answer => {
 			answer.acceptTime = a.AcceptTime
 			answer.submitTime = a.SubmitTime

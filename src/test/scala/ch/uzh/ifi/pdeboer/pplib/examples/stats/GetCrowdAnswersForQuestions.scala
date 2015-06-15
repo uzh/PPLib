@@ -2,11 +2,11 @@ package ch.uzh.ifi.pdeboer.pplib.examples.stats
 
 import java.io.PrintWriter
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompQueryProperties, QuestionRenderer}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HComp, HCompQueryProperties, QuestionRenderer}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, StringWrapper}
-import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+
 import scala.xml.NodeSeq
 
 /**
@@ -22,25 +22,27 @@ private[stats] class GetCrowdAnswersForQuestions(data: List[QuestionData]) exten
 
 		val process = new PassableProcessParam[Collection](Map(
 			DefaultParameters.PORTAL_PARAMETER.key -> HComp.mechanicalTurk,
-			DefaultParameters.WORKER_COUNT.key -> 1,
-			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10, qualifications = Nil),
+			DefaultParameters.WORKER_COUNT.key -> 3,
+			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
 			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "Check if 2 given terms in paragraph refer to each other"))
 		))
 
-		val memoizer = new FileProcessMemoizer("statsanswers.mem", true)
+		val memoizer = new FileProcessMemoizer("statsanswers.mem")
 
 		logger.info("processing items..")
 		val patches = dataMap.keys.map(k => new Patch(k, Some(StringWrapper(k)))).toList
-		val answers = patches.mpar.map(p => {
+		val answers = patches.map(p => {
 			val ans = memoizer.mem(s"answersFor_$p")(process.create().process(p))
 			logger.info(s"got answer for ${getQuestionForIndex(p.value)}: $ans")
+
 			ans
 		})
 
 		val fullString = answers.map(p => p.map(ans => {
 			val q = dataMap(ans.payload.get.asInstanceOf[StringWrapper].toString)
 			val a = ans.value
-			List(q.method, q.assumption, a).mkString(",")
+			val worker = ans.auxiliaryInformation("rawAnswer").asInstanceOf[HCompAnswer].responsibleWorkers.mkString("")
+			List(q.method, q.assumption, a, worker).mkString(",")
 		}).mkString("\n")).mkString("\n")
 
 		logger.info("storing output..")

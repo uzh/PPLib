@@ -23,12 +23,14 @@ class Collection(params: Map[String, Any] = Map.empty) extends CreateProcess[Pat
 				val mainQuery: FreetextQuery = FreetextQuery(
 					instr, "", instructionTitle + w + "_" + Math.abs(Random.nextInt()))
 				val query = createComposite(mainQuery)
-				val answ = portal.sendQueryAndAwaitResult(query, QUESTION_PRICE.get).get.is[CompositeQueryAnswer]
+				val rawAnswer: Option[HCompAnswer] = portal.sendQueryAndAwaitResult(query, QUESTION_PRICE.get)
+				val answ = rawAnswer.get.is[CompositeQueryAnswer]
 				(answ, answ.get[FreetextAnswer](mainQuery))
 			}).toList
 
 			answers.map(a => {
 				val newPatch = line.duplicate(a._2.answer)
+				newPatch.auxiliaryInformation += ("rawAnswer" -> a._2)
 				addInjectedAnswersToPatch(newPatch, a._1)
 				newPatch
 			})

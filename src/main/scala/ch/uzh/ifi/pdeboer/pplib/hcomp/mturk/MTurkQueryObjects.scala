@@ -40,7 +40,7 @@ sealed trait MTQuery extends LazyLogger {
 
 	def rawQuery: HCompQuery
 
-	def interpret(xml: NodeSeq): Option[HCompAnswer]
+	def interpret(xml: NodeSeq, workerId: String): Option[HCompAnswer]
 }
 
 object MTQuery {
@@ -60,8 +60,8 @@ class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
 		</FreeTextAnswer>
 	}
 
-	override def interpret(xml: NodeSeq) =
-		Some(FreetextAnswer(rawQuery, (getRelevantAnswerFromResponseXML(xml) \ "FreeText").text))
+	override def interpret(xml: NodeSeq, workerId: String) =
+		Some(FreetextAnswer(rawQuery, (getRelevantAnswerFromResponseXML(xml) \ "FreeText").text, responsibleWorkers = List(MTurkWorker(workerId))))
 
 	override def questionXML: NodeSeq = defaultQuestionXML(injectedXML = answerSpecification)
 }
@@ -95,7 +95,7 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 		</SelectionAnswer>
 	}
 
-	override def interpret(xml: NodeSeq): Option[HCompAnswer] = {
+	override def interpret(xml: NodeSeq, workerId: String): Option[HCompAnswer] = {
 		val relevantXMLAnswers: NodeSeq = getRelevantAnswerFromResponseXML(xml) \\ "SelectionIdentifier"
 		val selected = relevantXMLAnswers.map(i => {
 			val selectionId: String = i.text.split("_")(1)
@@ -107,7 +107,7 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 		}).toSet
 		val selections: Map[String, Boolean] = rawQuery.options.zipWithIndex.map(o => o._1 -> selected.contains(o._2)).toMap
 		assert(relevantXMLAnswers.size == selections.values.count(_ == true))
-		val answer = MultipleChoiceAnswer(rawQuery, selections)
+		val answer = MultipleChoiceAnswer(rawQuery, selections, responsibleWorkers = List(MTurkWorker(workerId)))
 		if (rawQuery.minNumberOfResults > 0 && answer.selectedAnswers.size == 0) {
 			logger.error("expected result for multiple choice query, but got none. Here's the complete answer: " + xml.toString())
 			None
@@ -119,9 +119,9 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 
 class MTCompositeQuery(val rawQuery: CompositeQuery) extends MTQuery {
 
-	override def interpret(xml: NodeSeq) = {
+	override def interpret(xml: NodeSeq, workerId: String) = {
 		Some(CompositeQueryAnswer(rawQuery,
-			rawQuery.queries.map(q => q -> MTQuery.convert(q).interpret(xml)).toMap))
+			rawQuery.queries.map(q => q -> MTQuery.convert(q).interpret(xml, workerId)).toMap))
 	}
 
 	override def questionXML: NodeSeq =

@@ -173,7 +173,9 @@ trait HCompQuery extends Serializable {
 	def valueIsRequired: Boolean = true
 }
 
-trait HCompWorker {}
+trait HCompWorker {
+	def id: String
+}
 
 @SerialVersionUID(1l)
 trait HCompAnswer extends Serializable with Prunable {
