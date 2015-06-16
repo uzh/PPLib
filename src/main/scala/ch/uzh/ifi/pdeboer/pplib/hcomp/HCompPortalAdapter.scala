@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.{QTLocale, QTNumberHITsApproved, QTPercentAssignmentsRejected}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.{QTNumberHITsApproved, QTPercentAssignmentsRejected}
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Prunable
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
@@ -343,7 +343,7 @@ case class HCompJobCancelled(query: HCompQuery, responsibleWorkers: List[HCompWo
 case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
 
 object HCompQueryProperties {
-	val DEFAULT_QUALIFICATIONS = List(new QTLocale === "US", new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000)
+	val DEFAULT_QUALIFICATIONS = List(new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000)
 }
 
 trait HCompPortalBuilder {

@@ -26,8 +26,8 @@ private[statsexample] class GetCrowdAnswersForQuestions(data: List[QuestionData]
 		val process = new PassableProcessParam[Collection](Map(
 			DefaultParameters.PORTAL_PARAMETER.key -> HComp.mechanicalTurk,
 			DefaultParameters.WORKER_COUNT.key -> 3,
-			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10, qualifications = (new QTCustomQualificationType(typeID) > 0) :: HCompQueryProperties.DEFAULT_QUALIFICATIONS),
-			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "Check if 2 given terms in paragraph refer to each other"))
+			DefaultParameters.QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 30, qualifications = (new QTCustomQualificationType(typeID) > 0) :: HCompQueryProperties.DEFAULT_QUALIFICATIONS),
+			DefaultParameters.OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(new ExplicitInstructionGenerator(new StatsQuestionRenderer(dataMap), "[Auto Approved Qual] Check if 2 given terms in paragraph refer to each other"))
 		))
 
 		val memoizer = new FileProcessMemoizer("statsanswers")
@@ -79,18 +79,18 @@ private[statsexample] class StatsQuestionRenderer(data: Map[String, ch.uzh.ifi.p
 	override def getInstructions(data1: String, data2: String, htmlData: NodeSeq): String = {
 		val qData: QuestionData = getQuestionContents(data1)
 
-		<p>Please check, whether the statistical assumption
+		<p>The statistical assumption
 			<b>
 				{qData.assumption}
 			</b>
 			(highlighted in yellow)
-			refers to the statistical method
+			needs to be satisfied in order for the statistical method
 			<b>
 				{qData.method}
 			</b>
-			(highlighted in orange) within this
+			(highlighted in orange) to deliver reliable results. In this
 			<a href={qData.url}>PDF</a>
-			. (i.e. are they related somehow?). Write "YES" or "NO" into the text field below to indicate your answer. You will usually need to scroll to the middle of the
+			, do the two terms refer to each other in that way as well? Write "YES" or "NO" into the text field below to indicate your answer. You will usually need to scroll to the middle of the
 			<a href={qData.url}>PDF</a>
 			and need to read part the (short) text between the two highlighted terms. No need to read the rest (except if you’re interested). Your answer will be evaluated by other crowd workers. We've set up a qualification, so you can't accept other hits of this type
 		</p>.toString
