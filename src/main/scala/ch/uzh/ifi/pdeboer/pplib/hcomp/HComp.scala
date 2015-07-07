@@ -19,8 +19,10 @@ object HComp extends LazyLogger {
 	}
 
 	def addPortal(key: String, portal: HCompPortalAdapter) {
-		logger.info(s"adding portaladapter ${portal.getClass.getSimpleName} with key ${portal.getDefaultPortalKey}")
-		portals += (key -> portal)
+		if (!portals.contains(key)) {
+			logger.info(s"adding portaladapter ${portal.getClass.getSimpleName} with key ${portal.getDefaultPortalKey}")
+			portals += (key -> portal)
+		}
 	}
 
 	def allDefinedPortals = portals.values.filter(_ != null).toList

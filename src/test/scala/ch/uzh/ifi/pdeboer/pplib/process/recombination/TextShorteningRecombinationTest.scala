@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.util.ProcessPrinter
+import ch.uzh.ifi.pdeboer.pplib.util.{ProcessPrinter, TestUtils}
 import org.junit.{Assert, Test}
 
 import scala.reflect.io.File
@@ -12,6 +12,8 @@ import scala.reflect.io.File
 class TextShorteningRecombinationTest {
 	@Test
 	def generateTextShorteningRecombinations: Unit = {
+		TestUtils.ensureThereIsAtLeast1Portal()
+
 		val toStore = <Data>
 			{candidates.map(c => {
 				new ProcessPrinter(c, Some(Nil)).lines

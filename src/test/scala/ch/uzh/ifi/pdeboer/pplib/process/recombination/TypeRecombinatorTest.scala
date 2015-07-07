@@ -3,6 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
+import ch.uzh.ifi.pdeboer.pplib.util.TestUtils
 import org.junit.{Assert, Test}
 
 import scala.reflect.runtime.universe._
@@ -11,6 +12,8 @@ import scala.reflect.runtime.universe._
  * Created by pdeboer on 27/03/15.
  */
 class TypeRecombinatorTest {
+	TestUtils.ensureThereIsAtLeast1Portal()
+
 	def newDB = {
 		val db = new RecombinationDB
 		db.addClass(classOf[Collection])
