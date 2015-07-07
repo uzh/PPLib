@@ -30,6 +30,6 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 //mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.statsexample.GetCrowdAnswersForQuestions")
 
 // To Skip Tests:
-test in assembly := {}
+//test in assembly := {}
 
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true)
+//assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true)
