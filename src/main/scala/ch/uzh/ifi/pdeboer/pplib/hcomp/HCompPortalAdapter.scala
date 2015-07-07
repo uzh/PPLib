@@ -301,6 +301,16 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
+case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: String = "") extends HCompQuery {
+	override def question: String = html.toString
+
+}
+
+case class HTMLQueryAnswer(answers: Map[String, String], query: HCompQuery, responsibleWorkers: List[HCompWorker]) extends HCompAnswer {
+	def get(key: String) = answers.get(key)
+}
+
+
 /**
  * @param question
  * @param defaultAnswer
