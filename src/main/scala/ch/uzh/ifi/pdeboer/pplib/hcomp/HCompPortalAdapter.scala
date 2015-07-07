@@ -124,7 +124,7 @@ private[hcomp] trait RejectableAnswer {
 }
 
 trait AnswerRejection {
-	var unapprovedAnswers = scala.collection.mutable.HashMap.empty[HCompAnswer, RejectableAnswer]
+	protected var unapprovedAnswers = scala.collection.mutable.HashMap.empty[HCompAnswer, RejectableAnswer]
 
 	def addUnapprovedAnswer(a: RejectableAnswer) = {
 		synchronized {
@@ -306,7 +306,7 @@ case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: Stri
 
 }
 
-case class HTMLQueryAnswer(answers: Map[String, String], query: HCompQuery, responsibleWorkers: List[HCompWorker]) extends HCompAnswer {
+case class HTMLQueryAnswer(answers: Map[String, String], query: HCompQuery, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer {
 	def get(key: String) = answers.get(key)
 }
 

@@ -10,6 +10,8 @@ fork := true
 
 libraryDependencies ++= Seq(
 	"junit" % "junit" % "4.8.1" % "test",
+	"org.mockito" % "mockito-core" % "1.10.19" % "test",
+	"org.scalacheck" %% "scalacheck" % "1.12.4" % "test",
 	"com.typesafe" % "config" % "1.2.1",
 	"org.reflections" % "reflections" % "0.9.9",
 	"com.novocode" % "junit-interface" % "0.8" % "test->default",
