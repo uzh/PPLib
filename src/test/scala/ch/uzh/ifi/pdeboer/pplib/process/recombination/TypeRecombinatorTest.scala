@@ -123,7 +123,7 @@ class TypeRecombinatorTest {
 
 			thisProcessContainsPortal && OneOfChildrenContainsPortal
 		}
-		val otherPortals = HComp.allDefinedPortals.toSet - HComp.mechanicalTurk
+		val otherPortals = HComp.allDefinedPortals.toSet - HComp.randomPortal
 		if (otherPortals.size == 0) println(Thread.currentThread().getStackTrace()(1) + ": This test will only work if you have defined more than 1 portal.")
 
 		Assert.assertFalse("no crowd flower must be used, only mturk", materialized.exists(p =>
