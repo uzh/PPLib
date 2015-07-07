@@ -137,5 +137,5 @@ object TypeRecombinatorTest {
 		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
 		new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
 			new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
-	) ::: RecombinationHints.hcompPlatform(List(HComp.mechanicalTurk))))
+	) ::: RecombinationHints.hcompPlatform(List(HComp.randomPortal))))
 }
