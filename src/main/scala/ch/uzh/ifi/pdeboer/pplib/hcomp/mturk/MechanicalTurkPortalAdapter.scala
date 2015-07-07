@@ -101,25 +101,29 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 }
 
 private[mturk] class RejectableTurkAnswer(a: Assignment, val answer: HCompAnswer, service: MTurkService) extends RejectableAnswer with LazyLogger {
-	def reject(message: String) = try {
+	private var untouched: Boolean = true
+
+	def reject(message: String) = if (untouched) try {
 		service.RejectAssignment(a, message)
+		untouched = false
 		true
 	}
 	catch {
 		case e: Exception =>
 			logger.error("couldn't reject assignment", e)
 			false
-	}
+	} else false
 
-	def approve(message: String, bonusCents: Int = 0) = try {
+	def approve(message: String, bonusCents: Int = 0) = if (untouched) try {
 		service.ApproveAssignment(a, message)
+		untouched = false
 		true
 	}
 	catch {
 		case e: Exception =>
 			logger.error("couldn't approve assignment", e)
 			false
-	}
+	} else false
 }
 
 object MechanicalTurkPortalAdapter {
