@@ -8,6 +8,9 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortal
  */
 object TestUtils {
 	def ensureThereIsAtLeast1Portal(): Unit = {
-		HComp.addPortal(new RandomHCompPortal(""))
+		if (HComp.randomPortal == null) {
+			Thread.sleep(1000)
+			HComp.addPortal(new RandomHCompPortal(""))
+		}
 	}
 }
