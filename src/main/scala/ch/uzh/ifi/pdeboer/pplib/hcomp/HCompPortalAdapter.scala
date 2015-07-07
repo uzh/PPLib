@@ -132,6 +132,8 @@ trait AnswerRejection {
 		}
 	}
 
+	def getUnapprovedAnswers = unapprovedAnswers.keySet
+
 	def rejectAnswer(ans: HCompAnswer, message: String = ""): Boolean = {
 		synchronized {
 			val a: Option[RejectableAnswer] = unapprovedAnswers.remove(ans)
@@ -224,8 +226,6 @@ trait HCompAnswer extends Serializable with Prunable {
 	def processingTimeMillis: Long = submitTime.getOrElse(receivedTime).getMillis - acceptTime.getOrElse(postTime).getMillis
 
 	override def prunableDouble = processingTimeMillis.toDouble
-
-	override def hashCode(): Int = query.hashCode()
 }
 
 @SerialVersionUID(1l)

@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextAnswer, FreetextQuery, MultipleChoiceAnswer, MultipleChoiceQuery}
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.U._
 import org.junit.{Assert, Test}
 
@@ -32,7 +32,9 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(Some(FreetextAnswer(ftq, "C3")), q.interpret(xml, ""))
+
+		val expected: Some[FreetextAnswer] = Some(FreetextAnswer(ftq, "C3", List(MTurkWorker(""))))
+		Assert.assertEquals(expected, q.interpret(xml, ""))
 	}
 
 	@Test
@@ -54,8 +56,9 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
-			mtc.options.map(o => o -> (o == "b")).toMap)), q.interpret(xml, ""))
+		val expected: Some[MultipleChoiceAnswer] = Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b")).toMap, List(MTurkWorker(""))))
+		Assert.assertEquals(expected, q.interpret(xml, ""))
 	}
 
 
@@ -84,8 +87,9 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
-			mtc.options.map(o => o -> (o == "b")).toMap)), q.interpret(xml, ""))
+		val expected: Some[MultipleChoiceAnswer] = Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b")).toMap, List(MTurkWorker(""))))
+		Assert.assertEquals(expected, q.interpret(xml, ""))
 	}
 
 
@@ -108,7 +112,8 @@ class MTQueryParsingTest {
 			</Answer>
 		</QuestionFormAnswers>
 
-		Assert.assertEquals(Some(MultipleChoiceAnswer(mtc,
-			mtc.options.map(o => o -> (o == "b\nb")).toMap)), q.interpret(xml, ""))
+		val exptected: Some[MultipleChoiceAnswer] = Some(MultipleChoiceAnswer(mtc,
+			mtc.options.map(o => o -> (o == "b\nb")).toMap, List(MTurkWorker(""))))
+		Assert.assertEquals(exptected, q.interpret(xml, ""))
 	}
 }
