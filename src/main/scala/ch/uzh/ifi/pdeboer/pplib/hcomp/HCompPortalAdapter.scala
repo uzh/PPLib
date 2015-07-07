@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.{QTNumberHITsApproved, QTPercentAssignmentsRejected}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.QualificationType.{QTLocale, QTNumberHITsApproved, QTPercentAssignmentsRejected}
 import ch.uzh.ifi.pdeboer.pplib.patterns.pruners.Prunable
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
@@ -79,7 +79,7 @@ trait HCompPortalAdapter extends LazyLogger {
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
 		val future: Future[Option[HCompAnswer]] = sendQuery(query, properties)
-		Await.result(future, 1 day)
+		Await.result(future, maxWaitTime)
 		future.value.get.get
 		/*
 		val (future, cancelQueryFuture) = U.interruptableFuture[Option[HCompAnswer]] { () =>
@@ -115,6 +115,37 @@ trait HCompPortalAdapter extends LazyLogger {
 	def cancelQuery(query: HCompQuery): Unit
 }
 
+private[hcomp] trait RejectableAnswer {
+	def answer: HCompAnswer
+
+	def reject(message: String): Boolean
+
+	def approve(message: String, bonusCents: Int): Boolean
+}
+
+trait AnswerRejection {
+	var unapprovedAnswers = scala.collection.mutable.HashMap.empty[HCompAnswer, RejectableAnswer]
+
+	def addUnapprovedAnswer(a: RejectableAnswer) = {
+		synchronized {
+			unapprovedAnswers += (a.answer -> a)
+		}
+	}
+
+	def rejectAnswer(ans: HCompAnswer, message: String = ""): Boolean = {
+		synchronized {
+			val a: Option[RejectableAnswer] = unapprovedAnswers.remove(ans)
+			a.map(_.reject(message)).getOrElse(false)
+		}
+	}
+
+	def approveAndBonusAnswer(ans: HCompAnswer, message: String = "", bonusCents: Int = 0): Boolean = {
+		synchronized {
+			val a: Option[RejectableAnswer] = unapprovedAnswers.remove(ans)
+			a.map(_.approve(message, bonusCents)).getOrElse(false)
+		}
+	}
+}
 
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
@@ -193,6 +224,8 @@ trait HCompAnswer extends Serializable with Prunable {
 	def processingTimeMillis: Long = submitTime.getOrElse(receivedTime).getMillis - acceptTime.getOrElse(postTime).getMillis
 
 	override def prunableDouble = processingTimeMillis.toDouble
+
+	override def hashCode(): Int = query.hashCode()
 }
 
 @SerialVersionUID(1l)
@@ -343,7 +376,7 @@ case class HCompJobCancelled(query: HCompQuery, responsibleWorkers: List[HCompWo
 case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
 
 object HCompQueryProperties {
-	val DEFAULT_QUALIFICATIONS = List(new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000)
+	val DEFAULT_QUALIFICATIONS = List(new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000, new QTLocale === "US")
 }
 
 trait HCompPortalBuilder {
@@ -369,3 +402,4 @@ trait HCompPortalBuilder {
 
 	def setParameter(param: String, value: String): Unit = _params += param -> value
 }
+

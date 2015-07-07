@@ -10,9 +10,11 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 19/11/14.
  */
-class MTurkManager(val service: MTurkService, val query: HCompQuery, val properties: HCompQueryProperties) extends LazyLogger {
+class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, val adapter: MechanicalTurkPortalAdapter) extends LazyLogger {
 	var hit = ""
 	var cancelled: Boolean = false
+
+	private val service = adapter.service
 
 	def waitForResponse() = {
 		val timer = new GrowingTimer(1 second, 1.0001, 20 seconds)
@@ -47,7 +49,7 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	/**
 	 * @return HIT ID
 	 */
-	def createHIT(): String = {
+	def createHIT(numAssignments: Int = 1): String = {
 		if (scala.xml.PCData(query.question).length > 1999)
 			logger.error("your question was longer than 1999 characters, which is not allowed by MTurk. Truncated the question to " + query.question.take(1999))
 		val mtQuery = MTQuery.convert(query)
@@ -61,8 +63,8 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 
 		val rnd = Math.abs(Random.nextInt()) + ""
 		val title: String = query.title.take(117 - rnd.length) + " [" + rnd + "]"
-		val hitTypeID = service.RegisterHITType(title, query.question, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], ONE_DAY, qualifications)
-		hit = service.CreateHIT(hitTypeID, new Question(mtQuery.xml), ONE_DAY, 1).HITId
+		val hitTypeID = service.RegisterHITType(title, query.question, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], 5 * ONE_DAY, qualifications)
+		hit = service.CreateHIT(hitTypeID, new Question(mtQuery.xml), ONE_DAY, numAssignments).HITId
 		hit
 	}
 
@@ -76,19 +78,18 @@ class MTurkManager(val service: MTurkService, val query: HCompQuery, val propert
 	}
 
 	def handleAssignmentResult(a: Assignment): Option[HCompAnswer] = {
-		try {
-			//We approve all assignments by default. Don't like rejections
-			service.ApproveAssignment(a)
-		}
-		catch {
-			case e: Exception => logger.error("could not approve assignment", e)
-		}
-
 		val xml = a.AnswerXML
-		val answer = MTQuery.convert(query).interpret(xml, a.WorkerId)
-		answer.map(answer => {
+		val convertedAnswer = MTQuery.convert(query).interpret(xml, a.WorkerId)
+		convertedAnswer.map(answer => {
 			answer.acceptTime = a.AcceptTime
 			answer.submitTime = a.SubmitTime
+
+			val ans: RejectableTurkAnswer = new RejectableTurkAnswer(a, answer, service)
+			if (adapter.approveAll)
+				ans.approve("")
+			else
+				adapter.addUnapprovedAnswer(ans)
+
 			answer
 		})
 	}

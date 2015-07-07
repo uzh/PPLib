@@ -11,7 +11,7 @@ import scala.collection.mutable
  * Created by pdeboer on 19/11/14.
  */
 @HCompPortal(builder = classOf[MechanicalTurkPortalBuilder], autoInit = true)
-class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true) extends HCompPortalAdapter with LazyLogger {
+class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, sandbox: Boolean = true, val approveAll: Boolean = true) extends HCompPortalAdapter with AnswerRejection with LazyLogger {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
@@ -21,7 +21,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		logger.info("registering query " + query.identifier)
-		val manager: MTurkManager = new MTurkManager(service, query, properties)
+		val manager: MTurkManager = new MTurkManager(query, properties, this)
 		map += query.identifier -> map.getOrElse(query.identifier, new MTurkQueries()).add(manager)
 		manager.createHIT()
 		manager.waitForResponse()
@@ -98,6 +98,28 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 		})
 	}
 
+}
+
+private[mturk] class RejectableTurkAnswer(a: Assignment, val answer: HCompAnswer, service: MTurkService) extends RejectableAnswer with LazyLogger {
+	def reject(message: String) = try {
+		service.RejectAssignment(a, message)
+		true
+	}
+	catch {
+		case e: Exception =>
+			logger.error("couldn't reject assignment", e)
+			false
+	}
+
+	def approve(message: String, bonusCents: Int = 0) = try {
+		service.ApproveAssignment(a, message)
+		true
+	}
+	catch {
+		case e: Exception =>
+			logger.error("couldn't approve assignment", e)
+			false
+	}
 }
 
 object MechanicalTurkPortalAdapter {
