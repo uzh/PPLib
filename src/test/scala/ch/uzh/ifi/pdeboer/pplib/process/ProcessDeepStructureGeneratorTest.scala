@@ -7,7 +7,7 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 10/10/14.
  */
-class ProcessCandidateGeneratorTest {
+class ProcessDeepStructureGeneratorTest {
 	@Test
 	def testSimpleCombination(): Unit = {
 		val list1 = List(new TestProcessPassable(1), new TestProcessPassable(2))
