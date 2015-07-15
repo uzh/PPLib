@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, PassableProcessParam}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinationVariant, RecombinationVariantProcessXMLExporter}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ProcessCandidate, RecombinationVariantProcessXMLExporter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
 
@@ -11,13 +11,13 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 28/11/14.
  */
-class RecombinationVariantProcessXMLExporterTest {
+class ProcessCandidateProcessXMLExporterTest {
 	@Test
 	def testStringListExport: Unit = {
 		val inputDataProcess: List[String] = List("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[List[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinationVariant(Map("testprocess" -> processType))
+		val variant = new ProcessCandidate(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -34,7 +34,7 @@ class RecombinationVariantProcessXMLExporterTest {
 		val inputDataProcess = Set("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[Set[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinationVariant(Map("testprocess" -> processType))
+		val variant = new ProcessCandidate(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
@@ -50,7 +50,7 @@ class RecombinationVariantProcessXMLExporterTest {
 		val inputDataProcess = List(1, 2, 3)
 		val outputDataProcess = 3
 		val processType = new PassableProcessWithRuns[List[Int], Integer](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinationVariant(Map("testprocess" -> processType))
+		val variant = new ProcessCandidate(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -68,7 +68,7 @@ class RecombinationVariantProcessXMLExporterTest {
 		val inputDataProcess = Map("key1" -> "value1", "key2" -> "value2")
 		val outputDataProcess = 3
 		val processType = new PassableProcessWithRuns[Map[String, String], Integer](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinationVariant(Map("testprocess" -> processType))
+		val variant = new ProcessCandidate(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -85,11 +85,11 @@ class RecombinationVariantProcessXMLExporterTest {
 		val inputDataProcess: List[String] = List("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[List[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinationVariant(Map("testprocess" -> processType))
+		val variant = new ProcessCandidate(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
-		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.RecombinationVariantProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
+		Assert.assertEquals("<Variant><ProcessExecutions><ProcessExecution><Name>testprocess</Name><Process><Class>ch.uzh.ifi.pdeboer.pplib.process.ProcessCandidateProcessXMLExporterTest$TestProcess</Class><InputClass>scala.collection.immutable.List</InputClass><OutputClass>java.lang.String</OutputClass><Parameters><Parameter><Name>memoizerName</Name><Value>None</Value><IsSpecified>false</IsSpecified></Parameter><Parameter><Name>storeExecutionResults</Name><Value>true</Value><IsSpecified>false</IsSpecified></Parameter></Parameters></Process><Results><Result><Input><List><Item>test1</Item><Item>test2</Item></List></Input><Output>result1</Output></Result></Results></ProcessExecution></ProcessExecutions></Variant>", U.removeWhitespaces(exporter.xml + ""))
 	}
 
 	private class PassableProcessWithRuns[IN, OUT](val runs: Map[IN, OUT])(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends PassableProcessParam[TestProcess[IN, OUT]]() {

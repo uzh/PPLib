@@ -4,7 +4,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
  * Created by pdeboer on 09/10/14.
  */
 
-class RecombinationRunner(subject: Recombinable[_], configurations: List[RecombinationVariant]) {
+class RecombinationRunner(subject: Recombinable[_], configurations: List[ProcessCandidate]) {
 	lazy val results = {
 		configurations.map(c => {
 			//TODO: more metrics
@@ -16,4 +16,4 @@ class RecombinationRunner(subject: Recombinable[_], configurations: List[Recombi
 	}
 }
 
-case class RecombinationResult(variant: RecombinationVariant, time: Double)
+case class RecombinationResult(variant: ProcessCandidate, time: Double)

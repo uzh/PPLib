@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HComp}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationSearchSpaceDefinition, RecombinationVariant}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationSearchSpaceDefinition, ProcessCandidate}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
 import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
 
@@ -10,12 +10,12 @@ import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
  * Created by pdeboer on 12/05/15.
  */
 class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[String] {
-	override def runRecombinedVariant(recombinationBlueprint: RecombinationVariant): String = {
+	override def runRecombinedVariant(processBlueprint: ProcessCandidate): String = {
 		//split the text to be shortened into it's paragraphs am memorize the index of every paragraph
 		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
 
 		//create an instance of the recombined process that's currently evaluated
-		val generatedShorteningProcess = recombinationBlueprint.createProcess[List[Patch], List[Patch]](
+		val generatedShorteningProcess = processBlueprint.createProcess[List[Patch], List[Patch]](
 			SHORTENER_PROCESS_KEY, forcedParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)
 		)
 
