@@ -14,14 +14,19 @@ class ProcessDeepStructure(val stubs: Map[String, PassableProcessParam[_]]) {
 
 	def created = procs
 
-	def createProcess[IN, OUT](key: String, lowerPrioParams: Map[String, Any] = Map.empty,
+	def createProcess[IN, OUT](key: String = "", lowerPrioParams: Map[String, Any] = Map.empty,
 							   forcedParams: Map[String, Any] = Map.empty): ProcessStub[IN, OUT] = {
-		val p = stubs(key).create(lowerPrioParams, forcedParams).asInstanceOf[ProcessStub[IN, OUT]]
+		val targetProcess: PassableProcessParam[_] = if (key == "" && stubs.size == 1) stubs.values.head else stubs(key)
+		val p = targetProcess.create(lowerPrioParams, forcedParams).asInstanceOf[ProcessStub[IN, OUT]]
 		stubs.synchronized {
 			procs = (key, p) :: procs
 		}
 		p
 	}
+
+	def costSoFar = ???
+
+	def durationSoFar = ???
 }
 
 class SimpleRecombinationVariantXMLExporter(val variant: ProcessDeepStructure) {
