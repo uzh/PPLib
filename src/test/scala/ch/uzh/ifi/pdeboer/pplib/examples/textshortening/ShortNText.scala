@@ -19,7 +19,7 @@ object ShortNText extends App {
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val results = recombinations.par.map(variant => {
-		(variant, surfaceStructure.runRecombinedVariant(variant))
+		(variant, surfaceStructure.runProcessCandidate(variant))
 	})
 
 	println("finished evaluation.")
