@@ -10,7 +10,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
  * Created by pdeboer on 12/05/15.
  */
 class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[String] {
-	override def runProcessCandidate(processBlueprint: ProcessDeepStructure): String = {
+	override def run(processBlueprint: ProcessDeepStructure): String = {
 		//split the text to be shortened into it's paragraphs am memorize the index of every paragraph
 		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
 

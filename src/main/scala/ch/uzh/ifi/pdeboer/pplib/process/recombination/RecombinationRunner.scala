@@ -10,7 +10,7 @@ class RecombinationRunner(subject: Recombinable[_], configurations: List[Process
 			//TODO: more metrics
 
 			val before = System.currentTimeMillis()
-			subject.runProcessCandidate(c)
+			subject.run(c)
 			RecombinationResult(c, System.currentTimeMillis() - before)
 		})
 	}
