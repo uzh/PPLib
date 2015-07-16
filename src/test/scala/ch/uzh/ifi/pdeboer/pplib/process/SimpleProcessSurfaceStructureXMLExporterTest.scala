@@ -7,7 +7,7 @@ import org.junit.{Assert, Test}
 /**
  * Created by pdeboer on 29/12/14.
  */
-class SimpleProcessDeepStructureXMLExporterTest {
+class SimpleProcessSurfaceStructureXMLExporterTest {
 	@Test
 	def recursionShouldWork: Unit = {
 		val exporter = new SimpleRecombinationVariantXMLExporter(null)

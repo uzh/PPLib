@@ -13,7 +13,7 @@ object ShortNText extends App {
 	val testData = new ShortNTestDataInitializer()
 	testData.initializePortal()
 
-	val surfaceStructure = new ShortNSurfaceStructure(testData.text)
+	val surfaceStructure = new ShortNDeepStructure(testData.text)
 
 	val recombinations = new Recombinator(surfaceStructure).recombine()
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")

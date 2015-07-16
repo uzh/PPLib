@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
+import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
+
 /**
  * Created by pdeboer on 05/12/14.
  */
@@ -57,6 +59,12 @@ class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializa
 	}
 
 	override def toString = value
+}
+
+object IndexedPatch {
+	def from(str: String, delimiter: String = "\n") = {
+		str.split(delimiter).zipWithIndex.map(s => new IndexedPatch(s._1, s._2, Some(StringWrapper(s._1))))
+	}
 }
 
 object PatchConversion {

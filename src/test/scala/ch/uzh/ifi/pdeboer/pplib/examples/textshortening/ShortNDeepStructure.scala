@@ -2,20 +2,24 @@ package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HComp}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationSearchSpaceDefinition, ProcessDeepStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationSearchSpaceDefinition, ProcessSurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
 import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
 
 /**
  * Created by pdeboer on 12/05/15.
  */
-class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[String] {
-	override def run(processBlueprint: ProcessDeepStructure): String = {
+case class ShortNResult(text: String, costInCents: Int, durationInSeconds: Int)
+
+class ShortNDeepStructure(textToBeShortened: String) extends Recombinable[String] {
+	override def run(processBlueprint: ProcessSurfaceStructure): String = {
 		//split the text to be shortened into it's paragraphs am memorize the index of every paragraph
 		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
 
+		type inputType = List[Patch]
+		type outputType = inputType
 		//create an instance of the recombined process that's currently evaluated
-		val generatedShorteningProcess = processBlueprint.createProcess[List[Patch], List[Patch]](
+		val generatedShorteningProcess = processBlueprint.createProcess[inputType, outputType](
 			SHORTENER_PROCESS_KEY, forcedParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)
 		)
 
@@ -27,7 +31,7 @@ class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[Str
 	}
 
 
-	override def defineRecombinationSearchSpace: Map[String, RecombinationSearchSpaceDefinition[_]] =
+	override def defineRecombinationSearchSpace = {
 		Map(SHORTENER_PROCESS_KEY -> RecombinationSearchSpaceDefinition[CreateProcess[_ <: List[Patch], _ <: List[Patch]]](
 			RecombinationHints.create(Map(
 				RecombinationHints.DEFAULT_HINTS -> {
@@ -37,7 +41,7 @@ class ShortNSurfaceStructure(textToBeShortened: String) extends Recombinable[Str
 				})
 			)
 		))
-
+	}
 	val SHORTENER_PROCESS_KEY: String = "shortener"
 
 	val HCOMP_PORTAL_TO_USE: HCompPortalAdapter = HComp(ShortNTestDataInitializer.TEST_PORTAL_KEY)
