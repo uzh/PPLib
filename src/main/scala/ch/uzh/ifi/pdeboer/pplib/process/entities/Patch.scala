@@ -63,8 +63,10 @@ class IndexedPatch(value: String, val index: Int, payload: Option[_ <: Serializa
 
 object IndexedPatch {
 	def from(str: String, delimiter: String = "\n") = {
-		str.split(delimiter).zipWithIndex.map(s => new IndexedPatch(s._1, s._2, Some(StringWrapper(s._1))))
+		IndexedPatch.from(str.split(delimiter).toList)
 	}
+
+	def from(l: List[String]) = l.zipWithIndex.map(s => new IndexedPatch(s._1, s._2, Some(StringWrapper(s._1))))
 }
 
 object PatchConversion {
