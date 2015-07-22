@@ -43,7 +43,7 @@ object HComp extends LazyLogger {
 			.asInstanceOf[Set[Class[HCompPortalAdapter]]]
 		val annotations = classes.map(_.getAnnotation(classOf[HCompPortal])).filter(a => a != null && a.autoInit)
 		val builders = annotations.map(_.builder().newInstance())
-		builders.foreach(b => {
+		builders.toList.sortBy(_.order).foreach(b => {
 			try {
 				b.loadConfig(config)
 				val portal: HCompPortalAdapter = b.build
