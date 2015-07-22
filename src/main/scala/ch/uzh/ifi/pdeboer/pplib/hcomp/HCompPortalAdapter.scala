@@ -391,11 +391,23 @@ object HCompQueryProperties {
 
 trait HCompPortalBuilder {
 	private var _params = collection.mutable.HashMap.empty[String, String]
+	val HCOMP_PREFIX = "hcomp."
+
+	def order = try {
+		U.getConfigString(portalConfigPrefix + "order").get.toInt
+	}
+	catch {
+		case e: Throwable => 0
+	}
+
+	def key: String
+
+	def portalConfigPrefix = HCOMP_PREFIX + key + "."
 
 	def loadConfig(config: Config): Unit = {
 		parameterToConfigPath.foreach {
 			case (parameter, configPath) =>
-				U.getConfigString(configPath) match {
+				U.getConfigString(portalConfigPrefix + configPath) match {
 					case Some(configValue) => setParameter(parameter, configValue)
 					case _ => {}
 				}

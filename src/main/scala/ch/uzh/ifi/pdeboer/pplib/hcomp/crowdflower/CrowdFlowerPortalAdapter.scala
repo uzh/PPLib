@@ -39,9 +39,9 @@ class CrowdFlowerPortalAdapter(val applicationName: String, val apiKey: String, 
 	}
 }
 object CrowdFlowerPortalAdapter {
-	val CONFIG_API_KEY = "hcomp.crowdflower.apikey"
-	val CONFIG_APPLICATION_NAME = "hcomp.crowdflower.applicationName"
-	val CONFIG_SANDBOX = "hcomp.crowdflower.sandbox"
+	val CONFIG_API_KEY = "apikey"
+	val CONFIG_APPLICATION_NAME = "applicationName"
+	val CONFIG_SANDBOX = "sandbox"
 
 	val PORTAL_KEY = "crowdFlower"
 }
@@ -56,6 +56,8 @@ class CrowdFlowerPortalBuilder extends HCompPortalBuilder {
 		APPLICATION_NAME -> CrowdFlowerPortalAdapter.CONFIG_APPLICATION_NAME,
 		SANDBOX -> CrowdFlowerPortalAdapter.CONFIG_SANDBOX
 	)
+
+	override def key = CrowdFlowerPortalAdapter.PORTAL_KEY
 
 	override def build: HCompPortalAdapter = new CrowdFlowerPortalAdapter(
 		params.getOrElse(APPLICATION_NAME, "PPLib Application"),

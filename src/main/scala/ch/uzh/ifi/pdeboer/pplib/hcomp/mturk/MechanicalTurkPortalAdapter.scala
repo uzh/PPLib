@@ -127,9 +127,9 @@ private[mturk] class RejectableTurkAnswer(a: Assignment, val answer: HCompAnswer
 }
 
 object MechanicalTurkPortalAdapter {
-	val CONFIG_ACCESS_ID_KEY = "hcomp.mturk.accessKeyID"
-	val CONFIG_SECRET_ACCESS_KEY = "hcomp.mturk.secretAccessKey"
-	val CONFIG_SANDBOX_KEY = "hcomp.mturk.sandbox"
+	val CONFIG_ACCESS_ID_KEY = "accessKeyID"
+	val CONFIG_SECRET_ACCESS_KEY = "secretAccessKey"
+	val CONFIG_SANDBOX_KEY = "sandbox"
 	val PORTAL_KEY = "mechanicalTurk"
 }
 
@@ -143,6 +143,8 @@ class MechanicalTurkPortalBuilder extends HCompPortalBuilder {
 		SECRET_ACCESS_KEY -> MechanicalTurkPortalAdapter.CONFIG_SECRET_ACCESS_KEY,
 		SANDBOX -> MechanicalTurkPortalAdapter.CONFIG_SANDBOX_KEY
 	)
+
+	override def key = MechanicalTurkPortalAdapter.PORTAL_KEY
 
 	override def build: HCompPortalAdapter = new MechanicalTurkPortalAdapter(
 		params(ACCESS_ID_KEY),
