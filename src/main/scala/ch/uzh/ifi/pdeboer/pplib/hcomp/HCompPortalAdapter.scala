@@ -383,7 +383,7 @@ case class HCompException(query: HCompQuery, exception: Throwable, responsibleWo
 case class HCompJobCancelled(query: HCompQuery, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
+case class HCompQueryProperties(var paymentCents: Int = 0, var cancelAndRepostAfter: Duration = 1 day, var qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
 
 object HCompQueryProperties {
 	val DEFAULT_QUALIFICATIONS = List(new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000, new QTLocale === "US")
