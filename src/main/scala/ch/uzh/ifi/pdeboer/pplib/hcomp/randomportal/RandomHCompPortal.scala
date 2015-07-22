@@ -56,11 +56,11 @@ class RandomHCompPortal(val param: String) extends HCompPortalAdapter {
 
 object RandomHCompPortal {
 	val PORTAL_KEY = "randomPortal"
-	val CONFIG_PARAM = "param"
+	val CONFIG_PARAM = "active"
 }
 
 class RandomPortalBuilder extends HCompPortalBuilder {
-	val PARAM_KEY = "param"
+	val PARAM_KEY = "active"
 
 	override def key = RandomHCompPortal.PORTAL_KEY
 
