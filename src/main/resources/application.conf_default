@@ -1,9 +1,6 @@
-{"hcomp": {
-  "crowdflower": {
-    "apikey" : "YOURKEY"
-  }
-},
-  "processes" : {
-    "auto_init_package" : "ch.uzh.ifi.pdeboer.pplib.test.stdlib2"
-  }
-}
+hcomp.crowdflower.apikey = "YOUR KEY"
+hcomp.crowdflower.sandbox = "true"
+hcomp.mturk.accessKeyID = "YOUR KEY"
+hcomp.mturk.secretAccessKey = "YOUR KEY"
+hcomp.mturk.sandbox = "true"
+hcomp.randomPortal.param = "true"
