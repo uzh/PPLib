@@ -10,7 +10,9 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 
-abstract class CreateProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params)
+abstract class CreateProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params) {
+	def dataSizeMultiplicator: Int = 1
+}
 
 abstract class DecideProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params)
 

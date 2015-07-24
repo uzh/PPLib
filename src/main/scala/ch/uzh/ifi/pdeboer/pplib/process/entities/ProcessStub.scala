@@ -74,7 +74,7 @@ object ProcessStub {
 		result
 	}
 
-	def getCostCeiling: Int = 0
+	def getCostCeiling(data: INPUT): Int = 0
 
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {

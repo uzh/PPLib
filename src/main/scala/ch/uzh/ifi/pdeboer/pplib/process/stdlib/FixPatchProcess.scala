@@ -34,7 +34,7 @@ class FixPatchProcess(params: Map[String, Any] = Map.empty) extends ProcessStub[
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(FIXER_PROCESS)
 
-	override def getCostCeiling: Int = FIXER_PROCESS.get.create().getCostCeiling
+	override def getCostCeiling(data: List[Patch]): Int = FIXER_PROCESS.get.create().getCostCeiling(data.head)
 }
 
 object FixPatchProcess {

@@ -23,7 +23,7 @@ class ContestWithMultipleEqualWinnersProcess(params: Map[String, Any] = Map.empt
 		res
 	}
 
-	override def getCostCeiling: Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
+	override def getCostCeiling(data: List[Patch]): Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(MAX_ITERATIONS, SHUFFLE_CHOICES, WORKER_COUNT, MAX_ITEMS_PER_ITERATION, THRESHOLD_MIN_WORKERS_TO_SELECT_ITEM)
 }

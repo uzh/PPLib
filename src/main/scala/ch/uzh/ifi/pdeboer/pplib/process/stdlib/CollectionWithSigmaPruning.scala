@@ -53,7 +53,9 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends C
 		override def prunableDouble: Double = freetextAnswer.prunableDouble
 	}
 
-	override def getCostCeiling: Int = WORKER_COUNT.get * QUESTION_PRICE.get.paymentCents
+	override def dataSizeMultiplicator = WORKER_COUNT.get
+
+	override def getCostCeiling(data: Patch): Int = WORKER_COUNT.get * QUESTION_PRICE.get.paymentCents
 	override def optionalParameters: List[ProcessParameter[_]] = List(PRUNE_TEXT_LENGTH, NUM_SIGMAS, WORKER_COUNT) ::: super.optionalParameters
 }
 

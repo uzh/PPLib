@@ -61,7 +61,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		new MultipleChoiceQuery(instructions.getInstructions(INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, instructionTitle)
 	}
 
-	override def getCostCeiling: Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
+	override def getCostCeiling(data: List[Patch]): Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
 
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K, INSTRUCTIONS_ITALIC)

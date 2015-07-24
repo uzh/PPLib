@@ -32,6 +32,12 @@ class CollectDecideProcess(_params: Map[String, Any] = Map.empty) extends Create
 		res
 	}
 
+	override def getCostCeiling(data: Patch) = {
+		val createProcess: CreateProcess[Patch, List[Patch]] = COLLECT.get.create()
+		val createOutputEstimate: List[Patch] = (1 to createProcess.dataSizeMultiplicator).map(l => data).toList
+		createProcess.getCostCeiling(data) + DECIDE.get.create().getCostCeiling(createOutputEstimate)
+	}
+
 	override def optionalParameters: List[ProcessParameter[_]] = List(FORWARD_PATCH_TO_DECIDE_MESSAGE, FORWARD_PATCH_TO_DECIDE_PARAMETER, FORWARD_PARAMS_TO_COLLECT, FORWARD_PARAMS_TO_DECIDE)
 }
 

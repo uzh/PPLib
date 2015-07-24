@@ -26,7 +26,7 @@ class IterativeRefinementProcess(params: Map[String, Any] = Map.empty) extends C
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(VOTING_PROCESS_TYPE, STRING_DIFFERENCE_THRESHOLD, TOLERATED_NUMBER_OF_ITERATIONS_BELOW_THRESHOLD, MAX_ITERATIONS)
 
-	override def getCostCeiling: Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
+	override def getCostCeiling(data: Patch): Int = MAX_ITERATIONS.get * VOTING_PROCESS_TYPE.get.create().getCostCeiling(List(data, data))
 }
 
 object IterativeRefinementProcess {
