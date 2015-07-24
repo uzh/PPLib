@@ -74,7 +74,10 @@ object ProcessStub {
 		result
 	}
 
-	def getCostCeiling(data: INPUT): Int = 0
+	def getCostCeiling(data: INPUT): Int = {
+		logger.info(s"No cost ceiling function implemented for ${getClass.getName}, returning zero-cost")
+		0
+	}
 
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {
