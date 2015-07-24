@@ -2,7 +2,6 @@ package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.StringQuestionRenderer
 import ch.uzh.ifi.pdeboer.pplib.patterns.{DPHCompDriverDefaultComparisonInstructionsConfig, DualPathWayDefaultHCompDriver, DualPathwayExecutor}
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 import scala.concurrent.duration.{Duration, _}
@@ -39,6 +38,7 @@ class DualPathwayProcess(params: Map[String, Any] = Map.empty[String, Any]) exte
 			QUESTION_NEW_PROCESSED_ELEMENT,
 			QUESTION_PER_PROCESSING_TASK,
 			QUESTION_PER_COMPARISON_TASK)
+
 }
 
 object DualPathwayProcess {

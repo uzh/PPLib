@@ -33,6 +33,9 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateP
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(FIND_PROCESS, FIX_PROCESS)
+
+	override def getCostCeiling: Int = FIND_PROCESS.get.create().getCostCeiling + FIX_PROCESS.get.create().getCostCeiling
+
 }
 
 object FindFixPatchProcess {

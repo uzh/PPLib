@@ -9,10 +9,7 @@ import scala.concurrent.duration._
  */
 object SingleQuestionExample extends App {
 	val links = List(
-		"https://uozdoe.qualtrics.com/SE/?SID=SV_3ItscLjT16PzqZf",
-		"https://uozdoe.qualtrics.com/SE/?SID=SV_3f6PCPM3QRhOHdz",
-		"https://uozdoe.qualtrics.com/SE/?SID=SV_1HxaVokvTI9r6nP",
-		"https://uozdoe.qualtrics.com/SE/?SID=SV_bD81ut5jF27Ytwh"
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQkB"
 	)
 	links.zipWithIndex.par.foreach(li => {
 		try {

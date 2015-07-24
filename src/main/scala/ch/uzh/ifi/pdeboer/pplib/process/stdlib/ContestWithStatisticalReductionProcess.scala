@@ -70,6 +70,9 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(CONFIDENCE_PARAMETER, SHUFFLE_CHOICES, MAX_ITERATIONS) ::: super.optionalParameters
+
+	override def getCostCeiling: Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
+
 }
 
 object ContestWithStatisticalReductionProcess {

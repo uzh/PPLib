@@ -21,4 +21,8 @@ class Recombinator(recombinable: Recombinable[_]) {
 
 		new RecombinationVariantGenerator(recombinations).variants
 	}
+
+	def getCostCeiling = {
+
+	}
 }

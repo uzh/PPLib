@@ -62,6 +62,7 @@ object ProcessStub {
 
 	def results: Map[INPUT, OUTPUT] = _results.toMap
 
+
 	def process(data: INPUT): OUTPUT = {
 		ensureExpectedParametersGiven(expectedParametersBeforeRun)
 
@@ -72,6 +73,8 @@ object ProcessStub {
 
 		result
 	}
+
+	def getCostCeiling: Int = 0
 
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {

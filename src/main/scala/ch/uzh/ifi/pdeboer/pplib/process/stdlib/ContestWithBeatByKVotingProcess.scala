@@ -1,7 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.process._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 import scala.collection.mutable
@@ -61,6 +60,9 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
 		new MultipleChoiceQuery(instructions.getInstructions(INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, instructionTitle)
 	}
+
+	override def getCostCeiling: Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
+
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K, INSTRUCTIONS_ITALIC)
 }

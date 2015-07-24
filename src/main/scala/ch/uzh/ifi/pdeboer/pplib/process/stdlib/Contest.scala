@@ -53,4 +53,7 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 
 	override def optionalParameters: List[ProcessParameter[_]] =
 		List(WORKER_COUNT) ::: super.optionalParameters
+
+	override def getCostCeiling: Int = WORKER_COUNT.get * QUESTION_PRICE.get.paymentCents
+
 }

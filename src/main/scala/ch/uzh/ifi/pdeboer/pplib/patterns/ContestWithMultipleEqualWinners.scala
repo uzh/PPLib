@@ -2,10 +2,10 @@ package ch.uzh.ifi.pdeboer.pplib.patterns
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners.PatchContainer
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{NoProcessMemoizer, ProcessMemoizer, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{NoProcessMemoizer, Patch, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
-import scala.collection.parallel.{ParSet, ForkJoinTaskSupport}
+import scala.collection.parallel.{ForkJoinTaskSupport, ParSet}
 import scala.util.Random
 import scala.xml.NodeSeq
 
@@ -15,8 +15,8 @@ import scala.xml.NodeSeq
 @SerialVersionUID(1L) class ContestWithMultipleEqualWinners(data: List[Patch], question: QuestionRenderer,
 															title: String, findersPerItem: Int, shuffle: Boolean,
 															@transient val portal: HCompPortalAdapter, maxItemsPerFind: Int = 5,
-															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None, pricePerVote: HCompQueryProperties = new HCompQueryProperties()
-															   ) {
+															@transient val memoizer: ProcessMemoizer = new NoProcessMemoizer(), questionAux: Option[NodeSeq] = None, pricePerVote: HCompQueryProperties = new HCompQueryProperties(),
+															maxIterations: Int = 20) {
 	val patches: List[PatchContainer] = data.map(p => new PatchContainer(p))
 
 	def getPatches(maxToInclude: Int) = {
@@ -30,7 +30,7 @@ import scala.xml.NodeSeq
 	protected lazy val selectionIterations = {
 		var iterations: List[List[PatchContainer]] = Nil
 
-		while (patches.map(_.displays).sum < patches.size * findersPerItem) {
+		while (patches.map(_.displays).sum < patches.size * findersPerItem && iterations.length < maxIterations) {
 			val patches = getPatches(maxItemsPerFind)
 			patches.synchronized {
 				patches.foreach(p => p.displays += 1)
