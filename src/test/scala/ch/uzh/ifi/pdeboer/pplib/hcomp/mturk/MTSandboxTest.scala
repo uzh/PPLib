@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.examples.SurveyResult
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
+import org.junit.Test
 
 /**
  * Created by pdeboer on 21/11/14.
@@ -12,6 +13,16 @@ class MTSandboxTest {
 		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(FreetextQuery("what's your name? <b>nothing much</b>"), HCompQueryProperties(5))
 		val answer = r.get.is[FreetextAnswer]
 		println(answer.answer)
+	}
+
+	//@Test
+	def testSendManyTextBoxQuestions: Unit = {
+		import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+		(1 to 10).mpar.foreach(i => {
+			val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(FreetextQuery("what's your name? <b>nothing much</b>"), HCompQueryProperties(5))
+			val answer = r.get.is[FreetextAnswer]
+			println(answer.answer)
+		})
 	}
 
 	//@Test

@@ -8,10 +8,17 @@ import scala.concurrent.duration._
  * Created by pdeboer on 26/06/15.
  */
 object SingleQuestionExample extends App {
+
+	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 	val links = List(
-		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQkB"
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQkB",
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQk2",
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQk4",
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQk5B",
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQ6",
+		"https://uozdoe.qualtrics.com/SE/?SID=SV_7V9P7lP1xPXhQ7"
 	)
-	links.zipWithIndex.par.foreach(li => {
+	links.zipWithIndex.mpar.foreach(li => {
 		try {
 			val l = li._1
 			println("Asking about " + l)
