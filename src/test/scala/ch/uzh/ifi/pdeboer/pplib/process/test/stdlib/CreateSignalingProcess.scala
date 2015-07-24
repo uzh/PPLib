@@ -11,8 +11,12 @@ import scala.reflect.ClassTag
 
 import scala.reflect.runtime.universe._
 
+trait ParamOverridenCostCeiling {
+	self: ProcessStub[_, _] =>
+	def defaultCostCeiling: Int = params.getOrElse("OverrideCostCeiling", "1").toString.toInt
+}
 
-class CreateSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends CreateProcess[IN, OUT](params) {
+class CreateSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends CreateProcess[IN, OUT](params) with ParamOverridenCostCeiling {
 	var called: Boolean = false
 
 	override protected def run(data: IN): OUT = {
@@ -21,6 +25,8 @@ class CreateSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(impl
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(CreateSignalingProcess.OUTPUT)
+
+	override def getCostCeiling(data: IN): Int = defaultCostCeiling
 }
 
 object CreateSignalingProcess {
@@ -36,7 +42,7 @@ class CreateSignalingProcessFactory[IN, OUT]()(implicit inputClass: ClassTag[IN]
 	}
 }
 
-class DecideSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends DecideProcess[IN, OUT](params) {
+class DecideSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(implicit inputClass: ClassTag[IN], outputClass: ClassTag[OUT], inputType1: TypeTag[IN], outputType1: TypeTag[OUT]) extends DecideProcess[IN, OUT](params) with ParamOverridenCostCeiling {
 	var called: Boolean = false
 
 	override protected def run(data: IN): OUT = {
@@ -45,6 +51,9 @@ class DecideSignalingProcess[IN, OUT](params: Map[String, Any] = Map.empty)(impl
 	}
 
 	override def expectedParametersBeforeRun: List[ProcessParameter[_]] = List(DecideSignalingProcess.OUTPUT)
+
+	override def getCostCeiling(data: IN): Int = defaultCostCeiling
+
 }
 
 object DecideSignalingProcess {

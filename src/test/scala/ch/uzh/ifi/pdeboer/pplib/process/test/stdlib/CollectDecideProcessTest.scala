@@ -2,9 +2,9 @@ package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, PassableProcessParam}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{PassableProcessParam, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.CollectDecideProcess
-import org.junit.{Before, Assert, Test}
+import org.junit.{Assert, Before, Test}
 
 /**
  * Created by pdeboer on 05/12/14.
@@ -19,18 +19,32 @@ class CollectDecideProcessTest {
 	}
 
 
+	private val data: Patch = new Patch("test")
+
 	@Test
 	def testEachProcessIsCalled: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
-		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
+		val cd: CollectDecideProcess = new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d))
+		cd.process(data)
 		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 
 	@Test
+	def testCostCeiling: Unit = {
+		val (c, d) = (collectProcess, decideProcess)
+		val cd: CollectDecideProcess = new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d))
+
+		Assert.assertEquals(1, c.createdProcesses.head.getCostCeiling(data))
+		Assert.assertEquals(1, d.createdProcesses.head.getCostCeiling(List(data)))
+
+		Assert.assertEquals(2, cd.getCostCeiling(data))
+	}
+
+	@Test
 	def testDefaultParam: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
-		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(new Patch("test"))
+		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(data)
 		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
