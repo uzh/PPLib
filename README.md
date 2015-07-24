@@ -7,7 +7,7 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 
 2. Install PPLib on your system. In Terminal: `cd PPLib && sbt publish-local`
 
-3. In the `build.sbt` file of your SBT-enabled application, add the PPLib dependency: `libraryDependencies += "pdeboer" %% "pplib" % "0.1-SNAPSHOT"`
+3. In the `build.sbt` file of your SBT-enabled application, add the PPLib dependency: `libraryDependencies += "pdeboer" %% "pplib" % "0.1-SNAPSHOT"`. You can find an example `build.sbt` file [here](https://github.com/pdeboer/PPLibBallotConnector/blob/master/build.sbt)
 
 4. If you don't have one yet, add an `application.conf` file in your target application in the `resources` folder and configure your access code to the human computation portals you'd like to use. An example configuration file can be found [here](https://github.com/pdeboer/PPLib/blob/master/src/main/resources/application.conf_default)
 
