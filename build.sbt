@@ -27,7 +27,7 @@ resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositori
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
-//mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.statsexample.GetCrowdAnswersForQuestions")
+//mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.singlequestion.MTurkCountWorkers")
 
 // To Skip Tests:
 //test in assembly := {}
