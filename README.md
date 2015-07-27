@@ -7,13 +7,19 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 
 2. Install PPLib on your system. In Terminal: `cd PPLib && sbt publish-local`
 
-3. In the `build.sbt` file of your SBT-enabled application, add the PPLib dependency: `libraryDependencies += "pdeboer" %% "pplib" % "0.1-SNAPSHOT"`. You can find an example `build.sbt` file [here](https://github.com/pdeboer/PPLibBallotConnector/blob/master/build.sbt)
+3. In the `build.sbt` file of your SBT-enabled application, add the PPLib dependency: `libraryDependencies += "pdeboer" %% "pplib" % "0.1-SNAPSHOT"`. You can find an example `build.sbt` file (with other dependencies as well) [here](https://github.com/pdeboer/PPLibBallotConnector/blob/master/build.sbt)
 
 4. If you don't have one yet, add an `application.conf` file in your target application in the `resources` folder and configure your access code to the human computation portals you'd like to use. An example configuration file can be found [here](https://github.com/pdeboer/PPLib/blob/master/src/main/resources/application.conf_default)
 
 # Examples
-* [Simple example for an interaction with a crowd workers (without using processes or recombination)](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala)
-* [Full Recombination example](https://github.com/pdeboer/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening).
+## Simple example 
+Please find a very simple example that doesn't use Recombination or Crowd Processes at all [here](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala). 
+It will show you how crowd processes are dealing with human computation portals, i.e. how they ask for information and work with their results. 
+
+## Simple Crowd Process (Collection)
+The Collection process is very simple: It just asks a specific 
+
+* [Full Recombination example](https://github.com/pdeboer/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening). 
  
 # Guides
 * [How to run the Recombinator](https://github.com/pdeboer/PPLib/blob/master/docs/recombination.md)
