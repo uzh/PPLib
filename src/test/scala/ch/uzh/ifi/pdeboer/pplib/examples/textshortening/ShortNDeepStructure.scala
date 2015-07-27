@@ -1,38 +1,39 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HComp}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{Recombinable, RecombinationHints, RecombinationSearchSpaceDefinition, ProcessSurfaceStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
-import ch.uzh.ifi.pdeboer.pplib.util.StringWrapper
 
 /**
  * Created by pdeboer on 12/05/15.
  */
-case class ShortNResult(text: String, costInCents: Int, durationInSeconds: Int)
+case class ShortNResult(text: String, costInCents: Int, durationInSeconds: Int) extends Comparable[ShortNResult] {
+	override def compareTo(o: ShortNResult): Int = -1 * text.length.compareTo(o.text.length)
+}
 
-class ShortNDeepStructure(textToBeShortened: String) extends Recombinable[String] {
-	override def run(processBlueprint: ProcessSurfaceStructure): String = {
+class ShortNDeepStructure extends SimpleDeepStructure[String, ShortNResult] {
+	override def run(data: String, blueprint: RecombinedProcessBlueprints): ShortNResult = {
 		//split the text to be shortened into it's paragraphs am memorize the index of every paragraph
-		val paragraphs: List[IndexedPatch] = textToBeShortened.split("\n").zipWithIndex.map(p => new IndexedPatch(p._1, p._2, Some(StringWrapper(p._1)))).toList
+		val paragraphs: List[IndexedPatch] = IndexedPatch.from(data)
 
 		type inputType = List[Patch]
 		type outputType = inputType
+
 		//create an instance of the recombined process that's currently evaluated
-		val generatedShorteningProcess = processBlueprint.createProcess[inputType, outputType](
-			SHORTENER_PROCESS_KEY, forcedParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs)
-		)
+		val generatedShorteningProcess = blueprint.createProcess[inputType, outputType](forcedParams = Map(FixPatchProcess.ALL_DATA.key -> paragraphs))
 
 		//run this process and get resulting, shortened text
 		val result: List[Patch] = generatedShorteningProcess.process(paragraphs)
 
 		//return the result
-		result.mkString("\n")
+		ShortNResult(result.mkString("\n"), generatedShorteningProcess.costSoFar, generatedShorteningProcess.durationSoFar)
 	}
 
+	val HCOMP_PORTAL_TO_USE: HCompPortalAdapter = HComp(ShortNTestDataInitializer.TEST_PORTAL_KEY)
 
-	override def defineRecombinationSearchSpace = {
-		Map(SHORTENER_PROCESS_KEY -> RecombinationSearchSpaceDefinition[CreateProcess[_ <: List[Patch], _ <: List[Patch]]](
+	override def defineSimpleRecombinationSearchSpace: RecombinationSearchSpaceDefinition[_ <: ProcessStub[_, _]] =
+		RecombinationSearchSpaceDefinition[CreateProcess[_ <: List[Patch], _ <: List[Patch]]](
 			RecombinationHints.create(Map(
 				RecombinationHints.DEFAULT_HINTS -> {
 					RecombinationHints.hcompPlatform(List(HCOMP_PORTAL_TO_USE)) :::
@@ -40,9 +41,5 @@ class ShortNDeepStructure(textToBeShortened: String) extends Recombinable[String
 							new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
 				})
 			)
-		))
-	}
-	val SHORTENER_PROCESS_KEY: String = "shortener"
-
-	val HCOMP_PORTAL_TO_USE: HCompPortalAdapter = HComp(ShortNTestDataInitializer.TEST_PORTAL_KEY)
+		)
 }

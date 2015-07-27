@@ -8,7 +8,7 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 09/10/14.
  */
-class ProcessSurfaceStructure(val stubs: Map[String, PassableProcessParam[_]]) {
+class RecombinedProcessBlueprints(val stubs: Map[String, PassableProcessParam[_]]) {
 	var name: Option[String] = None
 	private var procs: List[(String, ProcessStub[_, _])] = Nil
 
@@ -23,13 +23,9 @@ class ProcessSurfaceStructure(val stubs: Map[String, PassableProcessParam[_]]) {
 		}
 		p
 	}
-
-	def costSoFar = ???
-
-	def durationSoFar = ???
 }
 
-class SimpleRecombinationVariantXMLExporter(val variant: ProcessSurfaceStructure) {
+class SimpleRecombinationVariantXMLExporter(val variant: RecombinedProcessBlueprints) {
 	def passableToXML(passableProcessParam: PassableProcessParam[_], maxRecursions: Int = 4): NodeSeq =
 		<ProcessDef>
 			<Class>
@@ -62,7 +58,7 @@ class SimpleRecombinationVariantXMLExporter(val variant: ProcessSurfaceStructure
 	</ProcessClasses>
 }
 
-class RecombinationVariantProcessXMLExporter(val variant: ProcessSurfaceStructure, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
+class RecombinationVariantProcessXMLExporter(val variant: RecombinedProcessBlueprints, val processResultExporters: List[ProcessResultXMLExporter[_]] = List(new MapExporter(), new ListExporter(), new SetExporter())) {
 	def xml: NodeSeq = <Variant>
 		{variant.name match {
 			case Some(x: String) => <Name>

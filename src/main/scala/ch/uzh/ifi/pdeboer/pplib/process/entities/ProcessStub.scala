@@ -79,6 +79,10 @@ object ProcessStub {
 		0
 	}
 
+	def costSoFar = 0 //TODO implement
+
+	def durationSoFar = 0 //TODO implement
+
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {
 			case Some(v) => isParameterTypeCorrect(k.key, v)

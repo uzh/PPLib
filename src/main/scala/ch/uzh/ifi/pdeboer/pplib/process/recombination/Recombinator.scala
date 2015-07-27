@@ -8,8 +8,8 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 27/05/15.
  */
-class Recombinator(recombinable: Recombinable[_]) {
-	def recombine() = {
+class Recombinator[INPUT, OUTPUT <: Comparable[OUTPUT]](recombinable: DeepStructure[INPUT, OUTPUT]) {
+	lazy val variants = {
 		val recombinations = recombinable.defineRecombinationSearchSpace.par.map {
 			case (key, value) => {
 				val tpeTag = value.typeTag.asInstanceOf[TypeTag[ProcessStub[_, _]]]
@@ -22,7 +22,11 @@ class Recombinator(recombinable: Recombinable[_]) {
 		new RecombinationVariantGenerator(recombinations).variants
 	}
 
-	def getCostCeiling = {
+	def recombine() = {
+		variants.map(v => new SurfaceStructure(recombinable, v))
+	}
 
+	def getCostCeiling(data: Any): Int = {
+		variants.map(_.createProcess().getCostCeiling(data)).sum
 	}
 }

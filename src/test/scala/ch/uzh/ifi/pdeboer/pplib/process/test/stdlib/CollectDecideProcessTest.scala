@@ -34,6 +34,7 @@ class CollectDecideProcessTest {
 	def testCostCeiling: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
 		val cd: CollectDecideProcess = new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d))
+		cd.process(data)
 
 		Assert.assertEquals(1, c.createdProcesses.head.getCostCeiling(data))
 		Assert.assertEquals(1, d.createdProcesses.head.getCostCeiling(List(data)))
@@ -45,8 +46,8 @@ class CollectDecideProcessTest {
 	def testDefaultParam: Unit = {
 		val (c, d) = (collectProcess, decideProcess)
 		new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d)).process(data)
-		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
-		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(c.createdProcesses.head.asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(d.createdProcesses.head.asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 
 	def collectProcess = new PassableProcessParam[CreateSignalingProcess[Patch, List[Patch]]](Map(CreateSignalingProcess.OUTPUT.key -> List("a", "b").map(l => new Patch(l))), Some(new CreateSignalingProcessFactory()))
