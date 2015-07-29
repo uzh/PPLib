@@ -51,7 +51,7 @@ Portals can tie an annotation `@HCompPortal` to themselves, which will make them
  
  ` hcomp.simplePortal.answerToEveryQuestion = "Hodor" `
  
- ## Configuring MTurk and CrowdFlower
+## Configuring MTurk and CrowdFlower
  
  There is an [example application.conf file](https://github.com/pdeboer/PPLib/blob/master/src/main/resources/application.conf_default), that shows the available keys. It can just be copied into the classpath and then be renamed to `application.conf`. Alternatively, one can put the actual credentials in there right away and run `sbt publish-local` to store them in the local repo. 
  
