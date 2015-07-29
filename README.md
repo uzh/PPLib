@@ -12,6 +12,8 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 
 4. If you don't have one yet, add an `application.conf` file in your target application in the `resources` folder and configure your access code to the human computation portals you'd like to use. An example configuration file can be found [here](https://github.com/pdeboer/PPLib/blob/master/src/main/resources/application.conf_default)
 
+Please find a step-by-step guide in our [screencast](https://youtu.be/6sA6X9QRK-w)
+
 # How-to
 In order to get familiar with PPLib, we recommend the following steps:
 
