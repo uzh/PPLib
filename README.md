@@ -15,7 +15,7 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 # How-to
 In order to get familiar with PPLib, we recommend the following steps:
 
-1. Read how to formulate simple questions to crowd workers and act upon their responses [here](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala). 
+1. Read how to formulate simple questions to crowd workers and act upon their responses by looking at [this simple code](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala). 
 
 2. Learn how to aggregate simple question-answer routines into processes by following the narrated guide on [Crowd Processes](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md). This will also teach you how the parameter system works and how to create instances of existing processes for your application
 
