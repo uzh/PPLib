@@ -2,7 +2,8 @@
 PPLib People Programming LIBrary: Easily find the best Crowdsourcing process for your application
 
 # Setup
-Before setting up PPLib, please install [Java 8](https://www.java.com/en/download/help/download_options.xml), [sbt](http://www.scala-sbt.org/release/tutorial/Setup.html) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on your system. 
+Before setting up PPLib, please install [Java 8](https://www.java.com/en/download/help/download_options.xml), [sbt](http://www.scala-sbt.org/release/tutorial/Setup.html) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on your system.
+ 
 1. Download PPLib onto your machine. In Terminal, type `git clone https://github.com/pdeboer/PPLib`
 
 2. Install PPLib on your system. In Terminal: `cd PPLib && sbt publish-local`
