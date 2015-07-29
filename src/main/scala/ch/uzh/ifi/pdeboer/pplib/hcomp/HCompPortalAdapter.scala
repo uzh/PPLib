@@ -137,14 +137,14 @@ trait AnswerRejection {
 	def rejectAnswer(ans: HCompAnswer, message: String = ""): Boolean = {
 		synchronized {
 			val a: Option[RejectableAnswer] = unapprovedAnswers.remove(ans)
-			a.map(_.reject(message)).getOrElse(false)
+			a.exists(_.reject(message))
 		}
 	}
 
 	def approveAndBonusAnswer(ans: HCompAnswer, message: String = "", bonusCents: Int = 0): Boolean = {
 		synchronized {
 			val a: Option[RejectableAnswer] = unapprovedAnswers.remove(ans)
-			a.map(_.approve(message, bonusCents)).getOrElse(false)
+			a.exists(_.approve(message, bonusCents))
 		}
 	}
 }

@@ -12,19 +12,18 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 4. If you don't have one yet, add an `application.conf` file in your target application in the `resources` folder and configure your access code to the human computation portals you'd like to use. An example configuration file can be found [here](https://github.com/pdeboer/PPLib/blob/master/src/main/resources/application.conf_default)
 
 # How-to
-## Examples
-### Simple example on how to interact with Portals (MTurk / CrowdFlower)
-Please find a very simple example that doesn't use Recombination or Crowd Processes at all [here](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala). 
-This example shows you how to ask crowd workers questions and how to act upon their answers. 
+In order to get familiar with PPLib, we recommend the following steps:
 
-### A Simple Crowd Process 
-The `Collection process` is very simple: It just asks a specific number of people the same question. You can find the collection class, that gets used in PPLib [here](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/stdlib/Collection.scala)
+1. Read how to formulate simple questions to crowd workers and act upon their responses [here](https://github.com/pdeboer/PPLib/blob/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/Survey.scala). 
 
-### Recombination
-Recombination is used to generate all possible implementations of a crowd task as specified by its deep structure.
-You can find a full Recombination example [here](https://github.com/pdeboer/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening). Take a look at the callable Main class `ShortNText` first to see how everything fits together.  
+2. Learn how to aggregate simple question-answer routines into processes by following the narrated guide on [Crowd Processes](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md). This will also teach you how the parameter system works and how to create instances of existing processes for your application
  
-## Guides
+3. Learn how to use Recombination to find the best solution to your problem by following this guide: [How to run the Recombinator](https://github.com/pdeboer/PPLib/blob/master/docs/recombination.md)
+
+4. Learn how to use instruction generation by following this guide: [How to use question generation](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md)
+
+Other guides include
+
 * [Crowd Processes](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md)
 * [How to run the Recombinator](https://github.com/pdeboer/PPLib/blob/master/docs/recombination.md)
 * [How to create a new HComp Portal](https://github.com/pdeboer/PPLib/blob/master/docs/hcompportal.md)
