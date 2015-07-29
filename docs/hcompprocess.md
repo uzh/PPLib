@@ -78,7 +78,6 @@ In the code below, the following steps will happen:
   1.2 We create a query where crowd workers can answer in freetext using these instructions and store it in the `query` variable
   
   1.3 We send the query to our portal (mixed in by the `HCompPortalAccess` trait) and wait for it to give us a response. (Happens synchronously, but in parallel)
-  
   1.4 We return the answer into the answers field
   
 2. We then create new patches that are based on the supplied patch (called `line`) and add the crowd worker answers to them. These are then returned
