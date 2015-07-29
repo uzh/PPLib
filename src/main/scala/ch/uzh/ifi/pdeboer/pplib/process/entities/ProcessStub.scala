@@ -103,6 +103,8 @@ object ProcessStub {
 		ret
 	}
 
+	def processInstructionGenerator: Option[InstructionGenerator] = None
+
 	def allParams: List[ProcessParameter[_]] = {
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun :::
 			optionalParameters ::: defaultParameters

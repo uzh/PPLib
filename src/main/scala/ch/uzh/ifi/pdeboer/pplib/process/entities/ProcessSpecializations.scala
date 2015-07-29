@@ -12,9 +12,13 @@ import scala.reflect.runtime.universe._
 
 abstract class CreateProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params) {
 	def dataSizeMultiplicator: Int = 1
+
+	override def processInstructionGenerator: Option[InstructionGenerator] = Some(new SimpleInstructionGeneratorCreate())
 }
 
-abstract class DecideProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params)
+abstract class DecideProcess[INPUT, OUTPUT](params: Map[String, Any])(implicit inputClass: ClassTag[INPUT], outputClass: ClassTag[OUTPUT], inputType1: TypeTag[INPUT], outputType1: TypeTag[OUTPUT]) extends ProcessStub[INPUT, OUTPUT](params) {
+	override def processInstructionGenerator: Option[InstructionGenerator] = Some(new SimpleInstructionGeneratorDecide())
+}
 
 trait ProcessFactory[BASE <: ProcessStub[_, _]] {
 	def buildProcess(params: Map[String, Any] = Map.empty): BASE = typelessBuildProcess(params).asInstanceOf[BASE]
@@ -68,18 +72,11 @@ trait InstructionHandler extends IParametrizable {
 	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))
 
 	def instructionGenerator: InstructionGenerator = {
-		val generator = self.getParam(OVERRIDE_INSTRUCTION_GENERATOR) match {
-			case None => defaultInstructionGenerator.get //TODO yep, this is horrible
-			case Some(x: InstructionGenerator) => x
-		}
-		generator
+		self.getParam(OVERRIDE_INSTRUCTION_GENERATOR).getOrElse(defaultInstructionGenerator)
 	}
 
-	def defaultInstructionGenerator: Option[InstructionGenerator] = self match {
-		case x: CreateProcess[_, _] => Some(new SimpleInstructionGeneratorCreate())
-		case x: DecideProcess[_, _] => Some(new SimpleInstructionGeneratorDecide())
-		case _ => None
-	}
+	def defaultInstructionGenerator: InstructionGenerator =
+		self.processInstructionGenerator.get
 
 	override def defaultParameters: List[ProcessParameter[_]] = {
 		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE), super.defaultParameters)
@@ -94,7 +91,7 @@ trait InstructionHandler extends IParametrizable {
 
 			/**
 			 * AbstractMethodError occurs if class extends existing class with this trait, hence
-			 * trait is applied multiple times in a row
+			 * trait is applied multiple times in a row. This is ok and expected
 			 */
 		}
 		combineParameterLists(List(INSTRUCTIONS), superParam)

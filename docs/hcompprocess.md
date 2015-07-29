@@ -93,8 +93,7 @@ In the code below, the following steps will happen:
                 val instr: String = instructions.getInstructions(line + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
                 val mainQuery: FreetextQuery = FreetextQuery(
                     instr, "", instructionTitle + w + "_" + Math.abs(Random.nextInt()))
-                val query = createComposite(mainQuery)
-                portal.sendQueryAndAwaitResult(query, QUESTION_PRICE.get).is[FreetextAnswer].answer
+                portal.sendQueryAndAwaitResult(mainQuery, QUESTION_PRICE.get).is[FreetextAnswer].answer
 		    }	
         }).toList
         answers.map(a => line.duplicate(a))
