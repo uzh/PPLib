@@ -68,12 +68,13 @@ You will see an example of how to create an instance of a crowd process in step 
 ###Step 3: Implement the run-method. Or: Getting to work
 Every process has a purpose. This purpose is implemented in the `run` method of the process. Here, we will provide a simplified implementation of the one present in the actual implementation that doesn't use QueryInjection. 
 In the code below, the following steps will happen: 
+
 1. For every crowd worker we ask the following query and put it into the `answers` variable within a List:
-    1.0 We initialize the Memoizer that is responsible for inexpensive crash & rerun (If the process execution crashes, it will return from the last state that we have surrounded with an `memoizer.mem()` statement after we have fixed the problem and rerun the application)
-    1.1 We construct our precise worker instructions using the _InstructionHandler_ Trait ([learn more here](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md))
-    1.2 We create a query where crowd workers can answer in freetext using these instructions and store it in the `query` variable
-    1.3 We send the query to our portal (mixed in by the `HCompPortalAccess` trait) and wait for it to give us a response. (Happens synchronously, but in parallel)
-    1.4 We return the answer into the answers field
+  1.0 We initialize the Memoizer that is responsible for inexpensive crash & rerun (If the process execution crashes, it will return from the last state that we have surrounded with an `memoizer.mem()` statement after we have fixed the problem and rerun the application)
+  1.1 We construct our precise worker instructions using the _InstructionHandler_ Trait ([learn more here](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md))
+  1.2 We create a query where crowd workers can answer in freetext using these instructions and store it in the `query` variable
+  1.3 We send the query to our portal (mixed in by the `HCompPortalAccess` trait) and wait for it to give us a response. (Happens synchronously, but in parallel)
+  1.4 We return the answer into the answers field
 2. We then create new patches that are based on the supplied patch (called `line`) and add the crowd worker answers to them. These are then returned
 
 ```scala
