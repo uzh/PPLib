@@ -25,7 +25,7 @@ Recombination is used to generate all possible implementations of a crowd task a
 You can find a full Recombination example [here](https://github.com/pdeboer/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening). Take a look at the callable Main class `ShortNText` first to see how everything fits together.  
  
 ## Guides
-* [How to create a new crowd process](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md)
+* [Crowd Processes](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md)
 * [How to run the Recombinator](https://github.com/pdeboer/PPLib/blob/master/docs/recombination.md)
 * [How to create a new HComp Portal](https://github.com/pdeboer/PPLib/blob/master/docs/hcompportal.md)
 * [How to use question generation](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md)

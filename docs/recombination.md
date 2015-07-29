@@ -111,7 +111,8 @@ class ShortNDeepStructure extends SimpleDeepStructure[String, ShortNResult] {
 (iii) After specifying the formula to generate instructions for crowd workers, we use this formula as our only default parameter and (iv) construct the search space using instructions and our target type definition. 
 
 ###STEP 3 – Choice: Recombination and Auto-Experimentation. 
-This is the step that brings it all together: In the executable Main class of our PPLib project, (i) we first create an instance of the deep structure as specified in step 1. (ii) The deep structure is then passed to the Recombinator who uses it to generate surface structures of our process, i.e. concrete implementations. (iii) Lastly, the surface structures are supplied to the auto experimentation engine and executed there. The auto experimentation engine uses the utility function as defined in step 1 to determine the best performing process among all the surface structures. 
+This is the step that brings it all together: In the executable Main class of our PPLib project, (i) we first create an instance of the deep structure as specified in step 1. (ii) The deep structure is then passed to the Recombinator who uses it to generate surface structures of our process, i.e. concrete implementations. (iii) Lastly, the surface structures are supplied to the auto experimentation engine and executed there. The auto experimentation engine uses the utility function as defined in step 1 to determine the best performing process among all the surface structures.
+ 
 _Algorithm 3.  Recombination and Auto-Experimentation_
 ```scala
 object ShortnText extends App {

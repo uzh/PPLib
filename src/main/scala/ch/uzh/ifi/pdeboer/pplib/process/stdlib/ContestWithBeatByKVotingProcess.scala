@@ -53,7 +53,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 	def bestAndSecondBest = {
 		val sorted = votes.toList.sortBy(-_._2)
-		(sorted(0), sorted(1))
+		(sorted.head, sorted(1))
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
