@@ -78,6 +78,7 @@ In the code below, the following steps will happen:
   1.2 We create a query where crowd workers can answer in freetext using these instructions and store it in the `query` variable
   
   1.3 We send the query to our portal (mixed in by the `HCompPortalAccess` trait) and wait for it to give us a response. (Happens synchronously, but in parallel)
+  
   1.4 We return the answer into the answers field
   
 2. We then create new patches that are based on the supplied patch (called `line`) and add the crowd worker answers to them. These are then returned
@@ -100,6 +101,16 @@ In the code below, the following steps will happen:
 	}
 ```
 
+You have now finished creating your process. Next we'll look at how to create an instance of an existing process. 
+###Step 4: Creating an instance of a process
+Creating an instance of a process is quite easy. One just needs to supply the parameters that it requires to run. In our case, we don't have any mandatory parameters. We'll anyway pass a value for `WORKER_COUNT` though:
+ 
+ ```scala
+    val myCollectionProcess = new Collection(Map(WORKER_COUNT.key -> 5, PORTAL_PARAMETER.key -> HComp.mechanicalTurk))
+    myCollectionProcess.process( new Patch("some input data") )
+ ```
+
+Note that `PORTAL_PARAMETER` is mixed in to our own collection process by the trait _HCompPortalAccess_. It determines where queries get sent to. 
 
 ##Default structure of a process
 All PPLib processes have a default constructor that looks like this: `class MyProcess(params: Map[String, Any] = Map.empty) extends ..`. 
