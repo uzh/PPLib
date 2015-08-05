@@ -1,4 +1,4 @@
-Copyright (c) 2015 Patrick de Boer and Abraham Bernstein of the University of Zurich
+Copyright (c) 2015 Dynamic and Distributed Systems Group, University of Zurich
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
