@@ -87,7 +87,7 @@ class TypeRecombinatorTest {
 
 		Assert.assertTrue(materialized.forall(p => {
 			val thisParam = p.getParam(workerCountHint.param.key)
-			val valueIsSet = thisParam == Some(possibleValue1) || thisParam == Some(possibleValue2)
+			val valueIsSet = thisParam.contains(possibleValue1) || thisParam.contains(possibleValue2)
 			valueIsSet && p.params.size == 1
 		}))
 		Assert.assertEquals(4, materialized.length)
@@ -119,7 +119,7 @@ class TypeRecombinatorTest {
 				case _ => false
 			}
 
-			val thisProcessContainsPortal = process.getParam(DefaultParameters.PORTAL_PARAMETER) == Some(targetPortal)
+			val thisProcessContainsPortal = process.getParam(DefaultParameters.PORTAL_PARAMETER).contains(targetPortal)
 
 			thisProcessContainsPortal && OneOfChildrenContainsPortal
 		}
