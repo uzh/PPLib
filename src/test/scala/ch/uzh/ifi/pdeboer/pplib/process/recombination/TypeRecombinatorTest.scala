@@ -77,7 +77,7 @@ class TypeRecombinatorTest {
 		val possibleValue1 = 17
 		val possibleValue2 = 23
 		val workerCountHint = new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, List(possibleValue1, possibleValue2))
-		val settingsHint = new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false))
+		val settingsHint = new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false))
 		val db = newDB
 
 		val r = new TypeRecombinator(RecombinationHints.create(Map(
@@ -101,7 +101,7 @@ class TypeRecombinatorTest {
 		db.addClass(classOf[CollectDecideProcess])
 
 		val parametersToDisableDefaultValues: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(
-			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false))))
+			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false))))
 		val r = new TypeRecombinator(RecombinationHints.create(parametersToDisableDefaultValues), db)
 		val materialized = r.materialize[CollectDecideProcess]
 
@@ -124,7 +124,7 @@ class TypeRecombinatorTest {
 			thisProcessContainsPortal && OneOfChildrenContainsPortal
 		}
 		val otherPortals = HComp.allDefinedPortals.toSet - HComp.randomPortal
-		if (otherPortals.size == 0) println(Thread.currentThread().getStackTrace()(1) + ": This test will only work if you have defined more than 1 portal.")
+		if (otherPortals.isEmpty) println(Thread.currentThread().getStackTrace()(1) + ": This test will only work if you have defined more than 1 portal.")
 
 		Assert.assertFalse("no crowd flower must be used, only mturk", materialized.exists(p =>
 			otherPortals.exists(portal => containsSubProcessWithPortal(p, portal))))
@@ -134,7 +134,7 @@ class TypeRecombinatorTest {
 object TypeRecombinatorTest {
 	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> (List(
 		//disable default values for instruction values
-		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false)),
+		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false)),
 		new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
 			new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
 	) ::: RecombinationHints.hcompPlatform(List(HComp.randomPortal))))
