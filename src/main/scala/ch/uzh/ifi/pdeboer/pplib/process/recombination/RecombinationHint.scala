@@ -16,6 +16,8 @@ trait RecombinationHint {
 	def runComplexParameterRecombinationOn(processParameter: String): Option[Boolean] = None
 
 	def addDefaultValuesFromParamDefinition(processParameter: String): Option[Boolean] = None
+
+	def addDefaultValuesFromProcessDefinition(processParameter: String): Option[Boolean] = None
 }
 
 class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T], val values: Iterable[T]) extends RecombinationHint {
@@ -26,17 +28,19 @@ class AddedParameterRecombinationHint[T: ClassTag](val param: ProcessParameter[T
 	override def toString = s"AddedParameterRecombinationHint($param, $values)"
 }
 
-class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true), val addDefaultValuesForParam: Option[Boolean] = Some(true)) extends RecombinationHint {
+class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, val runComplexParameterRecombinationOnThisParam: Option[Boolean] = Some(true), val addGeneralDefaultValuesForParam: Option[Boolean] = Some(true), val addLocalDefaultValuesForParam: Option[Boolean] = Some(true)) extends RecombinationHint {
 	override def runComplexParameterRecombinationOn(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) runComplexParameterRecombinationOnThisParam else None
 
-	override def addDefaultValuesFromParamDefinition(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) addDefaultValuesForParam else None
+	override def addDefaultValuesFromParamDefinition(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) addGeneralDefaultValuesForParam else None
+
+	override def addDefaultValuesFromProcessDefinition(processParameterKey: String): Option[Boolean] = if (isParamTargetParam(processParameterKey)) addLocalDefaultValuesForParam else None
 
 	private def isParamTargetParam(processParameterKey: String): Boolean = {
-		targetParams.size == 0 || targetParams.contains(processParameterKey)
+		targetParams.isEmpty || targetParams.contains(processParameterKey)
 	}
 
 
-	override def toString = s"SettingsOnParamsRecombinationHint($targetParams, $runComplexParameterRecombinationOnThisParam, $addDefaultValuesForParam)"
+	override def toString = s"SettingsOnParamsRecombinationHint($targetParams, $runComplexParameterRecombinationOnThisParam, $addGeneralDefaultValuesForParam)"
 }
 
 class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[RecombinationHint]] = Map.empty) {
@@ -96,9 +100,9 @@ object RecombinationHints {
 
 	val DEFAULT_HINTS = classOf[DefaultHintProcessStub]
 
-	def hcompPlatform(l: List[HCompPortalAdapter]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, l))
+	def hcompPlatform(l: List[HCompPortalAdapter]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addGeneralDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, l))
 
-	def instructions(l: List[InstructionData]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, l))
+	def instructions(l: List[InstructionData]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, l))
 
 	class DefaultHintProcessStub private[RecombinationHints]() extends ProcessStub[String, String](Map.empty) {
 		override protected def run(data: String): String = data

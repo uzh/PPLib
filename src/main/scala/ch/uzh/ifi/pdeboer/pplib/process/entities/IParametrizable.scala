@@ -15,6 +15,8 @@ trait IParametrizable {
 
 	def defaultParameters: List[ProcessParameter[_]] = List(MEMOIZER_NAME, STORE_EXECUTION_RESULTS)
 
+	def processParameterDefaults: Map[ProcessParameter[_], List[Any]] = Map.empty
+
 	def combineParameterLists(paramsToAdd: List[ProcessParameter[_]], existingParameters: List[ProcessParameter[_]]): List[ProcessParameter[_]] = {
 		val existingKeys: List[String] = existingParameters.map(_.key)
 		val nonExisting = paramsToAdd.filterNot(p => existingKeys.contains(p.key))

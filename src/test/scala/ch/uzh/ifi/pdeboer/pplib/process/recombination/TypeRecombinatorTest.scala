@@ -77,7 +77,7 @@ class TypeRecombinatorTest {
 		val possibleValue1 = 17
 		val possibleValue2 = 23
 		val workerCountHint = new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, List(possibleValue1, possibleValue2))
-		val settingsHint = new SettingsOnParamsRecombinationHint(addDefaultValuesForParam = Some(false))
+		val settingsHint = new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false))
 		val db = newDB
 
 		val r = new TypeRecombinator(RecombinationHints.create(Map(
@@ -101,7 +101,7 @@ class TypeRecombinatorTest {
 		db.addClass(classOf[CollectDecideProcess])
 
 		val parametersToDisableDefaultValues: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(
-			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addDefaultValuesForParam = Some(false))))
+			RecombinationHints.DEFAULT_HINTS -> List(new SettingsOnParamsRecombinationHint(addGeneralDefaultValuesForParam = Some(false))))
 		val r = new TypeRecombinator(RecombinationHints.create(parametersToDisableDefaultValues), db)
 		val materialized = r.materialize[CollectDecideProcess]
 
@@ -134,7 +134,7 @@ class TypeRecombinatorTest {
 object TypeRecombinatorTest {
 	val DEFAULT_TESTING_HINTS: Map[Class[_ <: ProcessStub[_, _]], List[RecombinationHint]] = Map(RecombinationHints.DEFAULT_HINTS -> (List(
 		//disable default values for instruction values
-		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addDefaultValuesForParam = Some(false)),
+		new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false)),
 		new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, List(
 			new InstructionData(actionName = "shorten the following paragraph", detailedDescription = "grammar (e.g. tenses), text-length")))
 	) ::: RecombinationHints.hcompPlatform(List(HComp.randomPortal))))

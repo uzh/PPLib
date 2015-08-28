@@ -34,10 +34,13 @@ class TypeRecombinator(hints: RecombinationHints, db: RecombinationDB = Recombin
 		recombinationsOfTheseTypes
 	}
 
-	protected def generateCandidatesForParameter[T <: ProcessStub[_, _]](containerClass: T, containerType: Type, param: ProcessParameter[_]): List[Any] = {
-		val allParamsAddedInHints = hints(containerClass.getClass).map(_.processConstructionParameter.getOrElse(param.key, Nil)).flatten
-		val isAllowedToAddDefaultParams = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.addDefaultValuesFromParamDefinition(k)).getOrElse(true)
-		val allDefaultParamsInProcess = if (isAllowedToAddDefaultParams) param.candidateDefinitions.getOrElse(Nil).toList else Nil
+	protected def generateCandidatesForParameter[T <: ProcessStub[_, _]](processUnderRecombination: T, containerType: Type, param: ProcessParameter[_]): List[Any] = {
+		val allParamsAddedInHints = hints(processUnderRecombination.getClass).flatMap(_.processConstructionParameter.getOrElse(param.key, Nil))
+		val isAllowedToAddGeneralDefaultParams = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.addDefaultValuesFromParamDefinition(k)).getOrElse(true)
+		val allDefaultGeneralParamsInProcess = if (isAllowedToAddGeneralDefaultParams) param.candidateDefinitions.getOrElse(Nil).toList else Nil
+
+		val isAllowedToAddLocalDefaultParams = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.addDefaultValuesFromProcessDefinition(k)).getOrElse(true)
+		val allDefaultLocalParamsInProcess = if (isAllowedToAddLocalDefaultParams) processUnderRecombination.processParameterDefaults.getOrElse(param, Nil) else Nil
 
 		val shouldRunComplexParamRecombination = hints.singleValueHint[Boolean](containerType, param.key, (h, k) => h.runComplexParameterRecombinationOn(k))
 			.getOrElse(true)
@@ -49,7 +52,7 @@ class TypeRecombinator(hints: RecombinationHints, db: RecombinationDB = Recombin
 			processRecombination(encapsulatedType, clazz.asInstanceOf[Class[_ <: ProcessStub[_, _]]])
 		} else Nil
 
-		allParamsAddedInHints ::: allDefaultParamsInProcess ::: recursiveProcessParams
+		allParamsAddedInHints ::: allDefaultGeneralParamsInProcess ::: allDefaultLocalParamsInProcess ::: recursiveProcessParams
 	}
 
 	def getApplicableTypesInDB(baseType: Type) = {
