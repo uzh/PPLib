@@ -27,7 +27,7 @@ class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1) extends HC
 				val instructions: String = ih.instructions.getInstructions(instructionItalic, htmlData = htmlData)
 				val choices = if (base.getParamOption(SHUFFLE_CHOICES).getOrElse(true)) Random.shuffle(input) else input
 
-				MultipleChoiceQuery(instructions, choices.map(_.value), maxAnswers, minAnswers, ih.instructionTitle)
+				MultipleChoiceQuery(instructions, choices.map(_.value), maxAnswers, minAnswers, ih.instructionTitle + " [" + Math.abs(Random.nextDouble()) + "]")
 			case _ => throw new IllegalStateException("Default MC Query is only supported for Instruction-Handling enabled processes")
 		}
 	}
