@@ -65,11 +65,11 @@ class ContestWithStatisticalReductionProcessTest {
 
 		def votesCastPub = votesCast
 
-		override def castVote(alternatives: List[String], iteration: Int): String = {
+		override def castVote(alternatives: List[Patch], iteration: Int): String = {
 			val nonWinningCandidates = votesToCast.filter(k => k._2 > 0).keys
 				.map(l => (l, Random.nextDouble())).toList.sortBy(_._2)
 			//cast random vote out of master plan
-			val target = if (nonWinningCandidates.size > 0) nonWinningCandidates(0)._1 else new Patch("2")
+			val target = if (nonWinningCandidates.nonEmpty) nonWinningCandidates.head._1 else new Patch("2")
 			println(s"voted $target")
 			votesToCast += target -> (votesToCast.get(target).get - 1)
 			target.value
