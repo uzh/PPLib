@@ -105,10 +105,10 @@ object ProcessStub {
 
 	def processInstructionGenerator: Option[InstructionGenerator] = None
 
-	def allParams: List[ProcessParameter[_]] = {
+	def allParams: List[ProcessParameter[_]] =
 		expectedParametersOnConstruction ::: expectedParametersBeforeRun :::
 			optionalParameters ::: defaultParameters
-	}
+
 
 	def allParameterTypesCorrect: Boolean = {
 		params.forall {
@@ -119,24 +119,14 @@ object ProcessStub {
 	def getParamOption[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): Option[T] = {
 		params.get(param.key) match {
 			case Some(p) => Some(p.asInstanceOf[T])
-			case _ => if (useDefaultValues) param.candidateDefinitions.getOrElse(Nil).headOption
-			else None
+			case None => if (useDefaultValues) {
+				param.candidateDefinitions.getOrElse(processParameterDefaults.getOrElse(param, Nil).asInstanceOf[List[T]]).headOption
+			} else None
 		}
 	}
 
 	def getParam[T](param: ProcessParameter[T], useDefaultValues: Boolean = true): T =
 		getParamOption[T](param, useDefaultValues).get
-
-	def getParamByKey[T](param: String, useDefaultValues: Boolean = true): Option[T] = {
-		params.get(param) match {
-			case Some(p) => Some(p.asInstanceOf[T])
-			case _ => if (useDefaultValues) allParams.find(_.key.equals(param)) match {
-				case Some(param) => param.candidateDefinitions.getOrElse(Nil).headOption.asInstanceOf[Option[T]]
-				case None => None
-			}
-			else None
-		}
-	}
 
 	def to[IN, OUT] = this.asInstanceOf[ProcessStub[IN, OUT]]
 
@@ -168,12 +158,8 @@ object ProcessStub {
 	</Process>
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
-	if (allParams.map(_.key).toSet.size
-		!= allParams.map(_.key).size) {
-		println("bad")
-	}
-	assert(allParams.map(_.key).toSet.size
-		== allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
+
+	assert(allParams.map(_.key).toSet.size == allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 

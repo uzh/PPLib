@@ -1,37 +1,34 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 import scala.collection.mutable
-import scala.util.Random
 
 /**
  * Created by pdeboer on 28/11/14.
  */
 @PPLibProcess
-class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler {
-
+class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with HCompQueryBuilderSupport[List[Patch]] {
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
 	protected var votes = mutable.HashMap.empty[String, Int]
 
 	override protected def run(data: List[Patch]): Patch = {
-		if (data.size == 1) data(0)
-		else if (data.size == 0) null
+		if (data.size == 1) data.head
+		else if (data.isEmpty) null
 		else {
 			data.foreach(d => votes += (d.value -> 0))
 			val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 			var globalIteration: Int = 0
-			val stringData = data.map(_.value)
 			do {
 				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(delta).foreach(w => {
-					val answer = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(stringData),
-						QUESTION_PRICE.get).get.asInstanceOf[MultipleChoiceAnswer].selectedAnswer
+					val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
+						QUESTION_PRICE.get).get
+					val answer = queryBuilder.parseAnswer[String]("", data, answerRaw, this).get
 					logger.info("waiting for lock..")
-					stringData.synchronized {
+					data.synchronized {
 						logger.info("got lock. storing vote")
 						votes += answer -> votes.getOrElse(answer, 0)
 					}
@@ -56,13 +53,15 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		(sorted.head, sorted(1))
 	}
 
-	def createMultipleChoiceQuestion(alternatives: List[String]): MultipleChoiceQuery = {
-		val choices = if (SHUFFLE_CHOICES.get) Random.shuffle(alternatives) else alternatives
-		new MultipleChoiceQuery(instructions.getInstructions(INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil)), choices, 1, 1, instructionTitle)
+	def createMultipleChoiceQuestion(alternatives: List[Patch]) = {
+		queryBuilder.buildQuery("", alternatives, this)
 	}
 
 	override def getCostCeiling(data: List[Patch]): Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents
 
+	override val processParameterDefaults: Map[ProcessParameter[_], List[Any]] = {
+		Map(queryBuilderParam -> List(new DefaultMCQueryBuilder()))
+	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K, INSTRUCTIONS_ITALIC)
 }

@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 28/11/14.
  */
-@SerialVersionUID(1l) class ProcessParameter[T](keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None)(implicit baseClass: ClassTag[T], val baseType: TypeTag[T]) extends Serializable {
+@SerialVersionUID(1l) class ProcessParameter[T](val keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None)(implicit baseClass: ClassTag[T], val baseType: TypeTag[T]) extends Serializable {
 	def key = keyPostfix
 
 	def clazz: Class[_ <: ProcessStub[_, _]] = baseClass.runtimeClass.asInstanceOf[Class[ProcessStub[_, _]]]
@@ -16,6 +16,21 @@ import scala.reflect.runtime.universe._
 	def get(implicit processStub: ProcessStub[_, _]) = processStub.getParam(this)
 
 	override def toString: String = key
+
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessParameter[_]]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: ProcessParameter[_] =>
+			(that canEqual this) &&
+				keyPostfix == that.keyPostfix
+		case _ => false
+	}
+
+	override def hashCode(): Int = {
+		val state = Seq(keyPostfix)
+		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+	}
 }
 
 trait InstructionGenerator {

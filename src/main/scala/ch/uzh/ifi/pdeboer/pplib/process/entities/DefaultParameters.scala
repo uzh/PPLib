@@ -1,8 +1,10 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQuery, HCompQueryProperties, HComp, HCompPortalAdapter}
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
 
+import scala.reflect.ClassTag
 import scala.xml.NodeSeq
+import scala.reflect.runtime.universe._
 
 /**
  * Created by pdeboer on 09/02/15.
@@ -26,4 +28,9 @@ object DefaultParameters {
 	val MAX_ITERATIONS = new ProcessParameter[Int]("maxIterations", Some(List(20)))
 
 	val INJECT_QUERIES = new ProcessParameter[Map[String, HCompQuery]]("injectQuery", Some(List(Map.empty[String, HCompQuery])))
+
+	private[process] val QUERY_BUILDER_KEY: String = "hcompQueryBuilder"
+
+	def newQueryBuilderParam[T](implicit inputClass: ClassTag[T], inputType: TypeTag[T]) = new ProcessParameter[HCompQueryBuilder[T]](QUERY_BUILDER_KEY)
 }
+
