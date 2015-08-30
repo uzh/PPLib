@@ -296,14 +296,13 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	}
 
 
-	override def responsibleWorkers: List[HCompWorker] = answers.values.filter(_.isDefined).map(o => o.get.responsibleWorkers).flatten.toList
+	override def responsibleWorkers: List[HCompWorker] = answers.values.filter(_.isDefined).flatMap(o => o.get.responsibleWorkers).toList
 
-	override def toString() = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
+	override def toString = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
 case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: String = "") extends HCompQuery {
 	override def question: String = html.toString
-
 }
 
 case class HTMLQueryAnswer(answers: Map[String, String], query: HCompQuery, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer {
