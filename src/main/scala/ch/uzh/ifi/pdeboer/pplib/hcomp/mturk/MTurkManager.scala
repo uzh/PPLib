@@ -56,7 +56,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 
 		val ONE_DAY: Int = 60 * 60 * 24
 		val TEN_MINUTES: Int = 10 * 60
-		val dollars: Double = properties.paymentCents.toDouble / 100d
+		val dollars: Double = adapter.price(query, properties).toDouble / 100d
 
 		val qualifications: List[QualificationRequirement] = properties.qualifications.map(q =>
 			MTurkQualificationObjectConversion.toMTurkQualificationRequirement(q)).filterNot(_ == null)

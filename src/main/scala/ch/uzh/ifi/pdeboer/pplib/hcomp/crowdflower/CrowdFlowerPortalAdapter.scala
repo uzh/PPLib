@@ -21,7 +21,7 @@ class CrowdFlowerPortalAdapter(val applicationName: String, val apiKey: String, 
 
 	//TODO make this protected
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties) = {
-		if (properties.qualifications.length > 0)
+		if (properties.qualifications.nonEmpty)
 			logger.error("CrowdFlower implementation doesn't support Worker Qualifications yet. Executing query without them..")
 		val cfQuery: CFQuery = CFConversions.convertQueryToCFQuery(query)
 		val jobCreator = new CFJobCreator(apiKey, cfQuery, properties, sandbox)

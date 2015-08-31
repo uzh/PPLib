@@ -37,12 +37,14 @@ trait HCompPortalAdapter extends LazyLogger {
 		sendQueryNoFuture(query, details, omitBudgetCalculation)
 	}
 
+	def price(query: HCompQuery, details: HCompQueryProperties): Int = if (details.paymentCents < 1) query.suggestedPaymentCents else details.paymentCents
+
 	def sendQueryNoFuture(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Option[HCompAnswer] = {
-		val properties = if (details.paymentCents < 1) HCompQueryProperties(query.suggestedPaymentCents) else details
+		val cost = price(query, details)
 
 		val budgetAfterQuery = if (omitBudgetCalculation) budget
 		else budget match {
-			case Some(x) => Some(x - properties.paymentCents)
+			case Some(x) => Some(x - cost)
 			case None => None
 		}
 		if (budgetAfterQuery.isDefined && budgetAfterQuery.get < 0) {
@@ -52,12 +54,12 @@ trait HCompPortalAdapter extends LazyLogger {
 			synchronized {
 				_budget = budgetAfterQuery
 			}
-			logger.debug(s"sending query $query with properties $properties . Budget after query $budget")
+			logger.debug(s"sending query $query with properties $details . Budget after query $budget")
 			val timeBefore = new DateTime()
 
 			val answer = query.answerTrivialCases match {
 				case Some(x) => Some(x)
-				case None => processQuery(query, properties)
+				case None => processQuery(query, details)
 			}
 
 			val timeAfter = new DateTime()
@@ -71,15 +73,15 @@ trait HCompPortalAdapter extends LazyLogger {
 				case None =>
 			}
 
-			addQueryToLog(query, properties, answer, durationMillis)
+			addQueryToLog(query, details, answer, durationMillis, cost)
 
 			answer
 		}
 	}
 
-	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long): Unit = {
+	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, paymentCents: Int): Unit = {
 		this.synchronized {
-			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
+			queryLog = HCompQueryStats(query, answer, durationMillis, paymentCents) :: queryLog
 		}
 	}
 
@@ -137,9 +139,9 @@ class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) ex
 	private var queryLog = List.empty[HCompQueryStats]
 
 
-	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long): Unit = {
+	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, cost: Int): Unit = {
 		this.synchronized {
-			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
+			queryLog = HCompQueryStats(query, answer, durationMillis, cost) :: queryLog
 		}
 	}
 
@@ -374,7 +376,7 @@ case class HCompException(query: HCompQuery, exception: Throwable, responsibleWo
 case class HCompJobCancelled(query: HCompQuery, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable
 
 @SerialVersionUID(1l)
-case class HCompQueryProperties(var paymentCents: Int = 0, var cancelAndRepostAfter: Duration = 1 day, var qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
+case class HCompQueryProperties(paymentCents: Int = 0, cancelAndRepostAfter: Duration = 1 day, qualifications: List[QueryWorkerQualification] = HCompQueryProperties.DEFAULT_QUALIFICATIONS) extends Serializable
 
 object HCompQueryProperties {
 	val DEFAULT_QUALIFICATIONS = List(new QTPercentAssignmentsRejected < 4, new QTNumberHITsApproved > 4000, new QTLocale === "US")
