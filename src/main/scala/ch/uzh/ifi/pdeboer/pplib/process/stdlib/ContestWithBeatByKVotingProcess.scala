@@ -24,11 +24,10 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			var globalIteration: Int = 0
 			do {
 				logger.info("started iteration " + globalIteration)
-				getCrowdWorkers(delta).foreach(w => {
+				getCrowdWorkers(K.get - delta).foreach(w => {
 					val answer: String = obtainValidVote(data)
-					logger.info("waiting for lock..")
 					data.synchronized {
-						logger.info("got lock. storing vote")
+						logger.info("got valid vote for " + answer)
 						votes += answer -> (votes.getOrElse(answer, 0) + 1)
 					}
 				})
@@ -59,7 +58,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		delta < K.get && votes.values.sum + uncountedVotes + delta < MAX_ITERATIONS.get
 	}
 
-	def delta = if (votes.values.sum == 0) 2 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
+	def delta = if (votes.isEmpty) 0 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
 
 	def bestAndSecondBest = {
 		val sorted = votes.toList.sortBy(-_._2)
