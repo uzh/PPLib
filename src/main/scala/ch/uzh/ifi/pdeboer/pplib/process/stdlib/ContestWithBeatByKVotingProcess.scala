@@ -31,7 +31,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 					logger.info("waiting for lock..")
 					data.synchronized {
 						logger.info("got lock. storing vote")
-						votes += answer -> votes.getOrElse(answer, 0) + 1
+						votes += answer -> (votes.getOrElse(answer, 0) + 1)
 					}
 				})
 				globalIteration += 1
