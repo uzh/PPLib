@@ -31,7 +31,7 @@ trait HCompPortalAdapter extends LazyLogger {
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
-	private var queryLog = List.empty[HCompQueryStats]
+	protected var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
 		sendQueryNoFuture(query, details, omitBudgetCalculation)
@@ -71,8 +71,9 @@ trait HCompPortalAdapter extends LazyLogger {
 				case None =>
 			}
 
-			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
-
+			this.synchronized {
+				queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
+			}
 			answer
 		}
 	}
@@ -81,31 +82,6 @@ trait HCompPortalAdapter extends LazyLogger {
 		val future: Future[Option[HCompAnswer]] = sendQuery(query, properties)
 		Await.result(future, maxWaitTime)
 		future.value.get.get
-		/*
-		val (future, cancelQueryFuture) = U.interruptableFuture[Option[HCompAnswer]] { () =>
-			sendQueryNoFuture(query, properties)
-		}
-
-		val timeAtMaxWait = new DateTime(DateTime.now().getMillis + maxWaitTime.toMillis)
-		if (maxWaitTime.toMillis <= 0) None
-		else {
-			val waitStep = Math.min(properties.cancelAndRepostAfter.toMillis, maxWaitTime.toMillis)
-			try {
-				Await.result(future, waitStep milliseconds)
-				future.value.get.get
-			}
-			catch {
-				case e: TimeoutException =>
-					if (timeAtMaxWait.isAfterNow) {
-						logger.info(s"query with identifier ${query.identifier} timed out. Reposting..")
-						cancelQueryFuture()
-						cancelQuery(query)
-						sendQueryAndAwaitResult(query, properties,
-							maxWaitTime = (timeAtMaxWait.getMillis - DateTime.now().getMillis) millis)
-					} else None
-			}
-		}
-		*/
 	}
 
 	def getDefaultPortalKey: String
@@ -152,6 +128,8 @@ trait AnswerRejection {
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
+
+	override protected var queryLog = List.empty[HCompQueryStats]
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
