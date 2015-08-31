@@ -31,7 +31,7 @@ trait HCompPortalAdapter extends LazyLogger {
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
-	protected var queryLog = List.empty[HCompQueryStats]
+	private var queryLog = List.empty[HCompQueryStats]
 
 	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
 		sendQueryNoFuture(query, details, omitBudgetCalculation)
@@ -71,10 +71,15 @@ trait HCompPortalAdapter extends LazyLogger {
 				case None =>
 			}
 
-			this.synchronized {
-				queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
-			}
+			addQueryToLog(query, properties, answer, durationMillis)
+
 			answer
+		}
+	}
+
+	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long): Unit = {
+		this.synchronized {
+			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
 		}
 	}
 
@@ -129,7 +134,16 @@ class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) ex
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
 
-	override protected var queryLog = List.empty[HCompQueryStats]
+	private var queryLog = List.empty[HCompQueryStats]
+
+
+	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long): Unit = {
+		this.synchronized {
+			queryLog = HCompQueryStats(query, answer, durationMillis, properties.paymentCents) :: queryLog
+		}
+	}
+
+	override def queries = queryLog
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
