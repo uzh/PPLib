@@ -9,6 +9,7 @@ import scala.collection.mutable
  */
 @PPLibProcess
 class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with HCompQueryBuilderSupport[List[Patch]] {
+
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
@@ -30,7 +31,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 					logger.info("waiting for lock..")
 					data.synchronized {
 						logger.info("got lock. storing vote")
-						votes += answer -> votes.getOrElse(answer, 0)
+						votes += answer -> votes.getOrElse(answer, 0) + 1
 					}
 				})
 				globalIteration += 1

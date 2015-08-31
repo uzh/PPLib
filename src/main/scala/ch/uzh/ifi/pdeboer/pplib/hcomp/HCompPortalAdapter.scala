@@ -364,7 +364,7 @@ case class MultipleChoiceAnswer(query: MultipleChoiceQuery, answer: Map[String, 
 		case x if x._2 => x._1
 	}).toList
 
-	def selectedAnswer = selectedAnswers(0)
+	def selectedAnswer = selectedAnswers.head
 
 	override def toString() = selectedAnswers.mkString(", ")
 }
