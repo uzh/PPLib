@@ -29,7 +29,7 @@ object DefaultParameters {
 
 	val INJECT_QUERIES = new ProcessParameter[Map[String, HCompQuery]]("injectQuery", Some(List(Map.empty[String, HCompQuery])))
 
-	private[process] val QUERY_BUILDER_KEY: String = "hcompQueryBuilder"
+	val QUERY_BUILDER_KEY: String = "hcompQueryBuilder"
 
 	def newQueryBuilderParam[T](implicit inputClass: ClassTag[T], inputType: TypeTag[T]) = new ProcessParameter[HCompQueryBuilder[T]](QUERY_BUILDER_KEY)
 }
