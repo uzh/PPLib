@@ -47,7 +47,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		delta < K.get && votes.values.sum + delta < MAX_ITERATIONS.get
 	}
 
-	def delta = if (votes.values.sum == 0) 3 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
+	def delta = if (votes.values.sum == 0) 2 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
 
 	def bestAndSecondBest = {
 		val sorted = votes.toList.sortBy(-_._2)
