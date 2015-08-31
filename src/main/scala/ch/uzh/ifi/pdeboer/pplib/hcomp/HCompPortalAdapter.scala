@@ -348,7 +348,7 @@ case class MultipleChoiceQuery(question: String, private val _options: List[Stri
 	def maxSelections = if (maxNumberOfResults < 1) options.size else maxNumberOfResults
 
 	override def answerTrivialCases: Option[HCompAnswer] =
-		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options(0) -> true)))
+		if (options.size == 1 && minNumberOfResults == 1) Some(new MultipleChoiceAnswer(this, Map(options.head -> true)))
 		else None
 
 	override def suggestedPaymentCents: Int = 4

@@ -25,11 +25,13 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			do {
 				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(K.get - delta).foreach(w => {
-					val answer: String = obtainValidVote(data)
-					data.synchronized {
-						logger.info("got valid vote for " + answer)
-						votes += answer -> (votes.getOrElse(answer, 0) + 1)
-					}
+					val answerOpt = obtainValidVote(data)
+					answerOpt.foreach(answer => {
+						data.synchronized {
+							logger.info("got valid vote for " + answer)
+							votes += answer -> (votes.getOrElse(answer, 0) + 1)
+						}
+					})
 				})
 				globalIteration += 1
 			} while (shouldStartAnotherIteration)
@@ -42,15 +44,17 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 	private var uncountedVotes: Int = 0
 
-	private def obtainValidVote(data: List[Patch]): String = {
+	private def obtainValidVote(data: List[Patch]): Option[String] = {
 		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
 			QUESTION_PRICE.get).get
 		val ans = queryBuilder.parseAnswer[String]("", data, answerRaw, this)
 
-		if (ans.isDefined) ans.get
+		if (ans.isDefined) ans
 		else {
 			uncountedVotes += 1
-			obtainValidVote(data)
+			if (uncountedVotes < MAX_ITERATIONS.get)
+				obtainValidVote(data)
+			else None
 		}
 	}
 

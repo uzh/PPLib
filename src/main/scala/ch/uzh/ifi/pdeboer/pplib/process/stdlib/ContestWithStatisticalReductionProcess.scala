@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
-import ch.uzh.ifi.pdeboer.pplib.util.{MonteCarlo, U}
+import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
  * Created by pdeboer on 03/11/14.
@@ -25,9 +24,11 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 			data.foreach(d => votesCast += (d.value -> 0))
 			do {
 				iteration += 1
-				val choice: String = memoizer.mem("it" + iteration)(castVote(data, iteration))
-				votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
-			} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && votesCast.values.sum < MAX_ITERATIONS.get)
+				val choiceOpt = memoizer.mem("it" + iteration)(castVote(data))
+				choiceOpt.foreach(choice => {
+					votesCast += choice -> (votesCast.getOrElse(choice, 0) + 1)
+				})
+			} while (minVotesForAgreement(data).getOrElse(Integer.MAX_VALUE) > itemWithMostVotes._2 && uncountedVotes + votesCast.values.sum < MAX_ITERATIONS.get)
 
 			val winner = itemWithMostVotes._1
 			logger.info(s"contest with statistical reduction finished after $iteration rounds. Winner: $winner")
@@ -43,18 +44,20 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 		MonteCarlo.minAgreementRequired(data.size, votesCast.values.sum, confidence, MONTECARLO_ITERATIONS)
 	}
 
-	def castVote(choices: List[Patch], iteration: Int): String = {
-		U.retry(3) {
-			portal.sendQueryAndAwaitResult(
-				queryBuilder.buildQuery("", choices, this),
-				QUESTION_PRICE.get
+	var uncountedVotes: Int = 0
 
-			) match {
-				case Some(a: HCompAnswer) => queryBuilder.parseAnswer[String]("", choices, a, this).get
-				case _ =>
-					logger.info(getClass.getSimpleName + " didnt get a vote when asked for it.")
-					throw new IllegalStateException("didnt get any response")
-			}
+	def castVote(choices: List[Patch]): Option[String] = {
+		val answerRaw = portal.sendQueryAndAwaitResult(
+			queryBuilder.buildQuery("", choices, this),
+			QUESTION_PRICE.get).get
+		val ans = queryBuilder.parseAnswer[String]("", choices, answerRaw, this)
+
+		if (ans.isDefined) ans
+		else {
+			uncountedVotes += 1
+			if (uncountedVotes < MAX_ITERATIONS.get)
+				castVote(choices)
+			else None
 		}
 	}
 
