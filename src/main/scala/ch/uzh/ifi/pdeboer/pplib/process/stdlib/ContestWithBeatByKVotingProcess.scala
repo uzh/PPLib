@@ -25,9 +25,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			do {
 				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(delta).foreach(w => {
-					val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
-						QUESTION_PRICE.get).get
-					val answer = queryBuilder.parseAnswer[String]("", data, answerRaw, this).get
+					val answer: String = obtainValidVote(data)
 					logger.info("waiting for lock..")
 					data.synchronized {
 						logger.info("got lock. storing vote")
@@ -43,8 +41,22 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		}
 	}
 
+	private var uncountedVotes: Int = 0
+
+	private def obtainValidVote(data: List[Patch]): String = {
+		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
+			QUESTION_PRICE.get).get
+		val ans = queryBuilder.parseAnswer[String]("", data, answerRaw, this)
+
+		if (ans.isDefined) ans.get
+		else {
+			uncountedVotes += 1
+			obtainValidVote(data)
+		}
+	}
+
 	def shouldStartAnotherIteration: Boolean = {
-		delta < K.get && votes.values.sum + delta < MAX_ITERATIONS.get
+		delta < K.get && votes.values.sum + uncountedVotes + delta < MAX_ITERATIONS.get
 	}
 
 	def delta = if (votes.values.sum == 0) 2 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
