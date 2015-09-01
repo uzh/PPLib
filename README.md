@@ -15,12 +15,6 @@ Before setting up PPLib, please install [Java 8](https://www.java.com/en/downloa
 
 Please find a step-by-step guide in our [screencast](https://youtu.be/6sA6X9QRK-w)
 
-## By just referencing PPLib as a dependency in your application 
-In your `build.sbt` file, add the following dependency
-
-```
-libraryDependencies += "com.github.pdeboer" %% "PPLib" % "0.1-SNAPSHOT"
-```
 
 # How-to
 In order to get familiar with PPLib, we recommend the following steps:
