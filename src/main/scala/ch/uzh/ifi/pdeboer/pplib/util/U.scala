@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
 import java.lang.annotation
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
@@ -10,7 +11,8 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
-import scala.collection.parallel.{ForkJoinTaskSupport, ParSeq}
+import scala.collection.parallel.{ExecutionContextTaskSupport, ForkJoinTaskSupport, ParSeq}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.forkjoin.ForkJoinPool
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -21,12 +23,13 @@ import scala.reflect.runtime.universe._
 object U extends LazyLogger {
 	val hugeForkJoinPool = new ForkJoinPool(300)
 	val hugeForkJoinTaskSupport: ForkJoinTaskSupport = new ForkJoinTaskSupport(hugeForkJoinPool)
+	val execContextTaskSupport = new ExecutionContextTaskSupport(ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100)))
 
 	val tinyForkJoinPool = new ForkJoinPool(1)
 
 	def parallelify[T](seq: Seq[T]): ParSeq[T] = {
 		val par = seq.par
-		par.tasksupport = hugeForkJoinTaskSupport
+		par.tasksupport = execContextTaskSupport
 		par
 	}
 
