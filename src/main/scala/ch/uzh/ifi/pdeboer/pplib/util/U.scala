@@ -11,9 +11,8 @@ import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotati
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
 
 import scala.collection.JavaConversions._
-import scala.collection.parallel.{ExecutionContextTaskSupport, ForkJoinTaskSupport}
-import scala.concurrent.{ExecutionContextExecutorService, ExecutionContext}
-import scala.concurrent.forkjoin.ForkJoinPool
+import scala.collection.parallel.ExecutionContextTaskSupport
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
@@ -21,12 +20,8 @@ import scala.reflect.runtime.universe._
  * Created by pdeboer on 15/10/14.
  */
 object U extends LazyLogger {
-	val hugeForkJoinPool = new ForkJoinPool(300)
-	val hugeForkJoinTaskSupport: ForkJoinTaskSupport = new ForkJoinTaskSupport(hugeForkJoinPool)
 	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100))
 	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
-
-	val tinyForkJoinPool = new ForkJoinPool(1)
 
 	/**
 	 * Method used to retry some code that may fail n times.
