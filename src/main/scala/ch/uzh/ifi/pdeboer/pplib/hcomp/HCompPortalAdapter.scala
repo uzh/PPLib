@@ -79,10 +79,18 @@ trait HCompPortalAdapter extends LazyLogger {
 		}
 	}
 
+	private var queryLogListener = List.empty[(HCompQuery, HCompQueryProperties, Option[HCompAnswer], Long, Int) => Unit]
+
+	def addQueryLogListener(l: (HCompQuery, HCompQueryProperties, Option[HCompAnswer], Long, Int) => Unit): Unit = {
+		this.synchronized {
+			queryLogListener = l :: queryLogListener
+		}
+	}
 	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, paymentCents: Int): Unit = {
 		this.synchronized {
 			queryLog = HCompQueryStats(query, answer, durationMillis, paymentCents) :: queryLog
 		}
+		queryLogListener.foreach(l => l(query, properties, answer, durationMillis, paymentCents))
 	}
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
@@ -137,7 +145,7 @@ class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) ex
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
 
 	private var queryLog = List.empty[HCompQueryStats]
-
+	decoratedPortal.addQueryLogListener(addQueryToLog)
 
 	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, cost: Int): Unit = {
 		this.synchronized {
