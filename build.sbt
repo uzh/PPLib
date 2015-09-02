@@ -27,32 +27,6 @@ resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositori
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
-
-lazy val publishSettings = Seq(
-	publishMavenStyle := true,
-	publishArtifact in Test := false,
-	pomIncludeRepository := { x => false },
-	pomExtra := <url>https://github.com/pdeboer/pplib/</url>
-		<licenses>
-			<license>
-				<name>MIT License</name>
-				<url>http://www.opensource.org/licenses/mit-license.php</url>
-				<distribution>repo</distribution>
-			</license>
-		</licenses>
-		<scm>
-			<url>git@github.com:pdeboer/pplib.git</url>
-			<connection>scm:git:git@github.com:pdeboer/pplib.git</connection>
-		</scm>
-		<developers>
-			<developer>
-				<id>pdeboer</id>
-				<name>Patrick de Boer</name>
-				<url>http://inventas-it.ch</url>
-			</developer>
-		</developers>
-)
-
 //mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.singlequestion.MTurkCountWorkers")
 
 // To Skip Tests:
