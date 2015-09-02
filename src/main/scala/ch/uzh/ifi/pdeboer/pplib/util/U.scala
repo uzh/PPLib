@@ -20,11 +20,13 @@ import scala.reflect.runtime.universe._
  */
 object U extends LazyLogger {
 	val hugeForkJoinPool = new ForkJoinPool(300)
+	val hugeForkJoinTaskSupport: ForkJoinTaskSupport = new ForkJoinTaskSupport(hugeForkJoinPool)
+
 	val tinyForkJoinPool = new ForkJoinPool(1)
 
 	def parallelify[T](seq: Seq[T]): ParSeq[T] = {
 		val par = seq.par
-		par.tasksupport = new ForkJoinTaskSupport(hugeForkJoinPool)
+		par.tasksupport = hugeForkJoinTaskSupport
 		par
 	}
 
