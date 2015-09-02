@@ -5,7 +5,7 @@ import ch.uzh.ifi.pdeboer.pplib.patterns.ContestWithMultipleEqualWinners.PatchCo
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{NoProcessMemoizer, Patch, ProcessMemoizer}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
-import scala.collection.parallel.{ForkJoinTaskSupport, ParSet}
+import scala.collection.parallel.ParSet
 import scala.util.Random
 import scala.xml.NodeSeq
 
@@ -63,7 +63,7 @@ import scala.xml.NodeSeq
 
 	protected lazy val selectedContainers: ParSet[PatchContainer] = {
 		val it = selectionIterations.par
-		it.tasksupport = new ForkJoinTaskSupport(U.hugeForkJoinPool)
+		it.tasksupport = U.execContextTaskSupport
 		it.map(i => memoizer.mem("iteration" + i)(iteration(i))).flatten.toSet
 	}
 
