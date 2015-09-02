@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
 import java.lang.annotation
-import java.util.concurrent.Executors
+import java.util.concurrent.{ThreadFactory, Executors}
 import java.util.concurrent.atomic.AtomicReference
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
@@ -20,7 +20,13 @@ import scala.reflect.runtime.universe._
  * Created by pdeboer on 15/10/14.
  */
 object U extends LazyLogger {
-	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100))
+	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100, new ThreadFactory {
+		override def newThread(r: Runnable): Thread = {
+			val t = new Thread(r)
+			t.setDaemon(true)
+			t
+		}
+	}))
 	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
 
 	/**
