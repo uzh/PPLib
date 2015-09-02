@@ -32,7 +32,7 @@ lazy val publishSettings = Seq(
 	publishMavenStyle := true,
 	publishArtifact in Test := false,
 	pomIncludeRepository := { x => false },
-	pomExtra := <url>https://github.com/pdeboer/PPLib/</url>
+	pomExtra := <url>https://github.com/pdeboer/pplib/</url>
 		<licenses>
 			<license>
 				<name>MIT License</name>
@@ -41,8 +41,8 @@ lazy val publishSettings = Seq(
 			</license>
 		</licenses>
 		<scm>
-			<url>git@github.com:pdeboer/PPLib.git</url>
-			<connection>scm:git:git@github.com:pdeboer/PPLib.git</connection>
+			<url>git@github.com:pdeboer/pplib.git</url>
+			<connection>scm:git:git@github.com:pdeboer/pplib.git</connection>
 		</scm>
 		<developers>
 			<developer>
