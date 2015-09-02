@@ -12,7 +12,7 @@ import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilde
 
 import scala.collection.JavaConversions._
 import scala.collection.parallel.{ExecutionContextTaskSupport, ForkJoinTaskSupport}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContextExecutorService, ExecutionContext}
 import scala.concurrent.forkjoin.ForkJoinPool
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -23,7 +23,8 @@ import scala.reflect.runtime.universe._
 object U extends LazyLogger {
 	val hugeForkJoinPool = new ForkJoinPool(300)
 	val hugeForkJoinTaskSupport: ForkJoinTaskSupport = new ForkJoinTaskSupport(hugeForkJoinPool)
-	val execContextTaskSupport = new ExecutionContextTaskSupport(ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100)))
+	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100))
+	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
 
 	val tinyForkJoinPool = new ForkJoinPool(1)
 

@@ -8,7 +8,6 @@ import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
 import org.joda.time.DateTime
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Future, _}
 import scala.xml.NodeSeq
@@ -17,8 +16,8 @@ import scala.xml.NodeSeq
 /**
  * Created by pdeboer on 10/10/14.
  */
-
 trait HCompPortalAdapter extends LazyLogger {
+	implicit val global: ExecutionContextExecutor = U.execContext
 	private var _budget: Option[Int] = None
 
 	def setBudget(budget: Option[Int]): Unit =
