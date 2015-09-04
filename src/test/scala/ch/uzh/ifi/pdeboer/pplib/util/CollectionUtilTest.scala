@@ -11,8 +11,10 @@ import scala.util.Random
 class CollectionUtilTest {
 	@Test
 	def testManyParallelThreads: Unit = {
-		val mparRuntime: Long = runMPar
-		val delta = runPar - runMPar
+		val mparTime: Long = runMPar
+		val parTime: Long = runPar
+		val mparRuntime: Long = mparTime
+		val delta = parTime - mparTime
 
 		Assert.assertTrue(s"delta was $delta. Tolerance would be $mparRuntime", delta > mparRuntime)
 	}
@@ -21,7 +23,7 @@ class CollectionUtilTest {
 		import CollectionUtils._
 		val timeAtStart = DateTime.now()
 		val numCores = Runtime.getRuntime.availableProcessors()
-		val totalWaitingIterations: Int = numCores * 3
+		val totalWaitingIterations: Int = numCores * 10
 		val waitingTime: Int = 500
 		val blocking = (1 to totalWaitingIterations).mpar.map(c => {
 			Thread.sleep(waitingTime)
@@ -33,7 +35,7 @@ class CollectionUtilTest {
 	def runPar: Long = {
 		val timeAtStart = DateTime.now()
 		val numCores = Runtime.getRuntime.availableProcessors()
-		val totalWaitingIterations: Int = numCores * 3
+		val totalWaitingIterations: Int = numCores * 10
 		val waitingTime: Int = 500
 		val blocking = (1 to totalWaitingIterations).par.map(c => {
 			Thread.sleep(waitingTime)
