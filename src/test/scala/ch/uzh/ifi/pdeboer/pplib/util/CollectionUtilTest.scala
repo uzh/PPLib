@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
 import org.joda.time.DateTime
-import org.junit.{Assert, Test}
+import org.junit.Assert
 
 import scala.util.Random
 
@@ -9,7 +9,7 @@ import scala.util.Random
  * Created by pdeboer on 24/07/15.
  */
 class CollectionUtilTest {
-	@Test
+	//@Test
 	def testManyParallelThreads: Unit = {
 		val mparTime: Long = runMPar
 		val parTime: Long = runPar
