@@ -37,8 +37,16 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			} while (shouldStartAnotherIteration)
 
 			val winner = bestAndSecondBest._1._1
-			logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
-			data.find(d => d.value == winner).get
+			if (bestAndSecondBest._1._2 - bestAndSecondBest._2._2 < K.get) {
+				logger.info(s"beat-by-k finished after $globalIteration rounds with a tie")
+				if (RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.get)
+					data.find(d => d.value == winner).get
+				else
+					null
+			} else {
+				logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
+				data.find(d => d.value == winner).get
+			}
 		}
 	}
 
@@ -84,4 +92,5 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 
 object ContestWithBeatByKVotingProcess {
 	val K = new ProcessParameter[Int]("k", Some(List(2)))
+	val RETURN_LEADER_IF_MAX_ITERATIONS_REACHED = new ProcessParameter[Boolean]("returnLeaderIfMaxIterationsReached", Some(List(true)))
 }

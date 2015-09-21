@@ -33,4 +33,3 @@ object DefaultParameters {
 
 	def newQueryBuilderParam[T](implicit inputClass: ClassTag[T], inputType: TypeTag[T]) = new ProcessParameter[HCompQueryBuilder[T]](QUERY_BUILDER_KEY)
 }
-
