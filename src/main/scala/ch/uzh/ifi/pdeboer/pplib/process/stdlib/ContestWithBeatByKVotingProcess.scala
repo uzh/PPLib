@@ -36,21 +36,25 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 				globalIteration += 1
 			} while (shouldStartAnotherIteration)
 
-			val winner = bestAndSecondBest._1._1
-			if (bestAndSecondBest._1._2 - bestAndSecondBest._2._2 < K.get) {
-				logger.info(s"beat-by-k finished after $globalIteration rounds with a tie")
-				if (RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.get)
-					data.find(d => d.value == winner).get
-				else
-					null
-			} else {
-				logger.info(s"beat-by-k finished after $globalIteration rounds. Winner: " + winner)
-				data.find(d => d.value == winner).get
-			}
+			logger.info(s"beat-by-k finished after $globalIteration rounds")
+
+			getEndResult(data)
 		}
 	}
 
-	private var uncountedVotes: Int = 0
+	def getEndResult(data: List[Patch]): Patch = {
+		val winner = bestAndSecondBest._1._1
+		if (bestAndSecondBest._1._2 - bestAndSecondBest._2._2 < K.get) {
+			if (RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.get)
+				data.find(d => d.value == winner).get
+			else
+				null
+		} else {
+			data.find(d => d.value == winner).get
+		}
+	}
+
+	protected var uncountedVotes: Int = 0
 
 	private def obtainValidVote(data: List[Patch]): Option[String] = {
 		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
@@ -67,8 +71,10 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	}
 
 	def shouldStartAnotherIteration: Boolean = {
-		delta < K.get && votes.values.sum + uncountedVotes + delta < MAX_ITERATIONS.get
+		neededToWin > 0 && votes.values.sum + uncountedVotes + neededToWin <= MAX_ITERATIONS.get
 	}
+
+	def neededToWin = K.get - delta
 
 	def delta = if (votes.isEmpty) 0 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
 
