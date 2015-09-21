@@ -60,7 +60,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		if (ans.isDefined) ans
 		else {
 			uncountedVotes += 1
-			if (uncountedVotes < MAX_ITERATIONS.get)
+			if (uncountedVotes + votes.values.sum < MAX_ITERATIONS.get)
 				obtainValidVote(data)
 			else None
 		}
