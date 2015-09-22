@@ -58,6 +58,14 @@ class ContestWithBeatByKVotingProcessTest {
 	}
 
 	@Test
+	def testRuntimeProblem: Unit = {
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 4, DefaultParameters.MAX_ITERATIONS.key -> 10))
+		p.setVotes(Map("a" -> 5, "b" -> 2))
+
+		Assert.assertTrue(p.shouldStartAnotherIteration)
+	}
+
+	@Test
 	def testMaxIterationsWithUncountedVotes: Unit = {
 		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 10))
 		p.setVotes(Map("a" -> 3, "b" -> 3))
@@ -88,12 +96,10 @@ class ContestWithBeatByKVotingProcessTest {
 		p.setParam(RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.key, true)
 		Assert.assertNotNull(p.getEndResult(patches))
 	}
-
 	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ContestWithBeatByKVotingProcess(params) {
 		def setVotes(v: Map[String, Int]): Unit = {
 			votes ++= v
 		}
-
 		def setUncountedVotes(uncounted: Int): Unit = {
 			this.uncountedVotes = uncounted
 		}
