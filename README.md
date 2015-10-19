@@ -30,4 +30,4 @@ In order to get familiar with PPLib, we recommend the following steps:
 5. Learn how to use instruction generation by following this guide: [How to use question generation](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md)
 
 # Contact
-Write [Patrick](pdeboer@ifi.uzh.ch)
+Write [Patrick](http://www.ifi.uzh.ch/ddis/people/deboer.html)
