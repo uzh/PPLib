@@ -31,7 +31,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 		catch {
 			case e: Exception => {
 				/*hopefully we land here*/
-				logger.info("received response " + poll())
+				logger.info("received response " + answer)
 			}
 		}
 		answer
