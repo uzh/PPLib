@@ -8,8 +8,8 @@ import scala.util.Random
 import scala.xml.NodeSeq
 
 /**
- * Created by pdeboer on 19/11/14.
- */
+  * Created by pdeboer on 19/11/14.
+  */
 class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, val adapter: MechanicalTurkPortalAdapter) extends LazyLogger {
 	var hit = ""
 	var cancelled: Boolean = false
@@ -22,8 +22,13 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 		var answer: Option[HCompAnswer] = None
 		try {
 			(1 to 1000000).view.foreach(i => {
-				answer = poll()
-				if (cancelled || answer.isDefined) throw new Exception("I'm actually not an Exception")
+				val tmpAnswer = poll()
+				if (cancelled || tmpAnswer.isDefined) {
+					properties.synchronized {
+						answer = tmpAnswer
+						throw new Exception("I'm actually not an Exception")
+					}
+				}
 				timer.waitTime
 			})
 			logger.info(s"got timeout waiting for an answer for $query")
@@ -49,8 +54,8 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 	}
 
 	/**
-	 * @return HIT ID
-	 */
+	  * @return HIT ID
+	  */
 	def createHIT(numAssignments: Int = 1): String = {
 		if (scala.xml.PCData(query.question).length > 1999)
 			logger.error("your question was longer than 1999 characters, which is not allowed by MTurk. Truncated the question to " + query.question.take(1999))
