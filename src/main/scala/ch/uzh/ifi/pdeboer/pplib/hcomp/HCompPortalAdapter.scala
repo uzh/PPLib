@@ -348,6 +348,13 @@ case class FreetextAnswer(query: FreetextQuery, answer: String, responsibleWorke
 	override def toString() = answer
 }
 
+
+case class ExternalQuery(url: String, title: String = "External question") extends HCompQuery {
+	override def question: String = url
+
+	override def suggestedPaymentCents: Int = 8
+}
+
 @SerialVersionUID(1l)
 case class MultipleChoiceQuery(question: String, private val _options: List[String], maxNumberOfResults: Int, minNumberOfResults: Int = 1, title: String = "", override val valueIsRequired: Boolean = true) extends HCompQuery with Serializable {
 	val options = _options.distinct

@@ -66,6 +66,20 @@ class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
 	override def questionXML: NodeSeq = defaultQuestionXML(injectedXML = answerSpecification)
 }
 
+
+class MTExternalQuery(val rawQuery: ExternalQuery) extends MTQuery {
+
+	override def interpret(xml: NodeSeq, workerId: String) = ???
+
+
+	override def questionXML: NodeSeq = <ExternalQuestion>
+		<ExternalURL>
+			{rawQuery.url}
+		</ExternalURL>
+		<FrameHeight>800</FrameHeight>
+	</ExternalQuestion>
+}
+
 class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 	val processedOptions = rawQuery.options.map(_.replaceAll("\\n", ""))
 
@@ -108,7 +122,7 @@ class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
 		val selections: Map[String, Boolean] = rawQuery.options.zipWithIndex.map(o => o._1 -> selected.contains(o._2)).toMap
 		assert(relevantXMLAnswers.size == selections.values.count(_ == true))
 		val answer = MultipleChoiceAnswer(rawQuery, selections, responsibleWorkers = List(MTurkWorker(workerId)))
-		if (rawQuery.minNumberOfResults > 0 && answer.selectedAnswers.size == 0) {
+		if (rawQuery.minNumberOfResults > 0 && answer.selectedAnswers.isEmpty) {
 			logger.error("expected result for multiple choice query, but got none. Here's the complete answer: " + xml.toString())
 			None
 		} else Some(answer)

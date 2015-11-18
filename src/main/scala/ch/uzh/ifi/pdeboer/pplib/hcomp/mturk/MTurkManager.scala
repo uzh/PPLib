@@ -1,8 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
-import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, LazyLogger}
-
+import ch.uzh.ifi.pdeboer.pplib.util.{U, GrowingTimer, LazyLogger}
 import scala.concurrent.duration._
 import scala.util.Random
 import scala.xml.NodeSeq
@@ -16,17 +15,21 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 
 	private val service = adapter.service
 
+	private class GotAnswer extends Exception
+
+
 	def waitForResponse() = {
-		val timer = new GrowingTimer(1 second, 1.0001, 20 seconds)
+		val timer = new GrowingTimer(1 second, 1.0001, 60 seconds)
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
 		try {
-			(1 to 1000000).view.foreach(i => {
-				val tmpAnswer = poll()
+			(1 to 1000000).foreach(i => {
+				val tmpAnswer = U.retry(5)(poll())
 				if (cancelled || tmpAnswer.isDefined) {
+					logger.info(s"will break loop. cancelled? $cancelled answer: $tmpAnswer")
 					properties.synchronized {
 						answer = tmpAnswer
-						throw new Exception("I'm actually not an Exception")
+						throw new GotAnswer
 					}
 				}
 				timer.waitTime
@@ -34,9 +37,9 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 			logger.info(s"got timeout waiting for an answer for $query")
 		}
 		catch {
-			case e: Exception => {
+			case e: GotAnswer => {
 				/*hopefully we land here*/
-				logger.info("received response " + answer)
+				logger.info("received response " + answer, e)
 			}
 		}
 		answer

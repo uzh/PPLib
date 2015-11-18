@@ -14,6 +14,7 @@ import scala.collection.JavaConversions._
 import scala.collection.parallel.ExecutionContextTaskSupport
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 import scala.reflect.ClassTag
+import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 
 /**
@@ -36,12 +37,13 @@ object U extends LazyLogger {
 	 * @tparam T return value of the function
 	 * @return the result of the function
 	 */
-	def retry[T](n: Int)(fn: => T): T = {
+	def retry[T](n: Int, timer: GrowingTimer = new GrowingTimer(1 second, 1.5, 300 seconds))(fn: => T): T = {
 		try {
 			fn
 		} catch {
 			case e if n > 1 => {
 				logger.debug("retry got exception", e)
+				timer.waitTime
 				retry(n - 1)(fn)
 			}
 		}
