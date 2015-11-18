@@ -63,7 +63,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 
 		val rnd = Math.abs(Random.nextInt()) + ""
 		val title: String = query.title.take(117 - rnd.length) + " [" + rnd + "]"
-		val hitTypeID = service.RegisterHITType(title, query.question, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], 5 * ONE_DAY, qualifications)
+		val hitTypeID = service.RegisterHITType(title, query.questionPreview, Price(dollars.toString), TEN_MINUTES, Seq.empty[String], 5 * ONE_DAY, qualifications)
 		hit = service.CreateHIT(hitTypeID, new Question(mtQuery.xml), ONE_DAY, numAssignments).HITId
 		hit
 	}

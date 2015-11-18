@@ -196,6 +196,8 @@ private object HCompIDGen {
 trait HCompQuery extends Serializable {
 	def question: String
 
+	def questionPreview: String = question
+
 	def title: String
 
 	def suggestedPaymentCents: Int
@@ -302,7 +304,8 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 	override def toString = answers.map(q => q._1.question + "::" + q._2.getOrElse("[no answer]")).mkString("\n")
 }
 
-case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: String = "") extends HCompQuery {
+case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: String = "", questionPreviewOverride: String = "") extends HCompQuery {
+	override def questionPreview: String = if (questionPreviewOverride != "") questionPreview else super.questionPreview
 	override def question: String = html.toString
 }
 
