@@ -26,10 +26,12 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 				if (cancelled || answer.isDefined) throw new Exception("I'm actually not an Exception")
 				timer.waitTime
 			})
+			logger.info(s"got timeout waiting for an answer for $query")
 		}
 		catch {
 			case e: Exception => {
 				/*hopefully we land here*/
+				logger.info("received response " + poll())
 			}
 		}
 		answer
