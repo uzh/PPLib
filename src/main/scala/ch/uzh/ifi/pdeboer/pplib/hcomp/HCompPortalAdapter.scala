@@ -14,8 +14,8 @@ import scala.xml.NodeSeq
 
 
 /**
- * Created by pdeboer on 10/10/14.
- */
+  * Created by pdeboer on 10/10/14.
+  */
 trait HCompPortalAdapter extends LazyLogger {
 	implicit val global: ExecutionContextExecutor = U.execContext
 	private var _budget: Option[Int] = None
@@ -85,6 +85,7 @@ trait HCompPortalAdapter extends LazyLogger {
 			queryLogListener = l :: queryLogListener
 		}
 	}
+
 	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, paymentCents: Int): Unit = {
 		this.synchronized {
 			queryLog = HCompQueryStats(query, answer, durationMillis, paymentCents) :: queryLog
@@ -306,6 +307,7 @@ case class CompositeQueryAnswer(query: CompositeQuery, answers: Map[HCompQuery, 
 
 case class HTMLQuery(html: NodeSeq, suggestedPaymentCents: Int = 10, title: String = "", questionPreviewOverride: String = "") extends HCompQuery {
 	override def questionPreview: String = if (questionPreviewOverride != "") questionPreview else super.questionPreview
+
 	override def question: String = html.toString
 }
 
@@ -315,10 +317,10 @@ case class HTMLQueryAnswer(answers: Map[String, String], query: HCompQuery, resp
 
 
 /**
- * @param question
- * @param defaultAnswer
- * @param title
- */
+  * @param question
+  * @param defaultAnswer
+  * @param title
+  */
 @SerialVersionUID(1l)
 case class FreetextQuery(question: String, defaultAnswer: String = "", title: String = "") extends HCompQuery with Serializable {
 	def this(question: String, defaultAnswer: String) = this(question, defaultAnswer, question)
@@ -349,7 +351,7 @@ case class FreetextAnswer(query: HCompQuery, answer: String, responsibleWorkers:
 }
 
 
-case class ExternalQuery(url: String, title: String = "External question", idFieldName: String = "field") extends HCompQuery {
+case class ExternalQuery(url: String, title: String = "External question", idFieldName: String = "field", getParameterToAddPostTarget: String = "target") extends HCompQuery {
 	override def question: String = url
 
 	override def suggestedPaymentCents: Int = 8

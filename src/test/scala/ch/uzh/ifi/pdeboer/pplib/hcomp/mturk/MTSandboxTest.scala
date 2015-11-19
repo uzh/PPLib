@@ -15,7 +15,7 @@ class MTSandboxTest {
 		println(answer.answer)
 	}
 
-	@Test
+	//@Test
 	def testExternal: Unit = {
 		val q = ExternalQuery("https://lab.inventas-it.ch/externalsubmittest.php", "Patrick's great test", idFieldName = "testfield")
 		val r = HComp.mechanicalTurk.sendQueryAndAwaitResult(q, HCompQueryProperties(5, qualifications = Nil))

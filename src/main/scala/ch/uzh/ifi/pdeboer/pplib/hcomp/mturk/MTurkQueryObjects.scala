@@ -2,11 +2,14 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
+import org.apache.http.client.utils.URIBuilder
 
 import scala.xml._
 
 sealed trait MTQuery extends LazyLogger {
 	def id: String = "query" + rawQuery.identifier
+
+	var urlTargetParam: String = ""
 
 	def xml: Node = scala.xml.Utility.trim(<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
 		{questionXML}
@@ -75,11 +78,17 @@ class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
 class MTExternalQuery(val rawQuery: ExternalQuery) extends MTQuery {
 	override def id: String = rawQuery.idFieldName
 
+	def urlInclPostTarget = {
+		val b = new URIBuilder(rawQuery.url)
+		b.addParameter(rawQuery.getParameterToAddPostTarget, urlTargetParam)
+		b.build().toString
+	}
+
 	override def interpret(xml: NodeSeq, workerId: String) = new MTFreeTextQueryParser(this, xml, workerId).parse
 
 	override def xml: Node = <ExternalQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
 		<ExternalURL>
-			{rawQuery.url}
+			{urlInclPostTarget}
 		</ExternalURL>
 		<FrameHeight>800</FrameHeight>
 	</ExternalQuestion>

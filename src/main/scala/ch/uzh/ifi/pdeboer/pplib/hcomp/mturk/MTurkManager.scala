@@ -62,6 +62,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 		if (scala.xml.PCData(query.question).length > 1999)
 			logger.error("your question was longer than 1999 characters, which is not allowed by MTurk. Truncated the question to " + query.question.take(1999))
 		val mtQuery = MTQuery.convert(query)
+		mtQuery.urlTargetParam = if (adapter.sandbox) "workersandbox" else "www"
 
 		val ONE_DAY: Int = 60 * 60 * 24
 		val TEN_MINUTES: Int = 10 * 60
