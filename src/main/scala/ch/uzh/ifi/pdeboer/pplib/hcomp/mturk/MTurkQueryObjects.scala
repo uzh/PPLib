@@ -8,9 +8,9 @@ import scala.xml._
 sealed trait MTQuery extends LazyLogger {
 	def id: String = "query" + rawQuery.identifier
 
-	def xml = scala.xml.Utility.trim(<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+	def xml: Node = scala.xml.Utility.trim(<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
 		{questionXML}
-	</QuestionForm>).theSeq(0)
+	</QuestionForm>).theSeq.head
 
 	def questionXML: NodeSeq
 
@@ -48,7 +48,12 @@ object MTQuery {
 		case q: FreetextQuery => new MTFreeTextQuery(q)
 		case q: MultipleChoiceQuery => new MTMultipleChoiceQuery(q)
 		case q: CompositeQuery => new MTCompositeQuery(q)
+		case q: ExternalQuery => new MTExternalQuery(q)
 	}
+}
+
+class MTFreeTextQueryParser(query: MTQuery, xml: NodeSeq, workerId: String) {
+	def parse = Some(FreetextAnswer(query.rawQuery, (query.getRelevantAnswerFromResponseXML(xml) \ "FreeText").text, responsibleWorkers = List(MTurkWorker(workerId))))
 }
 
 class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
@@ -60,24 +65,26 @@ class MTFreeTextQuery(val rawQuery: FreetextQuery) extends MTQuery {
 		</FreeTextAnswer>
 	}
 
-	override def interpret(xml: NodeSeq, workerId: String) =
-		Some(FreetextAnswer(rawQuery, (getRelevantAnswerFromResponseXML(xml) \ "FreeText").text, responsibleWorkers = List(MTurkWorker(workerId))))
+	override def interpret(xml: NodeSeq, workerId: String) = new MTFreeTextQueryParser(this, xml, workerId).parse
+
 
 	override def questionXML: NodeSeq = defaultQuestionXML(injectedXML = answerSpecification)
 }
 
 
 class MTExternalQuery(val rawQuery: ExternalQuery) extends MTQuery {
+	override def id: String = rawQuery.idFieldName
 
-	override def interpret(xml: NodeSeq, workerId: String) = ???
+	override def interpret(xml: NodeSeq, workerId: String) = new MTFreeTextQueryParser(this, xml, workerId).parse
 
-
-	override def questionXML: NodeSeq = <ExternalQuestion>
+	override def xml: Node = <ExternalQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
 		<ExternalURL>
 			{rawQuery.url}
 		</ExternalURL>
 		<FrameHeight>800</FrameHeight>
 	</ExternalQuestion>
+
+	override def questionXML: NodeSeq = Nil
 }
 
 class MTMultipleChoiceQuery(val rawQuery: MultipleChoiceQuery) extends MTQuery {
@@ -139,5 +146,5 @@ class MTCompositeQuery(val rawQuery: CompositeQuery) extends MTQuery {
 	}
 
 	override def questionXML: NodeSeq =
-		NodeSeq.fromSeq(rawQuery.queries.map(MTQuery.convert(_).questionXML.theSeq).flatten)
+		NodeSeq.fromSeq(rawQuery.queries.flatMap(MTQuery.convert(_).questionXML.theSeq))
 }

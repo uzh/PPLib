@@ -26,7 +26,6 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 			(1 to 1000000).foreach(i => {
 				val tmpAnswer = U.retry(5)(poll())
 				if (cancelled || tmpAnswer.isDefined) {
-					logger.info(s"will break loop. cancelled? $cancelled answer: $tmpAnswer")
 					properties.synchronized {
 						answer = tmpAnswer
 						throw new GotAnswer

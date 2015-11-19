@@ -344,12 +344,12 @@ object FreetextQuery {
 }
 
 @SerialVersionUID(1l)
-case class FreetextAnswer(query: FreetextQuery, answer: String, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable {
+case class FreetextAnswer(query: HCompQuery, answer: String, responsibleWorkers: List[HCompWorker] = Nil) extends HCompAnswer with Serializable {
 	override def toString() = answer
 }
 
 
-case class ExternalQuery(url: String, title: String = "External question") extends HCompQuery {
+case class ExternalQuery(url: String, title: String = "External question", idFieldName: String = "field") extends HCompQuery {
 	override def question: String = url
 
 	override def suggestedPaymentCents: Int = 8
