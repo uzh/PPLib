@@ -38,7 +38,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 		catch {
 			case e: GotAnswer => {
 				/*hopefully we land here*/
-				logger.info("received response " + answer, e)
+				logger.info(s"received response for query ${query.identifier}: $answer")
 			}
 		}
 		answer
