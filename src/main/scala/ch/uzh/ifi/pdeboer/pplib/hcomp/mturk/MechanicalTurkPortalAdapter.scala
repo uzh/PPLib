@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
-import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+import ch.uzh.ifi.pdeboer.pplib.util.{GrowingTimer, U, LazyLogger}
 import org.joda.time.DateTime
 
 import scala.collection.mutable
@@ -103,8 +103,10 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 private[mturk] class RejectableTurkAnswer(a: Assignment, val answer: HCompAnswer, service: MTurkService) extends RejectableAnswer with LazyLogger {
 	private var untouched: Boolean = true
 
+	import scala.concurrent.duration._
+
 	def reject(message: String) = if (untouched) try {
-		service.RejectAssignment(a, message)
+		U.retry(3, new GrowingTimer(1 second, 30, 300 seconds))(service.RejectAssignment(a, message))
 		untouched = false
 		true
 	}
@@ -115,7 +117,7 @@ private[mturk] class RejectableTurkAnswer(a: Assignment, val answer: HCompAnswer
 	} else false
 
 	def approve(message: String, bonusCents: Int = 0) = if (untouched) try {
-		service.ApproveAssignment(a, message)
+		U.retry(3, new GrowingTimer(1 second, 30, 300 seconds))(service.ApproveAssignment(a, message))
 		untouched = false
 		true
 	}
