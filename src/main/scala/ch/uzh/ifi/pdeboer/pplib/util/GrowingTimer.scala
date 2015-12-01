@@ -8,14 +8,18 @@ import scala.concurrent.duration.Duration
  * @param factor the factor by which the time increases on each call
  * @param max the maximum duration of the timeout (in ms)
  */
-class GrowingTimer(val start: Duration, val factor: Double, val max: Duration) {
+class GrowingTimer(val start: Duration, val factor: Double, val max: Duration) extends LazyLogger {
 	var currentTime = start
 
 	/**
 	 * Waits the current amount of time
 	 */
 	def waitTime = {
-		Thread.sleep(currentTime.toMillis)
+		try {
+			Thread.sleep(currentTime.toMillis)
+		} catch {
+			case e: InterruptedException => logger.info("Parked thread got woken up. Let's see what's going on..")
+		}
 		updateTimer
 	}
 

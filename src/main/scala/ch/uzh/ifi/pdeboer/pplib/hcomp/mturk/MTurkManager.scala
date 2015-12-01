@@ -9,17 +9,18 @@ import scala.xml.NodeSeq
 /**
   * Created by pdeboer on 19/11/14.
   */
-class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, val adapter: MechanicalTurkPortalAdapter) extends LazyLogger {
+class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, val adapter: MechanicalTurkPortalAdapter, waitInterval: Int = 1) extends LazyLogger {
 	var hit = ""
 	var cancelled: Boolean = false
 
 	private val service = adapter.service
+	val thread = Thread.currentThread()
 
 	private class GotAnswer extends Exception
 
 
 	def waitForResponse() = {
-		val timer = new GrowingTimer(1 second, 1.5, 60 seconds)
+		val timer = new GrowingTimer(waitInterval second, 1.05, 20 * waitInterval seconds)
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
 		try {
@@ -40,6 +41,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 				/*hopefully we land here*/
 				logger.info(s"received response for query ${query.identifier}: $answer")
 			}
+			case e: Throwable => logger.error("got an unexpected exception at query ${query.identifier}", e)
 		}
 		answer
 	}
@@ -90,6 +92,14 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 			}
 		} catch {
 			case e: Throwable => logger.error(s"got exception while waiting for answer for ${query.identifier}. Continueing to wait", e); None
+		}
+	}
+
+	def forcePoll(): Unit = {
+		try {
+			thread.interrupt()
+		} catch {
+			case e: Throwable => logger.error("error when interrupting a sleeping thread", e)
 		}
 	}
 

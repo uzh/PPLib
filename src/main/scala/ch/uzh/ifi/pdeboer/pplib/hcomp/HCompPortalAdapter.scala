@@ -140,6 +140,10 @@ trait AnswerRejection {
 	}
 }
 
+trait ForcedQueryPolling {
+	def poll(query: HCompQuery): Unit
+}
+
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents = 0d
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
