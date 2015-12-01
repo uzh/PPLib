@@ -46,6 +46,7 @@ class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, 
 			catch {
 				case e: Exception => {}
 			})
+			managerOption.get.setFinished(None)
 			logger.info(s"cancelled '${query.title}'")
 		} else {
 			logger.info(s"could not find query with ID '${query.identifier}' when trying to cancel it")
