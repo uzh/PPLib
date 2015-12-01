@@ -5,7 +5,7 @@ import java.io._
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
-@SerialVersionUID(1l) trait ProcessMemoizer extends Serializable {
+@SerialVersionUID(1l) trait ProcessMemoizer extends Serializable with LazyLogger {
 	def name: String
 
 	def overwriteExistingData: Boolean
@@ -14,20 +14,25 @@ import org.joda.time.DateTime
 
 	def addIncrementalSnapshot(name: String): ProcessSnapshot = {
 		val s = addSnapshot(name)
-		val olderElements: Map[String, Serializable] = if (latest.isDefined) latest.get.elements else Map()
+		val latestElement = findLatest
+		val olderElements: Map[String, Serializable] = if (latestElement.isDefined) latestElement.get.elements else Map()
 		olderElements.foreach(e => s.addElement(e._1, e._2))
 		s
 	}
 
 	def memWithReinitialization[T <: Serializable](name: String)(fn: => T)(reInitialization: T => T): T = {
-		if (latest.isDefined && latest.get.elements.contains(name)) {
-			val cacheHit = latest.get.elements(name).asInstanceOf[T]
+		val latestElement = findLatest
+		if (latestElement.isDefined && latestElement.get.elements.contains(name)) {
+			logger.debug("got memoizer hit for " + name + " in memoizer " + this.name)
+			val cacheHit = latestElement.get.elements(name).asInstanceOf[T]
 			reInitialization(cacheHit)
 		} else {
 			val ret = fn
-			addIncrementalSnapshot(name)
-				.addElement(name, ret)
-				.release()
+			this.name.synchronized {
+				addIncrementalSnapshot(name)
+						.addElement(name, ret)
+						.release()
+			}
 			ret
 		}
 	}
@@ -37,7 +42,7 @@ import org.joda.time.DateTime
 
 	def addSnapshot(name: String): ProcessSnapshot = {
 		val r = new ProcessSnapshotImpl(name)
-		synchronized {
+		this.name.synchronized {
 			snapshotList = r :: snapshotList
 		}
 		r
@@ -45,7 +50,7 @@ import org.joda.time.DateTime
 
 	def snapshots = snapshotList
 
-	def latest = snapshotList.find(_.isFinal)
+	def findLatest = snapshotList.find(_.isFinal)
 
 	def flush(): Boolean
 
@@ -117,9 +122,15 @@ class NoProcessMemoizer(val name: String = "", val overwriteExistingData: Boolea
 	}
 }
 
+class InMemoryProcessMemoizer(val name: String = "", val overwriteExistingData: Boolean = false) extends ProcessMemoizer {
+	override def flush(): Boolean = true
+
+	override def load(): Boolean = true
+}
+
 /**
- * Created by pdeboer on 05/12/14.
- */
+  * Created by pdeboer on 05/12/14.
+  */
 class FileProcessMemoizer(val name: String, val overwriteExistingData: Boolean = false) extends ProcessMemoizer with LazyLogger {
 	val defaultPath = "state/"
 	val defaultSuffix = ".state"
@@ -148,9 +159,9 @@ class FileProcessMemoizer(val name: String, val overwriteExistingData: Boolean =
 	}
 
 	/**
-	 * do not execute during runtime
-	 * @return
-	 */
+	  * do not execute during runtime
+	  * @return
+	  */
 	override def load(): Boolean = {
 		synchronized {
 			try {

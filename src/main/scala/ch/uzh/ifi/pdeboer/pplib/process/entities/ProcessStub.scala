@@ -53,7 +53,7 @@ object ProcessStub {
 		params += key -> value
 	}
 
-	def getProcessMemoizer(identity: String) = MEMOIZER_NAME.get match {
+	def getProcessMemoizer(identity: String): Option[ProcessMemoizer] = MEMOIZER_NAME.get match {
 		case Some(x: String) => Some(new FileProcessMemoizer(x + identity))
 		case _ => None
 	}

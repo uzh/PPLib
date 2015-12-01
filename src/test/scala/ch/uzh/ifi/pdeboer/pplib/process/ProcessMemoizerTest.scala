@@ -81,11 +81,11 @@ class ProcessMemoizerTest {
 		catch {
 			case e: Exception => //hah! you were expected
 		}
-		Assert.assertEquals("sn1", mem.latest.get.name)
+		Assert.assertEquals("sn1", mem.findLatest.get.name)
 
 		val mem2 = new FileProcessMemoizer("asdf", false)
-		Assert.assertEquals("sn1", mem2.latest.get.name)
-		Assert.assertEquals(s.dateCreated, mem2.latest.get.dateCreated)
-		Assert.assertEquals(s.elements, mem2.latest.get.elements)
+		Assert.assertEquals("sn1", mem2.findLatest.get.name)
+		Assert.assertEquals(s.dateCreated, mem2.findLatest.get.dateCreated)
+		Assert.assertEquals(s.elements, mem2.findLatest.get.elements)
 	}
 }

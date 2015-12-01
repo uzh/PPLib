@@ -1,12 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, DefaultParameters}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.randomportal.RandomHCompPortal
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess
 import org.junit.{Assert, Test}
 
 /**
- * Created by pdeboer on 03/12/14.
- */
+  * Created by pdeboer on 03/12/14.
+  */
 class ContestWithBeatByKVotingProcessTest {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
@@ -96,13 +97,39 @@ class ContestWithBeatByKVotingProcessTest {
 		p.setParam(RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.key, true)
 		Assert.assertNotNull(p.getEndResult(patches))
 	}
-	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends ContestWithBeatByKVotingProcess(params) {
+
+	@Test
+	def testMemoizer: Unit = {
+		import DefaultParameters._
+		val mem = new InMemoryProcessMemoizer("bbkInMem")
+		val portal = new RandomHCompPortal("")
+		val bbkParamMap = Map(MEMOIZER_NAME.key -> Some("mem"), PORTAL_PARAMETER.key -> portal, K.key -> 4)
+		val data: List[IndexedPatch] = IndexedPatch.from("1,2,3,4,5,6,7,8,9", ",")
+		val bbk = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem)
+		val winner = bbk.process(data)
+
+		val bbk2 = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem)
+		val winner2 = bbk2.process(data)
+
+		Assert.assertEquals(winner, winner2)
+		Assert.assertEquals(bbk.getVotes, bbk2.getVotes)
+	}
+
+	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any], mem: ProcessMemoizer = null) extends ContestWithBeatByKVotingProcess(params) {
+
+		import DefaultParameters._
+
+		def getVotes = votes
+
 		def setVotes(v: Map[String, Int]): Unit = {
 			votes ++= v
 		}
+
 		def setUncountedVotes(uncounted: Int): Unit = {
 			this.uncountedVotes = uncounted
 		}
+
+		override def getProcessMemoizer(identity: String): Option[ProcessMemoizer] = if (MEMOIZER_NAME.get.isDefined) Some(mem) else None
 	}
 
 }
