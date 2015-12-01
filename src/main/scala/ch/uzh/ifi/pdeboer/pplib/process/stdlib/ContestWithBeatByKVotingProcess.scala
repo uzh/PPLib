@@ -25,7 +25,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 			do {
 				logger.info("started iteration " + globalIteration)
 				getCrowdWorkers(K.get - delta).foreach(w => {
-					val answerOpt = obtainValidVote(data)
+					val answerOpt = memoizer.mem(s"vote $globalIteration $w")(obtainValidVote(data))
 					answerOpt.foreach(answer => {
 						data.synchronized {
 							logger.info("got valid vote for " + answer)
