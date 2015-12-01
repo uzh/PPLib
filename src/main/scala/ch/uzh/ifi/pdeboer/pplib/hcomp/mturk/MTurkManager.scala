@@ -14,12 +14,13 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 	var cancelled: Boolean = false
 
 	private val service = adapter.service
-	val thread = Thread.currentThread()
+	var thread = Thread.currentThread()
 
 	private class GotAnswer extends Exception
 
 
 	def waitForResponse() = {
+		thread = Thread.currentThread()
 		val timer = new GrowingTimer(waitInterval second, 1.05, 20 * waitInterval seconds)
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
