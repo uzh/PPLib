@@ -18,7 +18,10 @@ class GrowingTimer(val start: Duration, val factor: Double, val max: Duration) e
 		try {
 			Thread.sleep(currentTime.toMillis)
 		} catch {
-			case e: InterruptedException => logger.info("Parked thread got woken up. Let's see what's going on..")
+			case e: InterruptedException => {
+				logger.info("Parked thread got woken up. Let's see what's going on..")
+				Thread.interrupted() //reset interruption status
+			}
 		}
 		updateTimer
 	}
