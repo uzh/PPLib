@@ -19,12 +19,12 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 
 
 	def waitForResponse() = {
-		val timer = new GrowingTimer(1 second, 1.0001, 60 seconds)
+		val timer = new GrowingTimer(1 second, 1.5, 60 seconds)
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
 		try {
 			(1 to 1000000).foreach(i => {
-				val tmpAnswer = U.retry(5)(poll())
+				val tmpAnswer = poll()
 				if (cancelled || tmpAnswer.isDefined) {
 					properties.synchronized {
 						answer = tmpAnswer
@@ -81,11 +81,15 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 	}
 
 	def poll(): Option[HCompAnswer] = {
-		logger.debug("checking for answer..")
-		val assignments = service.GetAssignmentsForHIT(hit)
-		assignments.headOption match {
-			case None => None
-			case Some(a: Assignment) => handleAssignmentResult(a)
+		try {
+			logger.debug("checking for answer..")
+			val assignments = service.GetAssignmentsForHIT(hit)
+			assignments.headOption match {
+				case None => None
+				case Some(a: Assignment) => handleAssignmentResult(a)
+			}
+		} catch {
+			case e: Throwable => logger.error(s"got exception while waiting for answer for ${query.identifier}. Continueing to wait", e); None
 		}
 	}
 
