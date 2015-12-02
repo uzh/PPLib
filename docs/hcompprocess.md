@@ -4,7 +4,7 @@ Human computation processes can be nested due to the use of a complex ProcessPar
 
 ##Example: The Collection process
 We think it is best to learn about crowd processes by walking step by step through the inception of one of them: The Collection process.
-A collection-process is very basic and is used to ask a question to a specific number of crowd workers. You can find the collection class, that gets used in PPLib [here](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/stdlib/Collection.scala)
+A collection-process is very basic and is used to ask a question to a specific number of crowd workers. You can find the collection class, that gets used in PPLib [here](https://github.com/uzh/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/stdlib/Collection.scala)
  
 ###Step 1: The class definition using an INPUT, an OUTPUT and a base type
 In order to make a process (re-)usable, it often pays out to think of a base class in the PPLib Process Repository (PPR) where it would fit in. 
@@ -15,7 +15,7 @@ There are currently two types of base classes present in the PPR:
 In case of our Collection-Process, it would make sense to list it under `CREATE`, since we are asking a couple of them to _create_ an answer to a text.
 
 As an input parameter, our target process will require an element about which it will ask crowd workers a question. We will therefore get multiple answers for an individual element. 
-This `element` could be anything: a paragraph, a sentence, an image etc. We therefore have introduced a data structure within PPLib that takes care of capturing this in an abstract fashion: [Patch](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/Patch.scala).
+This `element` could be anything: a paragraph, a sentence, an image etc. We therefore have introduced a data structure within PPLib that takes care of capturing this in an abstract fashion: [Patch](https://github.com/uzh/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/Patch.scala).
 Given this explanation, our input type will be one patch, while our output type will be a list of patches (since a specific number are going to create new patches that have some relationship to the input-patch). 
 
 These 3 decisions (input, output and base type) determine the base class out of the PPR that gets used. In case of Collection, we will use a CreateProcess with Patch as input parameter and a list of patches as output parameter: `CreateProcess[Patch, List[Patch]]`. 
@@ -30,13 +30,13 @@ class Collection(params: Map[String, Any] = Map.empty) extends CreateProcess[Pat
 In case you'd like to have your process automatically added to the PPR, add an @PPLibProcess annotation just before the class definition. Once PPLib is started, the PPR scans the classpath for all classes that have this annotation and adds them to the default PPR (you can create your own PPR with a subset of the processes). In case your process for some reason does not fulfill our default structure (see section below for more information), you can supply a ProcessFactory to this annotation using the builder pattern. Example: `@PPLibProcess(builder=classOf[MyProcessBuilder])`
 We then define the class and its constructors, which should be the same for all PPLib processes. After the base type definition, we mix in Traits for all supported operations of this process: `with HCompPortalAccess with InstructionHandler with QueryInjection`. 
 * _HCompPortalAccess_: Trait that introduces a parameter requiring a valid human computation portal and a convenient getter for this portal, such that within our process, we can directly interact with a variable called `portal`. 
-* _InstructionHandler_: This Collection class supports instruction handling, which is employed to generate instructions according to a definition of the deep structure of the instructions. You can read more about instruction generation [here](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md). The trait introduces a method `instructions.getInstruction(..)` and `instructionTitle`, both generating text based on parameters
+* _InstructionHandler_: This Collection class supports instruction handling, which is employed to generate instructions according to a definition of the deep structure of the instructions. You can read more about instruction generation [here](https://github.com/uzh/PPLib/blob/master/docs/instructiongenerator.md). The trait introduces a method `instructions.getInstruction(..)` and `instructionTitle`, both generating text based on parameters
 * _QueryInjection_: This trait supports injecting multiple additional queries into this process that get sent along to crowd workers with the actual query defined by the process programmer. As an example in the collection process, we will send a query to crowd workers based on this patch. Another person using this process, would additionally like to gain feedback by crowd workers about this task and can therefore supply this as an "injected query" that gets picked up and executed together with the actual query using this trait. Answers for injected queries can be retrieved directly on the process using `myProcess.getQueryAnswersFromComposite(..)` 
 
 For all traits, we recommend reading the class code for more information on how to use them. 
 
 ###Step 2: Define parameters
-Almost all Processes require some kind of parameters to be executed. We have provided a implementations of the most common parameters in [the DefaultParameters class](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/DefaultParameters.scala) that you can (and should) reuse. 
+Almost all Processes require some kind of parameters to be executed. We have provided a implementations of the most common parameters in [the DefaultParameters class](https://github.com/uzh/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/DefaultParameters.scala) that you can (and should) reuse. 
  In case of the Collection class, one doesn't need any more default parameters than the ones defined by DefaultParameters: one just needs `WORKER_COUNT`. In case one would require additional parameters, that aren't present in DefaultParameters, one can add a static portion to the class into the same file as illustrated below:
  ```scala
  //don't look at this
@@ -73,7 +73,7 @@ In the code below, the following steps will happen:
 
   1.0 We initialize the Memoizer that is responsible for inexpensive crash & rerun (If the process execution crashes, it will return from the last state that we have surrounded with an `memoizer.mem()` statement after we have fixed the problem and rerun the application)
   
-  1.1 We construct our precise worker instructions using the _InstructionHandler_ Trait ([learn more here](https://github.com/pdeboer/PPLib/blob/master/docs/instructiongenerator.md))
+  1.1 We construct our precise worker instructions using the _InstructionHandler_ Trait ([learn more here](https://github.com/uzh/PPLib/blob/master/docs/instructiongenerator.md))
   
   1.2 We create a query where crowd workers can answer in freetext using these instructions and store it in the `query` variable
   
@@ -115,8 +115,8 @@ Note that `PORTAL_PARAMETER` is mixed in to our own collection process by the tr
 All PPLib processes have a default constructor that looks like this: `class MyProcess(params: Map[String, Any] = Map.empty) extends ..`. 
 Even though there are ways to go around it if absolutely necessary, processes should stick to the following constraints
 * Have 2 constructors: one that takes a single parameter of type `Map[String,Any]` and one that takes no parameter (and forwards an empty Map into the first constructor). Note that all of these get automatically generated if you use the class header described above
-* Use parameters from [DefaultParameters](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/DefaultParameters.scala) wherever applicable (worker counts, worker payout, etc)
+* Use parameters from [DefaultParameters](https://github.com/uzh/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/entities/DefaultParameters.scala) wherever applicable (worker counts, worker payout, etc)
 * In case a parameter is required and not present in DefaultParameters, the parameter should be added as a static element to the class definition for increased readability (see step 3 above for an example)
 * Read _all_ parameters your process needs from the parameter map that gets passed to the class. There are convenience methods to make them more accessible and type-safe.
-* Specify the `costCeiling` and `dataSizeMultiplicator` function for your process. You can find an easy example in the [Collection class](https://github.com/pdeboer/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/stdlib/Collection.scala)
+* Specify the `costCeiling` and `dataSizeMultiplicator` function for your process. You can find an easy example in the [Collection class](https://github.com/uzh/PPLib/blob/master/src/main/scala/ch/uzh/ifi/pdeboer/pplib/process/stdlib/Collection.scala)
 * Try to build your class in a way such that it only requires optional parameters by giving default values to all parameters that you specify yourself
