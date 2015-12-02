@@ -2,7 +2,7 @@
 Recombination is used to generate all possible implementations of a crowd task as specified by its deep structure. 
 
 ##Example
-You can find a full Recombination example [here](https://github.com/pdeboer/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening). This guide is merely to focus your attention on some specifics. 
+You can find a full Recombination example [here](https://github.com/uzh/PPLib/tree/master/src/test/scala/ch/uzh/ifi/pdeboer/pplib/examples/textshortening). This guide is merely to focus your attention on some specifics. 
 
 Please note, that this section is based on the original PPLib paper. We try our best to keep it up to date as the code evolves. 
  
