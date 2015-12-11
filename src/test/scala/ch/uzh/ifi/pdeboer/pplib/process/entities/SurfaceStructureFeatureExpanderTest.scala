@@ -4,6 +4,7 @@ import java.io.FileWriter
 
 import ch.uzh.ifi.pdeboer.pplib.examples.textshortening.{ShortNDeepStructure, ShortNTestDataInitializer}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.Recombinator
+import com.github.tototoshi.csv.CSVWriter
 import org.junit.{Assert, Test}
 
 /**
@@ -25,10 +26,10 @@ class SurfaceStructureFeatureExpanderTest {
 		})
 
 		val fe = new SurfaceStructureFeatureExpander(recombinations)
-		val wr = new FileWriter("out.csv")
-		wr.write(fe.features.map(_.path).mkString(",") + "\n")
+		val wr = CSVWriter.open("out.csv")
+		wr.writeRow(fe.features.toList.map(_.path))
 		fe.surfaceStructures.foreach(s => {
-			wr.write(fe.features.map(f => fe.featureValueAt(f, s).getOrElse("")).mkString(",") + "\n")
+			wr.writeRow(fe.features.toList.map(f => fe.featureValueAt(f, s).getOrElse("")))
 		})
 		wr.close()
 	}

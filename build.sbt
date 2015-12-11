@@ -8,6 +8,8 @@ scalaVersion := "2.11.7"
 
 fork := true
 
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+
 libraryDependencies ++= Seq(
 	"junit" % "junit" % "4.8.1" % "test",
 	"org.scalacheck" %% "scalacheck" % "1.12.4" % "test",
@@ -20,12 +22,10 @@ libraryDependencies ++= Seq(
 	"org.apache.commons" % "commons-vfs2" % "2.0",
 	"org.apache.httpcomponents" % "httpclient" % "4.3.5",
 	"org.scala-lang.modules" %% "scala-xml" % "1.0.2",
-	"com.github.cb372" %% "scalacache-guava" % "0.6.3"
+	"com.github.cb372" %% "scalacache-guava" % "0.6.3",
+	"com.typesafe.play" %% "play-json" % "2.4.0-M1",
+	"com.github.tototoshi" %% "scala-csv" % "1.2.2" % "test"
 )
-
-//resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 
 //mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.singlequestion.MTurkCountWorkers")
 
