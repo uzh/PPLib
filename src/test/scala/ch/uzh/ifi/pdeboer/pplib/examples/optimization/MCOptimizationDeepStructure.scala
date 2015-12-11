@@ -9,7 +9,9 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionP
   * Created by pdeboer on 12/05/15.
   */
 case class MCOptimizationResult(text: String, costInCents: Int) extends Comparable[MCOptimizationResult] {
-	override def compareTo(o: MCOptimizationResult): Int = -1 * text.length.compareTo(o.text.length)
+	override def compareTo(o: MCOptimizationResult): Int = doubleRating.compareTo(o.doubleRating)
+
+	def doubleRating = MCOptimizeConstants.answerDistance(text.toInt) * 10 + costInCents
 }
 
 class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimizationResult] {
@@ -39,7 +41,7 @@ class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimiza
 						new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, 1 to 10) ::
 						new AddedParameterRecombinationHint[Int](ContestWithBeatByKVotingProcess.K, 1 to 10) ::
 						new AddedParameterRecombinationHint[Double](ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER, (1 to 8).map(i => 0.6 + (i.toDouble * .05))) ::
-					RecombinationHints.hcompPlatform(List(HCOMP_PORTAL_TO_USE)) :::
+						RecombinationHints.hcompPlatform(List(HCOMP_PORTAL_TO_USE)) :::
 						RecombinationHints.instructions(List(
 							new InstructionData(actionName = "select the element you like most", detailedDescription = "yeah, that one")))
 				})

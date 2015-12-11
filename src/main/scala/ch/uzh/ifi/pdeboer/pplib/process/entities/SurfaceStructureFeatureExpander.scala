@@ -61,6 +61,12 @@ class XMLFeatureExpander(xmls: List[NodeSeq]) {
 class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: Comparable[OUTPUT]](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends XMLFeatureExpander(surfaceStructures.map(s => s.recombinedProcessBlueprint.createProcess().xml)) {
 	def featureValueAt(feature: Feature, surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = valueAtPath(surfaceStructure.recombinedProcessBlueprint.createProcess().xml, feature.path)
 
+	def findSurfaceStructures(filter: Map[Feature, Option[String]]) = {
+		surfaceStructures.filter(ss => filter.forall(fi => featureValueAt(fi._1, ss) == fi._2))
+	}
+
+	def featureByPath(path: String) = featuresInclClass.find(_.path == path)
+
 	def toCSV(file: String, targetFeatures: List[Feature] = features.toList): Unit = {
 		val wr = CSVWriter.open(file)
 		wr.writeRow(targetFeatures.map(_.name))
