@@ -32,7 +32,7 @@ class MCOptimizationMockPortal extends HCompPortalAdapter {
 	protected def processMultipleChoiceQuery(x: MultipleChoiceQuery): Option[MultipleChoiceAnswer] = {
 		if (x.maxSelections != 1) throw new IllegalArgumentException("I can only deal with MC Questions that allow 1 selection")
 		val randomlySortedOptions = x.options.sortBy(s => Random.nextDouble())
-		val cdfOfOptions = randomlySortedOptions.zipWithIndex.map(t => randomlySortedOptions.take(t._2).map(_.toInt).sum)
+		val cdfOfOptions = randomlySortedOptions.zipWithIndex.map(t => randomlySortedOptions.take(t._2).map(_.toInt).sum + t._1.toInt)
 		val targetRandom = Random.nextDouble() * 100
 		val firstLargerElement = cdfOfOptions.zipWithIndex.find(i => i._1 > targetRandom)
 		val indexOfTargetElement = if (firstLargerElement.isDefined) firstLargerElement.get._2 else cdfOfOptions.length - 1
@@ -50,3 +50,4 @@ class MCOptimizationMockPortal extends HCompPortalAdapter {
 object MCOptimizationMockPortal {
 	val PORTAL_KEY = "MCOptimizationMockPortal"
 }
+
