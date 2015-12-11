@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
 	"com.github.cb372" %% "scalacache-guava" % "0.6.3"
 )
 
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+//resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
 

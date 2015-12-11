@@ -22,7 +22,7 @@ class Recombinator[INPUT, OUTPUT <: Comparable[OUTPUT]](recombinable: DeepStruct
 		new RecombinationVariantGenerator(recombinations).variants
 	}
 
-	def recombine() = {
+	def recombine(): List[SurfaceStructure[INPUT, OUTPUT]] = {
 		variants.map(v => new SurfaceStructure(recombinable, v))
 	}
 

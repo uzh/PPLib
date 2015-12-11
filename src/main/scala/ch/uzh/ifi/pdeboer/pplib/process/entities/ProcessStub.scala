@@ -4,11 +4,12 @@ import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
+import scala.xml.NodeSeq
 
 
 /**
- * Created by pdeboer on 13/02/15.
- */
+  * Created by pdeboer on 13/02/15.
+  */
 object ProcessStub {
 	def createFromBlueprint[P <: ProcessStub[_, _]](clazz: Class[P], params: Map[String, Any], factory: ProcessFactory[P]): P = {
 		//if Java Annotation factory was used --> convert to default
@@ -37,12 +38,12 @@ object ProcessStub {
 }
 
 /**
- * Created by pdeboer on 09/10/14.
- *
- * Base class for Recombination. Things to keep in mind:
- * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
- * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
- */
+  * Created by pdeboer on 09/10/14.
+  *
+  * Base class for Recombination. Things to keep in mind:
+  * <li>Your subclass should have a constructor that accepts an empty Map[String,Any] as parameter for RecombinationParameterGeneration to work</li>
+  * <li>If you would like to use automatic initialization, use the @RecombinationProcess annotation and make sure your process works out of the box without any parameters</li>
+  */
 @SerialVersionUID(1l) abstract class ProcessStub[INPUT, OUTPUT](var params: Map[String, Any])(implicit val inputClass: ClassTag[INPUT], val outputClass: ClassTag[OUTPUT], val inputType: TypeTag[INPUT], val outputType: TypeTag[OUTPUT]) extends LazyLogger with IParametrizable with Serializable {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
@@ -130,7 +131,7 @@ object ProcessStub {
 
 	def to[IN, OUT] = this.asInstanceOf[ProcessStub[IN, OUT]]
 
-	def xml = <Process>
+	def xml: NodeSeq = <Process>
 		<Class>
 			{getClass.getName}
 		</Class>
@@ -146,8 +147,14 @@ object ProcessStub {
 				<Name>
 					{p.key}
 				</Name>
+				<Type>
+					{p.baseType}
+				</Type>
 				<Value>
-					{getParam(p, useDefaultValues = true)}
+					{getParam(p, useDefaultValues = true) match {
+					case pp: PassableProcessParam[_] => pp.create().xml
+					case p => p
+				}}
 				</Value>
 				<IsSpecified>
 					{params.contains(p.key)}
