@@ -14,7 +14,9 @@ object MCOptimize extends App {
 
 	val multipeChoiceAnswers = "10,10,10,70"
 
-	new SurfaceStructureFeatureExpander(recombinations).toCSV("optimizationTest.csv")
+	private val expander = new SurfaceStructureFeatureExpander(recombinations)
+	private val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", expander.baseClassFeature.typeName).contains(f.typeName)).toList
+	expander.toCSV("optimizationTest.csv", targetFeatures)
 
 	val autoExperimentation = new AutoExperimentationEngine(recombinations)
 	val results = autoExperimentation.runOneIteration(multipeChoiceAnswers)
