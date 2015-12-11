@@ -6,8 +6,8 @@ import org.joda.time.DateTime
 import scala.util.Random
 
 /**
- * Created by pdeboer on 07/01/15.
- */
+  * Created by pdeboer on 07/01/15.
+  */
 @HCompPortal(builder = classOf[RandomPortalBuilder], autoInit = true)
 class RandomHCompPortal(val param: String) extends HCompPortalAdapter {
 	var answerPool: List[String] = Nil
@@ -42,7 +42,7 @@ class RandomHCompPortal(val param: String) extends HCompPortalAdapter {
 	}
 
 	protected def processFreetextQuery(x: FreetextQuery): Option[FreetextAnswer] = {
-		val answer: String = if (answerPool.size == 0) x.hashCode() + ""
+		val answer: String = if (answerPool.isEmpty) x.hashCode() + ""
 		else answerPool(Random.nextInt(answerPool.length))
 
 		Some(FreetextAnswer(x, answer))

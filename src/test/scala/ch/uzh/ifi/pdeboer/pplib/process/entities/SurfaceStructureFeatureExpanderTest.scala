@@ -12,7 +12,7 @@ import org.junit.{Assert, Test}
   */
 class SurfaceStructureFeatureExpanderTest {
 	@Test
-	def testExpander: Unit = {
+	def testExpanderShortn: Unit = {
 		val testData = new ShortNTestDataInitializer()
 		testData.initializePortal()
 		val deepStructure = new ShortNDeepStructure()
