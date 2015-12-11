@@ -2,7 +2,7 @@
 The instruction generator creates specific instructions based on the instruction-deep-structure provided through parameters. 
 Note that the instruction deep structure can be specified using the `InstructionData` class. 
 
-Please note that this is a fairly advanced topic and requires you to be proficient with [crowd processes and parameter handling in PPLib](https://github.com/pdeboer/PPLib/blob/master/docs/hcompprocess.md).
+Please note that this is a fairly advanced topic and requires you to be proficient with [crowd processes and parameter handling in PPLib](https://github.com/uzh/PPLib/blob/master/docs/hcompprocess.md).
 
 ##Overview
 A PPLib process that uses instruction generation needs to implement the trait `InstructionHandler`. 
