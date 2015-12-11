@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.SurfaceStructure
+import com.github.tototoshi.csv.CSVWriter
 
 import scala.xml.{NodeSeq, Node}
 
@@ -49,4 +50,14 @@ class XMLFeatureExpander(xmls: List[NodeSeq]) {
   */
 class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: Comparable[OUTPUT]](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends XMLFeatureExpander(surfaceStructures.map(s => s.recombinedProcessBlueprint.createProcess().xml)) {
 	def featureValueAt(feature: Feature, surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = valueAtPath(surfaceStructure.recombinedProcessBlueprint.createProcess().xml, feature.path.substring(1))
+
+	def toCSV(file: String): Unit = {
+		val featureList = features.toList
+		val wr = CSVWriter.open("out.csv")
+		wr.writeRow(featureList.map(_.path))
+		surfaceStructures.foreach(s => {
+			wr.writeRow(featureList.map(f => featureValueAt(f, s).getOrElse("")))
+		})
+		wr.close()
+	}
 }

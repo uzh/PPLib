@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.optimization
 
+import ch.uzh.ifi.pdeboer.pplib.process.entities.SurfaceStructureFeatureExpander
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AutoExperimentationEngine, Recombinator}
 
 /**
@@ -12,6 +13,8 @@ object MCOptimize extends App {
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val multipeChoiceAnswers = "10,10,10,70"
+
+	new SurfaceStructureFeatureExpander(recombinations).toCSV("optimizationTest.csv")
 
 	val autoExperimentation = new AutoExperimentationEngine(recombinations)
 	val results = autoExperimentation.runOneIteration(multipeChoiceAnswers)
