@@ -15,6 +15,7 @@ object MCOptimizeConstants {
 
 /**
   * Created by pdeboer on 12/05/15.
+  * sbt "run-main ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize"
   */
 object MCOptimize extends App {
 	val deepStructure = new MCOptimizationDeepStructure()
