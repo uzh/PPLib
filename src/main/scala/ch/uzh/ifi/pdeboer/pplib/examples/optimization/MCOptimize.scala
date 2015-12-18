@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.optimization
 
+import java.io.File
+
 import ch.uzh.ifi.pdeboer.pplib.process.entities.SurfaceStructureFeatureExpander
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AutoExperimentationEngine, Recombinator}
 
@@ -27,6 +29,7 @@ object MCOptimize extends App {
 	if (args.length == 0) {
 		val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", expander.baseClassFeature.typeName).contains(f.typeName)).toList
 		expander.toCSV("optimizationTest.csv", targetFeatures)
+		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
 	} else if (args.length == 1) {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
 			val content = l.split(" VALUE ")
@@ -36,11 +39,14 @@ object MCOptimize extends App {
 
 		val targetSurfaceStructures = expander.findSurfaceStructures(featureDefinition)
 
-		assert(targetSurfaceStructures.size == 1)
+		assert(targetSurfaceStructures.size <= 1)
 
-		val autoExperimentation = new AutoExperimentationEngine(targetSurfaceStructures)
-		val results = autoExperimentation.runOneIteration(MCOptimizeConstants.multipeChoiceAnswers)
+		if (targetSurfaceStructures.isEmpty) println(Double.MaxValue)
+		else {
+			val autoExperimentation = new AutoExperimentationEngine(targetSurfaceStructures)
+			val results = autoExperimentation.runOneIteration(MCOptimizeConstants.multipeChoiceAnswers)
 
-		println(results.results.head.result.get.doubleRating)
+			println(results.results.head.result.get.doubleRating)
+		}
 	}
 }

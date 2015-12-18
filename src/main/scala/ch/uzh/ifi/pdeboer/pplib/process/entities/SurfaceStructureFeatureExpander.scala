@@ -5,10 +5,9 @@ import com.github.tototoshi.csv.CSVWriter
 
 import scala.xml.{NodeSeq, Node}
 
+case class ProcessFeature(name: String, path: String, typeName: String)
+
 class XMLFeatureExpander(xmls: List[NodeSeq]) {
-
-	case class Feature(name: String, path: String, typeName: String)
-
 	def valueAtPath(xml: NodeSeq, path: String): Option[String] = {
 		if (path == baseClassFeature.path)
 			Some((xml \ "Class").text.trim)
@@ -30,21 +29,21 @@ class XMLFeatureExpander(xmls: List[NodeSeq]) {
 		}
 	}
 
-	lazy val features: Set[Feature] = {
+	lazy val features: Set[ProcessFeature] = {
 		xmls.map(x => extractFeaturesFromProcessXML(x.theSeq.head, "")).toSet.flatten
 	}
 
-	val baseClassFeature: Feature = Feature("baseclass", "++baseclass", "++baseclass")
+	val baseClassFeature: ProcessFeature = ProcessFeature("baseclass", "baseclass", "++baseclass")
 
 	def featuresInclClass = {
 		features + baseClassFeature
 	}
 
-	def extractFeaturesFromProcessXML(xml: Node, prefix: String): Set[Feature] = {
+	def extractFeaturesFromProcessXML(xml: Node, prefix: String): Set[ProcessFeature] = {
 		val params = (xml \ "Parameters" \ "Parameter").map(p => {
 			val name: String = (p \ "Name").text.trim
 			val newPrefix: String = prefix + "/" + name
-			val currentFeature = Feature(newPrefix, newPrefix, (p \ "Type").text.trim)
+			val currentFeature = ProcessFeature(newPrefix, newPrefix, (p \ "Type").text.trim)
 			if ((p \\ "Process").isEmpty) {
 				Set(currentFeature)
 			}
@@ -59,15 +58,15 @@ class XMLFeatureExpander(xmls: List[NodeSeq]) {
   * Created by pdeboer on 10/12/15.
   */
 class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: Comparable[OUTPUT]](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends XMLFeatureExpander(surfaceStructures.map(s => s.recombinedProcessBlueprint.createProcess().xml)) {
-	def featureValueAt(feature: Feature, surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = valueAtPath(surfaceStructure.recombinedProcessBlueprint.createProcess().xml, feature.path)
+	def featureValueAt(feature: ProcessFeature, surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = valueAtPath(surfaceStructure.recombinedProcessBlueprint.createProcess().xml, feature.path)
 
-	def findSurfaceStructures(filter: Map[Feature, Option[String]]) = {
+	def findSurfaceStructures(filter: Map[ProcessFeature, Option[String]]) = {
 		surfaceStructures.filter(ss => filter.forall(fi => featureValueAt(fi._1, ss) == fi._2))
 	}
 
 	def featureByPath(path: String) = featuresInclClass.find(_.path == path)
 
-	def toCSV(file: String, targetFeatures: List[Feature] = features.toList): Unit = {
+	def toCSV(file: String, targetFeatures: List[ProcessFeature] = features.toList): Unit = {
 		val wr = CSVWriter.open(file)
 		wr.writeRow(targetFeatures.map(_.name))
 		surfaceStructures.foreach(s => {
