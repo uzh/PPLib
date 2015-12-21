@@ -145,8 +145,8 @@ trait ForcedQueryPolling {
 }
 
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
-	private var spentCents = 0d
-	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Double]
+	private var spentCents: Int = 0
+	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Int]
 
 	private var queryLog = List.empty[HCompQueryStats]
 	decoratedPortal.addQueryLogListener(addQueryToLog)
@@ -161,8 +161,9 @@ class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) ex
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
-			spentCents += properties.paymentCents
-			spentPerQuery += query.identifier -> properties.paymentCents
+			val price: Int = decoratedPortal.price(query, properties)
+			spentCents += price
+			spentPerQuery += query.identifier -> price
 		}
 		decoratedPortal.sendQuery(query, properties)
 	}

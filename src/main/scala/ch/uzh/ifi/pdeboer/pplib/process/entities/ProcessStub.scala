@@ -80,9 +80,13 @@ object ProcessStub {
 		0
 	}
 
-	def costSoFar = 0 //TODO implement
+	def costSoFar: Int = {
+		logger.error("cost so far not implemented"); -1
+	} //TODO implement
 
-	def durationSoFar = 0 //TODO implement
+	def durationSoFar: Int = {
+		logger.error("duration so far not implemented"); -1
+	} //TODO implement
 
 	def ensureExpectedParametersGiven(expected: List[ProcessParameter[_]]): Unit = {
 		expected.forall(k => params.get(k.key) match {

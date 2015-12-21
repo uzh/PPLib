@@ -11,7 +11,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionP
 case class MCOptimizationResult(text: String, costInCents: Int) extends Comparable[MCOptimizationResult] {
 	override def compareTo(o: MCOptimizationResult): Int = doubleRating.compareTo(o.doubleRating)
 
-	def doubleRating = MCOptimizeConstants.answerDistance(text.toInt) * 10 + costInCents
+	def doubleRating: Double = MCOptimizeConstants.answerDistance(text.toInt) * 10d + costInCents.toDouble
 }
 
 class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimizationResult] {
@@ -28,7 +28,10 @@ class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimiza
 		val result: Patch = generatedShorteningProcess.process(options)
 
 		//return the result
-		MCOptimizationResult(result.value, generatedShorteningProcess.costSoFar)
+		MCOptimizationResult(result.value, generatedShorteningProcess match {
+			case x: HCompPortalAccess => x.portal.cost
+			case _ => throw new IllegalArgumentException("this only works for hcomp portals"); 0
+		})
 	}
 
 	val HCOMP_PORTAL_TO_USE: HCompPortalAdapter = new MCOptimizationMockPortal()

@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.optimization
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.SurfaceStructureFeatureExpander
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{XMLFeatureExpander, SurfaceStructureFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AutoExperimentationEngine, Recombinator}
 
 import scala.io.Source
@@ -27,7 +27,7 @@ object MCOptimize extends App {
 
 	val expander = new SurfaceStructureFeatureExpander(recombinations)
 	if (args.length == 0) {
-		val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", expander.baseClassFeature.typeName).contains(f.typeName)).toList
+		val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 		expander.toCSV("optimizationTest.csv", targetFeatures)
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
 	} else if (args.length == 1) {
@@ -37,11 +37,11 @@ object MCOptimize extends App {
 			expander.featureByPath(content(0)).get -> valueAsOption
 		}).toMap
 
-		val targetSurfaceStructures = expander.findSurfaceStructures(featureDefinition)
+		val targetSurfaceStructures = expander.findSurfaceStructures(featureDefinition, exactMatch = false)
 
 		assert(targetSurfaceStructures.size <= 1)
 
-		if (targetSurfaceStructures.isEmpty) println(Double.MaxValue)
+		if (targetSurfaceStructures.isEmpty) println(10000.0)
 		else {
 			val autoExperimentation = new AutoExperimentationEngine(targetSurfaceStructures)
 			val results = autoExperimentation.runOneIteration(MCOptimizeConstants.multipeChoiceAnswers)
