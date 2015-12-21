@@ -30,13 +30,14 @@ object MCOptimize extends App {
 	if (args.length == 0) {
 		expander.toCSV("optimizationTest.csv", targetFeatures)
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
-	} else if (args.length == 1 && args.head == "runall") {
+	} else if (args.head == "runall") {
 		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
-		val medians = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 99).medianResults
+		val medians = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 1).medianResults
 		val medianMap = medians.map(m => m.surfaceStructure -> List(m.result.getOrElse({
-			throw new IllegalStateException("no result for m"); ???
+			throw new IllegalStateException("no result for m");
+			???
 		}).doubleRating)).toMap
-		expander.toCSV("optimizationTestResults.csv", targetFeatures, medianMap)
+		expander.toCSV(s"optimizationTestResults${if (args.length == 2) args(1) else ""}.csv", targetFeatures, medianMap)
 
 	} else {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
