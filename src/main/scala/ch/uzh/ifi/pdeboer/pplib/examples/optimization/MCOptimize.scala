@@ -26,11 +26,19 @@ object MCOptimize extends App {
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val expander = new SurfaceStructureFeatureExpander(recombinations)
+	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 	if (args.length == 0) {
-		val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 		expander.toCSV("optimizationTest.csv", targetFeatures)
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
-	} else if (args.length == 1) {
+	} else if (args.length == 1 && args.head == "runall") {
+		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
+		val medians = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 99).medianResults
+		val medianMap = medians.map(m => m.surfaceStructure -> List(m.result.getOrElse({
+			throw new IllegalStateException("no result for m"); ???
+		}).doubleRating)).toMap
+		expander.toCSV("optimizationTestResults.csv", targetFeatures, medianMap)
+
+	} else {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
 			val content = l.split(" VALUE ")
 			val valueAsOption = if (content(1) == "None") None else Some(content(1))
@@ -46,7 +54,7 @@ object MCOptimize extends App {
 			val autoExperimentation = new AutoExperimentationEngine(targetSurfaceStructures)
 			val results = autoExperimentation.runOneIteration(MCOptimizeConstants.multipeChoiceAnswers)
 
-			println(results.results.head.result.get.doubleRating)
+			println(results.rawResults.head.result.get.doubleRating)
 		}
 	}
 }
