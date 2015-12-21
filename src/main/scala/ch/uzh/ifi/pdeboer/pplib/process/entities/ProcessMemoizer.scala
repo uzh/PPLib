@@ -117,6 +117,9 @@ class NoProcessMemoizer(val name: String = "", val overwriteExistingData: Boolea
 
 	override def load(): Boolean = true
 
+
+	override def addSnapshot(name: String): ProcessSnapshot = new ProcessSnapshotImpl(name)
+
 	override def memWithReinitialization[T <: Serializable](name: String)(fn: => T)(reInitialization: T => T): T = {
 		fn
 	}
