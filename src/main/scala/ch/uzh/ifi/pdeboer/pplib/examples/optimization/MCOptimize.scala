@@ -32,7 +32,7 @@ object MCOptimize extends App {
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
 	} else if (args.head == "runall") {
 		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
-		val medians = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 9).medianResults
+		val medians = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 19).medianResults
 		val medianMap = medians.map(m => m.surfaceStructure -> List(m.result.getOrElse({
 			throw new IllegalStateException("no result for m")
 			???
