@@ -80,7 +80,7 @@ class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: Comparable[OUTPUT]](val s
 
 	def featureByPath(path: String) = featuresInclClass.find(_.path == path)
 
-	def toCSV(file: String, targetFeatures: List[ProcessFeature] = features.toList, dataToInject: Map[SurfaceStructure[INPUT, OUTPUT], List[Any]] = Map.empty): Unit = {
+	def toCSV(file: String, targetFeatures: List[ProcessFeature] = features.toList, dataToInject: Map[SurfaceStructure[INPUT, OUTPUT], List[_]] = Map.empty): Unit = {
 		val wr = CSVWriter.open(file)
 		wr.writeRow(targetFeatures.map(_.name))
 		surfaceStructures.foreach(s => {
