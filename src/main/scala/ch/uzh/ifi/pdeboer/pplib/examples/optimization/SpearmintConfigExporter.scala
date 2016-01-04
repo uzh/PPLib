@@ -18,7 +18,7 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: Comparable[OUTPUT]](featureExpand
 	def enumRangeFor(feature: ProcessFeature): List[String] = {
 		val range = featureExpander.surfaceStructures.groupBy(s => featureExpander.featureValueAt(feature, s))
 
-		range.map(_._1.getOrElse("None")).toList
+		range.filter(_._1.isDefined).map(_._1.get).toList
 	}
 
 	def jsonFormatFeature(feature: ProcessFeature): String = {
