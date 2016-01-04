@@ -22,13 +22,41 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: Comparable[OUTPUT]](featureExpand
 	}
 
 	def jsonFormatFeature(feature: ProcessFeature): String = {
+		val targetType = FeatureTypeDescription.of(feature)
 		s"""
 		   "${feature.name}" : {
-	 			"type" : "ENUM",
-	 			"size" : 2,
-	 			"options" : [${enumRangeFor(feature).map(f => "\"" + f + "\"").mkString(", ")}]
+	 			"type" : "${targetType.typ}",
+	 			"size" : ${targetType.size},
+	 			${targetType.options}
 		   }
 		 """
+	}
+
+	private sealed abstract class FeatureTypeDescription(val typ: String, val size: Int = 1) {
+		def options: String
+	}
+
+	object FeatureTypeDescription {
+		def of(feature: ProcessFeature): FeatureTypeDescription = {
+			val range = enumRangeFor(feature)
+			val enumFeatureType = new EnumFeatureType(range)
+			if (range.forall(_.matches("[0-9]*"))) {
+				val numericRange = range.map(_.toInt).sorted
+				val (min, max) = (numericRange.head, numericRange.last)
+				if (max - min == range.length + 1) new IntFeatureType(min, max) else enumFeatureType
+			} else enumFeatureType
+		}
+	}
+
+	private class EnumFeatureType(range: List[String]) extends FeatureTypeDescription("ENUM") {
+		def options: String = s"\"options\" : [${range.map(f => "\"" + f + "\"").mkString(", ")}]"
+	}
+
+	private class IntFeatureType(min: Int, max: Int) extends FeatureTypeDescription("INT") {
+		def options: String =
+			s""""min" : $min,
+			   	 "max" : $max
+			 """
 	}
 
 	def jsonFeatureDescription(features: List[ProcessFeature]) =
