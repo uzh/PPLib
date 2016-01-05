@@ -8,7 +8,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AutoExperimentationEngine
 import scala.io.Source
 
 object MCOptimizeConstants {
-	val multipeChoiceAnswers = "10,10,10,70"
+	var multipeChoiceAnswers = ""
 
 	lazy val bestAnswer = multipeChoiceAnswers.split(",").map(_.toInt).max
 
@@ -20,6 +20,9 @@ object MCOptimizeConstants {
   * sbt "run-main ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize"
   */
 object MCOptimize extends App {
+	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("10,10,10,70")
+	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam
+
 	val deepStructure = new MCOptimizationDeepStructure()
 
 	val recombinations = new Recombinator(deepStructure).recombine()
@@ -27,15 +30,14 @@ object MCOptimize extends App {
 
 	val expander = new SurfaceStructureFeatureExpander(recombinations)
 	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
-	if (args.length == 0) {
+	if (args.contains("spearmintconfig")) {
 		expander.toCSV("optimizationTest.csv", targetFeatures)
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
-	} else if (args.head == "runall") {
+	} else if (args.contains("runall")) {
 		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
 		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 20)
 		val resultMap = results.surfaceStructures.map(ss => ss -> results.resultsForSurfaceStructure(ss).map(r => r.result.get.doubleRating)).toMap
 		expander.toCSV(s"optimizationTestResults${if (args.length == 2) args(1) else ""}.csv", targetFeatures, resultMap)
-
 	} else {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
 			val content = l.split(" VALUE ")
