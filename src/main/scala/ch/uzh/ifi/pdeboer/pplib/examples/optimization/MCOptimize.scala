@@ -20,8 +20,8 @@ object MCOptimizeConstants {
   * sbt "run-main ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize"
   */
 object MCOptimize extends App {
-	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("10,10,10,70")
-	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam
+	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("answers10,10,10,70")
+	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam.substring("answers".length)
 
 	val deepStructure = new MCOptimizationDeepStructure()
 
