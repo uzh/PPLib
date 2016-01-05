@@ -37,7 +37,7 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: Comparable[OUTPUT]](featureExpand
 	}
 
 	object FeatureTypeDescription {
-		def of(feature: ProcessFeature): FeatureTypeDescription = {
+		private[SpearmintConfigExporter] def of(feature: ProcessFeature): FeatureTypeDescription = {
 			val range = enumRangeFor(feature)
 			val enumFeatureType = new EnumFeatureType(range)
 			if (range.forall(_.matches("[0-9]*"))) {
@@ -49,7 +49,11 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: Comparable[OUTPUT]](featureExpand
 	}
 
 	private class EnumFeatureType(range: List[String]) extends FeatureTypeDescription("ENUM") {
-		def options: String = s"\"options\" : [${range.map(f => "\"" + f + "\"").mkString(", ")}]"
+		def options: String = s""""options" : [$optionsList]"""
+
+		protected def optionsList: String = {
+			range.map(f => "\"" + f + "\"").mkString(", ")
+		}
 	}
 
 	private class IntFeatureType(min: Int, max: Int) extends FeatureTypeDescription("INT") {
