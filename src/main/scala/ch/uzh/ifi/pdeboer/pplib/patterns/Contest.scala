@@ -16,7 +16,7 @@ class ContestExecutor[T](val driver: ContestDriver[T], val showsPerElement: Int 
 
 		val candidates = winnerCandidates
 		if (candidates.size == 1)
-			candidates(0)._2.alternative
+			candidates.head._2.alternative
 		else
 			voteOnTargetsAndReturnWinner(candidates.map(_._2)).alternative
 	}

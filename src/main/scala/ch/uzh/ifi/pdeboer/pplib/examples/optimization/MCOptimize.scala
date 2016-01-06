@@ -20,8 +20,8 @@ object MCOptimizeConstants {
   * sbt "run-main ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize"
   */
 object MCOptimize extends App {
-	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("answers10,10,10,70")
-	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam.substring("answers".length)
+	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("answers10,10,10,70").substring("answers".length)
+	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam
 
 	val deepStructure = new MCOptimizationDeepStructure()
 
@@ -37,7 +37,7 @@ object MCOptimize extends App {
 		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
 		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 20)
 		val resultMap = results.surfaceStructures.map(ss => ss -> results.resultsForSurfaceStructure(ss).map(r => r.result.get.doubleRating)).toMap
-		expander.toCSV(s"optimizationTestResults${if (args.length == 2) args(1) else ""}.csv", targetFeatures, resultMap)
+		expander.toCSV(s"optimizationTestResults$mcAnswersParam.csv", targetFeatures, resultMap)
 	} else {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
 			val content = l.split(" VALUE ")
