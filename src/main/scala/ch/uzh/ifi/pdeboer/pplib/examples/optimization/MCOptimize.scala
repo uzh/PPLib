@@ -53,7 +53,7 @@ object MCOptimize extends App {
 		else {
 			val autoExperimentation = new AutoExperimentationEngine(targetSurfaceStructures)
 			val results = autoExperimentation.runOneIteration(MCOptimizeConstants.multipeChoiceAnswers)
-			println("cost was" + results.rawResults.head.result.get.costInCents)
+			println("cost was " + results.rawResults.head.result.get.costInCents)
 
 			println(results.rawResults.head.result.get.doubleRating)
 		}

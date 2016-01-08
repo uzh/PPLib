@@ -1,14 +1,14 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils
-import CollectionUtils._
-
+import scala.util.Random
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 /**
   * Created by pdeboer on 27/07/15.
   */
 class AutoExperimentationEngine[INPUT, OUTPUT <: Comparable[OUTPUT]](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) {
 	def runOneIteration(input: INPUT) = {
-		val results = surfaceStructures.mpar.map(s => SurfaceStructureResult(s, s.test(input)))
+		val shuffledStructures = surfaceStructures.map(s => (Random.nextDouble(), s)).sortBy(_._1).map(_._2)
+		val results = shuffledStructures.mpar.map(s => SurfaceStructureResult(s, s.test(input)))
 		ExperimentIteration(results.toList)
 	}
 

@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
+import com.google.common.cache.CacheBuilder
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 import scalacache.ScalaCache
@@ -85,7 +87,9 @@ object MonteCarlo {
 
 	import scalacache.memoization._
 
-	implicit val scalaCache = ScalaCache(GuavaCache())
+	private val underlyingGuavaCache = CacheBuilder.newBuilder().maximumSize(10000L).build[String, Object]
+	implicit val scalaCache = ScalaCache(GuavaCache(underlyingGuavaCache))
+
 
 	/**
 	 * Calculates the minimum number of tasks the schedule to allow for the provided confidence level to result
