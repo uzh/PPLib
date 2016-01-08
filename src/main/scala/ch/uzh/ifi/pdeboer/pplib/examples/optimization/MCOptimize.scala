@@ -43,7 +43,8 @@ object MCOptimize extends App {
 
 			resultCost ::: resultsUtilities
 		}.toMap).toMap
-		expander.toCSV(s"optimizationTestResults$mcAnswersParam.csv", targetFeatures, resultMap)
+		val hostname = args.find(_.startsWith("hostname")).map(_.substring("hostname".length))
+		expander.toCSV(s"optimizationTestResults$mcAnswersParam${hostname.map(h => "_" + h).getOrElse("")}.csv", targetFeatures, resultMap)
 	} else {
 		val featureDefinition = Source.fromFile(args(0)).getLines().map(l => {
 			val content = l.split(" VALUE ")
