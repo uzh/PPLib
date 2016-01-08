@@ -10,7 +10,7 @@ import scala.io.Source
 object MCOptimizeConstants {
 	var multipeChoiceAnswers = ""
 
-	lazy val bestAnswer = multipeChoiceAnswers.split(",").map(_.toInt).max
+	def bestAnswer = multipeChoiceAnswers.split(",").map(_.toInt).max
 
 	def answerDistance(answer: Int) = bestAnswer - answer
 }
@@ -35,7 +35,7 @@ object MCOptimize extends App {
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
 	} else if (args.contains("runall")) {
 		val autoExperimentationEngine = new AutoExperimentationEngine(recombinations)
-		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 10)
+		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 5)
 		val resultMap = results.surfaceStructures.map(ss => ss -> {
 			val resultsObjects = results.resultsForSurfaceStructure(ss).zipWithIndex
 			val resultsUtilities = resultsObjects.map(r => "iteration_utility_" + r._2 -> r._1.result.get.doubleRating)
