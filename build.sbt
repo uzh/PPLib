@@ -27,9 +27,9 @@ libraryDependencies ++= Seq(
 	"com.github.tototoshi" %% "scala-csv" % "1.2.2"
 )
 
-//mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.singlequestion.MTurkCountWorkers")
+mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize")
 
 // To Skip Tests:
-//test in assembly := {}
+test in assembly := {}
 
-//assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true)
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true)
