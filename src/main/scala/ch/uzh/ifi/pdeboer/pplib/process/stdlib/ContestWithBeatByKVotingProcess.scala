@@ -59,7 +59,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	private def obtainValidVote(data: List[Patch]): Option[String] = {
 		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
 			QUESTION_PRICE.get).get
-		val ans = queryBuilder.parseAnswer[String]("", data, answerRaw, this)
+		val ans = queryBuilder.parseAnswer[String](data, answerRaw, this)
 
 		if (ans.isDefined) ans
 		else {
@@ -84,7 +84,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[Patch]) = {
-		queryBuilder.buildQuery("", alternatives, this)
+		queryBuilder.buildQuery(alternatives, this)
 	}
 
 	override def getCostCeiling(data: List[Patch]): Int = MAX_ITERATIONS.get * QUESTION_PRICE.get.paymentCents

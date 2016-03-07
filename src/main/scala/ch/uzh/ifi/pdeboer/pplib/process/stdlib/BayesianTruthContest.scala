@@ -38,7 +38,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 					}
 				)).toList
 
-			val valueOfAnswer: Option[String] = answers.groupBy(s => queryBuilder.parseAnswer[String]("", alternatives, s._2, this)).maxBy(s => s._2.length)._1
+			val valueOfAnswer: Option[String] = answers.groupBy(s => queryBuilder.parseAnswer[String](alternatives, s._2, this)).maxBy(s => s._2.length)._1
 			logger.info("got answer " + valueOfAnswer)
 			val p = alternatives.find(_.value == valueOfAnswer.get).get
 			addInjectedAnswersToPatch(p, answers.map(_._1))
@@ -47,10 +47,10 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	}
 
 	def createMCQueryForOwnOpinion(alternatives: List[Patch]) = {
-		queryBuilder.buildQuery("", alternatives, this)
+		queryBuilder.buildQuery(alternatives, this)
 	}
 
-	def createTextFieldForOthersOpinions(patch: Patch) = OTHERS_OPINIONS_QUERY_BUILDER.get.buildQuery("", patch, this)
+	def createTextFieldForOthersOpinions(patch: Patch) = OTHERS_OPINIONS_QUERY_BUILDER.get.buildQuery(patch, this)
 
 
 	override val processParameterDefaults: Map[ProcessParameter[_], List[Any]] = {

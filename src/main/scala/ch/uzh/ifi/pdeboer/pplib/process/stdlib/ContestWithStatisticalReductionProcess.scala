@@ -4,8 +4,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.MonteCarlo
 
 /**
- * Created by pdeboer on 03/11/14.
- */
+  * Created by pdeboer on 03/11/14.
+  */
 @PPLibProcess
 class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with HCompQueryBuilderSupport[List[Patch]] {
 
@@ -48,9 +48,9 @@ class ContestWithStatisticalReductionProcess(params: Map[String, Any] = Map.empt
 
 	def castVote(choices: List[Patch]): Option[String] = {
 		val answerRaw = portal.sendQueryAndAwaitResult(
-			queryBuilder.buildQuery("", choices, this),
+			queryBuilder.buildQuery(choices, this),
 			QUESTION_PRICE.get).get
-		val ans = queryBuilder.parseAnswer[String]("", choices, answerRaw, this)
+		val ans = queryBuilder.parseAnswer[String](choices, answerRaw, this)
 
 		if (ans.isDefined) ans
 		else {

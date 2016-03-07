@@ -10,9 +10,9 @@ import scala.xml.NodeSeq
   * Created by pdeboer on 28/08/15.
   */
 trait HCompQueryBuilder[T] {
-	def buildQuery(queryKey: String, input: T, base: ProcessStub[_, _], payload: Any = ""): HCompQuery
+	def buildQuery(input: T, base: ProcessStub[_, _], payload: Any = ""): HCompQuery
 
-	def parseAnswer[TARGET](queryKey: String, input: T, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET]
+	def parseAnswer[TARGET](input: T, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET]
 }
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
@@ -20,7 +20,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1, italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
 							auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX, shuffleChoicesParam: ProcessParameter[Boolean] = SHUFFLE_CHOICES) extends HCompQueryBuilder[List[Patch]] {
 
-	override def buildQuery(queryKey: String, input: List[Patch], base: ProcessStub[_, _], payload: Any = ""): HCompQuery = {
+	override def buildQuery(input: List[Patch], base: ProcessStub[_, _], payload: Any = ""): HCompQuery = {
 		base match {
 			case ih: InstructionHandler =>
 				val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse("")
@@ -33,7 +33,7 @@ class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1, italicInst
 		}
 	}
 
-	override def parseAnswer[TARGET](queryKey: String, input: List[Patch], answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+	override def parseAnswer[TARGET](input: List[Patch], answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
 		val castedAnswer = answer.is[MultipleChoiceAnswer]
 		val ret = baseCls.runtimeClass match {
 			case s: Class[String] =>
@@ -50,7 +50,7 @@ class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1, italicInst
 class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
 							  auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
 
-	override def buildQuery(queryKey: String, input: Patch, base: ProcessStub[_, _], payload: Any): HCompQuery = base match {
+	override def buildQuery(input: Patch, base: ProcessStub[_, _], payload: Any): HCompQuery = base match {
 		case ih: InstructionHandler =>
 			val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse("")
 			val htmlData: NodeSeq = base.getParamOption(auxParam).getOrElse(Some(Nil)).getOrElse(Nil)
@@ -60,7 +60,7 @@ class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] 
 		case _ => throw new IllegalStateException("Default Text Query is only supported for Instruction-Handling enabled processes")
 	}
 
-	override def parseAnswer[TARGET](queryKey: String, input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
 		Some(answer.is[FreetextAnswer].answer).asInstanceOf[Option[TARGET]]
 	}
 }
