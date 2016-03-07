@@ -1,31 +1,32 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompQuery, MultipleChoiceAnswer, MultipleChoiceQuery}
+import ch.uzh.ifi.pdeboer.pplib.hcomp._
 
 import scala.reflect.ClassTag
 import scala.util.Random
 import scala.xml.NodeSeq
 
 /**
- * Created by pdeboer on 28/08/15.
- */
+  * Created by pdeboer on 28/08/15.
+  */
 trait HCompQueryBuilder[T] {
-	def buildQuery(queryKey: String, input: T, base: ProcessStub[_, _]): HCompQuery
+	def buildQuery(queryKey: String, input: T, base: ProcessStub[_, _], payload: Any = ""): HCompQuery
 
 	def parseAnswer[TARGET](queryKey: String, input: T, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET]
 }
 
-class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1) extends HCompQueryBuilder[List[Patch]] {
+import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
-	import DefaultParameters._
+class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1, italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
+							auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX, shuffleChoicesParam: ProcessParameter[Boolean] = SHUFFLE_CHOICES) extends HCompQueryBuilder[List[Patch]] {
 
-	override def buildQuery(queryKey: String, input: List[Patch], base: ProcessStub[_, _]): HCompQuery = {
+	override def buildQuery(queryKey: String, input: List[Patch], base: ProcessStub[_, _], payload: Any = ""): HCompQuery = {
 		base match {
 			case ih: InstructionHandler =>
-				val instructionItalic: String = base.getParamOption(INSTRUCTIONS_ITALIC).getOrElse("")
-				val htmlData: NodeSeq = base.getParamOption(QUESTION_AUX).getOrElse(Some(Nil)).getOrElse(Nil)
+				val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse("")
+				val htmlData: NodeSeq = base.getParamOption(auxParam).getOrElse(Some(Nil)).getOrElse(Nil)
 				val instructions: String = ih.instructions.getInstructions(instructionItalic, htmlData = htmlData)
-				val choices = if (base.getParamOption(SHUFFLE_CHOICES).getOrElse(true)) Random.shuffle(input) else input
+				val choices = if (base.getParamOption(shuffleChoicesParam).getOrElse(true)) Random.shuffle(input) else input
 
 				MultipleChoiceQuery(instructions, choices.map(_.value), maxAnswers, minAnswers, ih.instructionTitle + " [" + Math.abs(Random.nextDouble()) + "]")
 			case _ => throw new IllegalStateException("Default MC Query is only supported for Instruction-Handling enabled processes")
@@ -43,6 +44,24 @@ class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1) extends HC
 			case _ => None
 		}
 		ret.asInstanceOf[Option[TARGET]] //this is ugly. but at least we got some magic above
+	}
+}
+
+class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
+							  auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
+
+	override def buildQuery(queryKey: String, input: Patch, base: ProcessStub[_, _], payload: Any): HCompQuery = base match {
+		case ih: InstructionHandler =>
+			val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse("")
+			val htmlData: NodeSeq = base.getParamOption(auxParam).getOrElse(Some(Nil)).getOrElse(Nil)
+			val instructions: String = ih.instructions.getInstructions(instructionItalic, htmlData = htmlData)
+
+			FreetextQuery(instructions, "", ih.instructionTitle + " [" + Math.abs(Random.nextDouble()) + "]")
+		case _ => throw new IllegalStateException("Default Text Query is only supported for Instruction-Handling enabled processes")
+	}
+
+	override def parseAnswer[TARGET](queryKey: String, input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+		Some(answer.is[FreetextAnswer].answer).asInstanceOf[Option[TARGET]]
 	}
 }
 

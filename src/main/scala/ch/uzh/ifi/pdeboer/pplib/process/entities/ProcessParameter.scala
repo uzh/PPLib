@@ -84,3 +84,11 @@ class SimpleInstructionGeneratorDecide extends InstructionGenerator {
 
 	override def generateQuestionTitle(base: InstructionData): String = s"Please select the ${base.objectName} you like best"
 }
+
+class SimpleInstructionGeneratorEstimateOthers extends InstructionGenerator {
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new StringQuestionRenderer(
+		"If other crowd workers were asked to " + base.actionName, "Please let us know how likely you think it is that other crowd workers will give the answer below. "
+	)
+
+	override def generateQuestionTitle(base: InstructionData): String = s"What would other crowd workers answer to this question?"
+}
