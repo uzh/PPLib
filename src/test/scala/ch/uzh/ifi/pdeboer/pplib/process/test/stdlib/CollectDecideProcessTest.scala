@@ -26,8 +26,8 @@ class CollectDecideProcessTest {
 		val (c, d) = (collectProcess, decideProcess)
 		val cd: CollectDecideProcess = new CollectDecideProcess(Map(COLLECT.key -> c, DECIDE.key -> d))
 		cd.process(data)
-		Assert.assertTrue(c.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
-		Assert.assertTrue(d.createdProcesses(0).asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(c.createdProcesses.head.asInstanceOf[CreateSignalingProcess[_, _]].called)
+		Assert.assertTrue(d.createdProcesses.head.asInstanceOf[CreateSignalingProcess[_, _]].called)
 	}
 
 	@Test

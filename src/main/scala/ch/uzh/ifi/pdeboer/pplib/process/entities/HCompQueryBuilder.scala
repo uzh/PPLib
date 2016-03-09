@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.entities
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
-import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 import scala.util.Random
 import scala.xml.NodeSeq
 
@@ -13,7 +13,7 @@ import scala.xml.NodeSeq
 trait HCompQueryBuilder[T] {
 	def buildQuery(input: T, base: ProcessStub[_, _], nonBaseClassInstructionGenerator: Option[InstructionGenerator] = None): HCompQuery
 
-	def parseAnswer[TARGET](input: T, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET]
+	def parseAnswer[TARGET](input: T, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: TypeTag[TARGET]): Option[TARGET]
 
 	protected def prepareInstructions(base: ProcessStub[_, _], nonBaseClassInstructionGenerator: Option[InstructionGenerator]): (QuestionRenderer, String) = {
 		if (nonBaseClassInstructionGenerator.isDefined) {
@@ -47,19 +47,18 @@ class DefaultMCQueryBuilder(maxAnswers: Int = 1, minAnswers: Int = 1, italicInst
 		MultipleChoiceQuery(instructions.getInstructions(instructionItalic, htmlData = htmlData), choices.map(_.value), maxAnswers, minAnswers, instructionTitle)
 	}
 
-	override def parseAnswer[TARGET](input: List[Patch], answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+	override def parseAnswer[TARGET](input: List[Patch], answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: TypeTag[TARGET]): Option[TARGET] = {
 		val castedAnswer = answer.is[MultipleChoiceAnswer]
-		val ret = baseCls.runtimeClass match {
-			case s: Class[String] =>
-				assert(maxAnswers == 1)
-				Some(castedAnswer.selectedAnswer)
-			case s: Class[Patch] =>
-				assert(maxAnswers == 1)
-				Some(input.find(i => i.value == castedAnswer.selectedAnswer).get)
-			case li: Class[List[String]] =>
-				Some(castedAnswer.selectedAnswers)
-			case _ => None
-		}
+		val tpe = baseCls.tpe
+		val ret = if (tpe <:< typeOf[String]) {
+			assert(maxAnswers == 1)
+			Some(castedAnswer.selectedAnswer)
+		} else if (tpe <:< typeOf[Patch]) {
+			assert(maxAnswers == 1)
+			Some(input.find(i => i.value == castedAnswer.selectedAnswer).get)
+		} else if (tpe <:< typeOf[List[String]]) Some(castedAnswer.selectedAnswers)
+		else None
+
 		ret.asInstanceOf[Option[TARGET]] //this is ugly. but at least we got some magic above
 	}
 }
@@ -73,10 +72,10 @@ class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] 
 
 		val (instructions, instructionTitle) = prepareInstructions(base, nonBaseClassInstructionGenerator)
 
-		FreetextQuery(instructions.getInstructions(instructionItalic, htmlData = htmlData), "", instructionTitle)
+		FreetextQuery(instructions.getInstructions(input.value, instructionItalic, htmlData), "", instructionTitle)
 	}
 
-	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: TypeTag[TARGET]): Option[TARGET] = {
 		Some(answer.is[FreetextAnswer].answer).asInstanceOf[Option[TARGET]]
 	}
 }
@@ -91,12 +90,12 @@ class DefaultDoubleQueryBuilder(italicInstructionsParam: ProcessParameter[String
 
 		val (instructions, instructionTitle) = prepareInstructions(base, nonBaseClassInstructionGenerator)
 
-		FreetextQuery(instructions.getInstructions(instructionItalic, htmlData = htmlData), "", instructionTitle)
+		FreetextQuery(instructions.getInstructions(input.value, instructionItalic, htmlData), "", instructionTitle)
 	}
 
-	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: ClassTag[TARGET]): Option[TARGET] = {
+	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: TypeTag[TARGET]): Option[TARGET] = {
 		val textAnswer = answer.is[FreetextAnswer].answer
-		val doubleAnswer = textAnswer.replaceAll("[^0-9]", "").toDouble
+		val doubleAnswer = textAnswer.replaceAll("[^0-9\\.]", "").toDouble
 		Some(doubleAnswer).asInstanceOf[Option[TARGET]]
 	}
 }

@@ -99,7 +99,7 @@ trait HCompPortalAdapter extends LazyLogger {
 		future.value.get.get
 	}
 
-	def getDefaultPortalKey: String
+	def getDefaultPortalKey: String = getClass.getSimpleName
 
 	def queries = queryLog
 

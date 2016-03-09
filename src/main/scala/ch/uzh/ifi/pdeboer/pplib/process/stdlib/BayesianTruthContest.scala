@@ -22,7 +22,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 				memoizer.mem("bayesianTruth" + w)(
-					U.retry(2) {
+					U.retry(0) {
 						val ownOpinion = createMCQueryForOwnOpinion(alternatives)
 						val opinionsOnOtherPatches = alternatives.map(p => createTextFieldForOthersOpinions(p))
 						portal.sendQueryAndAwaitResult(
@@ -73,7 +73,9 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 		queryBuilder.buildQuery(alternatives, this)
 	}
 
-	def createTextFieldForOthersOpinions(patch: Patch) = otherOpinionsQueryBuilder.buildQuery(patch, this)
+	def createTextFieldForOthersOpinions(patch: Patch) = {
+		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(OTHERS_OPINIONS_INSTRUCTION_GENERATOR.get))
+	}
 
 
 	protected def otherOpinionsQueryBuilder: HCompQueryBuilder[Patch] = OTHERS_OPINIONS_QUERY_BUILDER.get
@@ -92,5 +94,5 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 object BayesianTruthContest {
 	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", Some(List(new SimpleInstructionGeneratorEstimateOthers())))
-	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultTextQueryBuilder())))
+	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultDoubleQueryBuilder())))
 }
