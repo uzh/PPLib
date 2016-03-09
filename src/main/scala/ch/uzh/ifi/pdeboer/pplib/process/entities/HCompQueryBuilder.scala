@@ -81,8 +81,8 @@ class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] 
 }
 
 
-class DefaultDoubleQueryBuilder(italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
-								auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
+class DefaultPercentageQueryBuilder(italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
+									auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
 
 	override def buildQuery(input: Patch, base: ProcessStub[_, _], nonBaseClassInstructionGenerator: Option[InstructionGenerator]): HCompQuery = {
 		val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse(" Please enter a percentage followed by the '%' sign. For example: 59%. Please use only integer percentages (e.g. 23.5% is not valid, 23% is). Your number should be between 0% and 100%. Your estimates for all of these questions must sum up to 100%.")
@@ -96,7 +96,8 @@ class DefaultDoubleQueryBuilder(italicInstructionsParam: ProcessParameter[String
 	override def parseAnswer[TARGET](input: Patch, answer: HCompAnswer, base: ProcessStub[_, _])(implicit baseCls: TypeTag[TARGET]): Option[TARGET] = {
 		val textAnswer = answer.is[FreetextAnswer].answer
 		val doubleAnswer = textAnswer.replaceAll("[^0-9\\.]", "").toDouble
-		Some(doubleAnswer).asInstanceOf[Option[TARGET]]
+		val percentage = if (doubleAnswer > 1) doubleAnswer / 100d else doubleAnswer
+		Some(percentage).asInstanceOf[Option[TARGET]]
 	}
 }
 

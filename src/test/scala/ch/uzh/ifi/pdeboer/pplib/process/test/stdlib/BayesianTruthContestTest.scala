@@ -21,21 +21,66 @@ class BayesianTruthContestTest extends LazyLogger {
 		})
 	}
 
-	def runTrivialCase(winnerSettings: Map[Patch, Boolean]) = {
-		val othersSelections = winnerSettings.map(p => p._1.toString -> (if (p._2) 100.0d else 0d)).toMap
-		val theWinner = winnerSettings.find(w => w._2).get._1.value
-		val portal = new BTTestPortal(List(BTWorkerAnswer(theWinner, othersSelections), BTWorkerAnswer(theWinner, othersSelections), BTWorkerAnswer(theWinner, othersSelections)))
+	@Test
+	def testExpertCountMajority: Unit = {
+		val patches = createPatches
+		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
+		val contest = createContest(new BTTestPortal(playbook))
+		val result = contest.process(patches)
+		Assert.assertEquals(patches(1), result)
+	}
 
-		val contest = new BayesianTruthContest(Map(PORTAL_PARAMETER.key -> portal, WORKER_COUNT.key -> 3))
+	@Test
+	def testExpertCountEqualNonExpert: Unit = {
+		val patches = createPatches
+		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
+		val contest = createContest(new BTTestPortal(playbook))
+		val result = contest.process(patches)
+		Assert.assertEquals(patches(1), result)
+	}
+
+	@Test
+	def testExpertCountJustBelowNonExpert: Unit = {
+		val patches = createPatches
+		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head))
+		val contest = createContest(new BTTestPortal(playbook))
+		val result = contest.process(patches)
+		Assert.assertEquals(patches(1), result)
+	}
+
+	@Test
+	def testAnswerUnclear: Unit = {
+		val patches = createPatches
+		val targetPercentage: Double = 100d / createPatches.length.toDouble
+		val playbook = List(createPlaybookAnswer(patches.head, winnerPercentage = targetPercentage), createPlaybookAnswer(patches.head, winnerPercentage = targetPercentage), createPlaybookAnswer(patches(1)))
+		val contest = createContest(new BTTestPortal(playbook))
+		val result = contest.process(patches)
+		Assert.assertEquals(patches.head, result)
+	}
+
+	def createPlaybookAnswer(own: Patch, others: Patch = null, allPatches: List[Patch] = createPatches, winnerPercentage: Double = 100d) = BTWorkerAnswer(own.value, {
+		val comparisonTarget = if (others == null) own else others
+		val loserPercentage = (100d - winnerPercentage) / (allPatches.size.toDouble - 1d)
+		allPatches.map(p => p.value -> (if (p == comparisonTarget) winnerPercentage else loserPercentage)).toMap
+	})
+
+	def runTrivialCase(winnerSettings: Map[Patch, Boolean]) = {
+		val theWinner = winnerSettings.find(w => w._2).get._1
+		val playbook = (1 to 3).map(f => createPlaybookAnswer(theWinner))
+		val portal = new BTTestPortal(playbook.toList)
+
+		val contest = createContest(portal)
 		val result: Patch = contest.process(winnerSettings.keys.toList)
 		result
 	}
+
+	def createContest(portal: BTTestPortal) = new BayesianTruthContest(Map(PORTAL_PARAMETER.key -> portal, WORKER_COUNT.key -> portal.workerAnswers.size))
 
 	def createPatches: List[IndexedPatch] = {
 		IndexedPatch.from("asdf,qwer,yxcv,zuio", ",")
 	}
 
-	private[BayesianTruthContestTest] class BTTestPortal(workerAnswers: List[BTWorkerAnswer]) extends HCompPortalAdapter {
+	private[BayesianTruthContestTest] class BTTestPortal(val workerAnswers: List[BTWorkerAnswer]) extends HCompPortalAdapter {
 
 		val answerPool = mutable.Queue.empty[BTWorkerAnswer] ++ workerAnswers.sortBy(s => Random.nextDouble())
 
@@ -58,6 +103,8 @@ class BayesianTruthContestTest extends LazyLogger {
 		}
 
 		override def cancelQuery(query: HCompQuery): Unit = ???
+
+		override def getDefaultPortalKey: String = super.getDefaultPortalKey + Random.nextDouble()
 	}
 
 	private[BayesianTruthContestTest] case class BTWorkerAnswer(ownAnswer: String, probabilitiesForOthers: Map[String, Double])

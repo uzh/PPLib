@@ -22,7 +22,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 				memoizer.mem("bayesianTruth" + w)(
-					U.retry(0) {
+					U.retry(2) {
 						val ownOpinion = createMCQueryForOwnOpinion(alternatives)
 						val opinionsOnOtherPatches = alternatives.map(p => createTextFieldForOthersOpinions(p))
 						portal.sendQueryAndAwaitResult(
@@ -46,13 +46,21 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 			val prunedAnswers = answers.filter(a => {
 				val totalPercentage: Double = a.probabilitiesForOtherAnswers.values.sum
-				totalPercentage > 99 && totalPercentage < 101
+				totalPercentage > 0.99d && totalPercentage < 1.01d
 			})
 
 			val avgOwnAnswers = alternatives.map(a => a -> (prunedAnswers.count(p => p.ownAnswer == a).toDouble / prunedAnswers.length.toDouble)).toMap
-			val avgOthersAnswers = alternatives.map(a => a -> prunedAnswers.map(p => p.probabilitiesForOtherAnswers(a)).sum / 100d).toMap
+			val avgOthersAnswers = alternatives.map(a => a -> {
+				val product = prunedAnswers.foldLeft(1d)((pv, p) => pv * p.probabilitiesForOtherAnswers(a))
+				Math.pow(product, 1d / prunedAnswers.size)
+			}).toMap
 
-			val selectedAnswer = prunedAnswers.maxBy(_.btsScore(avgOwnAnswers, avgOthersAnswers)).ownAnswer
+			val userBTSScores = prunedAnswers.map(a => (a, a.btsScore(avgOwnAnswers, avgOthersAnswers)))
+			val answerBTS = alternatives.map(p => (p, userBTSScores.filter(_._1.ownAnswer == p).map(b => b._2).sum / avgOwnAnswers(p)))
+
+			val btsSelectedAnswer = answerBTS.maxBy(a => if (a._2.isNaN) 0 else a._2)._1
+			val selectedAnswer = if (prunedAnswers.groupBy(_.ownAnswer).size == 1) prunedAnswers.head.ownAnswer else btsSelectedAnswer //trivial case doesnt work with bts
+
 			logger.info(s"selected answer $selectedAnswer")
 
 			addInjectedAnswersToPatch(selectedAnswer, prunedAnswers.map(_.rawAnswer))
@@ -63,8 +71,9 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	private case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: Patch, probabilitiesForOtherAnswers: Map[Patch, Double]) {
 
 		def btsScore(avgOwn: Map[Patch, Double], avgOthers: Map[Patch, Double]) = {
-			val leftTerm = Math.log(avgOwn(ownAnswer) / avgOthers(ownAnswer))
-			val rightTerm = probabilitiesForOtherAnswers.map(p => avgOwn(p._1) * Math.log(p._2 / avgOwn(p._1))).sum
+			val correctedAvgOwn = avgOwn.map(p => p._1 -> (if (p._2 > 0) p._2 else 0.0001))
+			val leftTerm = Math.log(correctedAvgOwn(ownAnswer) / avgOthers(ownAnswer))
+			val rightTerm = probabilitiesForOtherAnswers.map(p => correctedAvgOwn(p._1) * Math.log(p._2 / correctedAvgOwn(p._1))).filterNot(d => d.isInfinite || d.isNaN).sum
 			leftTerm + rightTerm
 		}
 	}
@@ -94,5 +103,5 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 object BayesianTruthContest {
 	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", Some(List(new SimpleInstructionGeneratorEstimateOthers())))
-	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultDoubleQueryBuilder())))
+	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultPercentageQueryBuilder())))
 }
