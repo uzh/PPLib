@@ -16,7 +16,7 @@ object BTSExperiment extends App {
 	val capitals = CSVReader.open("us capitals.csv")
 	val csvWriter = CSVWriter.open("bts result.csv")
 
-	capitals.all().slice(1, 1).foreach(state => {
+	capitals.all().slice(1, 2).foreach(state => {
 		val stateName = state.head
 		val capital = state(1)
 
