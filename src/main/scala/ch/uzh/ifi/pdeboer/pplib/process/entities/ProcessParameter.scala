@@ -6,8 +6,8 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 /**
- * Created by pdeboer on 28/11/14.
- */
+  * Created by pdeboer on 28/11/14.
+  */
 @SerialVersionUID(1l) class ProcessParameter[T](val keyPostfix: String, val candidateDefinitions: Option[Iterable[T]] = None)(implicit baseClass: ClassTag[T], val baseType: TypeTag[T]) extends Serializable {
 	def key = keyPostfix
 
@@ -87,8 +87,14 @@ class SimpleInstructionGeneratorDecide extends InstructionGenerator {
 
 class SimpleInstructionGeneratorEstimateOthers extends InstructionGenerator {
 	override def generateQuestion(base: InstructionData): QuestionRenderer = new StringQuestionRenderer(
-		"If other crowd workers were asked to " + base.actionName, "Please let us know how likely you think it is that other crowd workers will give the answer below. "
+		"If other crowd workers were asked " + base.actionName, "The question for other crowd workers would of course also be to " + base.detailedDescription
 	)
 
 	override def generateQuestionTitle(base: InstructionData): String = s"What would other crowd workers answer to this question?"
+}
+
+class TrivialInstructionGenerator(questionBefore: String, title: String, questionBetween: String = "", questionAfter: String = "") extends InstructionGenerator {
+	override def generateQuestion(base: InstructionData): QuestionRenderer = new StringQuestionRenderer(questionBefore, questionBetween, questionAfter)
+
+	override def generateQuestionTitle(base: InstructionData): String = title
 }

@@ -85,8 +85,8 @@ class DefaultPercentageQueryBuilder(italicInstructionsParam: ProcessParameter[St
 									auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
 
 	override def buildQuery(input: Patch, base: ProcessStub[_, _], nonBaseClassInstructionGenerator: Option[InstructionGenerator]): HCompQuery = {
-		val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse(" Please enter a percentage followed by the '%' sign. For example: 59%. Please use only integer percentages (e.g. 23.5% is not valid, 23% is). Your number should be between 0% and 100%. Your estimates for all of these questions must sum up to 100%.")
-		val htmlData: NodeSeq = base.getParamOption(auxParam).getOrElse(Some(Nil)).getOrElse(Nil)
+		val instructionItalic: String = base.getParamOption(italicInstructionsParam).getOrElse("")
+		val htmlData: NodeSeq = base.getParamOption(auxParam).getOrElse(Some(Nil)).getOrElse(<i>Please enter a percentage followed by the '%' sign. For example: 59%. Please use only integer percentages (e.g. 23.5% is not valid, 23% is). Your number should be between 0% and 100%. Your estimates for all of these estimation questions must sum up to 100% in order for you to get paid.</i>)
 
 		val (instructions, instructionTitle) = prepareInstructions(base, nonBaseClassInstructionGenerator)
 

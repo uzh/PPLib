@@ -24,7 +24,10 @@ libraryDependencies ++= Seq(
 	"org.scala-lang.modules" %% "scala-xml" % "1.0.2",
 	"com.github.cb372" %% "scalacache-guava" % "0.6.3",
 	"com.typesafe.play" %% "play-json" % "2.4.0-M1",
-	"com.github.tototoshi" %% "scala-csv" % "1.2.2"
+	"com.github.tototoshi" %% "scala-csv" % "1.2.2",
+	"mysql" % "mysql-connector-java" % "5.1.34",
+	"org.scalikejdbc" %% "scalikejdbc" % "2.2.1",
+	"com.fasterxml.jackson.module" % "jackson-module-scala" % "2.1.2"
 )
 
 mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize")

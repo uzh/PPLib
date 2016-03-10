@@ -5,6 +5,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
+import scala.util.Random
+
 /**
   * Created by pdeboer on 03/03/16.
   */
@@ -24,7 +26,8 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 				memoizer.mem("bayesianTruth" + w)(
 					U.retry(2) {
 						val ownOpinion = createMCQueryForOwnOpinion(alternatives)
-						val opinionsOnOtherPatches = alternatives.map(p => createTextFieldForOthersOpinions(p))
+						def shuffleIfNeeded(l: List[Patch]) = if (SHUFFLE_CHOICES.get) l.sortBy(s => Random.nextDouble()) else l
+						val opinionsOnOtherPatches = shuffleIfNeeded(alternatives).map(p => createTextFieldForOthersOpinions(p))
 						portal.sendQueryAndAwaitResult(
 							createComposite(ownOpinion :: opinionsOnOtherPatches),
 							QUESTION_PRICE.get
