@@ -21,10 +21,34 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 			mapper.writeValueAsString(obj)
 		}
 
-		sql"""
+		try {
+			sql"""
 				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, answerUser)
 				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime)}, ${answer.map(_.receivedTime)}, ${answer.map(_.responsibleWorkers.map(_.id).mkString(","))})
 		   """.update.apply()
+		} catch {
+			case e: Throwable => createLayout()
+		}
+	}
+
+	def createLayout(): Unit = DB localTx { implicit session =>
+		try {
+			sql"""CREATE TABLE `queries` (
+			    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			    `question` LONGTEXT,
+			    `fullQuery` LONGTEXT,
+			    `answer` LONGTEXT,
+			    `fullAnswer` LONGTEXT,
+			    `paymentCents` INT(11) DEFAULT NULL,
+			    `fullProperties` LONGTEXT,
+			    `questionCreationDate` DATETIME DEFAULT NULL,
+			    `questionAnswerDate` DATETIME DEFAULT NULL,
+			    `answerUser` VARCHAR(255) DEFAULT NULL,
+			    PRIMARY KEY (`id`)
+			  ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;""".update().apply()
+		} catch {
+			case e: Throwable => {}
+		}
 	}
 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
