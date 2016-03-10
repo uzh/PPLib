@@ -51,6 +51,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 				val totalPercentage: Double = a.probabilitiesForOtherAnswers.values.sum
 				totalPercentage > 0.99d && totalPercentage < 1.01d
 			})
+			logger.info(s"pruned ${answers.size - prunedAnswers.size} answers")
 
 			val avgOwnAnswers = alternatives.map(a => a -> (prunedAnswers.count(p => p.ownAnswer == a).toDouble / prunedAnswers.length.toDouble)).toMap
 			val avgOthersAnswers = alternatives.map(a => a -> {

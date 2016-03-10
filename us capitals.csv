@@ -1,0 +1,51 @@
+state,capital,city1,city2,city3,city4,rand,to_test
+Alabama,Montgomery,Birmingham,Mobile,Huntsville,Tuscaloosa,0.756137731,1
+Oklahoma,Oklahoma City,Tulsa,Norman,Broken Arrow,Lawton,9.73998E-05,1
+Delaware,Dover,Wilmington,Newark,Middletown,Smyrna,0.013820351,1
+California,Sacramento,Los Angeles,San Diego,San Jose,San Francisco,0.020772804,1
+Oregon,Salem,Portland,Eugene,Gresham,Hillsboro,0.028451703,1
+Georgia,Atlanta,Columbus,Augusta,Savannah,Athens,0.036673494,1
+Indiana,Indianapolis,Fort Wayne,Evansville,South Bend,Carmel,0.077128084,1
+Kansas,Topeka,Wichita,Overland Park,Kansas City,Olathe,0.077255853,1
+Arizona,Phoenix,Tucson,Mesa,Chandler,Glendale,0.088546152,1
+Pennsylvania,Harrisburg,Philadelphia,Pittsburgh,Allentown,Erie,0.10165298,1
+Tennessee,Nashville,Memphis,Knoxville,Chattanooga,Clarksville,0.112800604,0
+Nevada,Carson City,Las Vegas,Henderson,North Las Vegas,Reno,0.133309069,0
+Louisiana,Baton Rouge,New Orleans,Shreveport,Lafayette,Lake Charles,0.139201896,0
+Wyoming,Cheyenne,Casper,Laramie,Gillette,Rock Springs,0.152030735,0
+Montana,Helena,Billings,Missoula,Great Falls,Bozeman,0.168403218,0
+Mississippi,Jackson,Gulfport,Hattiesburg,Southaven,Biloxi,0.174940969,0
+New York,Albany,New York City,Buffalo,Rochester,Yonkers,0.177851927,0
+Alaska,Juneau,Anchorage,Fairbanks,Sitka,Ketchikan,0.178306523,0
+Rhode Island,Providence,Warwick,Cranston,Pawtucket,East Providence,0.193269228,0
+Washington,Olympia,Seattle,Spokane,Tacoma,Vancouver,0.197127601,0
+Connecticut,Hartford,Bridgeport,New Haven,Stamford,Waterbury,0.219323635,0
+Wisconsin,Madison,Milwaukee,Green Bay,Kenosha,Racine,0.249385087,0
+North Carolina,Raleigh,Charlotte,Greensboro,Durham,Winston-Salem,0.289497438,0
+Michigan,Lansing,Detroit,Grand Rapids,Warren,Sterling Heights,0.424766569,0
+Massachusetts,Boston,Worcester,Springfield,Lowell,Cambridge,0.439574614,0
+North Dakota,Bismarck,Fargo,Grand Forks,Minot,West Fargo,0.476768532,0
+Missouri,Jefferson City,Kansas City,Saint Louis,Springfield,Independence,0.502652695,0
+New Jersey,Trenton,Newark,Jersey City,Paterson,Elizabeth,0.509519499,0
+Virginia,Richmond,Virginia Beach,Norfolk,Chesapeake,Newport News,0.535353521,0
+Kentucky,Frankfort,Louisville,Lexington,Bowling Green,Owensboro,0.552033506,0
+West Virginia,Charleston,Huntington,Parkersburg,Morgantown,Wheeling,0.571214356,0
+Texas,Austin,Houston,San Antonio,Dallas,Fort Worth,0.57864063,0
+Hawaii,Honolulu,Hilo,Kailua,Kapolei,Kaneohe,0.610836342,0
+Vermont,Montpelier,Burlington,Essex,South Burlington,Colchester,0.646820357,0
+Maryland,Annapolis,Baltimore,Columbia,Germantown,Silver Spring,0.712578016,0
+New Mexico,Santa Fe,Albuquerque,Las Cruces,Rio Rancho,Roswell,0.725421033,0
+Nebraska,Lincoln,Omaha,Bellevue,Grand Island,Kearney,0.729743237,0
+Illinois,Springfield,Chicago,Aurora,Rockford,Joliet,0.751328138,0
+Florida,Tallahassee,Jacksonville,Miami,Tampa,St. Petersburg,0.773675658,0
+Ohio,Columbus,Cleveland,Cincinnati,Toledo,Akron,0.780811937,0
+Iowa,Des Moines,Cedar Rapids,Davenport,Sioux City,Waterloo,0.786344058,0
+Idaho,Boise,Nampa,Meridian,Idaho Falls,Pocatello,0.826405286,0
+Minnesota,St. Paul,Minneapolis,Rochester,Duluth,Bloomington,0.834305453,0
+Arkansas,Little Rock,Fort Smith,Fayetteville,Springdale,Jonesboro,0.845523777,0
+Colorado,Denver,Colorado Springs,Aurora,Fort Collins,Lakewood,0.864208491,0
+Utah,Salt Lake City,West Valley City,Provo,West Jordan,Orem,0.893056243,0
+South Dakota,Pierre,Sioux Falls,Rapid City,Aberdeen,Brookings,0.899357176,0
+New Hampshire,Concord,Manchester,Nashua,Derry,Rochester,0.92043689,0
+Maine,Augusta,Portland,Lewiston,Bangor,South Portland,0.926582181,0
+South Carolina,Columbia,Charleston,North Charleston,Mount Pleasant,Rock Hill,0.938638144,0
