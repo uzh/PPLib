@@ -42,7 +42,6 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 							case _ =>
 								logger.info(s"${getClass.getSimpleName} didn't get answer for query. retrying..")
 								throw new IllegalStateException("didnt get any response")
-
 						}
 					}
 				)).toList

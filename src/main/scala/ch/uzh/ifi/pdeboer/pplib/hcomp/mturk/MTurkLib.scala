@@ -1,24 +1,27 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.mturk
 
 import java.io.{File, FileReader, IOException}
-import java.net.{URL, URLEncoder}
+import java.net.URLEncoder
 import java.util.Properties
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
+import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.apache.commons.codec.binary.Base64
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.util.EntityUtils
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
 import scala.xml.{Node, NodeSeq, XML}
 
 /**
- * taken from https://bitbucket.org/bethard/mturk/src/76b174f56c37a72e9d2188b05ef66c409dda7cc7/src/main/scala/info/bethard/mturk/mturk.scala?at=default
- * and adapted by PDB
- *
- */
+  * taken from https://bitbucket.org/bethard/mturk/src/76b174f56c37a72e9d2188b05ef66c409dda7cc7/src/main/scala/info/bethard/mturk/mturk.scala?at=default
+  * and adapted by PDB
+  *
+  */
 
 private[mturk] case class CreatedHIT(xml: Node) {
 	val HITId = MTurkUtil.oneText(xml \ "HITId")
@@ -97,22 +100,22 @@ private[mturk] case class Price(val Amount: String, val CurrencyCode: String = "
 
 
 /**
- * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
- */
+  * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
+  */
 private[mturk] case class QualificationRequirement(
-									   QualificationTypeId: String,
-									   Comparator: String,
-									   RequiredToPreview: Boolean = false,
-									   extraParameters: Seq[(String, String)] = Seq.empty) {
+													  QualificationTypeId: String,
+													  Comparator: String,
+													  RequiredToPreview: Boolean = false,
+													  extraParameters: Seq[(String, String)] = Seq.empty) {
 
 	/**
-	 * Creates a new QualificationRequirement where RequiredToPreview is set to true.
-	 */
+	  * Creates a new QualificationRequirement where RequiredToPreview is set to true.
+	  */
 	def andIsRequiredToPreview = this.copy(RequiredToPreview = true)
 
 	/**
-	 * Create the URL parameter name=value strings for the "index"-th requirement.
-	 */
+	  * Create the URL parameter name=value strings for the "index"-th requirement.
+	  */
 	private[mturk] def toParameterStrings(index: Int): Seq[String] = {
 		val parameters = Seq(
 			"QualificationTypeId" -> this.QualificationTypeId,
@@ -120,18 +123,18 @@ private[mturk] case class QualificationRequirement(
 			"RequiredToPreview" -> this.RequiredToPreview.toString)
 		val prefix = "QualificationRequirement.%d".format(index)
 		for ((name, value) <- parameters ++ this.extraParameters)
-		yield "%s.%s=%s".format(prefix, name, URLEncoder.encode(value, "UTF8"))
+			yield "%s.%s=%s".format(prefix, name, URLEncoder.encode(value, "UTF8"))
 	}
 }
 
 /**
- * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
- */
+  * {@link http://docs.amazonwebservices.com/AWSMturkAPI/2008-08-02/index.html?ApiReference_QualificationRequirementDataStructureArticle.html}
+  */
 private[mturk] object QualificationRequirement {
 
 	/**
-	 * Names of different Comparators used to specify QualificationRequirements.
-	 */
+	  * Names of different Comparators used to specify QualificationRequirements.
+	  */
 	private[mturk] object Comparator {
 		val LessThan = "LessThan"
 		val LessThanOrEqualTo = "LessThanOrEqualTo"
@@ -143,74 +146,75 @@ private[mturk] object QualificationRequirement {
 	}
 
 	/**
-	 * The percentage of assignments the Worker has submitted, over all
-	 * assignments the Worker has accepted. The value is an integer between
-	 * 0 and 100.
-	 */
+	  * The percentage of assignments the Worker has submitted, over all
+	  * assignments the Worker has accepted. The value is an integer between
+	  * 0 and 100.
+	  */
 	private[mturk] object Worker_PercentAssignmentsSubmitted
 		extends IntegerValueFactory("00000000000000000000")
 
 	/**
-	 * The percentage of assignments the Worker has abandoned (allowed the
-	 * deadline to elapse), over all assignments the Worker has accepted. The
-	 * value is an integer between 0 and 100.
-	 */
+	  * The percentage of assignments the Worker has abandoned (allowed the
+	  * deadline to elapse), over all assignments the Worker has accepted. The
+	  * value is an integer between 0 and 100.
+	  */
 	private[mturk] object Worker_PercentAssignmentsAbandoned
 		extends IntegerValueFactory("00000000000000000070")
 
 	/**
-	 * The percentage of assignments the Worker has returned, over all
-	 * assignments the Worker has accepted. The value is an integer between
-	 * 0 and 100.
-	 */
+	  * The percentage of assignments the Worker has returned, over all
+	  * assignments the Worker has accepted. The value is an integer between
+	  * 0 and 100.
+	  */
 	private[mturk] object Worker_PercentAssignmentsReturned
 		extends IntegerValueFactory("000000000000000000E0")
 
 	/**
-	 * The percentage of assignments the Worker has submitted that were
-	 * subsequently approved by the Requester, over all assignments the Worker
-	 * has submitted. The value is an integer between 0 and 100.
-	 */
+	  * The percentage of assignments the Worker has submitted that were
+	  * subsequently approved by the Requester, over all assignments the Worker
+	  * has submitted. The value is an integer between 0 and 100.
+	  */
 	private[mturk] object Worker_PercentAssignmentsApproved
 		extends IntegerValueFactory("000000000000000000L0")
 
 	/**
-	 * The percentage of assignments the Worker has submitted that were
-	 * subsequently rejected by the Requester, over all assignments the Worker
-	 * has submitted. The value is an integer between 0 and 100.
-	 */
+	  * The percentage of assignments the Worker has submitted that were
+	  * subsequently rejected by the Requester, over all assignments the Worker
+	  * has submitted. The value is an integer between 0 and 100.
+	  */
 	private[mturk] object Worker_PercentAssignmentsRejected
 		extends IntegerValueFactory("000000000000000000S0")
 
 	/**
-	 * Specifies the total number of HITs submitted by a Worker that have been
-	 * approved. The value is an integer greater than or equal to 0.
-	 */
+	  * Specifies the total number of HITs submitted by a Worker that have been
+	  * approved. The value is an integer greater than or equal to 0.
+	  */
 	private[mturk] object Worker_NumberHITsApproved
 		extends IntegerValueFactory("00000000000000000040")
 
 	/**
-	 * Requires workers to acknowledge that they are over 18 and that they agree
-	 * to work on potentially offensive content. The value type is boolean,
-	 * 1 (required), 0 (not required, the default)
-	 */
+	  * Requires workers to acknowledge that they are over 18 and that they agree
+	  * to work on potentially offensive content. The value type is boolean,
+	  * 1 (required), 0 (not required, the default)
+	  */
 	private[mturk] object Worker_Adult
 		extends IntegerValueFactory("00000000000000000060")
 
 	/**
-	 * The location of the Worker, as specified in the Worker's mailing address.
-	 */
+	  * The location of the Worker, as specified in the Worker's mailing address.
+	  */
 	private[mturk] object Worker_Locale
 		extends Factory[String]("00000000000000000071", "LocaleValue.Country")
 
 
 	class Custom_QualificationType(val id: String) extends IntegerValueFactory(id)
+
 	/**
-	 * Base class for objects that create QualificationRequirements supporting
-	 * the Exists, EqualTo and NotEqualTo comparators.
-	 *
-	 * Provides "exists", "===" and "!==" syntax for invoking comparators.
-	 */
+	  * Base class for objects that create QualificationRequirements supporting
+	  * the Exists, EqualTo and NotEqualTo comparators.
+	  *
+	  * Provides "exists", "===" and "!==" syntax for invoking comparators.
+	  */
 	private[mturk] abstract class Factory[VALUE](val QualificationTypeId: String, val valueName: String) {
 		def exists = QualificationRequirement(this.QualificationTypeId, Comparator.Exists)
 
@@ -225,12 +229,12 @@ private[mturk] object QualificationRequirement {
 	}
 
 	/**
-	 * Base class for objects that create QualificationRequirements that take an
-	 * IntegerValue (and thus support all comparators).
-	 *
-	 * Provides "exists", "===", "!==", "<", "<=", ">" and ">=" syntax for
-	 * invoking comparators.
-	 */
+	  * Base class for objects that create QualificationRequirements that take an
+	  * IntegerValue (and thus support all comparators).
+	  *
+	  * Provides "exists", "===", "!==", "<", "<=", ">" and ">=" syntax for
+	  * invoking comparators.
+	  */
 	private[mturk] abstract class IntegerValueFactory(_QualificationTypeId: String)
 		extends Factory[Int](_QualificationTypeId, "IntegerValue") {
 		def <(value: Int) = this.comparing(Comparator.LessThan, value)
@@ -263,7 +267,7 @@ private[mturk] object MTurkService {
 			new File(".", ".mturk.properties"),
 			new File(userHome, "mturk.properties"),
 			new File(userHome, ".mturk.properties"))
-		possibleFiles.filter(_.exists).headOption match {
+		possibleFiles.find(_.exists) match {
 			case None => {
 				val message = "unable to find one of [%s]".format(possibleFiles.mkString(", "))
 				throw new IllegalStateException(message)
@@ -289,9 +293,9 @@ private[mturk] object MTurkService {
 }
 
 private[mturk] class MTurkService(
-					  accessKey: String,
-					  secretKey: String,
-					  val server: Server) {
+									 accessKey: String,
+									 secretKey: String,
+									 val server: Server) extends LazyLogger {
 
 	def RegisterHITType(
 						   Title: String,
@@ -312,7 +316,7 @@ private[mturk] class MTurkService(
 		val indexedReqs = QualificationRequirements.zipWithIndex
 		val qualParams =
 			for ((req, i) <- indexedReqs; param <- req.toParameterStrings(i + 1))
-			yield param
+				yield param
 		val params = simpleParams ++ qualParams
 		val result = this.makeRequest("RegisterHITType", params: _*)
 		MTurkUtil.oneText(result \ "RegisterHITTypeResult" \ "HITTypeId")
@@ -342,7 +346,7 @@ private[mturk] class MTurkService(
 			"MaxAssignments=" + MaxAssignments)
 		val optionParam =
 			for (value <- RequesterAnnotation)
-			yield "RequesterAnnotation=" + URLEncoder.encode(value, "UTF8")
+				yield "RequesterAnnotation=" + URLEncoder.encode(value, "UTF8")
 		val params = basicParams ++ optionParam.toSeq
 		val result = this.makeRequest("CreateHIT", params: _*)
 		CreatedHIT(MTurkUtil.oneNode(result \ "HIT"))
@@ -356,14 +360,14 @@ private[mturk] class MTurkService(
 									  urls: Seq[String]): Iterator[CreatedHIT] = {
 		val postedURLs = Set() ++ (
 			for (hit <- this.SearchHITs; url <- hit.RequesterAnnotation)
-			yield url)
+				yield url)
 		for (url <- urls.iterator.filter(url => !postedURLs.contains(url)))
-		yield this.CreateHIT(
-			Question = Question.ExternalQuestion(url, FrameHeight),
-			HITTypeId = HITTypeId,
-			LifetimeInSeconds = LifetimeInSeconds,
-			MaxAssignments = MaxAssignments,
-			RequesterAnnotation = Some(url))
+			yield this.CreateHIT(
+				Question = Question.ExternalQuestion(url, FrameHeight),
+				HITTypeId = HITTypeId,
+				LifetimeInSeconds = LifetimeInSeconds,
+				MaxAssignments = MaxAssignments,
+				RequesterAnnotation = Some(url))
 	}
 
 	def ChangeHITTypeOfHIT(hit: HIT, HITTypeId: String): Unit = {
@@ -501,7 +505,15 @@ private[mturk] class MTurkService(
 		val url = this.makeRequestURL(operation, extraParameters: _*)
 		val tries = Iterator.continually {
 			try {
-				Some(XML.load(new URL(url)))
+				val client = HttpClientBuilder.create().build()
+				val response = client.execute(new HttpGet(url))
+				val entity = EntityUtils.toString(response.getEntity)
+				if (response.getStatusLine.getStatusCode != 200) {
+					val additionalInfo = s"statuscode ${response.getStatusLine.getStatusCode}. entity $entity"
+					logger.error(s"couldn't get url. $additionalInfo")
+					throw new IOException(s"the request didn't work out. Here's some info $additionalInfo")
+				}
+				Some(XML.load(entity)) //as opposed to new URL(url)
 			} catch {
 				case e: IOException => {
 					Thread.sleep(500)
@@ -565,6 +577,6 @@ private object MTurkUtil {
 
 	def oneDateTimeOption(nodes: NodeSeq): Option[DateTime] = {
 		for (text <- this.oneTextOption(nodes))
-		yield this.dateTimeFormatter.parseDateTime(text)
+			yield this.dateTimeFormatter.parseDateTime(text)
 	}
 }
