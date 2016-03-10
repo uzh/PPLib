@@ -33,7 +33,7 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 
 	def createLayout(): Unit = DB localTx { implicit session =>
 		try {
-			sql"""CREATE TABLE `queries` (
+			sql"""CREATE TABLE IF NOT EXISTS `queries` (
 			    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			    `question` LONGTEXT,
 			    `fullQuery` LONGTEXT,
