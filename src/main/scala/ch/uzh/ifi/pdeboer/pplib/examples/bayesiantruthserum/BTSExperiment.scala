@@ -27,7 +27,7 @@ object BTSExperiment extends App {
 			PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(HComp.mechanicalTurk),
 			INSTRUCTIONS.key -> new InstructionData(actionName = "the same question. How likely is it that they give the answer below?", detailedDescription = "identify the capital of"),
 			WORKER_COUNT.key -> 5,
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 18, cancelAndRepostAfter = 24 hours),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 18, cancelAndRepostAfter = 24 hours, qualifications = Nil),
 			INSTRUCTIONS_ITALIC.key -> stateName,
 			OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(decideInstructions),
 			MEMOIZER_NAME.key -> Some("btruth" + stateName)
