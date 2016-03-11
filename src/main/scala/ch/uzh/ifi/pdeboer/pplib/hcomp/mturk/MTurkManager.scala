@@ -21,7 +21,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 
 	def waitForResponse() = {
 		thread = Thread.currentThread()
-		val timer = new GrowingTimer(waitInterval second, 1.05, 20 * waitInterval seconds)
+		val timer = new GrowingTimer(waitInterval second, 1.1, 60 * waitInterval seconds)
 		//very very ugly, but we dont have a break statement in scala..
 		var answer: Option[HCompAnswer] = None
 		try {
@@ -92,7 +92,7 @@ class MTurkManager(val query: HCompQuery, val properties: HCompQueryProperties, 
 				case Some(a: Assignment) => handleAssignmentResult(a)
 			}
 		} catch {
-			case e: Throwable => logger.error(s"got exception while waiting for answer for ${query.identifier}. Continueing to wait", e); None
+			case e: Throwable => None //logger.error(s"got exception while waiting for answer for ${query.identifier}. Continueing to wait", e); None
 		}
 	}
 

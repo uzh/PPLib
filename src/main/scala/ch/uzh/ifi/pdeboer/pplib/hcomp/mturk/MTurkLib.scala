@@ -286,16 +286,15 @@ private[mturk] object MTurkService {
 						throw new IllegalArgumentException(message)
 					}
 				}
-				new MTurkService(props("access_key"), props("secret_key"), server)
+				new MTurkService(props.getProperty("access_key"), props.getProperty("secret_key"), server)
 			}
 		}
 	}
 }
 
-private[mturk] class MTurkService(
-									 accessKey: String,
-									 secretKey: String,
-									 val server: Server) extends LazyLogger {
+private[mturk] class MTurkService(accessKey: String,
+								  secretKey: String,
+								  val server: Server) extends LazyLogger {
 
 	def RegisterHITType(
 						   Title: String,
@@ -509,14 +508,14 @@ private[mturk] class MTurkService(
 				val response = client.execute(new HttpGet(url))
 				val entity = EntityUtils.toString(response.getEntity)
 				if (response.getStatusLine.getStatusCode != 200) {
-					val additionalInfo = s"statuscode ${response.getStatusLine.getStatusCode}. entity $entity"
-					logger.error(s"couldn't get url. $additionalInfo")
+					val additionalInfo = s"statuscode ${response.getStatusLine.getStatusCode}. entity $entity url $url"
 					throw new IOException(s"the request didn't work out. Here's some info $additionalInfo")
 				}
-				Some(XML.load(entity)) //as opposed to new URL(url)
+				Some(XML.loadString(entity)) //as opposed to new URL(url)
 			} catch {
-				case e: IOException => {
-					Thread.sleep(500)
+				case e: Exception => {
+					logger.debug("problem connecting", e)
+					Thread.sleep(1000)
 					None
 				}
 			}
@@ -526,7 +525,7 @@ private[mturk] class MTurkService(
 			throw new Exception("unable to connect to " + url)
 		}
 		val xml = successes.next
-		if ((xml \\ "Error").size > 0) {
+		if ((xml \\ "Error").nonEmpty) {
 			throw new Exception(xml.toString.replaceAll("<", "\n<"))
 		}
 		xml

@@ -21,7 +21,7 @@ object BTSExperiment extends App {
 		val stateName = state.head
 		val capital = state(1)
 
-		val cities = state.slice(1, 6)
+		val cities = state.slice(1, 5)
 
 		val contest = new BayesianTruthContest(Map(
 			PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(HComp.mechanicalTurk),
