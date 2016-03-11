@@ -1,5 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal
 
+import java.util.Date
+
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompPortalAdapter, HCompQuery, HCompQueryProperties}
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.PropertyAccessor
@@ -23,8 +25,8 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 
 		try {
 			sql"""
-				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, answerUser)
-				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime)}, ${answer.map(_.receivedTime)}, ${answer.map(_.responsibleWorkers.map(_.id).mkString(","))})
+				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, createDate, answerUser)
+				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime)}, ${answer.map(_.receivedTime)}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).mkString(","))})
 		   """.update.apply()
 		} catch {
 			case e: Throwable => createLayout()
@@ -42,7 +44,8 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 			    `paymentCents` INT(11) DEFAULT NULL,
 			    `fullProperties` LONGTEXT,
 			    `questionCreationDate` DATETIME DEFAULT NULL,
-			    `questionAnswerDate` DATETIME DEFAULT NULL,
+				 `questionAnswerDate` DATETIME DEFAULT NULL,
+				 `createDate` DATETIME DEFAULT NULL,
 			    `answerUser` VARCHAR(255) DEFAULT NULL,
 			    PRIMARY KEY (`id`)
 			  ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;""".update().apply()
