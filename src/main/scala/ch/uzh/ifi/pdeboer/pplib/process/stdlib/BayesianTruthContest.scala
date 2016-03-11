@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, CompositeQueryAnswer}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompQuery, HCompAnswer, CompositeQueryAnswer}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
@@ -71,21 +71,11 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 		}
 	}
 
-	private case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: Patch, probabilitiesForOtherAnswers: Map[Patch, Double]) {
-
-		def btsScore(avgOwn: Map[Patch, Double], avgOthers: Map[Patch, Double]) = {
-			val correctedAvgOwn = avgOwn.map(p => p._1 -> (if (p._2 > 0) p._2 else 0.0001))
-			val leftTerm = Math.log(correctedAvgOwn(ownAnswer) / avgOthers(ownAnswer))
-			val rightTerm = probabilitiesForOtherAnswers.map(p => correctedAvgOwn(p._1) * Math.log(p._2 / correctedAvgOwn(p._1))).filterNot(d => d.isInfinite || d.isNaN).sum
-			leftTerm + rightTerm
-		}
-	}
-
-	def createMCQueryForOwnOpinion(alternatives: List[Patch]) = {
+	def createMCQueryForOwnOpinion(alternatives: List[Patch]): HCompQuery = {
 		queryBuilder.buildQuery(alternatives, this)
 	}
 
-	def createTextFieldForOthersOpinions(patch: Patch) = {
+	def createTextFieldForOthersOpinions(patch: Patch): HCompQuery = {
 		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(OTHERS_OPINIONS_INSTRUCTION_GENERATOR.get))
 	}
 
@@ -102,6 +92,16 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	override def getCostCeiling(data: List[Patch]): Int = WORKER_COUNT.get * QUESTION_PRICE.get.paymentCents
 
 
+}
+
+private[stdlib] case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: Patch, probabilitiesForOtherAnswers: Map[Patch, Double]) {
+
+	def btsScore(avgOwn: Map[Patch, Double], avgOthers: Map[Patch, Double]) = {
+		val correctedAvgOwn = avgOwn.map(p => p._1 -> (if (p._2 > 0) p._2 else 0.0001))
+		val leftTerm = Math.log(correctedAvgOwn(ownAnswer) / avgOthers(ownAnswer))
+		val rightTerm = probabilitiesForOtherAnswers.map(p => correctedAvgOwn(p._1) * Math.log(p._2 / correctedAvgOwn(p._1))).filterNot(d => d.isInfinite || d.isNaN).sum
+		leftTerm + rightTerm
+	}
 }
 
 object BayesianTruthContest {
