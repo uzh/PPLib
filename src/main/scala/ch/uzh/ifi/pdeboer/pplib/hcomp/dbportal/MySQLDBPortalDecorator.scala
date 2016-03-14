@@ -26,7 +26,7 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 		try {
 			sql"""
 				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, createDate, answerUser)
-				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime)}, ${answer.map(_.receivedTime)}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).mkString(","))})
+				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime).orNull}, ${answer.map(_.receivedTime).orNull}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).toSet.mkString(","))})
 		   """.update.apply()
 		} catch {
 			case e: Throwable => createLayout()
