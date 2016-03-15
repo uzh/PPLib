@@ -55,7 +55,7 @@ trait HCompPortalAccess extends IParametrizable {
 	lazy val portal = new CostCountingEnabledHCompPortal(self.getParam(DefaultParameters.PORTAL_PARAMETER))
 
 	def getCrowdWorkers(workerCount: Int): ParSeq[Int] = {
-		(1 to workerCount).view.mpar
+		if (workerCount < 1) List.empty[Int].view.mpar else (1 to workerCount).view.mpar
 	}
 
 	override def defaultParameters: List[ProcessParameter[_]] = combineParameterLists(List(PARALLEL_EXECUTION_PARAMETER, PORTAL_PARAMETER), super.defaultParameters)

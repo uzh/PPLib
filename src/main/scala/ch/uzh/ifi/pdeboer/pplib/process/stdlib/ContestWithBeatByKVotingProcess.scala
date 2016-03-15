@@ -1,35 +1,33 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompAnswer
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
-import scala.collection.mutable
-
 /**
- * Created by pdeboer on 28/11/14.
- */
+  * Created by pdeboer on 28/11/14.
+  */
 @PPLibProcess
 class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with HCompQueryBuilderSupport[List[Patch]] {
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
-	protected var votes = mutable.HashMap.empty[String, Int]
+	protected val votes = new VotesTable()
 
 	override protected def run(data: List[Patch]): Patch = {
 		if (data.size == 1) data.head
 		else if (data.isEmpty) null
 		else {
-			data.foreach(d => votes += (d.value -> 0))
 			val memoizer: ProcessMemoizer = getProcessMemoizer(data.hashCode() + "").getOrElse(new NoProcessMemoizer())
 			var globalIteration: Int = 0
 			do {
 				logger.info("started iteration " + globalIteration)
-				getCrowdWorkers(K.get - delta).foreach(w => {
+				getCrowdWorkers((K.get - delta).toInt).foreach(w => {
 					val answerOpt = memoizer.mem(s"vote $globalIteration $w")(obtainValidVote(data))
 					answerOpt.foreach(answer => {
 						data.synchronized {
 							logger.info("got valid vote for " + answer)
-							votes += answer -> (votes.getOrElse(answer, 0) + 1)
+							votes.addVote(answer._1, answer._2)
 						}
 					})
 				})
@@ -46,41 +44,44 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		val winner = bestAndSecondBest._1._1
 		if (bestAndSecondBest._1._2 - bestAndSecondBest._2._2 < K.get) {
 			if (RETURN_LEADER_IF_MAX_ITERATIONS_REACHED.get)
-				data.find(d => d.value == winner).get
+				winner
 			else
 				null
 		} else {
-			data.find(d => d.value == winner).get
+			winner
 		}
 	}
 
 	protected var uncountedVotes: Int = 0
 
-	private def obtainValidVote(data: List[Patch]): Option[String] = {
+	private def obtainValidVote(data: List[Patch]): Option[(Patch, HCompAnswer)] = {
 		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
 			QUESTION_PRICE.get).get
 		val ans = queryBuilder.parseAnswer[String](data, answerRaw, this)
+		val patch = data.find(d => ans.contains(d.value)).orNull
 
-		if (ans.isDefined) ans
+		if (ans.isDefined) ans.map(a => (patch, answerRaw))
 		else {
 			uncountedVotes += 1
-			if (uncountedVotes + votes.values.sum < MAX_ITERATIONS.get)
+			if (uncountedVotes + votes.votesCount < MAX_ITERATIONS.get)
 				obtainValidVote(data)
 			else None
 		}
 	}
 
 	def shouldStartAnotherIteration: Boolean = {
-		neededToWin > 0 && votes.values.sum + uncountedVotes + neededToWin <= MAX_ITERATIONS.get
+		neededToWin > 0 && votes.votesCount + uncountedVotes + neededToWin <= MAX_ITERATIONS.get
 	}
 
 	def neededToWin = K.get - delta
 
-	def delta = if (votes.isEmpty) 0 else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
+	def delta = if (votes.answers.isEmpty) 0d else Math.abs(bestAndSecondBest._1._2 - bestAndSecondBest._2._2)
 
 	def bestAndSecondBest = {
-		val sorted = votes.toList.sortBy(-_._2)
-		(sorted.head, sorted(1))
+		val sorted = votes.sortedByWeight.take(2)
+		if (sorted.size == 1) (sorted.head, sorted.head)
+		else
+			(sorted.head, sorted(1))
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[Patch]) = {

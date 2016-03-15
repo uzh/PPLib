@@ -14,26 +14,30 @@ class ContestWithBeatByKVotingProcessTest {
 
 	@Test
 	def testBestAndSecondBest: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess()
+		val p = new MiniContestWithBeatByKVotingProcess(patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
-		Assert.assertEquals((("b", 2), ("a", 1)), p.bestAndSecondBest)
+		Assert.assertEquals("b", p.bestAndSecondBest._1._1.value)
+		Assert.assertEquals("a", p.bestAndSecondBest._2._1.value)
+
+		Assert.assertEquals(2d, p.bestAndSecondBest._1._2, 0.1d)
+		Assert.assertEquals(1d, p.bestAndSecondBest._2._2, 0.1d)
 	}
 
 	@Test
 	def testDelta: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess()
+		val p = new MiniContestWithBeatByKVotingProcess(patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
-		Assert.assertEquals(1, p.delta)
+		Assert.assertEquals(1d, p.delta, 0.1d)
 
 		p.setVotes(Map("a" -> 2))
-		Assert.assertEquals(0, p.delta)
+		Assert.assertEquals(0d, p.delta, 0.1d)
 	}
 
 	@Test
 	def testKDiff: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3), patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 1, "b" -> 2))
 
 		Assert.assertTrue(p.shouldStartAnotherIteration)
@@ -47,7 +51,7 @@ class ContestWithBeatByKVotingProcessTest {
 
 	@Test
 	def testMaxIterationsExceeded: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 9))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 9), patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 4, "b" -> 2))
 		Assert.assertTrue(p.shouldStartAnotherIteration)
 
@@ -60,7 +64,7 @@ class ContestWithBeatByKVotingProcessTest {
 
 	@Test
 	def testRuntimeProblem: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 4, DefaultParameters.MAX_ITERATIONS.key -> 10))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 4, DefaultParameters.MAX_ITERATIONS.key -> 10), patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 5, "b" -> 2))
 
 		Assert.assertTrue(p.shouldStartAnotherIteration)
@@ -68,7 +72,7 @@ class ContestWithBeatByKVotingProcessTest {
 
 	@Test
 	def testMaxIterationsWithUncountedVotes: Unit = {
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 10))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 10), patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 3, "b" -> 3))
 		p.setUncountedVotes(1)
 		Assert.assertTrue(p.shouldStartAnotherIteration)
@@ -80,7 +84,7 @@ class ContestWithBeatByKVotingProcessTest {
 	@Test
 	def testEndResult: Unit = {
 		val patches = IndexedPatch.from(List("a", "b"))
-		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 9))
+		val p = new MiniContestWithBeatByKVotingProcess(Map(K.key -> 3, DefaultParameters.MAX_ITERATIONS.key -> 9), patches = IndexedPatch.from("a,b", ","))
 		p.setVotes(Map("a" -> 5, "b" -> 2))
 		Assert.assertEquals(patches.head, p.getEndResult(patches))
 
@@ -105,24 +109,28 @@ class ContestWithBeatByKVotingProcessTest {
 		val portal = new RandomHCompPortal("")
 		val bbkParamMap = Map(MEMOIZER_NAME.key -> Some("mem"), PORTAL_PARAMETER.key -> portal, K.key -> 4)
 		val data: List[IndexedPatch] = IndexedPatch.from("1,2,3,4,5,6,7,8,9", ",")
-		val bbk = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem)
+		val bbk = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem, data)
 		val winner = bbk.process(data)
 
-		val bbk2 = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem)
+		val bbk2 = new MiniContestWithBeatByKVotingProcess(bbkParamMap, mem, data)
 		val winner2 = bbk2.process(data)
 
 		Assert.assertEquals(winner, winner2)
 		Assert.assertEquals(bbk.getVotes, bbk2.getVotes)
 	}
 
-	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any], mem: ProcessMemoizer = null) extends ContestWithBeatByKVotingProcess(params) {
+	private class MiniContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[String, Any], mem: ProcessMemoizer = null, patches: List[Patch]) extends ContestWithBeatByKVotingProcess(params) {
 
 		import DefaultParameters._
 
 		def getVotes = votes
 
 		def setVotes(v: Map[String, Int]): Unit = {
-			votes ++= v
+			votes.clear()
+			v.foreach(mv => {
+				val patch: Patch = patches.find(_.value == mv._1).get
+				(1 to mv._2).foreach(n => votes.addVote(patch, null))
+			})
 		}
 
 		def setUncountedVotes(uncounted: Int): Unit = {
