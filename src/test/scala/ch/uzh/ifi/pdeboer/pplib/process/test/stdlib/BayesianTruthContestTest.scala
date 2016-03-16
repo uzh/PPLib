@@ -4,11 +4,12 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BayesianTruthContest
-import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+import ch.uzh.ifi.pdeboer.pplib.util.{CollectionUtils, LazyLogger}
 import org.junit.{Assert, Test}
 
 import scala.collection.mutable
 import scala.util.Random
+import CollectionUtils._
 
 /**
   * Created by pdeboer on 07/03/16.
@@ -23,29 +24,38 @@ class BayesianTruthContestTest extends LazyLogger {
 
 	@Test
 	def testExpertCountMajority: Unit = {
-		val patches = createPatches
-		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
-		val contest = createContest(new BTTestPortal(playbook))
-		val result = contest.process(patches)
-		Assert.assertEquals(patches(1), result)
+		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+			val patches = createPatches
+			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
+			val contest = createContest(new BTTestPortal(playbook))
+			val result = contest.process(patches)
+			if (patches(1) == result) 1 else 0
+		}).sum
+		Assert.assertTrue(expertAnswerChosenCount > 500)
 	}
 
 	@Test
 	def testExpertCountEqualNonExpert: Unit = {
-		val patches = createPatches
-		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
-		val contest = createContest(new BTTestPortal(playbook))
-		val result = contest.process(patches)
-		Assert.assertEquals(patches(1), result)
+		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+			val patches = createPatches
+			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
+			val contest = createContest(new BTTestPortal(playbook))
+			val result = contest.process(patches)
+			if (patches(1) == result) 1 else 0
+		}).sum
+		Assert.assertTrue(expertAnswerChosenCount > 500)
 	}
 
 	@Test
 	def testExpertCountJustBelowNonExpert: Unit = {
-		val patches = createPatches
-		val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head))
-		val contest = createContest(new BTTestPortal(playbook))
-		val result = contest.process(patches)
-		Assert.assertEquals(patches(1), result)
+		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+			val patches = createPatches
+			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
+			val contest = createContest(new BTTestPortal(playbook))
+			val result = contest.process(patches)
+			if (patches(1) == result) 1 else 0
+		}).sum
+		Assert.assertTrue(expertAnswerChosenCount > 500)
 	}
 
 	@Test
