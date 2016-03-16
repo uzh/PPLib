@@ -58,7 +58,7 @@ class BayesianTruthContestTest extends LazyLogger {
 		Assert.assertEquals(patches.head, result)
 	}
 
-	def createPlaybookAnswer(own: Patch, others: Patch = null, allPatches: List[Patch] = createPatches, winnerPercentage: Double = 100d) = BTWorkerAnswer(own.value, {
+	def createPlaybookAnswer(own: Patch, others: Patch = null, allPatches: List[Patch] = createPatches, winnerPercentage: Double = 90d) = BTWorkerAnswer(own.value, {
 		val comparisonTarget = if (others == null) own else others
 		val loserPercentage = (100d - winnerPercentage) / (allPatches.size.toDouble - 1d)
 		allPatches.map(p => p.value -> (if (p == comparisonTarget) winnerPercentage else loserPercentage)).toMap
