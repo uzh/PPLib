@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.optimization
+package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
 
 import org.junit.{After, Before, Assert, Test}
 

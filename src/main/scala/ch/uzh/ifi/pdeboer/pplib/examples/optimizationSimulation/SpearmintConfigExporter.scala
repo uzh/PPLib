@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.optimization
+package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
 
 /**
   * Created by pdeboer on 13/12/15.

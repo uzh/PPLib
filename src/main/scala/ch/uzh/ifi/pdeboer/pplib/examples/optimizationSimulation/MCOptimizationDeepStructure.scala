@@ -1,4 +1,4 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.optimization
+package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
