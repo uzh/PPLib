@@ -40,7 +40,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 		Some(new FileWriter(new File(s"$dir${File.separator}branin.py"))).foreach(f => {
 			val pplibPath: String = overridePPLibPath.getOrElse(new File(".")).getAbsolutePath
 			val featureList: List[String] = targetFeatures.map(f => f.path)
-			f.write(createPythonScript(pplibPath, dir.getAbsolutePath, experimentName, featureList, sbtCommand, classOf[BOSpearmintEntrance].getCanonicalName))
+			f.write(createPythonScript(pplibPath, dir.getAbsolutePath, experimentName, featureList, sbtCommand, classOf[BOSpearmintEntrance[_, _]].getCanonicalName))
 			f.close()
 		})
 	}
@@ -65,6 +65,18 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 
 		processSpearmintResult(entrance)
 	}
+
+	def sockPythonScriptContent(variables: List[String], port: Int = 9988) =
+		s"""
+		   |import socket
+		   |
+ 			|def main(job_id, params):
+		   |    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		   |    sock.connect( ("127.0.0.1", 9988) )
+		   |    sock.send(u"all key VALUE value\n")
+		   |    utility = sock.recv(1024)
+		   |    return float(utility)
+		 """.stripMargin
 
 
 	def createPythonScript(pplibPath: String, experimentPath: String, experimentName: String, variables: List[String], sbtCommand: String, pplibTargetClass: String): String =
@@ -107,7 +119,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 }
 
 object BOSpearmintEntrance extends App {
-	assert(this.getClass.getCanonicalName == classOf[BOSpearmintEntrance].getCanonicalName, "always needs to have the same name as class.")
+	assert(this.getClass.getCanonicalName == classOf[BOSpearmintEntrance[_, _]].getCanonicalName, "always needs to have the same name as class.")
 
 
 }
