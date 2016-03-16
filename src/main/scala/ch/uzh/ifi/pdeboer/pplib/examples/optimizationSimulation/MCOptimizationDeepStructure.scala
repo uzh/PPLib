@@ -8,10 +8,10 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionP
 /**
   * Created by pdeboer on 12/05/15.
   */
-case class MCOptimizationResult(text: String, costInCents: Int) extends Comparable[MCOptimizationResult] {
-	override def compareTo(o: MCOptimizationResult): Int = doubleRating.compareTo(o.doubleRating)
+case class MCOptimizationResult(text: String, costInCents: Int) extends Comparable[MCOptimizationResult] with ResultWithUtility {
+	override def compareTo(o: MCOptimizationResult): Int = utility.compareTo(o.utility)
 
-	def doubleRating: Double = MCOptimizeConstants.answerDistance(text.toInt) + costInCents.toDouble
+	override def utility: Double = MCOptimizeConstants.answerDistance(text.toInt) + costInCents.toDouble
 }
 
 class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimizationResult] {

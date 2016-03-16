@@ -7,8 +7,9 @@ package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
 import java.io.{FileWriter, File}
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessFeature, SurfaceStructureFeatureExpander}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.ResultWithUtility
 
-class SpearmintConfigExporter[INPUT, OUTPUT <: Comparable[OUTPUT]](featureExpander: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) {
+class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithUtility](featureExpander: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) {
 	/*
 		 "X":{"type"    : "ENUM",
 		  "size"    : 2,

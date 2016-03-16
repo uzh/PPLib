@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.textshortening
 
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AutoExperimentationEngine, Recombinator}
+import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.Recombinator
 
 /**
  * Created by pdeboer on 12/05/15.
@@ -18,7 +19,7 @@ object ShortNText extends App {
 		  The 2nd sentence is also very useless.
 		  And the third one as well - very much so."""
 
-	val autoExperimentation = new AutoExperimentationEngine(recombinations)
+	val autoExperimentation = new NaiveAutoExperimentationEngine(recombinations)
 	val results = autoExperimentation.runOneIteration(textToBeShortened)
 
 	println("finished evaluation.")
