@@ -102,7 +102,7 @@ class ContestWithBeatByKVotingProcessTest {
 		Assert.assertNotNull(p.getEndResult(patches))
 	}
 
-	@Test
+	//@Test
 	def testMemoizer: Unit = {
 		import DefaultParameters._
 		val mem = new InMemoryProcessMemoizer("bbkInMem")
