@@ -16,7 +16,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 		ExperimentResult(iterationResults.flatMap(_.iterations))
 	}
 
-	case class ExperimentIteration(rawResults: List[SurfaceStructureResult]) {
+	case class ExperimentIteration(rawResults: List[SurfaceStructureResult[INPUT, OUTPUT]]) {
 		def bestProcess = rawResults.maxBy(_.result.map(_.utility))
 	}
 
@@ -25,7 +25,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 
 		def surfaceStructures = resultsOfSuccessfulRuns.map(_.surfaceStructure).toSet
 
-		def rawResults: List[SurfaceStructureResult] = iterations.flatMap(_.rawResults)
+		def rawResults: List[SurfaceStructureResult[INPUT, OUTPUT]] = iterations.flatMap(_.rawResults)
 
 		def resultsOfSuccessfulRuns = rawResults.filter(_.result.isDefined)
 
@@ -42,7 +42,6 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 		}
 	}
 
-	case class SurfaceStructureResult(surfaceStructure: SurfaceStructure[INPUT, OUTPUT], result: Option[OUTPUT])
 
 	object CompositeExperimentResult {
 		def medianResult(results: List[Option[OUTPUT]]): Option[OUTPUT] = {
@@ -50,7 +49,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 			upper.head
 		}
 	}
-
 }
 
+case class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithUtility](surfaceStructure: SurfaceStructure[INPUT, OUTPUT], result: Option[OUTPUT])
 

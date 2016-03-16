@@ -1,10 +1,16 @@
 package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 
-import java.io.{File, FileWriter}
+import java.io._
+import java.net.{ServerSocket, Socket}
 
 import ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation.SpearmintConfigExporter
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithUtility, SurfaceStructure}
+import org.joda.time.DateTime
+
+import scala.collection.mutable
+import scala.io.Source
+import scala.util.Random
 
 /**
   * Created by pdeboer on 16/03/16.
@@ -43,12 +49,23 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 		new SpearmintConfigExporter(expander).storeAsJson(new File(s"$dir${File.separator}config.json"), targetFeatures)
 	}
 
+	def processSpearmintResult(entrance: BOSpearmintEntrance[INPUT, OUTPUT]): ExperimentResult = {
+		ExperimentResult(entrance.results.map(r => ExperimentIteration(List(r))))
+	}
+
 	override def runOneIteration(input: INPUT): ExperimentResult = {
 		import sys.process._
+
+		val entrance = new BOSpearmintEntrance(input, expander)
+		entrance.listen()
+
 		s"$pythonCommand $pathToSpearmint${File.separator}spearmint${File.separator}main.py ${experimentPath.getAbsolutePath}" ! ProcessLogger(s => logger.info(s), s => logger.error(s))
 
-		???
+		entrance.terminate()
+
+		processSpearmintResult(entrance)
 	}
+
 
 	def createPythonScript(pplibPath: String, experimentPath: String, experimentName: String, variables: List[String], sbtCommand: String, pplibTargetClass: String): String =
 		s"""
@@ -81,7 +98,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 		   |
 		  |    costLine = lines[len(lines) - 4]
 		   |    linePrefix = "[0m[[0minfo[0m] [0mcost was"
-		   |    print "process cost was " + costLine[len(linePrefix):len(costLine) - len(" [0m")]
+		   |    print "process serialization was " + costLine[len(linePrefix):len(costLine) - len(" [0m")]
 		   |
 		  |    print "got float string " + floatString
 		   |    #return {'branin': float(floatString)}
@@ -90,7 +107,94 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 }
 
 object BOSpearmintEntrance extends App {
+	assert(this.getClass.getCanonicalName == classOf[BOSpearmintEntrance].getCanonicalName, "always needs to have the same name as class.")
+
 
 }
 
-class BOSpearmintEntrance {}
+class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithUtility](input: INPUT, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) {
+	private var kill: Option[DateTime] = None
+
+	protected var openThreads: mutable.Set[SpearmintSocketProcessor] = mutable.Set.empty
+
+	protected var _results: List[SurfaceStructureResult[INPUT, OUTPUT]] = List.empty
+
+	def results = _results.toList
+
+	def listen(): Unit = {
+		new Thread() {
+			override def run(): Unit = {
+				val server = new ServerSocket(port)
+				while (surfaceStructure.synchronized(kill).isEmpty) {
+					val socket = server.accept()
+					new SpearmintSocketProcessor(socket).start()
+				}
+			}
+		}
+	}
+
+	class SpearmintSocketProcessor(val socket: Socket) extends Thread {
+		protected val rand = Random.nextLong()
+
+		override def run(): Unit = {
+			surfaceStructure.synchronized {
+				openThreads += this
+			}
+
+			val featureDefinition = Source.fromInputStream(socket.getInputStream).getLines().map(l => {
+				val content = l.split(" VALUE ")
+				val valueAsOption = if (content(1) == "None") None else Some(content(1))
+				surfaceStructure.featureByPath(content(0)).get -> valueAsOption
+			}).toMap
+
+			val targetSurfaceStructures = surfaceStructure.findSurfaceStructures(featureDefinition, exactMatch = false)
+			if (targetSurfaceStructures.isEmpty) println(10000.0)
+			else {
+				val res = targetSurfaceStructures.head.test(input)
+				surfaceStructure.synchronized {
+					_results = SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
+				}
+				val os = new OutputStreamWriter(socket.getOutputStream)
+				os.write("" + res.map(_.utility).getOrElse("1000"))
+				os.close()
+			}
+
+			surfaceStructure.synchronized {
+				openThreads -= this
+			}
+		}
+
+		def canEqual(other: Any): Boolean = other.isInstanceOf[SpearmintSocketProcessor]
+
+		override def equals(other: Any): Boolean = other match {
+			case that: SpearmintSocketProcessor =>
+				(that canEqual this) &&
+					rand == that.rand
+			case _ => false
+		}
+
+		override def hashCode(): Int = {
+			val state = Seq(rand)
+			state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+		}
+	}
+
+	def terminate(): Unit = {
+		synchronized {
+			kill = Some(DateTime.now())
+		}
+		new Thread {
+			override def run(): Unit = {
+				Thread.sleep(5000)
+				val threadsCopy = surfaceStructure.synchronized(openThreads.toSet)
+				threadsCopy.foreach(t => {
+					try {
+						t.stop() //bad bad me
+					} catch {
+						case t: Throwable => {}
+					}
+				})
+			}
+		}.start()
+	}
+}
