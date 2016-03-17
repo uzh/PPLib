@@ -1,10 +1,10 @@
-package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
+package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 
 /**
   * Created by pdeboer on 13/12/15.
   */
 
-import java.io.{FileWriter, File}
+import java.io.{File, FileWriter}
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessFeature, SurfaceStructureFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.ResultWithUtility

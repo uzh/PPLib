@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
+import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.{SpearmintConfigExporter, NaiveAutoExperimentationEngine}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{XMLFeatureExpander, SurfaceStructureFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.Recombinator
 
