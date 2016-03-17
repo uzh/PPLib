@@ -12,7 +12,7 @@ class MCOptimizationMockPortal extends HCompPortalAdapter {
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val answer = query match {
 			case x: FreetextQuery =>
-				throw new IllegalArgumentException("I can only process multiple choice queries")
+				Some(FreetextAnswer(x, "2", Nil))
 			case x: MultipleChoiceQuery =>
 				processMultipleChoiceQuery(x)
 			case x: CompositeQuery => Some(CompositeQueryAnswer(x, x.queries.map(q => (q, processQuery(q, properties))).toMap))

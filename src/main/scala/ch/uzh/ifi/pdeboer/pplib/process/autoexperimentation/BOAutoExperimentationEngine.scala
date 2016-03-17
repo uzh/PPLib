@@ -1,15 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 
 import java.io._
-import java.net.{ServerSocket, Socket}
+
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithUtility, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
-import scala.collection.mutable
 import scala.io.Source
-import scala.util.Random
 
 /**
   * Created by pdeboer on 16/03/16.
@@ -22,6 +20,18 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 	protected val expander = new SurfaceStructureFeatureExpander(surfaceStructures)
 	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 
+	val JOB_QUEUE: String = "jobqueue"
+	val JOB_QUEUE_DONE: String = "done"
+
+	def createExperimentCommDirs(dir: File) = {
+		new File(dir.getAbsolutePath + File.separator + JOB_QUEUE).mkdir()
+		new File(dir.getAbsolutePath + File.separator + JOB_QUEUE_DONE).mkdir()
+	}
+
+	def jobQueueDir = experimentPath.getAbsolutePath + File.separator + JOB_QUEUE + File.separator
+
+	def jobQueueDoneDir = experimentPath.getAbsolutePath + File.separator + JOB_QUEUE_DONE + File.separator
+
 	def experimentPath = {
 		val dir = pathToSpearmintExperimentFolder.getOrElse(
 			new File(s"${pathToSpearmint.getAbsolutePath}${File.separator}examples${File.separator}$experimentName${File.separator}"))
@@ -31,6 +41,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 
 			writeSpearmintConfig(dir)
 			writeSpearmintPythonScript(dir)
+			createExperimentCommDirs(dir)
 		}
 		dir
 	}
@@ -53,7 +64,10 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 	override def runOneIteration(input: INPUT): ExperimentResult = {
 		import sys.process._
 
-		val entrance = new BOSpearmintEntrance(input, expander, port)
+		val watchfolder = new File(experimentPath.getAbsolutePath + File.separator + JOB_QUEUE)
+		val doneFolder = new File(experimentPath.getAbsolutePath + File.separator + JOB_QUEUE_DONE)
+
+		val entrance = new BOSpearmintEntrance(input, watchfolder, doneFolder, expander, port)
 		entrance.listen()
 
 		//val exportCmd = if (prefixPythonPathExport) s"export PYTHONPATH='$pathToSpearmint' &&" else ""
@@ -68,111 +82,90 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 
 	def spearmintPythonScriptContent() =
 		s"""import socket
+			|import os
+			|import re
+			|import time
 			|
 			 |
 			 |def main(job_id, params):
-			|    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			|    sock.connect(("127.0.0.1", $port))
-			|    strToSend = u""
+			|    jobDesc = ""
 			|    for key in params.keys():
-			|            strToSend += u"%s VALUE %s\n" % (key,params[key][0])
-			|    print("sent %s" % strToSend)
-			|    sock.sendall(strToSend)
-			|    utility = sock.recv(4096)
-			|    print("received %s" % utility)
-			|    socket.close()
-			|    return float(utility) """.stripMargin
+			|        jobDesc += "%s VALUE %s\\n" % (key, params[key][0])
+			|
+ 			|    f = open("${jobQueueDir}jobdesc_%s" % job_id, "w+")
+			|    f.write(jobDesc)
+			|    f.close()
+			|
+			|    outDir = "$jobQueueDoneDir"
+			|
+ 			|    while (True):
+			|        time.sleep(1)
+			|        for aFile in os.listdir(outDir):
+			|            if (aFile == ("answer_jobdesc_%s" % job_id)):
+			|                ans = open(outDir+aFile, "r")
+			|                utilityStringUnparsed = ans.readline()
+			|                print("got line %s" % utilityStringUnparsed)
+			|                ans.close()
+			|                utilityString = re.sub(r"[^0-9\\.]", "", utilityStringUnparsed)
+			|                print("parsed it to %s" % utilityString)
+			|
+ 			|                return float(utilityString)
+			| """.stripMargin
 }
 
-class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithUtility](input: INPUT, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) extends LazyLogger {
+class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithUtility](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) extends LazyLogger {
 	private var kill: Option[DateTime] = None
-
-	protected var openThreads: mutable.Set[SpearmintSocketProcessor] = mutable.Set.empty
 
 	protected var _results: List[SurfaceStructureResult[INPUT, OUTPUT]] = List.empty
 
-	def results = _results.toList
+	def results = _results
 
 	def listen(): Unit = {
 		new Thread() {
 			override def run(): Unit = {
-				val server = new ServerSocket(port)
-				logger.info(s"starting pplib bo server at $port")
 				while (surfaceStructure.synchronized(kill).isEmpty) {
-					logger.info("waiting for connections..")
-					val socket = server.accept()
-					logger.info(s"got connection: $socket")
-					new SpearmintSocketProcessor(socket).start()
+					watchFolder.listFiles().filter(f => f.getName.startsWith("jobdesc")).foreach(f => {
+						val inProgress: File = new File(doneFolder.getAbsolutePath + File.separator + f.getName)
+						f.renameTo(inProgress)
+						new SpearmintJobProcessor(inProgress).start()
+					})
+					Thread.sleep(500)
 				}
 			}
 		}.start()
 	}
 
-	class SpearmintSocketProcessor(val socket: Socket) extends Thread with LazyLogger {
-		protected val rand = Random.nextLong()
+	class SpearmintJobProcessor(val jobDescription: File) extends Thread with LazyLogger {
 
 		override def run(): Unit = {
-			surfaceStructure.synchronized {
-				openThreads += this
-			}
-
-			val lines = Source.fromInputStream(socket.getInputStream).getLines().toList
-			logger.info(s"received message $lines")
-
-			val featureDefinition = lines.map(l => {
+			val featureDefinition = Source.fromFile(jobDescription).getLines().map(l => {
 				val content = l.split(" VALUE ")
 				val valueAsOption = if (content(1) == "None") None else Some(content(1))
 				surfaceStructure.featureByPath(content(0)).get -> valueAsOption
 			}).toMap
 
 			val targetSurfaceStructures = surfaceStructure.findSurfaceStructures(featureDefinition, exactMatch = false)
-			if (targetSurfaceStructures.isEmpty) println(10000.0)
+			val result = if (targetSurfaceStructures.isEmpty) None
 			else {
 				val res = targetSurfaceStructures.head.test(input)
 				surfaceStructure.synchronized {
 					_results = SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
 				}
-				val os = new OutputStreamWriter(socket.getOutputStream)
-				os.write("" + res.map(_.utility).getOrElse("1000"))
-				os.close()
+				res.map(_.utility)
 			}
 
-			surfaceStructure.synchronized {
-				openThreads -= this
-			}
-		}
+			val outputFileName: String = jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName
+			Some(new FileWriter(outputFileName)).foreach(f => {
+				f.write(result.map(_.toString).getOrElse("1000"))
+				f.close()
+			})
 
-		def canEqual(other: Any): Boolean = other.isInstanceOf[SpearmintSocketProcessor]
-
-		override def equals(other: Any): Boolean = other match {
-			case that: SpearmintSocketProcessor =>
-				(that canEqual this) &&
-					rand == that.rand
-			case _ => false
-		}
-
-		override def hashCode(): Int = {
-			val state = Seq(rand)
-			state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 		}
 	}
 
 	def terminate(): Unit = {
-		synchronized {
+		surfaceStructure.synchronized {
 			kill = Some(DateTime.now())
 		}
-		new Thread {
-			override def run(): Unit = {
-				Thread.sleep(5000)
-				val threadsCopy = surfaceStructure.synchronized(openThreads.toSet)
-				threadsCopy.foreach(t => {
-					try {
-						t.stop() //bad bad me
-					} catch {
-						case t: Throwable => {}
-					}
-				})
-			}
-		}.start()
 	}
 }
