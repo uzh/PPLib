@@ -20,8 +20,8 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 		def bestProcess = rawResults.maxBy(_.result.map(_.utility))
 	}
 
-	case class ExperimentResult(val iterations: List[ExperimentIteration]) {
-		def resultsForSurfaceStructure(surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = iterations.map(it => it.rawResults.filter(_.surfaceStructure == surfaceStructure).head)
+	case class ExperimentResult(iterations: List[ExperimentIteration]) {
+		def resultsForSurfaceStructure(surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = iterations.map(it => it.rawResults.find(_.surfaceStructure == surfaceStructure)).filter(_.isDefined).map(_.get)
 
 		def surfaceStructures = resultsOfSuccessfulRuns.map(_.surfaceStructure).toSet
 
