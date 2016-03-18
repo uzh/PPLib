@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.entities
 
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithUtility, SurfaceStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
 import com.github.tototoshi.csv.CSVWriter
 
 import scala.xml.{Node, NodeSeq}
@@ -63,7 +63,7 @@ object XMLFeatureExpander {
 /**
   * Created by pdeboer on 10/12/15.
   */
-class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: ResultWithUtility](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends XMLFeatureExpander(surfaceStructures.map(s => s.recombinedProcessBlueprint.createProcess().xml)) {
+class SurfaceStructureFeatureExpander[INPUT, OUTPUT <: ResultWithCostfunction](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends XMLFeatureExpander(surfaceStructures.map(s => s.recombinedProcessBlueprint.createProcess().xml)) {
 	def featureValueAt(feature: ProcessFeature, surfaceStructure: SurfaceStructure[INPUT, OUTPUT]) = valueAtPath(surfaceStructure.recombinedProcessBlueprint.createProcess().xml, feature.path)
 
 	def findSurfaceStructures(filter: Map[ProcessFeature, Option[String]], exactMatch: Boolean = true) = {

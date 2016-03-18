@@ -31,7 +31,7 @@ import scala.io.Source
 		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 5)
 		val resultMap = results.surfaceStructures.map(ss => ss -> {
 			val resultsObjects = results.resultsForSurfaceStructure(ss).zipWithIndex
-			val resultsUtilities = resultsObjects.map(r => "iteration_utility_" + r._2 -> r._1.result.get.utility)
+			val resultsUtilities = resultsObjects.map(r => "iteration_utility_" + r._2 -> r._1.result.get.cost)
 			val resultCost = resultsObjects.map(r => "iteration_cost_" + r._2 -> r._1.result.get.costInCents)
 
 			resultCost ::: resultsUtilities

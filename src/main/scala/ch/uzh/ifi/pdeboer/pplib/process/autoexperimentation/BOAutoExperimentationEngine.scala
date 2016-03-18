@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import java.io._
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithUtility, SurfaceStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
@@ -12,8 +12,8 @@ import scala.io.Source
 /**
   * Created by pdeboer on 16/03/16.
   */
-class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]],
-																	  pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, overridePPLibPath: Option[File] = None, sbtCommand: String = "sbt", pythonCommand: String = "python2.7", prefixPythonPathExport: Boolean = true, port: Int = 9988) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
+class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]],
+																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, overridePPLibPath: Option[File] = None, sbtCommand: String = "sbt", pythonCommand: String = "python2.7", prefixPythonPathExport: Boolean = true, port: Int = 9988) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
 	assert(experimentName != null && experimentName.length > 0)
 	assert(pathToSpearmint.exists(), "Spearmint not found")
 
@@ -113,7 +113,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](surfaceStr
 			| """.stripMargin
 }
 
-class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithUtility](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) extends LazyLogger {
+class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) extends LazyLogger {
 	private var kill: Option[DateTime] = None
 
 	protected var _results: List[SurfaceStructureResult[INPUT, OUTPUT]] = List.empty
@@ -151,7 +151,7 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithUtility](input: INPUT, watc
 				surfaceStructure.synchronized {
 					_results = SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
 				}
-				res.map(_.utility)
+				res.map(_.cost)
 			}
 
 			val outputFileName: String = jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName

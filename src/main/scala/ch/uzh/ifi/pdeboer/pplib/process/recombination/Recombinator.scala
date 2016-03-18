@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 /**
  * Created by pdeboer on 27/05/15.
  */
-class Recombinator[INPUT, OUTPUT <: ResultWithUtility](recombinable: DeepStructure[INPUT, OUTPUT]) {
+class Recombinator[INPUT, OUTPUT <: ResultWithCostfunction](recombinable: DeepStructure[INPUT, OUTPUT]) {
 	lazy val variants = {
 		val recombinations = recombinable.defineRecombinationSearchSpace.par.map {
 			case (key, value) => {

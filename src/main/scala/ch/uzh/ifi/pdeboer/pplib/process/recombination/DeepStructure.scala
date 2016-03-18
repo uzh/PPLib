@@ -6,13 +6,13 @@ import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 /**
  * Created by pdeboer on 09/10/14.
  */
-trait DeepStructure[INPUT, OUTPUT <: ResultWithUtility] {
+trait DeepStructure[INPUT, OUTPUT <: ResultWithCostfunction] {
 	def run(data: INPUT, recombinedProcessBlueprint: RecombinedProcessBlueprints): OUTPUT
 
 	def defineRecombinationSearchSpace: Map[String, RecombinationSearchSpaceDefinition[_]]
 }
 
-trait SimpleDeepStructure[INPUT, OUTPUT <: ResultWithUtility] extends DeepStructure[INPUT, OUTPUT] {
+trait SimpleDeepStructure[INPUT, OUTPUT <: ResultWithCostfunction] extends DeepStructure[INPUT, OUTPUT] {
 
 	import SimpleDeepStructure._
 
@@ -27,7 +27,7 @@ object SimpleDeepStructure {
 	val DEFAULT_KEY: String = ""
 }
 
-class SurfaceStructure[INPUT, OUTPUT <: ResultWithUtility](val deepStructure: DeepStructure[INPUT, OUTPUT], val recombinedProcessBlueprint: RecombinedProcessBlueprints) extends LazyLogger {
+class SurfaceStructure[INPUT, OUTPUT <: ResultWithCostfunction](val deepStructure: DeepStructure[INPUT, OUTPUT], val recombinedProcessBlueprint: RecombinedProcessBlueprints) extends LazyLogger {
 	def test(data: INPUT): Option[OUTPUT] = try {
 		Some(deepStructure.run(data, recombinedProcessBlueprint))
 	}

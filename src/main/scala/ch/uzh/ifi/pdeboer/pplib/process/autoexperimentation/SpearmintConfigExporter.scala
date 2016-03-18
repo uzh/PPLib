@@ -7,9 +7,9 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import java.io.{File, FileWriter}
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessFeature, SurfaceStructureFeatureExpander}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.ResultWithUtility
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.ResultWithCostfunction
 
-class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithUtility](featureExpander: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) {
+class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithCostfunction](featureExpander: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) {
 	/*
 		 "X":{"type"    : "ENUM",
 		  "size"    : 2,
