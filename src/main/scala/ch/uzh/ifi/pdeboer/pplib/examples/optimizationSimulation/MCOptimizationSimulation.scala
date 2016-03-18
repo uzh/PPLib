@@ -5,6 +5,13 @@ import java.io.File
 import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.BOAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.Recombinator
 
+object MCOptimizeConstants {
+	var multipeChoiceAnswers = ""
+
+	def bestAnswer = multipeChoiceAnswers.split(",").map(_.toInt).max
+
+	def answerDistance(answer: Int) = bestAnswer - answer
+}
 /**
   * Created by pdeboer on 17/03/16.
   */

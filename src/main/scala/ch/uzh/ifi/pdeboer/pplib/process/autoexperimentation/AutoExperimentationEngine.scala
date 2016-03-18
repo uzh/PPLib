@@ -52,4 +52,3 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithUtility](val
 }
 
 case class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithUtility](surfaceStructure: SurfaceStructure[INPUT, OUTPUT], result: Option[OUTPUT])
-

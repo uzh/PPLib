@@ -8,19 +8,11 @@ import ch.uzh.ifi.pdeboer.pplib.process.recombination.Recombinator
 
 import scala.io.Source
 
-object MCOptimizeConstants {
-	var multipeChoiceAnswers = ""
-
-	def bestAnswer = multipeChoiceAnswers.split(",").map(_.toInt).max
-
-	def answerDistance(answer: Int) = bestAnswer - answer
-}
-
 /**
   * Created by pdeboer on 12/05/15.
   * sbt "run-main ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize"
   */
-object MCOptimize extends App {
+@deprecated object MCOptimizeExternal extends App {
 	val mcAnswersParam = args.find(_.startsWith("answers")).getOrElse("answers10,10,10,70").substring("answers".length)
 	MCOptimizeConstants.multipeChoiceAnswers = mcAnswersParam
 
