@@ -15,7 +15,7 @@ case class ShortNResult(text: String, costInCents: Int, durationInSeconds: Int) 
 }
 
 class ShortNDeepStructure extends SimpleDeepStructure[String, ShortNResult] {
-	override def run(data: String, blueprint: RecombinedProcessBlueprints): ShortNResult = {
+	override def run(data: String, blueprint: RecombinedProcessBlueprint): ShortNResult = {
 		//split the text to be shortened into it's paragraphs am memorize the index of every paragraph
 		val paragraphs: List[IndexedPatch] = IndexedPatch.from(data)
 

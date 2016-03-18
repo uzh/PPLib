@@ -15,7 +15,7 @@ case class MCOptimizationResult(text: String, costInCents: Int) extends Comparab
 }
 
 class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimizationResult] {
-	override def run(data: String, blueprint: RecombinedProcessBlueprints): MCOptimizationResult = {
+	override def run(data: String, blueprint: RecombinedProcessBlueprint): MCOptimizationResult = {
 		val options: List[IndexedPatch] = IndexedPatch.from(data, ",")
 
 		type inputType = List[Patch]

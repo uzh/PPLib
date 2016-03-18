@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{ProcessStub, PassableProcessParam}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinedProcessBlueprints, RecombinationVariantProcessXMLExporter}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{RecombinedProcessBlueprint, RecombinationVariantProcessXMLExporter}
 import ch.uzh.ifi.pdeboer.pplib.util.U
 import org.junit.{Assert, Test}
 
@@ -17,7 +17,7 @@ class ProcessCandidateProcessXMLExporterTest {
 		val inputDataProcess: List[String] = List("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[List[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinedProcessBlueprints(Map("testprocess" -> processType))
+		val variant = new RecombinedProcessBlueprint(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -34,7 +34,7 @@ class ProcessCandidateProcessXMLExporterTest {
 		val inputDataProcess = Set("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[Set[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinedProcessBlueprints(Map("testprocess" -> processType))
+		val variant = new RecombinedProcessBlueprint(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
 		val xmlExport = exporter.transformDataWithExporter(process, process.inputClass.runtimeClass, inputDataProcess)
@@ -50,7 +50,7 @@ class ProcessCandidateProcessXMLExporterTest {
 		val inputDataProcess = List(1, 2, 3)
 		val outputDataProcess = 3
 		val processType = new PassableProcessWithRuns[List[Int], Integer](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinedProcessBlueprints(Map("testprocess" -> processType))
+		val variant = new RecombinedProcessBlueprint(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -68,7 +68,7 @@ class ProcessCandidateProcessXMLExporterTest {
 		val inputDataProcess = Map("key1" -> "value1", "key2" -> "value2")
 		val outputDataProcess = 3
 		val processType = new PassableProcessWithRuns[Map[String, String], Integer](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinedProcessBlueprints(Map("testprocess" -> processType))
+		val variant = new RecombinedProcessBlueprint(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
@@ -85,7 +85,7 @@ class ProcessCandidateProcessXMLExporterTest {
 		val inputDataProcess: List[String] = List("test1", "test2")
 		val outputDataProcess: String = "result1"
 		val processType = new PassableProcessWithRuns[List[String], String](Map(inputDataProcess -> outputDataProcess))
-		val variant = new RecombinedProcessBlueprints(Map("testprocess" -> processType))
+		val variant = new RecombinedProcessBlueprint(Map("testprocess" -> processType))
 		val process = variant.createProcess("testprocess")
 
 		val exporter = new RecombinationVariantProcessXMLExporter(variant) //List is default
