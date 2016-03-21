@@ -75,7 +75,9 @@ trait InstructionHandler extends IParametrizable {
 		self.getParam(OVERRIDE_INSTRUCTION_GENERATOR).getOrElse(generatorFromPool.getOrElse(defaultInstructionGenerator))
 	}
 
-	private def baseTpe[BASE <: ProcessStub[_, _]](self: BASE)(implicit baseType: TypeTag[BASE], baseClass: ClassTag[BASE]) = baseType
+	def nonDefaultInstructionGeneratorOrPool[POOL_TYPE](param: ProcessParameter[Option[InstructionGenerator]])(implicit typeTag: TypeTag[POOL_TYPE]): InstructionGenerator = {
+		self.getParam(param).getOrElse(getGeneratorFromPoolByType[POOL_TYPE].orNull)
+	}
 
 	def generatorFromPool: Option[InstructionGenerator] = {
 		val me = runtimeMirror(this.getClass.getClassLoader).classSymbol(getClass).toType
@@ -83,11 +85,16 @@ trait InstructionHandler extends IParametrizable {
 		foundGenerators.map(_._2.head)
 	}
 
+	def getGeneratorFromPoolByType[TYPE](implicit typeTag: TypeTag[TYPE]): Option[InstructionGenerator] = {
+		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => typeTag.tpe <:< i._1)
+		foundGenerators.map(_._2.head)
+	}
+
 	def defaultInstructionGenerator: InstructionGenerator =
 		self.processInstructionGenerator.get
 
 	override def defaultParameters: List[ProcessParameter[_]] = {
-		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE), super.defaultParameters)
+		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE, INSTRUCTION_GENERATOR_POOL), super.defaultParameters)
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = {

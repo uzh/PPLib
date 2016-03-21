@@ -76,7 +76,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	}
 
 	def createTextFieldForOthersOpinions(patch: Patch): HCompQuery = {
-		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(OTHERS_OPINIONS_INSTRUCTION_GENERATOR.get))
+		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(nonDefaultInstructionGeneratorOrPool[OtherOpinionsDecide](OTHERS_OPINIONS_INSTRUCTION_GENERATOR)))
 	}
 
 
@@ -105,6 +105,8 @@ private[stdlib] case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: 
 }
 
 object BayesianTruthContest {
-	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", Some(List(new SimpleInstructionGeneratorEstimateOthers())))
+	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[Option[InstructionGenerator]]("othersOpinionsInstructionGenerator", Some(List(Some(new SimpleInstructionGeneratorEstimateOthers()))))
 	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultPercentageQueryBuilder())))
 }
+
+class OtherOpinionsDecide {}
