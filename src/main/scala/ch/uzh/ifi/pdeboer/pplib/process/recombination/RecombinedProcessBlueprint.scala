@@ -24,6 +24,11 @@ class RecombinedProcessBlueprint(val stubs: Map[String, PassableProcessParam[_]]
 		p
 	}
 
+	def clear(): Unit = {
+		procs = Nil
+		stubs.values.foreach(_.clear())
+	}
+
 
 	override def toString = s"RecombinedProcessBlueprint($stubs)"
 }

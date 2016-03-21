@@ -9,9 +9,12 @@ import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, MathUtils}
 abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](val surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) extends LazyLogger {
 	def runOneIteration(input: INPUT): ExperimentResult
 
-	def run(input: INPUT, iterations: Int = 1): ExperimentResult = {
+	def run(input: INPUT, iterations: Int = 1, memoryFriendly: Boolean = false): ExperimentResult = {
 		val iterationResults = (0 to iterations).map(iteration => {
-			runOneIteration(input)
+			val res = runOneIteration(input)
+			if (memoryFriendly)
+				res.surfaceStructures.foreach(_.recombinedProcessBlueprint.clear())
+			res
 		}).toList
 		ExperimentResult(iterationResults.flatMap(_.iterations))
 	}

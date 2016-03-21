@@ -34,6 +34,9 @@ class PassableProcessParam[Base <: ProcessStub[_, _]](var params: Map[String, An
 
 	def getParam[T](param: ProcessParameter[T]): Option[T] = params.get(param.key).asInstanceOf[Option[T]]
 
+	def clear(): Unit = {
+		_createdProcesses = List.empty[Base]
+	}
 
 	override def toString = s"PassableProcessParam($baseType, $params)"
 }

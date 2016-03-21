@@ -104,6 +104,12 @@ trait HCompPortalAdapter extends LazyLogger {
 	def queries = queryLog
 
 	def cancelQuery(query: HCompQuery): Unit
+
+	def clearLog(): Unit = {
+		this.synchronized {
+			queryLog = List.empty[HCompQueryStats]
+		}
+	}
 }
 
 private[hcomp] trait RejectableAnswer {
@@ -154,6 +160,12 @@ class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) ex
 	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, cost: Int): Unit = {
 		this.synchronized {
 			queryLog = HCompQueryStats(query, answer, durationMillis, cost) :: queryLog
+		}
+	}
+
+	override def clearLog(): Unit = {
+		synchronized {
+			this.queryLog = List.empty[HCompQueryStats]
 		}
 	}
 
