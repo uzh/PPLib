@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.stdlib
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompAnswer
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompQuery}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 
 /**
@@ -55,7 +55,8 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	protected var uncountedVotes: Int = 0
 
 	private def obtainValidVote(data: List[Patch]): Option[(Patch, HCompAnswer)] = {
-		val answerRaw = portal.sendQueryAndAwaitResult(createMultipleChoiceQuestion(data),
+		val query: HCompQuery = createMultipleChoiceQuestion(data)
+		val answerRaw = portal.sendQueryAndAwaitResult(query,
 			QUESTION_PRICE.get).get
 		val ans = queryBuilder.parseAnswer[String](data, answerRaw, this)
 		val patch = data.find(d => ans.contains(d.value)).orNull
