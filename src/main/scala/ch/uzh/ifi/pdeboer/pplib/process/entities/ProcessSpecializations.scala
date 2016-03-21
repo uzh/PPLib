@@ -81,7 +81,7 @@ trait InstructionHandler extends IParametrizable {
 
 	def generatorFromPool: Option[InstructionGenerator] = {
 		val me = runtimeMirror(this.getClass.getClassLoader).classSymbol(getClass).toType
-		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => me <:< i._1)
+		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => me <:< i._1 && Option(i._2).isDefined)
 		foundGenerators.map(_._2)
 	}
 

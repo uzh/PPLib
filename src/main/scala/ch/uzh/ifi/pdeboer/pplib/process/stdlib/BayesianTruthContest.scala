@@ -6,6 +6,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.util.Random
+import scala.reflect.runtime.universe._
 
 /**
   * Created by pdeboer on 03/03/16.
@@ -76,14 +77,18 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	}
 
 	def createTextFieldForOthersOpinions(patch: Patch): HCompQuery = {
-		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(nonDefaultInstructionGeneratorOrPool[OtherOpinionsDecide](OTHERS_OPINIONS_INSTRUCTION_GENERATOR)))
+		val igForOthersOpinions: InstructionGenerator = nonDefaultInstructionGeneratorOrPool[OtherOpinionsDecide](OTHERS_OPINIONS_INSTRUCTION_GENERATOR)
+		otherOpinionsQueryBuilder.buildQuery(patch, this, Some(igForOthersOpinions))
 	}
 
 
 	protected def otherOpinionsQueryBuilder: HCompQueryBuilder[Patch] = OTHERS_OPINIONS_QUERY_BUILDER.get
 
+
 	override val processParameterDefaults: Map[ProcessParameter[_], List[Any]] = {
-		Map(queryBuilderParam -> List(new DefaultMCQueryBuilder()))
+		val mergedPool = Map(typeOf[OtherOpinionsDecide] -> new SimpleInstructionGeneratorCreate) ++ INSTRUCTION_GENERATOR_POOL.get
+		Map(queryBuilderParam -> List(new DefaultMCQueryBuilder()),
+			DefaultParameters.INSTRUCTION_GENERATOR_POOL -> List(mergedPool))
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] =

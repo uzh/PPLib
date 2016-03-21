@@ -2,7 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.test.stdlib
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, Patch}
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, InstructionData, Patch}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.BayesianTruthContest
 import ch.uzh.ifi.pdeboer.pplib.util.{CollectionUtils, LazyLogger}
 import org.junit.{Assert, Test}
@@ -84,7 +84,7 @@ class BayesianTruthContestTest extends LazyLogger {
 		result
 	}
 
-	def createContest(portal: BTTestPortal) = new BayesianTruthContest(Map(PORTAL_PARAMETER.key -> portal, WORKER_COUNT.key -> portal.workerAnswers.size))
+	def createContest(portal: BTTestPortal) = new BayesianTruthContest(Map(PORTAL_PARAMETER.key -> portal, WORKER_COUNT.key -> portal.workerAnswers.size, INSTRUCTIONS.key -> new InstructionData()))
 
 	def createPatches: List[IndexedPatch] = {
 		IndexedPatch.from("asdf,qwer,yxcv,zuio", ",")
