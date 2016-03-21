@@ -75,8 +75,8 @@ trait InstructionHandler extends IParametrizable {
 		self.getParam(OVERRIDE_INSTRUCTION_GENERATOR).getOrElse(generatorFromPool.getOrElse(defaultInstructionGenerator))
 	}
 
-	def nonDefaultInstructionGeneratorOrPool[POOL_TYPE](param: ProcessParameter[Option[InstructionGenerator]])(implicit typeTag: TypeTag[POOL_TYPE]): InstructionGenerator = {
-		self.getParam(param).getOrElse(getGeneratorFromPoolByType[POOL_TYPE].orNull)
+	def nonDefaultInstructionGeneratorOrPool[POOL_TYPE](param: ProcessParameter[InstructionGenerator])(implicit typeTag: TypeTag[POOL_TYPE]): InstructionGenerator = {
+		self.getParamOption(param).getOrElse(getGeneratorFromPoolByType[POOL_TYPE].orNull)
 	}
 
 	def generatorFromPool: Option[InstructionGenerator] = {

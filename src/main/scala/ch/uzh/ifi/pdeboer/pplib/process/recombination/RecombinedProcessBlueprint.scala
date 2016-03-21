@@ -23,6 +23,9 @@ class RecombinedProcessBlueprint(val stubs: Map[String, PassableProcessParam[_]]
 		}
 		p
 	}
+
+
+	override def toString = s"RecombinedProcessBlueprint($stubs)"
 }
 
 class SimpleRecombinationVariantXMLExporter(val variant: RecombinedProcessBlueprint) {

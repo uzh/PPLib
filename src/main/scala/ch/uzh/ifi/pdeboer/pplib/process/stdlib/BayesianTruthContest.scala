@@ -41,7 +41,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 								val parsedAnswersForOtherPatches = rawAnswersForOtherPatches.map(r => r._1 -> otherOpinionsQueryBuilder.parseAnswer[Double](r._1, r._2, this).get)
 								BTAnswer(a, parsedOwnAnswer, parsedAnswersForOtherPatches)
 							case _ =>
-								logger.info(s"${getClass.getSimpleName} didn't get answer for query. retrying..")
+								logger.info(s"${getClass.getSimpleName} didn't get answer for query.")
 								throw new IllegalStateException("didnt get any response")
 						}
 					}
@@ -92,7 +92,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] =
-		List(WORKER_COUNT, BayesianTruthContest.OTHERS_OPINIONS_INSTRUCTION_GENERATOR) ::: super.optionalParameters
+		List(WORKER_COUNT, BayesianTruthContest.OTHERS_OPINIONS_INSTRUCTION_GENERATOR, OTHERS_OPINIONS_QUERY_BUILDER) ::: super.optionalParameters
 
 	override def getCostCeiling(data: List[Patch]): Int = WORKER_COUNT.get * QUESTION_PRICE.get.paymentCents
 
@@ -110,7 +110,7 @@ private[stdlib] case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: 
 }
 
 object BayesianTruthContest {
-	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[Option[InstructionGenerator]]("othersOpinionsInstructionGenerator", Some(List(Some(new SimpleInstructionGeneratorEstimateOthers()))))
+	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", None)
 	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultPercentageQueryBuilder())))
 }
 

@@ -37,4 +37,6 @@ class SurfaceStructure[INPUT, OUTPUT <: ResultWithCostfunction](val deepStructur
 			None
 		}
 	}
+
+	override def toString = s"SurfaceStructure($recombinedProcessBlueprint)"
 }

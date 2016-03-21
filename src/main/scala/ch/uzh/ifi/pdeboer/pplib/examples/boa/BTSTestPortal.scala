@@ -19,7 +19,7 @@ class BTSTestPortal(val probabilityForCapitalToBeSelected: Double = 0.7) extends
 		val targetState = BTSResult.stateToCities.keys.find(state => query.question.contains(state)).get
 		if (query.question.contains("asked")) {
 			//if other crowd workers were asked the same question..
-			val targetCity = BTSResult.stateToCities(targetState).find(city => query.question.contains(city)).get
+			val targetCity = BTSResult.stateToCities(targetState).find(city => query.question.contains(city)).getOrElse(new IllegalStateException("could not find city"))
 			val probaDouble = if (targetCity == BTSResult.groundTruth(targetState)) probabilityForCapitalToBeSelected else probaForNonCapital(targetState)
 			val q = query.asInstanceOf[FreetextQuery]
 			Some(FreetextAnswer(q, (probaDouble * 100).toInt.toString))

@@ -105,7 +105,7 @@ object RecombinationHints {
 	def instructions(l: List[InstructionData]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, l))
 
 	def instructionPool(p: Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]) = {
-		List(new AddedParameterRecombinationHint[Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]](DefaultParameters.INSTRUCTION_GENERATOR_POOL, List(p)))
+		List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTION_GENERATOR_POOL.key), addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]](DefaultParameters.INSTRUCTION_GENERATOR_POOL, List(p)))
 	}
 
 	class DefaultHintProcessStub private[RecombinationHints]() extends ProcessStub[String, String](Map.empty) {
