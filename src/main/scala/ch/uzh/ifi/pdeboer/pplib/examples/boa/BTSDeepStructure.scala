@@ -26,14 +26,14 @@ object BTSExperiment extends App {
 	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 	expander.toCSV("btsresultsModel.csv", targetFeatures, results.surfaceStructures.map(ss => ss ->
 		results.resultsForSurfaceStructure(ss).zipWithIndex
-			.map(r => (r._2 + "_result") -> r._1.result.get.cost).toMap
+			.map(r => (r._2 + "_result") -> r._1.result.get.costFunctionResult).toMap
 	).toMap)
 
 	println(s"best result: ${results.bestProcess}")
 }
 
 class BTSResult(selectedCitiesForStates: Map[String, String], processCostInCents: Int) extends ResultWithCostfunction {
-	override def cost: Double = {
+	override def costFunctionResult: Double = {
 		val correct = selectedCitiesForStates.map(kv => if (BTSResult.groundTruth(kv._1) == kv._2) 1 else 0).sum
 		val wrongClassifications: Int = selectedCitiesForStates.size - correct
 		val LOSS_FROM_WRONG_CLASSIFICATION_IN_CENTS: Int = 300

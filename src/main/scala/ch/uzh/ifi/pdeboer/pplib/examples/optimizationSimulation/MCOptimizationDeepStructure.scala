@@ -9,9 +9,9 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithStatisticalReductionP
   * Created by pdeboer on 12/05/15.
   */
 case class MCOptimizationResult(text: String, costInCents: Int) extends Comparable[MCOptimizationResult] with ResultWithCostfunction {
-	override def compareTo(o: MCOptimizationResult): Int = cost.compareTo(o.cost)
+	override def compareTo(o: MCOptimizationResult): Int = costFunctionResult.compareTo(o.costFunctionResult)
 
-	override def cost: Double = MCOptimizeConstants.answerDistance(text.toInt) + costInCents.toDouble
+	override def costFunctionResult: Double = MCOptimizeConstants.answerDistance(text.toInt) + costInCents.toDouble
 }
 
 class MCOptimizationDeepStructure extends SimpleDeepStructure[String, MCOptimizationResult] {

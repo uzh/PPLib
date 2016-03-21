@@ -11,7 +11,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.stdlib.FixPatchProcess
 case class ShortNResult(text: String, costInCents: Int, durationInSeconds: Int) extends Comparable[ShortNResult] with ResultWithCostfunction {
 	override def compareTo(o: ShortNResult): Int = -1 * text.length.compareTo(o.text.length)
 
-	override def cost: Double = -1 * text.length
+	override def costFunctionResult: Double = -1 * text.length
 }
 
 class ShortNDeepStructure extends SimpleDeepStructure[String, ShortNResult] {

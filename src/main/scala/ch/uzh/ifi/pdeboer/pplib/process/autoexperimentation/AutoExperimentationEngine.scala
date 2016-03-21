@@ -20,7 +20,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 	}
 
 	case class ExperimentIteration(rawResults: List[SurfaceStructureResult[INPUT, OUTPUT]]) {
-		def bestProcess = rawResults.maxBy(_.result.map(_.cost))
+		def bestProcess = rawResults.maxBy(_.result.map(_.costFunctionResult))
 	}
 
 	case class ExperimentResult(iterations: List[ExperimentIteration]) {
@@ -36,19 +36,19 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 
 		def bestProcess = {
 			val groups = surfaceStructures.map(s => s -> resultsForSurfaceStructure(s)).toMap
-			val sortedWithMean = groups.map(g => (g._1, MathUtils.mean(g._2.map(_.result.get.cost)), MathUtils.stddev(g._2.map(_.result.get.cost)))).toList.sortBy(_._2)
+			val sortedWithMean = groups.map(g => (g._1, MathUtils.mean(g._2.map(_.result.get.costFunctionResult)), MathUtils.stddev(g._2.map(_.result.get.costFunctionResult)))).toList.sortBy(_._2)
 			val betterHalfSortedWithMean = sortedWithMean.take(sortedWithMean.size / 2)
 			val stdev = MathUtils.stddev(betterHalfSortedWithMean.map(_._2))
 			val withinOneStdev = betterHalfSortedWithMean.takeWhile(s => s._2 - s._3 < betterHalfSortedWithMean.head._2 + stdev)
 			val bestProcessesWithNonzeroStdev = (sortedWithMean.head :: withinOneStdev).filter(_._3 > 0)
 			val winningProcess = if (bestProcessesWithNonzeroStdev.nonEmpty) bestProcessesWithNonzeroStdev.minBy(_._3) else sortedWithMean.head
-			groups(winningProcess._1).minBy(_.result.get.cost)
+			groups(winningProcess._1).minBy(_.result.get.costFunctionResult)
 		}
 	}
 
 	object CompositeExperimentResult {
 		def medianResult(results: List[Option[OUTPUT]]): Option[OUTPUT] = {
-			val (lower, upper) = results.sortBy(_.map(_.cost)).splitAt(results.size / 2)
+			val (lower, upper) = results.sortBy(_.map(_.costFunctionResult)).splitAt(results.size / 2)
 			upper.head
 		}
 	}

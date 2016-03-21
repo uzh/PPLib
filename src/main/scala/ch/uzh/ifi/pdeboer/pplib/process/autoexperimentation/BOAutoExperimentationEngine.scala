@@ -151,7 +151,7 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 				surfaceStructure.synchronized {
 					_results = SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
 				}
-				res.map(_.cost)
+				res.map(_.costFunctionResult)
 			}
 
 			val outputFileName: String = jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName
