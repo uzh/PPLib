@@ -2,11 +2,11 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithStatisticalReductionProcess, FixPatchProcess, OtherOpinionsDecide}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
 import com.github.tototoshi.csv.CSVReader
 
 import scala.util.Random
@@ -93,7 +93,10 @@ class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepSt
 						)) :::
 						RecombinationHints.instructions(List(
 							new InstructionData(actionName = "the same question. How likely is it that they give the answer below?", detailedDescription = "identify the capital of")))
-				})
+				},
+				classOf[BayesianTruthContest] ->
+					List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.QUESTION_PRICE.key), addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompQueryProperties](DefaultParameters.QUESTION_PRICE, List(HCompQueryProperties(18))))
+			)
 			)
 		)
 }
