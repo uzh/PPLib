@@ -32,7 +32,7 @@ class InstructionHandlerTest {
 		val collector = new PassableProcessParam[Collection](Map(
 			WORKER_COUNT.key -> 1,
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 20),
-			DefaultParameters.INSTRUCTION_GENERATOR_POOL.key -> Map(typeOf[CreateProcess[_, _]] -> List(theGenerator))
+			DefaultParameters.INSTRUCTION_GENERATOR_POOL.key -> Map(typeOf[CreateProcess[_, _]] -> theGenerator)
 		))
 		val coll = collector.create()
 		Assert.assertEquals(expectedInstructions, coll.instructions)

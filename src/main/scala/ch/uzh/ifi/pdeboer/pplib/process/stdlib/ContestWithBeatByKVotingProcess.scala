@@ -94,7 +94,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 		Map(queryBuilderParam -> List(new DefaultMCQueryBuilder()))
 	}
 
-	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K, INSTRUCTIONS_ITALIC)
+	override def optionalParameters: List[ProcessParameter[_]] = List(SHUFFLE_CHOICES, MAX_ITERATIONS, K)
 }
 
 object ContestWithBeatByKVotingProcess {

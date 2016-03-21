@@ -170,7 +170,7 @@ object ProcessStub {
 
 	ensureExpectedParametersGiven(expectedParametersOnConstruction)
 
-	assert(allParams.map(_.key).toSet.size == allParams.map(_.key).size, "Please assign a unique key to every parameter of this process")
+	assert(allParams.map(_.key).toSet.size == allParams.map(_.key).size, "Please assign a unique key to every parameter of this process.")
 
 	def canEqual(other: Any): Boolean = other.isInstanceOf[ProcessStub[_, _]]
 
