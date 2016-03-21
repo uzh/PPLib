@@ -1,6 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithStatisticalReductionProcess}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -22,9 +23,17 @@ class Recombinator[INPUT, OUTPUT <: ResultWithCostfunction](recombinable: DeepSt
 		new RecombinationVariantGenerator(recombinations).variants
 	}
 
-	def recombine(): List[SurfaceStructure[INPUT, OUTPUT]] = {
+	lazy val recombine: List[SurfaceStructure[INPUT, OUTPUT]] = {
 		variants.map(v => new SurfaceStructure(recombinable, v))
 	}
+
+	def sneakPeek = recombine.groupBy(_.recombinedProcessBlueprint.stubs.values.head.baseType).values.map(_.minBy(s => {
+		val p = s.recombinedProcessBlueprint.stubs.values.head
+		val wc: Int = p.getParam(DefaultParameters.WORKER_COUNT).getOrElse(0)
+		val conf: Double = p.getParam(ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER).getOrElse(0d)
+		val k: Int = p.getParam(ContestWithBeatByKVotingProcess.K).getOrElse(0)
+		wc.toDouble + conf + k.toDouble
+	})).toList
 
 	def getCostCeiling(data: Any): Int = {
 		variants.map(_.createProcess().getCostCeiling(data)).sum

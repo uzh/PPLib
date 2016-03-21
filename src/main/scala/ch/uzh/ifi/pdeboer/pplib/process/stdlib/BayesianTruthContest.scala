@@ -26,7 +26,6 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w =>
 				memoizer.mem("bayesianTruth" + w)(
 					U.retry(2) {
-						val p = QUESTION_PRICE.get.paymentCents
 						val ownOpinion = createMCQueryForOwnOpinion(alternatives)
 						def shuffleIfNeeded(l: List[Patch]) = if (SHUFFLE_CHOICES.get) l.sortBy(s => Random.nextDouble()) else l
 						val opinionsOnOtherPatches = shuffleIfNeeded(alternatives).map(p => createTextFieldForOthersOpinions(p))

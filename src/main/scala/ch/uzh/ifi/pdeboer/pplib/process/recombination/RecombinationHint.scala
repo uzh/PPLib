@@ -1,6 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
@@ -106,6 +106,10 @@ object RecombinationHints {
 
 	def instructionPool(p: Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]) = {
 		List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTION_GENERATOR_POOL.key), addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]](DefaultParameters.INSTRUCTION_GENERATOR_POOL, List(p)))
+	}
+
+	def questionPrice(l: List[HCompQueryProperties]) = {
+		List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.QUESTION_PRICE.key), addGeneralDefaultValuesForParam = Some(false), addLocalDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompQueryProperties](DefaultParameters.QUESTION_PRICE, l))
 	}
 
 	class DefaultHintProcessStub private[RecombinationHints]() extends ProcessStub[String, String](Map.empty) {
