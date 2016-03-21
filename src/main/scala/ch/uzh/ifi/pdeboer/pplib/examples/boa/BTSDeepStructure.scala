@@ -19,9 +19,16 @@ object BTSExperiment extends App {
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val autoExperimentation = new NaiveAutoExperimentationEngine(recombinations)
-	val results = autoExperimentation.runOneIteration(targetStates)
+	val results = autoExperimentation.run(targetStates, 5)
 
 	println("finished evaluation.")
+	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
+	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
+	expander.toCSV("btsresultsModel.csv", targetFeatures, results.surfaceStructures.map(ss => ss ->
+		results.resultsForSurfaceStructure(ss).zipWithIndex
+			.map(r => (r._2 + "_result") -> r._1.result.get.cost).toMap
+	).toMap)
+
 	println(s"best result: ${results.bestProcess}")
 }
 
