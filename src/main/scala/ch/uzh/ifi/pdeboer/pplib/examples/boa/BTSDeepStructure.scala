@@ -23,7 +23,10 @@ object BTSExperiment extends App {
 
 	val targetRecombinations = recombinator.sneakPeek
 
-	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
+	import scala.reflect.runtime.universe._
+
+	private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
+	val autoExperimentation = new NaiveAutoExperimentationEngine(onlyTruthContest)
 	autoExperimentation.runOneIteration(targetStates)
 	val results = autoExperimentation.run(targetStates, 50, memoryFriendly = true)
 
@@ -58,7 +61,7 @@ object BTSResult {
 	lazy val stateToCities = {
 		val reader = CSVReader.open(s"example_data${File.separator}us capitals.csv")
 		val rawData = reader.allWithHeaders()
-		rawData.map(rd => rd("state") -> List(rd("capital"), rd("city1"), rd("city2"), rd("city3"), rd("city4"))).toMap
+		rawData.map(rd => rd("state") -> List(rd("capital"), rd("city1"), rd("city2"), rd("city3"))).toMap
 	}
 }
 
