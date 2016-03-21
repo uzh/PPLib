@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 /**
   * Created by pdeboer on 10/03/16.
   */
-object BTSExperiment extends App {
+object BTSExperimentNORecombination extends App {
 	val decideInstructions = new TrivialInstructionGenerator("What is the capital of the state below?", "Please select the capital of this state", questionBetween = "Please select the city you think is the capital from the top of your head (no google) among the list below. ")
 
 	val capitals = CSVReader.open("us capitals.csv")

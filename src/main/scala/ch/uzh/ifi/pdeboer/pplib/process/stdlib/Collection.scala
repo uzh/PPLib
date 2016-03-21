@@ -19,7 +19,7 @@ class Collection(params: Map[String, Any] = Map.empty) extends CreateProcess[Pat
 
 		memoizer.mem("answer_line_" + line) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
-				val instr: String = instructions.getInstructions(line + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
+				val instr: String = instructions.getInstructions(line + "", INSTRUCTIONS_ITALIC.get, QUESTION_AUX.get.getOrElse(Nil))
 				val mainQuery: FreetextQuery = FreetextQuery(
 					instr, "", instructionTitle + w + "_" + Math.abs(Random.nextInt()))
 				val query = createComposite(mainQuery)

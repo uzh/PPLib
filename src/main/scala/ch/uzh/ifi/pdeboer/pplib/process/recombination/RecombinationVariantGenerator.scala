@@ -105,7 +105,7 @@ object CombinationGenerator {
 	 * @return
 	 */
 	def generate[T](x: List[List[T]]): List[List[T]] = {
-		val listWithoutEmptyLists = x.filter(_.length > 0)
+		val listWithoutEmptyLists = x.filter(_.nonEmpty)
 		listWithoutEmptyLists match {
 			case Nil => List(Nil)
 			case h :: t => for (j <- generate(t); i <- h) yield i :: j

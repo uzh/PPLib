@@ -22,9 +22,9 @@ object DefaultParameters {
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", Some(List(HCompQueryProperties())))
 	val OVERRIDE_INSTRUCTION_GENERATOR = new ProcessParameter[Option[InstructionGenerator]]("instructionGenerator", Some(List(None)))
-	val INSTRUCTION_GENERATOR_POOL = new ProcessParameter("instructionGeneratorPool", Some(List(Map(
-		typeOf[CreateProcess[_, _]] -> List.empty[InstructionGenerator],
-		typeOf[DecideProcess[_, _]] -> List.empty[InstructionGenerator]
+	val INSTRUCTION_GENERATOR_POOL: ProcessParameter[Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]] = new ProcessParameter("instructionGeneratorPool", Some(List(Map(
+		typeOf[CreateProcess[_, _]] -> null,
+		typeOf[DecideProcess[_, _]] -> null
 	))))
 
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))

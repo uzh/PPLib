@@ -1,15 +1,15 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, DefaultParameters, ProcessParameter, ProcessStub}
+import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 /**
- * Created by pdeboer on 10/04/15.
- */
+  * Created by pdeboer on 10/04/15.
+  */
 trait RecombinationHint {
 	def processConstructionParameter: Map[String, Iterable[Any]] = Map.empty
 
@@ -45,8 +45,8 @@ class SettingsOnParamsRecombinationHint(val targetParams: List[String] = Nil, va
 
 class RecombinationHints(val hints: Map[Option[Class[ProcessStub[_, _]]], List[RecombinationHint]] = Map.empty) {
 	/**
-	 * convert hints map of classes to types such that we don't lose the information stored in generics due to type erasure
-	 */
+	  * convert hints map of classes to types such that we don't lose the information stored in generics due to type erasure
+	  */
 	private val _hints = hints.map(h => {
 		val key = h._1.map(c => U.getTypeFromClass(c))
 		(key, h._2)
@@ -103,6 +103,10 @@ object RecombinationHints {
 	def hcompPlatform(l: List[HCompPortalAdapter]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.PORTAL_PARAMETER.key), addGeneralDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[HCompPortalAdapter](DefaultParameters.PORTAL_PARAMETER, l))
 
 	def instructions(l: List[InstructionData]): List[RecombinationHint] = List(new SettingsOnParamsRecombinationHint(List(DefaultParameters.INSTRUCTIONS.key), addGeneralDefaultValuesForParam = Some(false)), new AddedParameterRecombinationHint[InstructionData](DefaultParameters.INSTRUCTIONS, l))
+
+	def instructionPool(p: Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]) = {
+		List(new AddedParameterRecombinationHint[Map[_root_.scala.reflect.runtime.universe.Type, InstructionGenerator]](DefaultParameters.INSTRUCTION_GENERATOR_POOL, List(p)))
+	}
 
 	class DefaultHintProcessStub private[RecombinationHints]() extends ProcessStub[String, String](Map.empty) {
 		override protected def run(data: String): String = data

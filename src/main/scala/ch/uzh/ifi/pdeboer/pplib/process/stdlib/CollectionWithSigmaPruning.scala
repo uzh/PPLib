@@ -22,7 +22,7 @@ class CollectionWithSigmaPruning(params: Map[String, Any] = Map.empty) extends C
 		memoizer.mem("answer_line_" + patch) {
 			val answers = getCrowdWorkers(WORKER_COUNT.get).map(w => {
 
-				val instructionString: String = instructions.getInstructions(patch + "", htmlData = QUESTION_AUX.get.getOrElse(Nil))
+				val instructionString: String = instructions.getInstructions(patch + "", INSTRUCTIONS_ITALIC.get, htmlData = QUESTION_AUX.get.getOrElse(Nil))
 				val mainQuery: FreetextQuery = FreetextQuery(
 					instructionString, "", instructionTitle + w + "_" + Math.abs(Random.nextInt()))
 

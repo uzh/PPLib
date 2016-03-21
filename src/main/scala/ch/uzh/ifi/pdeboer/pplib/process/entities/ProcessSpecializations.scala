@@ -82,19 +82,19 @@ trait InstructionHandler extends IParametrizable {
 	def generatorFromPool: Option[InstructionGenerator] = {
 		val me = runtimeMirror(this.getClass.getClassLoader).classSymbol(getClass).toType
 		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => me <:< i._1)
-		foundGenerators.map(_._2.head)
+		foundGenerators.map(_._2)
 	}
 
 	def getGeneratorFromPoolByType[TYPE](implicit typeTag: TypeTag[TYPE]): Option[InstructionGenerator] = {
 		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => typeTag.tpe <:< i._1)
-		foundGenerators.map(_._2.head)
+		foundGenerators.map(_._2)
 	}
 
 	def defaultInstructionGenerator: InstructionGenerator =
 		self.processInstructionGenerator.get
 
 	override def defaultParameters: List[ProcessParameter[_]] = {
-		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE, INSTRUCTION_GENERATOR_POOL), super.defaultParameters)
+		combineParameterLists(List(OVERRIDE_INSTRUCTION_GENERATOR, QUESTION_AUX, QUESTION_PRICE, INSTRUCTION_GENERATOR_POOL, INSTRUCTIONS_ITALIC), super.defaultParameters)
 	}
 
 	override def optionalParameters: List[ProcessParameter[_]] = {

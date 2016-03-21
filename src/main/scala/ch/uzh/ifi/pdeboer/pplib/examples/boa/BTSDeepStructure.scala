@@ -3,10 +3,27 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 import java.io.File
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
+import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithStatisticalReductionProcess, FixPatchProcess}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithStatisticalReductionProcess, FixPatchProcess, OtherOpinionsDecide}
 import com.github.tototoshi.csv.CSVReader
+
+import scala.util.Random
+
+object BTSExperiment extends App {
+	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(10)
+
+	val deepStructure = new BTSDeepStructure(new BTSTestPortal())
+	val recombinations = new Recombinator(deepStructure).recombine()
+	println(s"generated ${recombinations.size} recombinations. running evaluation..")
+
+	val autoExperimentation = new NaiveAutoExperimentationEngine(recombinations)
+	val results = autoExperimentation.runOneIteration(targetStates)
+
+	println("finished evaluation.")
+	println(s"best result: ${results.bestProcess}")
+}
 
 class BTSResult(selectedCitiesForStates: Map[String, String], processCostInCents: Int) extends ResultWithCostfunction {
 	override def cost: Double = {
@@ -36,6 +53,9 @@ object BTSResult {
   * Created by pdeboer on 18/03/16.
   */
 class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepStructure[List[String], BTSResult] {
+
+	import scala.reflect.runtime.universe._
+
 	override def run(data: List[String], blueprint: RecombinedProcessBlueprint): BTSResult = {
 
 		type inputType = List[Patch]
@@ -56,10 +76,14 @@ class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepSt
 			RecombinationHints.create(Map(
 				RecombinationHints.DEFAULT_HINTS -> {
 					new AddedParameterRecombinationHint[Int](DefaultParameters.MAX_ITERATIONS, 20 to 30) ::
-						new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, 1 to 10) ::
+						new AddedParameterRecombinationHint[Int](DefaultParameters.WORKER_COUNT, 3 to 9) ::
 						new AddedParameterRecombinationHint[Int](ContestWithBeatByKVotingProcess.K, 1 to 10) ::
 						new AddedParameterRecombinationHint[Double](ContestWithStatisticalReductionProcess.CONFIDENCE_PARAMETER, (1 to 8).map(i => 0.6 + (i.toDouble * .05))) ::
 						RecombinationHints.hcompPlatform(List(portalToUse)) :::
+						RecombinationHints.instructionPool(Map(
+							typeOf[DecideProcess[_, _]] -> new TrivialInstructionGenerator("What is the capital of the state below?", "Please select the capital of this state", questionBetween = "Please select the city you think is the capital from the top of your head (no google) among the list below. "),
+							typeOf[OtherOpinionsDecide] -> new TrivialInstructionGenerator("If other crowd workers were asked the same question. How likely is it, that they give the answer below?", "", "They would of course also be asked to identify the capital of")
+						)) :::
 						RecombinationHints.instructions(List(
 							new InstructionData(actionName = "the same question. How likely is it that they give the answer below?", detailedDescription = "identify the capital of")))
 				})
