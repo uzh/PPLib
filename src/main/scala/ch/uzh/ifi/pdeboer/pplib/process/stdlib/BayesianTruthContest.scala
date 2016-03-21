@@ -49,7 +49,7 @@ class BayesianTruthContest(params: Map[String, Any] = Map.empty[String, Any]) ex
 
 			val prunedAnswers = answers.filter(a => {
 				val totalPercentage: Double = a.probabilitiesForOtherAnswers.values.sum
-				totalPercentage > 0.99d && totalPercentage < 1.01d
+				totalPercentage > 0.97d && totalPercentage < 1.03d
 			})
 			logger.info(s"pruned ${answers.size - prunedAnswers.size} answers")
 
