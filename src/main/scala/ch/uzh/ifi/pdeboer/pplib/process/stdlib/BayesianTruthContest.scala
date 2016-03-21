@@ -110,7 +110,7 @@ private[stdlib] case class BTAnswer(rawAnswer: CompositeQueryAnswer, ownAnswer: 
 }
 
 object BayesianTruthContest {
-	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", None)
+	val OTHERS_OPINIONS_INSTRUCTION_GENERATOR = new ProcessParameter[InstructionGenerator]("othersOpinionsInstructionGenerator", Some(List(new SimpleInstructionGeneratorEstimateOthers)))
 	val OTHERS_OPINIONS_QUERY_BUILDER = new ProcessParameter[HCompQueryBuilder[Patch]]("othersOpinionsQueryBuilder", Some(List(new DefaultPercentageQueryBuilder())))
 }
 
