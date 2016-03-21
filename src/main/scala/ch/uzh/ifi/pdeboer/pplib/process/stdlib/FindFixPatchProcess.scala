@@ -21,7 +21,7 @@ class FindFixPatchProcess(_params: Map[String, Any] = Map.empty) extends CreateP
 			fixer.process(found)).asInstanceOf[List[IndexedPatch]]
 			.map(f => (f.index, f)).toMap
 
-		data.map(d => fixed.get(d.index).getOrElse(d))
+		data.map(d => fixed.getOrElse(d.index, d))
 	}
 
 	def getMemoizerForProcess(process: PassableProcessParam[_ <: ProcessStub[_, _]], suffix: String = "") = {

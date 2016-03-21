@@ -72,7 +72,15 @@ trait InstructionHandler extends IParametrizable {
 	def instructionTitle: String = instructionGenerator.generateQuestionTitle(self.getParam(INSTRUCTIONS))
 
 	def instructionGenerator: InstructionGenerator = {
-		self.getParam(OVERRIDE_INSTRUCTION_GENERATOR).getOrElse(defaultInstructionGenerator)
+		self.getParam(OVERRIDE_INSTRUCTION_GENERATOR).getOrElse(generatorFromPool.getOrElse(defaultInstructionGenerator))
+	}
+
+	private def baseTpe[BASE <: ProcessStub[_, _]](self: BASE)(implicit baseType: TypeTag[BASE], baseClass: ClassTag[BASE]) = baseType
+
+	def generatorFromPool: Option[InstructionGenerator] = {
+		val me = runtimeMirror(this.getClass.getClassLoader).classSymbol(getClass).toType
+		val foundGenerators = self.getParam(INSTRUCTION_GENERATOR_POOL).find(i => me <:< i._1)
+		foundGenerators.map(_._2.head)
 	}
 
 	def defaultInstructionGenerator: InstructionGenerator =
@@ -90,9 +98,9 @@ trait InstructionHandler extends IParametrizable {
 			case e: AbstractMethodError => Nil
 
 			/**
-			 * AbstractMethodError occurs if class extends existing class with this trait, hence
-			 * trait is applied multiple times in a row. This is ok and expected
-			 */
+			  * AbstractMethodError occurs if class extends existing class with this trait, hence
+			  * trait is applied multiple times in a row. This is ok and expected
+			  */
 		}
 		combineParameterLists(List(INSTRUCTIONS), superParam)
 	}

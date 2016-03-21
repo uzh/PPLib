@@ -7,8 +7,8 @@ import scala.xml.NodeSeq
 import scala.reflect.runtime.universe._
 
 /**
- * Created by pdeboer on 09/02/15.
- */
+  * Created by pdeboer on 09/02/15.
+  */
 object DefaultParameters {
 	val PORTAL_PARAMETER = new ProcessParameter[HCompPortalAdapter]("portal", Some(HComp.allDefinedPortals))
 	val PARALLEL_EXECUTION_PARAMETER = new ProcessParameter[Boolean]("parallel", Some(List(true)))
@@ -22,6 +22,10 @@ object DefaultParameters {
 	val WORKER_COUNT = new ProcessParameter[Int]("workerCount", Some(List(5)))
 	val QUESTION_PRICE = new ProcessParameter[HCompQueryProperties]("cost", Some(List(HCompQueryProperties())))
 	val OVERRIDE_INSTRUCTION_GENERATOR = new ProcessParameter[Option[InstructionGenerator]]("instructionGenerator", Some(List(None)))
+	val INSTRUCTION_GENERATOR_POOL = new ProcessParameter("instructionGeneratorPool", Some(List(Map(
+		typeOf[CreateProcess[_, _]] -> List.empty[InstructionGenerator],
+		typeOf[DecideProcess[_, _]] -> List.empty[InstructionGenerator]
+	))))
 
 	val SHUFFLE_CHOICES = new ProcessParameter[Boolean]("shuffle", Some(List(true)))
 
