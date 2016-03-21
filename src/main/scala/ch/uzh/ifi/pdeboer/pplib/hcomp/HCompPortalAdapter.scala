@@ -30,8 +30,6 @@ trait HCompPortalAdapter extends LazyLogger {
 	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
-	private var queryLog = List.empty[HCompQueryStats]
-
 	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
 		sendQueryNoFuture(query, details, omitBudgetCalculation)
 	}
@@ -72,26 +70,10 @@ trait HCompPortalAdapter extends LazyLogger {
 				case None =>
 			}
 
-			addQueryToLog(query, details, answer, durationMillis, cost)
-
 			answer
 		}
 	}
 
-	private var queryLogListener = List.empty[(HCompQuery, HCompQueryProperties, Option[HCompAnswer], Long, Int) => Unit]
-
-	def addQueryLogListener(l: (HCompQuery, HCompQueryProperties, Option[HCompAnswer], Long, Int) => Unit): Unit = {
-		this.synchronized {
-			queryLogListener = l :: queryLogListener
-		}
-	}
-
-	protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, paymentCents: Int): Unit = {
-		this.synchronized {
-			queryLog = HCompQueryStats(query, answer, durationMillis, paymentCents) :: queryLog
-		}
-		queryLogListener.foreach(l => l(query, properties, answer, durationMillis, paymentCents))
-	}
 
 	def sendQueryAndAwaitResult(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), maxWaitTime: Duration = 14 days): Option[HCompAnswer] = {
 		val future: Future[Option[HCompAnswer]] = sendQuery(query, properties)
@@ -101,15 +83,8 @@ trait HCompPortalAdapter extends LazyLogger {
 
 	def getDefaultPortalKey: String = getClass.getSimpleName
 
-	def queries = queryLog
-
 	def cancelQuery(query: HCompQuery): Unit
 
-	def clearLog(): Unit = {
-		this.synchronized {
-			queryLog = List.empty[HCompQueryStats]
-		}
-	}
 }
 
 private[hcomp] trait RejectableAnswer {
@@ -153,23 +128,6 @@ trait ForcedQueryPolling {
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
 	private var spentCents: Int = 0
 	private var spentPerQuery = scala.collection.mutable.HashMap.empty[Int, Int]
-
-	private var queryLog = List.empty[HCompQueryStats]
-	decoratedPortal.addQueryLogListener(addQueryToLog)
-
-	override protected def addQueryToLog(query: HCompQuery, properties: HCompQueryProperties, answer: Option[HCompAnswer], durationMillis: Long, cost: Int): Unit = {
-		this.synchronized {
-			queryLog = HCompQueryStats(query, answer, durationMillis, cost) :: queryLog
-		}
-	}
-
-	override def clearLog(): Unit = {
-		synchronized {
-			this.queryLog = List.empty[HCompQueryStats]
-		}
-	}
-
-	override def queries = queryLog
 
 	override def sendQuery(query: HCompQuery, properties: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = {
 		decoratedPortal.synchronized {
