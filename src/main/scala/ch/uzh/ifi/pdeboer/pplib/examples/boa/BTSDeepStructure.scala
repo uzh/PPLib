@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 import java.io.File
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.BOAutoExperimentationEngine
+import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
@@ -25,10 +25,10 @@ object BTSExperiment extends App {
 	val targetRecombinations = recombinations //recombinator.sneakPeek
 
 	//private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
-	//val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
-	val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
+	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
+	//val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
 	//val results = autoExperimentation.runOneIteration(targetStates)
-	val results = autoExperimentation.run(targetStates)
+	val results = autoExperimentation.run(targetStates, iterations = 20, memoryFriendly = true)
 
 	println("finished evaluation.")
 	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
