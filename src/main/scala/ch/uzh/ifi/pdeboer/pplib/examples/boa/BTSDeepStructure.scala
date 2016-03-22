@@ -13,7 +13,8 @@ import com.github.tototoshi.csv.CSVReader
 import scala.util.Random
 
 object BTSExperiment extends App {
-	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(10)
+	val EXPERIMENT_SIZE = 2
+	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(EXPERIMENT_SIZE)
 
 	private val portal: HCompPortalAdapter = new MySQLDBPortalDecorator(HComp.mechanicalTurk)
 	//new BTSTestPortal()
@@ -24,10 +25,8 @@ object BTSExperiment extends App {
 
 	val targetRecombinations = recombinator.sneakPeek
 
-	import scala.reflect.runtime.universe._
-
-	private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
-	val autoExperimentation = new NaiveAutoExperimentationEngine(onlyTruthContest)
+	//private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
+	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
 	val results = autoExperimentation.runOneIteration(targetStates)
 	//val results = autoExperimentation.run(targetStates, 50, memoryFriendly = true)
 
@@ -107,7 +106,7 @@ class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepSt
 				}
 				,
 				classOf[BayesianTruthContest] ->
-					RecombinationHints.questionPrice(List(HCompQueryProperties(15, qualifications = Nil)))
+					RecombinationHints.questionPrice(List(HCompQueryProperties(15)))
 
 			)
 			)
