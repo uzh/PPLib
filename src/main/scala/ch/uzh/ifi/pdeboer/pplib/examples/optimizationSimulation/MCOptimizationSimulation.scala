@@ -21,7 +21,7 @@ object MCOptimizationSimulation extends App {
 
 	val deepStructure = new MCOptimizationDeepStructure()
 
-	val recombinations = new Recombinator(deepStructure).recombine()
+	val recombinations = new Recombinator(deepStructure).recombine
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val autoExperimenter = new BOAutoExperimentationEngine(recombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "testNewBO")

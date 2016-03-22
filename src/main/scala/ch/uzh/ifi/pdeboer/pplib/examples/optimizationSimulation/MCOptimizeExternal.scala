@@ -18,7 +18,7 @@ import scala.io.Source
 
 	val deepStructure = new MCOptimizationDeepStructure()
 
-	val recombinations = new Recombinator(deepStructure).recombine()
+	val recombinations = new Recombinator(deepStructure).recombine
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val expander = new SurfaceStructureFeatureExpander(recombinations)
