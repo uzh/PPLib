@@ -13,10 +13,16 @@ import scala.util.Random
 
 object BTSExperiment extends App {
 	val EXPERIMENT_SIZE = 10
-	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(EXPERIMENT_SIZE)
-
 	private val portal: HCompPortalAdapter = new BTSTestPortal()
+
+	val targetStates = BTSResult.stateToCities.keys.toList.filter(f => {
+		if (portal.isInstanceOf[BTSTestPortal]) {
+			//make sure our simulation approach works
+			!BTSResult.stateToCities.keys.exists(k => k != f && k.contains(f))
+		} else true
+	}).sortBy(r => Random.nextDouble()).take(EXPERIMENT_SIZE)
 	//new MySQLDBPortalDecorator(HComp.mechanicalTurk)
+
 	val deepStructure = new BTSDeepStructure(portal)
 	private val recombinator: Recombinator[List[String], BTSResult] = new Recombinator(deepStructure)
 	val recombinations = recombinator.recombine

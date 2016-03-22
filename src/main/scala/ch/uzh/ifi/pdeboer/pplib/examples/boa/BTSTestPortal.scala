@@ -7,7 +7,7 @@ import scala.util.Random
 /**
   * Created by pdeboer on 21/03/16.
   */
-class BTSTestPortal(val probabilityForCapitalToBeSelected: Double = 0.7) extends HCompPortalAdapter {
+class BTSTestPortal(val probabilityForCapitalToBeSelected: Double = 0.65) extends HCompPortalAdapter {
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		query match {
 			case c: CompositeQuery => Some(CompositeQueryAnswer(c, c.queries.map(q => q -> processSubquery(q, properties)).toMap))
