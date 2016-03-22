@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 
 import java.io.File
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
@@ -14,7 +15,7 @@ import scala.util.Random
 object BTSExperiment extends App {
 	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(10)
 
-	private val portal: HCompPortalAdapter = HComp.mechanicalTurk
+	private val portal: HCompPortalAdapter = new MySQLDBPortalDecorator(HComp.mechanicalTurk)
 	//new BTSTestPortal()
 	val deepStructure = new BTSDeepStructure(portal)
 	private val recombinator: Recombinator[List[String], BTSResult] = new Recombinator(deepStructure)
@@ -27,8 +28,8 @@ object BTSExperiment extends App {
 
 	private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
 	val autoExperimentation = new NaiveAutoExperimentationEngine(onlyTruthContest)
-	autoExperimentation.runOneIteration(targetStates)
-	val results = autoExperimentation.run(targetStates, 50, memoryFriendly = true)
+	val results = autoExperimentation.runOneIteration(targetStates)
+	//val results = autoExperimentation.run(targetStates, 50, memoryFriendly = true)
 
 	println("finished evaluation.")
 	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
@@ -100,14 +101,14 @@ class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepSt
 							typeOf[DecideProcess[_, _]] -> new TrivialInstructionGenerator("What is the capital of the state below?", "Please select the capital of this state", questionBetween = "Please select the city you think is the capital from the top of your head (no google) among the list below. "),
 							typeOf[OtherOpinionsDecide] -> new TrivialInstructionGenerator("If other crowd workers were asked the same question. How likely is it, that they give the answer below?", "", "They would of course also be asked to identify the capital of")
 						)) :::
-						RecombinationHints.questionPrice(List(HCompQueryProperties(0, qualifications = Nil))) :::
+						//RecombinationHints.questionPrice(List(HCompQueryProperties(0, qualifications = Nil))) :::
 						RecombinationHints.instructions(List(
 							new InstructionData(actionName = "the same question. How likely is it that they give the answer below?", detailedDescription = "identify the capital of")))
 				}
-				/*,
+				,
 				classOf[BayesianTruthContest] ->
-					RecombinationHints.questionPrice(List(HCompQueryProperties(18)))
-					*/
+					RecombinationHints.questionPrice(List(HCompQueryProperties(15)))
+
 			)
 			)
 		)
