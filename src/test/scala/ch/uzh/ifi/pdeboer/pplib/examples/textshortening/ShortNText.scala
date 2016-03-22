@@ -12,7 +12,7 @@ object ShortNText extends App {
 
 	val deepStructure = new ShortNDeepStructure()
 
-	val recombinations = new Recombinator(deepStructure).recombine()
+	val recombinations = new Recombinator(deepStructure).recombine
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val textToBeShortened = """This text is too long and could be shortened by anyone except for people who can't.

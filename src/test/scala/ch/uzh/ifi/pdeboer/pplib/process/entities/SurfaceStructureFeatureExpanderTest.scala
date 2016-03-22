@@ -16,7 +16,7 @@ class SurfaceStructureFeatureExpanderTest {
 		val testData = new ShortNTestDataInitializer()
 		testData.initializePortal()
 		val deepStructure = new ShortNDeepStructure()
-		val recombinations = new Recombinator(deepStructure).recombine()
+		val recombinations = new Recombinator(deepStructure).recombine
 
 		Some(new FileWriter("output.xml")).foreach(s => {
 			s.write(<Processes>
