@@ -28,7 +28,7 @@ object BTSExperiment extends App {
 	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
 	//val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
 	//val results = autoExperimentation.runOneIteration(targetStates)
-	val results = autoExperimentation.run(targetStates, iterations = 20, memoryFriendly = true)
+	val results = autoExperimentation.run(targetStates, iterations = 10, memoryFriendly = true)
 
 	println("finished evaluation.")
 	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
