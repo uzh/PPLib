@@ -16,20 +16,22 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 	ConnectionPool.singleton(s"jdbc:mysql://$mysqlHost/$mysqlDB", mysqlUser, mysqlPassword)
 	implicit val session = AutoSession
 
-	def insertQueryAndAnswer(query: HCompQuery, answer: Option[HCompAnswer], hCompQueryProperties: HCompQueryProperties): Unit = DB localTx { implicit session =>
-		def getJSON(obj: Any): String = {
-			val mapper = new ObjectMapper()
-			mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-			mapper.writeValueAsString(obj)
-		}
+	def insertQueryAndAnswer(query: HCompQuery, answer: Option[HCompAnswer], hCompQueryProperties: HCompQueryProperties, retries: Int = 1): Unit = DB localTx { implicit session =>
+		if (retries > 0) {
+			def getJSON(obj: Any): String = {
+				val mapper = new ObjectMapper()
+				mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+				mapper.writeValueAsString(obj)
+			}
 
-		try {
-			sql"""
+			try {
+				sql"""
 				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, createDate, answerUser)
 				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${hCompQueryProperties.paymentCents}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime).orNull}, ${answer.map(_.receivedTime).orNull}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).toSet.mkString(","))})
 		   """.update.apply()
-		} catch {
-			case e: Throwable => createLayout()
+			} catch {
+				case e: Throwable => createLayout(); insertQueryAndAnswer(query, answer, hCompQueryProperties, retries - 1)
+			}
 		}
 	}
 
