@@ -107,7 +107,7 @@ class BTSDeepStructure(val portalToUse: HCompPortalAdapter) extends SimpleDeepSt
 				}
 				,
 				classOf[BayesianTruthContest] ->
-					RecombinationHints.questionPrice(List(HCompQueryProperties(15)))
+					RecombinationHints.questionPrice(List(HCompQueryProperties(15, qualifications = Nil)))
 
 			)
 			)
