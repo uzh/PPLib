@@ -13,7 +13,7 @@ import scala.io.Source
   * Created by pdeboer on 16/03/16.
   */
 class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]],
-																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, overridePPLibPath: Option[File] = None, sbtCommand: String = "sbt", pythonCommand: String = "python2.7", prefixPythonPathExport: Boolean = true, port: Int = 9988) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
+																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, pythonCommand: String = "python2.7") extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
 	assert(experimentName != null && experimentName.length > 0)
 	assert(pathToSpearmint.exists(), "Spearmint not found")
 
@@ -67,10 +67,9 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfa
 		val watchfolder = new File(experimentPath.getAbsolutePath + File.separator + JOB_QUEUE)
 		val doneFolder = new File(experimentPath.getAbsolutePath + File.separator + JOB_QUEUE_DONE)
 
-		val entrance = new BOSpearmintEntrance(input, watchfolder, doneFolder, expander, port)
+		val entrance = new BOSpearmintEntrance(input, watchfolder, doneFolder, expander)
 		entrance.listen()
 
-		//val exportCmd = if (prefixPythonPathExport) s"export PYTHONPATH='$pathToSpearmint' &&" else ""
 		val cmd: String = s"$pythonCommand $pathToSpearmint${File.separator}spearmint${File.separator}main.py ${experimentPath.getAbsolutePath}"
 		logger.info(s"will execute $cmd")
 		cmd ! ProcessLogger(s => logger.info(s), s => logger.error(s))
@@ -113,7 +112,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfa
 			| """.stripMargin
 }
 
-class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT], port: Int = 9988) extends LazyLogger {
+class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) extends LazyLogger {
 	private var kill: Option[DateTime] = None
 
 	protected var _results: List[SurfaceStructureResult[INPUT, OUTPUT]] = List.empty

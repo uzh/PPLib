@@ -2,9 +2,8 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 
 import java.io.File
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.BOAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
@@ -13,22 +12,23 @@ import com.github.tototoshi.csv.CSVReader
 import scala.util.Random
 
 object BTSExperiment extends App {
-	val EXPERIMENT_SIZE = 2
+	val EXPERIMENT_SIZE = 10
 	val targetStates = BTSResult.stateToCities.keys.toList.sortBy(r => Random.nextDouble()).take(EXPERIMENT_SIZE)
 
-	private val portal: HCompPortalAdapter = new MySQLDBPortalDecorator(HComp.mechanicalTurk)
-	//new BTSTestPortal()
+	private val portal: HCompPortalAdapter = new BTSTestPortal()
+	//new MySQLDBPortalDecorator(HComp.mechanicalTurk)
 	val deepStructure = new BTSDeepStructure(portal)
 	private val recombinator: Recombinator[List[String], BTSResult] = new Recombinator(deepStructure)
 	val recombinations = recombinator.recombine
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
-	val targetRecombinations = recombinator.sneakPeek
+	val targetRecombinations = recombinations //recombinator.sneakPeek
 
 	//private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
-	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
-	val results = autoExperimentation.runOneIteration(targetStates)
-	//val results = autoExperimentation.run(targetStates, 50, memoryFriendly = true)
+	//val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
+	val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
+	//val results = autoExperimentation.runOneIteration(targetStates)
+	val results = autoExperimentation.run(targetStates)
 
 	println("finished evaluation.")
 	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
