@@ -4,15 +4,15 @@ import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompPortalAdapter, HCompQuery, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.util.U
-import scalikejdbc.{AutoSession, ConnectionPool, _}
+import scalikejdbc.{AutoSession, _}
 
 /**
   * Created by pdeboer on 10/03/16.
   */
-class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Long] = None, mysqlUser: String = "root", mysqlPassword: String = "", mysqlHost: String = "127.0.0.1", mysqlDB: String = "pplibQueries") extends HCompPortalAdapter {
-	Class.forName("com.mysql.jdbc.Driver")
-	ConnectionPool.singleton(s"jdbc:mysql://$mysqlHost/$mysqlDB", mysqlUser, mysqlPassword)
+class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Long] = None) extends HCompPortalAdapter {
 	implicit val session = AutoSession
+
+	createTable()
 
 	def insertQueryAndAnswer(query: HCompQuery, answer: Option[HCompAnswer], hCompQueryProperties: HCompQueryProperties, retries: Int = 1): Unit = DB localTx { implicit session =>
 		if (retries > 0) {

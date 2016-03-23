@@ -8,6 +8,7 @@ import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimenta
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib._
+import ch.uzh.ifi.pdeboer.pplib.util.U
 import com.github.tototoshi.csv.CSVReader
 
 import scala.util.Random
@@ -15,14 +16,14 @@ import scala.util.Random
 object BTSExperiment extends App {
 	val EXPERIMENT_SIZE = 10
 	private val portal: HCompPortalAdapter = new BTSTestPortal()
+	U.initDB()
 
 	val targetStates = BTSResult.stateToCities.keys.toList.filter(f => {
 		if (portal.isInstanceOf[BTSTestPortal]) {
 			//make sure our simulation approach works
 			!BTSResult.stateToCities.keys.exists(k => k != f && k.contains(f))
 		} else true
-	}).sortBy(r => Random.nextDouble()).take(EXPERIMENT_SIZE)
-	//new MySQLDBPortalDecorator(HComp.mechanicalTurk)
+	}).map(r => (r, Random.nextDouble())).sortBy(_._2).map(_._1).take(EXPERIMENT_SIZE)
 
 	val deepStructure = new BTSDeepStructure(portal)
 	private val recombinator: Recombinator[List[String], BTSResult] = new Recombinator(deepStructure)
@@ -30,12 +31,13 @@ object BTSExperiment extends App {
 
 	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](recombinations)
 	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
-	val persistor = new MySQLSurfaceStructurePersistor(expander)
-
+	val persistor = new MySQLSurfaceStructurePersistor(expander, Some(targetFeatures))
 	recombinator.injectQueryLogger((s, p) => {
 		val id = persistor.surfaceStructureIDs(s)
 		new MySQLDBPortalDecorator(p, Some(id))
 	})
+	val surfaceResultLogger = new MySQLSurfaceStructureResultListener[List[String], BTSResult](persistor)
+	recombinations.foreach(_.addResultListener(surfaceResultLogger))
 
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
@@ -45,7 +47,7 @@ object BTSExperiment extends App {
 	val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
 	//val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
 	//val results = autoExperimentation.runOneIteration(targetStates)
-	val results = autoExperimentation.run(targetStates, iterations = 10, memoryFriendly = true)
+	val results = autoExperimentation.run(targetStates, iterations = 1, memoryFriendly = true)
 
 	println("finished evaluation.")
 	expander.toCSV("btsresultsModel.csv", targetFeatures, results.surfaceStructures.map(ss => ss ->
@@ -56,7 +58,7 @@ object BTSExperiment extends App {
 	println(s"best result: ${results.bestProcess}")
 }
 
-class BTSResult(selectedCitiesForStates: Map[String, String], processCostInCents: Int) extends ResultWithCostfunction {
+class BTSResult(val selectedCitiesForStates: Map[String, String], val processCostInCents: Int) extends ResultWithCostfunction with Serializable {
 	override def costFunctionResult: Double = {
 		val correct = selectedCitiesForStates.map(kv => if (BTSResult.groundTruth(kv._1) == kv._2) 1 else 0).sum
 		val wrongClassifications: Int = selectedCitiesForStates.size - correct
@@ -64,6 +66,8 @@ class BTSResult(selectedCitiesForStates: Map[String, String], processCostInCents
 
 		wrongClassifications * LOSS_FROM_WRONG_CLASSIFICATION_IN_CENTS + processCostInCents
 	}
+
+	override def toString = s"BTSResult($selectedCitiesForStates, $processCostInCents, $costFunctionResult)"
 }
 
 object BTSResult {

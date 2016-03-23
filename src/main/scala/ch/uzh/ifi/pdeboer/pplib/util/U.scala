@@ -12,6 +12,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
+import scalikejdbc.config.DBs
 
 import scala.collection.JavaConversions._
 import scala.collection.parallel.ExecutionContextTaskSupport
@@ -32,6 +33,15 @@ object U extends LazyLogger {
 		}
 	}))
 	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
+
+	def initDB(): Unit = {
+		val config = ConfigFactory.load()
+
+		if (config.hasPath("db.default.driver")) {
+			//Class.forName("com.mysql.jdbc.Driver")
+			DBs.setupAll()
+		}
+	}
 
 	/**
 	  * Method used to retry some code that may fail n times.

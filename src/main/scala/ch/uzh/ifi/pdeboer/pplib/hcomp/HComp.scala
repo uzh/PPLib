@@ -57,11 +57,11 @@ object HComp extends LazyLogger {
 				}
 			}
 		})
-
 	}
 
 	try {
 		autoloadConfiguredPortals()
+		U.initDB()
 	}
 	catch {
 		case e: Throwable => logger.error("could not auto-initialize portals due to an error", e)

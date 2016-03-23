@@ -26,7 +26,8 @@ libraryDependencies ++= Seq(
 	"com.typesafe.play" %% "play-json" % "2.4.0-M1",
 	"com.github.tototoshi" %% "scala-csv" % "1.2.2",
 	"mysql" % "mysql-connector-java" % "5.1.34",
-	"org.scalikejdbc" %% "scalikejdbc" % "2.2.1",
+	"org.scalikejdbc" %% "scalikejdbc" % "2.3.5",
+	"org.scalikejdbc" %% "scalikejdbc-config" % "2.3.5",
 	"com.fasterxml.jackson.module" % "jackson-module-scala" % "2.1.2"
 )
 
