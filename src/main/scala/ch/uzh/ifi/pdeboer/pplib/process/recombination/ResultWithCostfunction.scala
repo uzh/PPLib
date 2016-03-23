@@ -6,3 +6,5 @@ package ch.uzh.ifi.pdeboer.pplib.process.recombination
 trait ResultWithCostfunction extends Serializable {
 	def costFunctionResult: Double
 }
+
+class SimpleResultwithCostfunction(val costFunctionResult: Double) extends ResultWithCostfunction

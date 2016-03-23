@@ -13,7 +13,7 @@ resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositori
 libraryDependencies ++= Seq(
 	"junit" % "junit" % "4.8.1" % "test",
 	"org.scalacheck" %% "scalacheck" % "1.12.4" % "test",
-	"org.mockito" % "mockito-core" % "1.10.19" % "test",
+	"org.mockito" % "mockito-core" % "1.10.19",
 	"com.novocode" % "junit-interface" % "0.8" % "test->default",
 	"com.typesafe" % "config" % "1.2.1",
 	"org.reflections" % "reflections" % "0.9.9",

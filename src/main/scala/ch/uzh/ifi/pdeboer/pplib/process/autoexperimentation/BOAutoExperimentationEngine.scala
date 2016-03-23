@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import java.io._
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SimpleResultwithCostfunction, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
@@ -13,7 +13,7 @@ import scala.io.Source
   * Created by pdeboer on 16/03/16.
   */
 class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]],
-																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, pythonCommand: String = "python2.7") extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
+																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, pythonCommand: String = "python2.7", loadDataFromInterruptedRuns: Boolean = true) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
 	assert(experimentName != null && experimentName.length > 0)
 	assert(pathToSpearmint.exists(), "Spearmint not found")
 
@@ -68,6 +68,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfa
 		val doneFolder = new File(experimentPath.getAbsolutePath + File.separator + JOB_QUEUE_DONE)
 
 		val entrance = new BOSpearmintEntrance(input, watchfolder, doneFolder, expander)
+		if (loadDataFromInterruptedRuns) entrance.loadDoneFolder()
 		entrance.listen()
 
 		val cmd: String = s"$pythonCommand $pathToSpearmint${File.separator}spearmint${File.separator}main.py ${experimentPath.getAbsolutePath}"
@@ -119,6 +120,16 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 
 	def results = _results
 
+	def loadDoneFolder(): Unit = {
+		doneFolder.listFiles().foreach(f => {
+			val processor: SpearmintJobProcessor = new SpearmintJobProcessor(f)
+			val costFunctionResult = Source.fromFile(processor.outputFileName).getLines().mkString("").toDouble
+			surfaceStructure.synchronized {
+				_results = new MockSurfaceStructureResult(processor.correspondingSurfaceStructure.get, new SimpleResultwithCostfunction(costFunctionResult)) :: _results
+			}
+		})
+	}
+
 	def listen(): Unit = {
 		new Thread() {
 			override def run(): Unit = {
@@ -135,8 +146,29 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 	}
 
 	class SpearmintJobProcessor(val jobDescription: File) extends Thread with LazyLogger {
-
 		override def run(): Unit = {
+			val targetSurfaceStructures = correspondingSurfaceStructure
+			val result = if (targetSurfaceStructures.isEmpty) None
+			else {
+				val res = targetSurfaceStructures.head.test(input)
+				surfaceStructure.synchronized {
+					_results = new SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
+				}
+				res.map(_.costFunctionResult)
+			}
+
+			Some(new FileWriter(outputFileName)).foreach(f => {
+				f.write(result.map(_.toString).getOrElse("9999"))
+				f.close()
+			})
+
+		}
+
+		def outputFileName: File = {
+			new File(jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName)
+		}
+
+		def correspondingSurfaceStructure: Option[SurfaceStructure[INPUT, OUTPUT]] = {
 			val featureDefinition = Source.fromFile(jobDescription).getLines().map(l => {
 				val content = l.split(" VALUE ")
 				val valueAsOption = if (content(1) == "None") None else Some(content(1))
@@ -144,21 +176,7 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 			}).toMap
 
 			val targetSurfaceStructures = surfaceStructure.findSurfaceStructures(featureDefinition, exactMatch = false)
-			val result = if (targetSurfaceStructures.isEmpty) None
-			else {
-				val res = targetSurfaceStructures.head.test(input)
-				surfaceStructure.synchronized {
-					_results = SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
-				}
-				res.map(_.costFunctionResult)
-			}
-
-			val outputFileName: String = jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName
-			Some(new FileWriter(outputFileName)).foreach(f => {
-				f.write(result.map(_.toString).getOrElse("1000"))
-				f.close()
-			})
-
+			targetSurfaceStructures.headOption
 		}
 	}
 

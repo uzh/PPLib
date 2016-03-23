@@ -3,6 +3,8 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, MathUtils}
 
+import scala.reflect.ClassTag
+
 /**
   * Created by pdeboer on 16/03/16.
   */
@@ -32,7 +34,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 
 		def resultsOfSuccessfulRuns = rawResults.filter(_.result.isDefined)
 
-		lazy val medianResults = surfaceStructures.map(ss => SurfaceStructureResult(ss, CompositeExperimentResult.medianResult(resultsForSurfaceStructure(ss).map(_.result))))
+		lazy val medianResults = surfaceStructures.map(ss => new SurfaceStructureResult(ss, CompositeExperimentResult.medianResult(resultsForSurfaceStructure(ss).map(_.result))))
 
 		def bestProcess = {
 			val groups = surfaceStructures.map(s => s -> resultsForSurfaceStructure(s)).toMap
@@ -55,4 +57,32 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 
 }
 
-case class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructure: SurfaceStructure[INPUT, OUTPUT], result: Option[OUTPUT])
+class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](val surfaceStructure: SurfaceStructure[INPUT, OUTPUT], val result: Option[OUTPUT]) {
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[SurfaceStructureResult[_, _]]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: SurfaceStructureResult[_, _] =>
+			(that canEqual this) &&
+				surfaceStructure == that.surfaceStructure &&
+				result == that.result
+		case _ => false
+	}
+
+	override def hashCode(): Int = {
+		val state = Seq(surfaceStructure, result)
+		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+	}
+}
+
+class MockSurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructure: SurfaceStructure[INPUT, OUTPUT], resultCost: ResultWithCostfunction)
+	extends SurfaceStructureResult[INPUT, OUTPUT](surfaceStructure, MockSurfaceStructureResult.getMock(resultCost))
+
+object MockSurfaceStructureResult {
+	def getMock[INPUT, OUTPUT <: ResultWithCostfunction](costFunction: ResultWithCostfunction)(implicit classTag: ClassTag[OUTPUT]): OUTPUT = {
+		import org.mockito.Mockito._
+		val mockedOutputClass = mock(classTag.runtimeClass).asInstanceOf[OUTPUT]
+		when(mockedOutputClass.costFunctionResult).thenReturn(costFunction.costFunctionResult)
+		mockedOutputClass
+	}
+}
