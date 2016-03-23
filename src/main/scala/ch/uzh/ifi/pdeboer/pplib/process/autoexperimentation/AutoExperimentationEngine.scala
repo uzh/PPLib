@@ -10,7 +10,7 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 	def runOneIteration(input: INPUT): ExperimentResult
 
 	def run(input: INPUT, iterations: Int = 1, memoryFriendly: Boolean = false): ExperimentResult = {
-		val iterationResults = (0 to iterations).map(iteration => {
+		val iterationResults = (1 to iterations).map(iteration => {
 			val res = runOneIteration(input)
 			if (memoryFriendly)
 				res.surfaceStructures.foreach(_.recombinedProcessBlueprint.clear())
