@@ -2,6 +2,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 
 import java.io.File
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.NaiveAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
@@ -26,6 +27,16 @@ object BTSExperiment extends App {
 	val deepStructure = new BTSDeepStructure(portal)
 	private val recombinator: Recombinator[List[String], BTSResult] = new Recombinator(deepStructure)
 	val recombinations = recombinator.recombine
+
+	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](recombinations)
+	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
+	val persistor = new MySQLSurfaceStructurePersistor(expander)
+
+	recombinator.injectQueryLogger((s, p) => {
+		val id = persistor.surfaceStructureIDs(s)
+		new MySQLDBPortalDecorator(p, Some(id))
+	})
+
 	println(s"generated ${recombinations.size} recombinations. running evaluation..")
 
 	val targetRecombinations = recombinations //recombinator.sneakPeek
@@ -37,8 +48,6 @@ object BTSExperiment extends App {
 	val results = autoExperimentation.run(targetStates, iterations = 10, memoryFriendly = true)
 
 	println("finished evaluation.")
-	val expander = new SurfaceStructureFeatureExpander[List[String], BTSResult](results.surfaceStructures.toList)
-	val targetFeatures = expander.featuresInclClass.filter(f => List("TypeTag[Int]", "TypeTag[Double]", XMLFeatureExpander.baseClassFeature.typeName).contains(f.typeName)).toList
 	expander.toCSV("btsresultsModel.csv", targetFeatures, results.surfaceStructures.map(ss => ss ->
 		results.resultsForSurfaceStructure(ss).zipWithIndex
 			.map(r => (r._2 + "_result") -> r._1.result.get.costFunctionResult).toMap

@@ -3,42 +3,35 @@ package ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal
 import java.util.Date
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompAnswer, HCompPortalAdapter, HCompQuery, HCompQueryProperties}
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
-import com.fasterxml.jackson.annotation.PropertyAccessor
-import com.fasterxml.jackson.databind.ObjectMapper
+import ch.uzh.ifi.pdeboer.pplib.util.U
 import scalikejdbc.{AutoSession, ConnectionPool, _}
 
 /**
   * Created by pdeboer on 10/03/16.
   */
-class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = "root", mysqlPassword: String = "", mysqlHost: String = "127.0.0.1", mysqlDB: String = "pplibQueries") extends HCompPortalAdapter {
+class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Long] = None, mysqlUser: String = "root", mysqlPassword: String = "", mysqlHost: String = "127.0.0.1", mysqlDB: String = "pplibQueries") extends HCompPortalAdapter {
 	Class.forName("com.mysql.jdbc.Driver")
 	ConnectionPool.singleton(s"jdbc:mysql://$mysqlHost/$mysqlDB", mysqlUser, mysqlPassword)
 	implicit val session = AutoSession
 
 	def insertQueryAndAnswer(query: HCompQuery, answer: Option[HCompAnswer], hCompQueryProperties: HCompQueryProperties, retries: Int = 1): Unit = DB localTx { implicit session =>
 		if (retries > 0) {
-			def getJSON(obj: Any): String = {
-				val mapper = new ObjectMapper()
-				mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-				mapper.writeValueAsString(obj)
-			}
-
 			try {
 				sql"""
-				INSERT INTO queries (question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, createDate, answerUser)
-				VALUES ( ${query.question}, ${getJSON(query)}, ${answer.toString}, ${getJSON(answer)}, ${decorated.price(query, hCompQueryProperties)}, ${getJSON(hCompQueryProperties)}, ${answer.map(_.postTime).orNull}, ${answer.map(_.receivedTime).orNull}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).toSet.mkString(","))})
+				INSERT INTO queries (process_id, question, fullQuery, answer, fullAnswer, paymentCents, fullProperties, questionCreationDate, questionAnswerDate, createDate, answerUser)
+				VALUES (${processId.orNull}, ${query.question}, ${U.getJSON(query)}, ${answer.toString}, ${U.getJSON(answer)}, ${decorated.price(query, hCompQueryProperties)}, ${U.getJSON(hCompQueryProperties)}, ${answer.map(_.postTime).orNull}, ${answer.map(_.receivedTime).orNull}, ${new Date()}, ${answer.map(_.responsibleWorkers.map(_.id).toSet.mkString(","))})
 		   """.update.apply()
 			} catch {
-				case e: Throwable => createLayout(); insertQueryAndAnswer(query, answer, hCompQueryProperties, retries - 1)
+				case e: Throwable => createTable(); insertQueryAndAnswer(query, answer, hCompQueryProperties, retries - 1)
 			}
 		}
 	}
 
-	def createLayout(): Unit = DB localTx { implicit session =>
+	def createTable(): Unit = DB localTx { implicit session =>
 		try {
 			sql"""CREATE TABLE IF NOT EXISTS `queries` (
 			    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+				process_id INT(11) UNSIGNED NULL,
 			    `question` LONGTEXT,
 			    `fullQuery` LONGTEXT,
 			    `answer` LONGTEXT,
@@ -50,7 +43,7 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, mysqlUser: String = 
 				 `createDate` DATETIME DEFAULT NULL,
 			    `answerUser` VARCHAR(255) DEFAULT NULL,
 			    PRIMARY KEY (`id`)
-			  ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;""".update().apply()
+			  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;""".update().apply()
 		} catch {
 			case e: Throwable => {}
 		}

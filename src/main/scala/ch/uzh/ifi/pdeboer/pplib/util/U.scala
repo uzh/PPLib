@@ -1,10 +1,13 @@
 package ch.uzh.ifi.pdeboer.pplib.util
 
 import java.lang.annotation
-import java.util.concurrent.{ThreadFactory, Executors}
+import java.util.concurrent.{Executors, ThreadFactory}
 import java.util.concurrent.atomic.AtomicReference
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.ProcessStub
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
+import com.fasterxml.jackson.annotation.PropertyAccessor
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.config.{Config, ConfigFactory}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner, TypeAnnotationsScanner}
@@ -18,8 +21,8 @@ import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 
 /**
- * Created by pdeboer on 15/10/14.
- */
+  * Created by pdeboer on 15/10/14.
+  */
 object U extends LazyLogger {
 	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100, new ThreadFactory {
 		override def newThread(r: Runnable): Thread = {
@@ -31,12 +34,13 @@ object U extends LazyLogger {
 	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
 
 	/**
-	 * Method used to retry some code that may fail n times.
-	 * @param n  how often to retry
-	 * @param fn  the fallible function
-	 * @tparam T return value of the function
-	 * @return the result of the function
-	 */
+	  * Method used to retry some code that may fail n times.
+	  *
+	  * @param n  how often to retry
+	  * @param fn the fallible function
+	  * @tparam T return value of the function
+	  * @return the result of the function
+	  */
 	def retry[T](n: Int, timer: GrowingTimer = new GrowingTimer(1 second, 1.5, 300 seconds))(fn: => T): T = {
 		try {
 			fn
@@ -67,7 +71,7 @@ object U extends LazyLogger {
 			.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false), new ResourcesScanner())
 			.setUrls(ClasspathHelper.forClassLoader(classLoadersList(0)))
 			.filterInputsBy(new FilterBuilder().include(
-			FilterBuilder.prefix(packagePrefix))))
+				FilterBuilder.prefix(packagePrefix))))
 
 		reflections.getTypesAnnotatedWith(anno).toSet
 	}
@@ -133,14 +137,20 @@ object U extends LazyLogger {
 	def getTypeFromClass(c: Class[_]) =
 		if (c == null) null else runtimeMirror(c.getClassLoader).classSymbol(c).toType
 
+	def getJSON(obj: Any): String = {
+		val mapper = new ObjectMapper()
+		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
+		mapper.writeValueAsString(obj)
+	}
 }
 
 /**
- * this is pretty much the most horrible thing you'll see in this code :( but we haven't
- * found another way of easily manipulating runtimeClass of a ClassTag that's handed
- * over to a method/class.
- * @param clazz
- */
+  * this is pretty much the most horrible thing you'll see in this code :( but we haven't
+  * found another way of easily manipulating runtimeClass of a ClassTag that's handed
+  * over to a method/class.
+  *
+  * @param clazz
+  */
 class SimpleClassTag[IN, OUT](clazz: Class[_]) extends ClassTag[ProcessStub[IN, OUT]] {
 	override def runtimeClass: Class[_] = clazz
 }

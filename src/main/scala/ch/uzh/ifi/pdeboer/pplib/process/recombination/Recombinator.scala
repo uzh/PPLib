@@ -1,5 +1,6 @@
 package ch.uzh.ifi.pdeboer.pplib.process.recombination
 
+import ch.uzh.ifi.pdeboer.pplib.hcomp.HCompPortalAdapter
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{DefaultParameters, ProcessStub}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.{ContestWithBeatByKVotingProcess, ContestWithStatisticalReductionProcess}
 
@@ -7,8 +8,8 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 /**
- * Created by pdeboer on 27/05/15.
- */
+  * Created by pdeboer on 27/05/15.
+  */
 class Recombinator[INPUT, OUTPUT <: ResultWithCostfunction](recombinable: DeepStructure[INPUT, OUTPUT]) {
 	lazy val variants = {
 		val recombinations = recombinable.defineRecombinationSearchSpace.par.map {
@@ -21,6 +22,17 @@ class Recombinator[INPUT, OUTPUT <: ResultWithCostfunction](recombinable: DeepSt
 		}.toList.toMap //toList toMap is an ugly hack to get it to be non-parallel again
 
 		new RecombinationVariantGenerator(recombinations).variants
+	}
+
+	def injectQueryLogger(f: (SurfaceStructure[INPUT, OUTPUT], HCompPortalAdapter) => HCompPortalAdapter) {
+		recombine.foreach(s => {
+			s.recombinedProcessBlueprint.stubs.values.foreach(proc => {
+				proc.getParam(DefaultParameters.PORTAL_PARAMETER).foreach(portal => proc.setParams(Map(DefaultParameters.PORTAL_PARAMETER.key -> {
+					val decoratorPortal = f(s, portal)
+					decoratorPortal
+				}), replace = true))
+			})
+		})
 	}
 
 	lazy val recombine: List[SurfaceStructure[INPUT, OUTPUT]] = {
