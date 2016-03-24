@@ -4,3 +4,14 @@ hcomp.mechanicalTurk.accessKeyID = "YOUR KEY"
 hcomp.mechanicalTurk.secretAccessKey = "YOUR KEY"
 hcomp.mechanicalTurk.sandbox = "true"
 hcomp.randomPortal.active = "true"
+
+db.default.driver = "com.mysql.jdbc.Driver"
+db.default.url = "jdbc:mysql://127.0.0.1/pplibQueries"
+db.default.user = "root"
+db.default.password = ""
+db.default.poolInitialSize = 10
+db.default.poolMaxSize = 40
+db.default.connectionTimeoutMillis = 1000
+
+autoexperimentation.bo.spearmintPath = "/Users/pdeboer/Documents/phd_local/Spearmint"
+autoexperimentation.bo.experimentName = "PPLibBOExperiment"

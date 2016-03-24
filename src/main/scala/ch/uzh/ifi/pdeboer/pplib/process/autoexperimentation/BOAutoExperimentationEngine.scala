@@ -4,7 +4,7 @@ import java.io._
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
-import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import org.joda.time.DateTime
 
 import scala.io.Source
@@ -111,6 +111,17 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfa
 			|
  			|                return float(utilityString)
 			| """.stripMargin
+}
+
+object BOAutoExperimentationEngine {
+	val CONFIG_PREFIX: String = "autoexperimentation.bo."
+
+	def createThroughConfig[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]]) = {
+		val spearmintPath = U.getConfigString(CONFIG_PREFIX + "spearmintPath").get
+		val experimentName = U.getConfigString(CONFIG_PREFIX + "experimentName").getOrElse("PPLibExperiment")
+
+		new BOAutoExperimentationEngine(surfaceStructures, new File(spearmintPath), experimentName)
+	}
 }
 
 class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT, watchFolder: File, doneFolder: File, surfaceStructure: SurfaceStructureFeatureExpander[INPUT, OUTPUT]) extends LazyLogger {

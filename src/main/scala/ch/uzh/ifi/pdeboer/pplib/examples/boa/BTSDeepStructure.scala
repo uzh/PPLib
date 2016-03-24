@@ -45,7 +45,7 @@ object BTSExperiment extends App {
 
 	//private val onlyTruthContest = targetRecombinations.filter(_.recombinedProcessBlueprint.stubs.values.head.baseType.tpe <:< typeOf[BayesianTruthContest])
 	//val autoExperimentation = new NaiveAutoExperimentationEngine(targetRecombinations)
-	val autoExperimentation = new BOAutoExperimentationEngine(targetRecombinations, new File("/Users/pdeboer/Documents/phd_local/Spearmint"), "BTSSimulation")
+	val autoExperimentation = BOAutoExperimentationEngine.createThroughConfig(recombinations)
 	val results = autoExperimentation.runOneIteration(targetStates)
 	//val results = autoExperimentation.run(targetStates, iterations = 1, memoryFriendly = true)
 
