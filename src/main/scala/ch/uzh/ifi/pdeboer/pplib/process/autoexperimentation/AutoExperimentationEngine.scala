@@ -71,4 +71,7 @@ class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](val surfac
 		val state = Seq(surfaceStructure, result)
 		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 	}
+
+
+	override def toString = s"SurfaceStructureResult($surfaceStructure, $result)"
 }
