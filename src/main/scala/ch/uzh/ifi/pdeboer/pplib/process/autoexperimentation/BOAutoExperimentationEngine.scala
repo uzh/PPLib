@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import java.io._
 
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{SurfaceStructureFeatureExpander, XMLFeatureExpander}
-import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SimpleResultwithCostfunction, SurfaceStructure}
+import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.LazyLogger
 import org.joda.time.DateTime
 
@@ -121,13 +121,23 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 	def results = _results
 
 	def loadDoneFolder(): Unit = {
-		doneFolder.listFiles().foreach(f => {
-			val processor: SpearmintJobProcessor = new SpearmintJobProcessor(f)
-			val costFunctionResult = Source.fromFile(processor.outputFileName).getLines().mkString("").toDouble
-			surfaceStructure.synchronized {
-				_results = new MockSurfaceStructureResult(processor.correspondingSurfaceStructure.get, new SimpleResultwithCostfunction(costFunctionResult)) :: _results
+		doneFolder.listFiles().filter(_.getName.startsWith("jobdesc")).foreach(f => {
+			try {
+				val processor: SpearmintJobProcessor = new SpearmintJobProcessor(f)
+				val output = Some(new ObjectInputStream(new FileInputStream(processor.resultObjectFileName))).map(f => {
+					val out = f.readObject().asInstanceOf[Option[OUTPUT]]
+					f.close()
+					out
+				}).get
+
+				surfaceStructure.synchronized {
+					_results = new SurfaceStructureResult(processor.correspondingSurfaceStructure.get, output) :: _results
+				}
+			} catch {
+				case e: Throwable => logger.info(s"did not load $f", e.getMessage)
 			}
 		})
+		logger.info(s"loaded ${_results.size} previous results")
 	}
 
 	def listen(): Unit = {
@@ -151,21 +161,31 @@ class BOSpearmintEntrance[INPUT, OUTPUT <: ResultWithCostfunction](input: INPUT,
 			val result = if (targetSurfaceStructures.isEmpty) None
 			else {
 				val res = targetSurfaceStructures.head.test(input)
+				val structureResult = new SurfaceStructureResult(targetSurfaceStructures.head, res)
 				surfaceStructure.synchronized {
-					_results = new SurfaceStructureResult(targetSurfaceStructures.head, res) :: _results
+					_results = structureResult :: _results
 				}
-				res.map(_.costFunctionResult)
+				Some(structureResult)
 			}
 
 			Some(new FileWriter(outputFileName)).foreach(f => {
-				f.write(result.map(_.toString).getOrElse("9999"))
+				val cost: Option[String] = result.flatMap(_.result.map(_.costFunctionResult.toString))
+				f.write(cost.getOrElse("9999"))
 				f.close()
 			})
 
+			Some(new ObjectOutputStream(new FileOutputStream(resultObjectFileName))).foreach(oos => {
+				oos.writeObject(result.flatMap(_.result))
+				oos.close()
+			})
 		}
 
 		def outputFileName: File = {
 			new File(jobDescription.getParentFile.getAbsolutePath + File.separator + "answer_" + jobDescription.getName)
+		}
+
+		def resultObjectFileName: File = {
+			new File(jobDescription.getParentFile.getAbsolutePath + File.separator + "resultObject_" + jobDescription.getName)
 		}
 
 		def correspondingSurfaceStructure: Option[SurfaceStructure[INPUT, OUTPUT]] = {

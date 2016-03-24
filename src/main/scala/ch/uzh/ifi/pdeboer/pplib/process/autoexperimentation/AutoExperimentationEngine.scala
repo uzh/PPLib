@@ -3,8 +3,6 @@ package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, MathUtils}
 
-import scala.reflect.ClassTag
-
 /**
   * Created by pdeboer on 16/03/16.
   */
@@ -72,17 +70,5 @@ class SurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](val surfac
 	override def hashCode(): Int = {
 		val state = Seq(surfaceStructure, result)
 		state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
-	}
-}
-
-class MockSurfaceStructureResult[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructure: SurfaceStructure[INPUT, OUTPUT], resultCost: ResultWithCostfunction)
-	extends SurfaceStructureResult[INPUT, OUTPUT](surfaceStructure, MockSurfaceStructureResult.getMock(resultCost))
-
-object MockSurfaceStructureResult {
-	def getMock[INPUT, OUTPUT <: ResultWithCostfunction](costFunction: ResultWithCostfunction)(implicit classTag: ClassTag[OUTPUT]): OUTPUT = {
-		import org.mockito.Mockito._
-		val mockedOutputClass = mock(classTag.runtimeClass).asInstanceOf[OUTPUT]
-		when(mockedOutputClass.costFunctionResult).thenReturn(costFunction.costFunctionResult)
-		mockedOutputClass
 	}
 }

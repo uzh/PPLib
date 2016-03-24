@@ -80,7 +80,6 @@ class DefaultTextQueryBuilder(italicInstructionsParam: ProcessParameter[String] 
 	}
 }
 
-
 class DefaultPercentageQueryBuilder(italicInstructionsParam: ProcessParameter[String] = INSTRUCTIONS_ITALIC,
 									auxParam: ProcessParameter[Option[NodeSeq]] = QUESTION_AUX) extends HCompQueryBuilder[Patch] {
 
