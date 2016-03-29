@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
 	"com.fasterxml.jackson.module" % "jackson-module-scala" % "2.1.2"
 )
 
-mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.optimization.MCOptimize")
+mainClass in assembly := Some("ch.uzh.ifi.pdeboer.pplib.examples.optimizationSimulation.MCOptimizeExternal")
 
 // To Skip Tests:
 test in assembly := {}
