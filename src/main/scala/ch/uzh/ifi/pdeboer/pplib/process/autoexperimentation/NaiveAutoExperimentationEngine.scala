@@ -1,10 +1,9 @@
 package ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation
 
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{ResultWithCostfunction, SurfaceStructure}
-import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 import scala.util.Random
-
+import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 /**
   * Created by pdeboer on 27/07/15.
   */

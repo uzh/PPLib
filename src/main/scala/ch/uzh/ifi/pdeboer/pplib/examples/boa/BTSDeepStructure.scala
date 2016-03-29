@@ -3,7 +3,7 @@ package ch.uzh.ifi.pdeboer.pplib.examples.boa
 import java.io.File
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HCompPortalAdapter, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompPortalAdapter, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.autoexperimentation.BOAutoExperimentationEngine
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{InstructionData, _}
 import ch.uzh.ifi.pdeboer.pplib.process.recombination.{AddedParameterRecombinationHint, _}
@@ -15,8 +15,8 @@ import scala.util.Random
 
 object BTSExperiment extends App {
 	val EXPERIMENT_SIZE = 10
-	private val portal: HCompPortalAdapter = new BTSTestPortal()
-	U.initDB()
+	private val portal: HCompPortalAdapter = HComp.mechanicalTurk
+	U.initDBConnection()
 
 	val targetStates = new FileProcessMemoizer("state_BORun").mem("borun")(BTSResult.stateToCities.keys.toList.filter(f => {
 		if (portal.isInstanceOf[BTSTestPortal]) {

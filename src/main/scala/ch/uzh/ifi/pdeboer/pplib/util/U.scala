@@ -25,7 +25,7 @@ import scala.reflect.runtime.universe._
   * Created by pdeboer on 15/10/14.
   */
 object U extends LazyLogger {
-	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(100, new ThreadFactory {
+	val execContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(1000, new ThreadFactory {
 		override def newThread(r: Runnable): Thread = {
 			val t = new Thread(r)
 			t.setDaemon(true)
@@ -34,7 +34,7 @@ object U extends LazyLogger {
 	}))
 	val execContextTaskSupport = new ExecutionContextTaskSupport(execContext)
 
-	def initDB(): Unit = {
+	def initDBConnection(): Unit = {
 		val config = ConfigFactory.load()
 
 		if (config.hasPath("db.default.driver")) {
