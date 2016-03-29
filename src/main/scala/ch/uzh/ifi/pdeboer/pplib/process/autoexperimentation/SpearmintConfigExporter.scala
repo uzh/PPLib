@@ -67,11 +67,11 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithCostfunction](featureEx
 	def jsonFeatureDescription(features: List[ProcessFeature]) =
 		features.map(f => jsonFormatFeature(f)).mkString(",")
 
-	def fullJson(features: List[ProcessFeature]) =
+	def fullJson(features: List[ProcessFeature], experimentName: String, mongoPort: Int) =
 		s"""
 		   {
 		     "language": "PYTHON",
-		     "experiment-name": "noisyPPLib",
+		     "experiment-name": "$experimentName",
 		     "polling-time": 1,
 		     "resources": {
 		       "my-machine": {
@@ -79,6 +79,9 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithCostfunction](featureEx
 		         "max-concurrent": 10,
 		         "max-finished-jobs": 10000
 		       }
+		     },
+ 		  "database" : {
+		       "address" : "localhost:$mongoPort"
 		     },
 		     "tasks": {
 		       "branin": {
@@ -94,9 +97,9 @@ class SpearmintConfigExporter[INPUT, OUTPUT <: ResultWithCostfunction](featureEx
 			}
 		"""
 
-	def storeAsJson(outfile: File, features: List[ProcessFeature] = featureExpander.featuresInclClass.toList): Unit = {
+	def storeAsJson(outfile: File, features: List[ProcessFeature] = featureExpander.featuresInclClass.toList, experimentName: String = "PPLib", mongoPort: Int = 27017): Unit = {
 		Some(new FileWriter(outfile)).foreach(f => {
-			f.write(fullJson(features))
+			f.write(fullJson(features, experimentName, mongoPort))
 			f.close()
 		})
 	}

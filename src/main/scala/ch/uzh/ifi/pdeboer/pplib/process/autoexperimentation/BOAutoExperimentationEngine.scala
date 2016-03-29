@@ -13,7 +13,8 @@ import scala.io.Source
   * Created by pdeboer on 16/03/16.
   */
 class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfaceStructures: List[SurfaceStructure[INPUT, OUTPUT]],
-																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, pythonCommand: String = "python2.7", loadDataFromInterruptedRuns: Boolean = true) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
+																		   pathToSpearmint: File, experimentName: String, pathToSpearmintExperimentFolder: Option[File] = None, pythonCommand: String = "python2.7",
+																		   loadDataFromInterruptedRuns: Boolean = true, mongoDBPort: Int = 27017) extends AutoExperimentationEngine[INPUT, OUTPUT](surfaceStructures) {
 	assert(experimentName != null && experimentName.length > 0)
 	assert(pathToSpearmint.exists(), "Spearmint not found")
 
@@ -54,7 +55,7 @@ class BOAutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction](surfa
 	}
 
 	protected def writeSpearmintConfig(dir: File): Unit = {
-		new SpearmintConfigExporter(expander).storeAsJson(new File(s"$dir${File.separator}config.json"), targetFeatures)
+		new SpearmintConfigExporter(expander).storeAsJson(new File(s"$dir${File.separator}config.json"), targetFeatures, experimentName, mongoDBPort)
 	}
 
 	def processSpearmintResult(entrance: BOSpearmintEntrance[INPUT, OUTPUT]): ExperimentResult = {
