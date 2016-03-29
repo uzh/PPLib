@@ -28,7 +28,9 @@ import scala.io.Source
 		new SpearmintConfigExporter(expander).storeAsJson(new File("/Users/pdeboer/Documents/phd_local/Spearmint/examples/noisyPPLib/config.json"), targetFeatures)
 	} else if (args.contains("runall")) {
 		val autoExperimentationEngine = new NaiveAutoExperimentationEngine(recombinations)
-		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, 5)
+		val numRepetitions = args.find(_.startsWith("reps")).map(_.substring("reps".length).toInt).getOrElse(5)
+		println(s"repeating $numRepetitions times")
+		val results = autoExperimentationEngine.run(MCOptimizeConstants.multipeChoiceAnswers, numRepetitions)
 		val resultMap = results.surfaceStructures.map(ss => ss -> {
 			val resultsObjects = results.resultsForSurfaceStructure(ss).zipWithIndex
 			val resultsUtilities = resultsObjects.map(r => "iteration_utility_" + r._2 -> r._1.result.get.costFunctionResult)
