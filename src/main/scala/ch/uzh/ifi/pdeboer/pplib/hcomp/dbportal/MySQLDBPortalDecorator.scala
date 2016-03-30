@@ -9,7 +9,7 @@ import scalikejdbc.{AutoSession, _}
 /**
   * Created by pdeboer on 10/03/16.
   */
-class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Long] = None) extends HCompPortalAdapter {
+class MySQLDBPortalDecorator(val decorated: HCompPortalAdapter, processId: Option[Long] = None) extends HCompPortalAdapter {
 	implicit val session = AutoSession
 
 	createTable()
@@ -49,6 +49,7 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Lo
 		}
 	}
 
+
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val answer = decorated.processQuery(query, properties)
 		insertQueryAndAnswer(query, answer, properties)
@@ -58,4 +59,6 @@ class MySQLDBPortalDecorator(decorated: HCompPortalAdapter, processId: Option[Lo
 	override def cancelQuery(query: HCompQuery): Unit = {
 		decorated.cancelQuery(query)
 	}
+
+	override def toString = s"MySQLDBPortalDecorator($decorated)"
 }
