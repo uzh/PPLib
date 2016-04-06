@@ -64,7 +64,8 @@ class BTSResult(val selectedCitiesForStates: Map[String, String], val processCos
 		val wrongClassifications: Int = selectedCitiesForStates.size - correct
 		val LOSS_FROM_WRONG_CLASSIFICATION_IN_CENTS: Int = 300
 
-		wrongClassifications * LOSS_FROM_WRONG_CLASSIFICATION_IN_CENTS + processCostInCents
+		//wrongClassifications * LOSS_FROM_WRONG_CLASSIFICATION_IN_CENTS + processCostInCents
+		wrongClassifications
 	}
 
 	override def toString = s"BTSResult($selectedCitiesForStates, $processCostInCents, $costFunctionResult)"
