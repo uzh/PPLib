@@ -24,38 +24,38 @@ class BayesianTruthContestTest extends LazyLogger {
 
 	@Test
 	def testExpertCountMajority: Unit = {
-		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+		val expertAnswerChosenCount = (1 to 2000).mpar.map(i => {
 			val patches = createPatches
 			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
 			val contest = createContest(new BTTestPortal(playbook))
 			val result = contest.process(patches)
 			if (patches(1) == result) 1 else 0
 		}).sum
-		Assert.assertTrue(expertAnswerChosenCount > 500)
+		Assert.assertTrue(expertAnswerChosenCount > 100)
 	}
 
 	@Test
 	def testExpertCountEqualNonExpert: Unit = {
-		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+		val expertAnswerChosenCount = (1 to 2000).mpar.map(i => {
 			val patches = createPatches
 			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
 			val contest = createContest(new BTTestPortal(playbook))
 			val result = contest.process(patches)
 			if (patches(1) == result) 1 else 0
 		}).sum
-		Assert.assertTrue(expertAnswerChosenCount > 500)
+		Assert.assertTrue(expertAnswerChosenCount > 100)
 	}
 
 	@Test
 	def testExpertCountJustBelowNonExpert: Unit = {
-		val expertAnswerChosenCount = (1 to 1000).mpar.map(i => {
+		val expertAnswerChosenCount = (1 to 2000).mpar.map(i => {
 			val patches = createPatches
 			val playbook = List(createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches.head), createPlaybookAnswer(patches(1), patches.head), createPlaybookAnswer(patches(1), patches.head))
 			val contest = createContest(new BTTestPortal(playbook))
 			val result = contest.process(patches)
 			if (patches(1) == result) 1 else 0
 		}).sum
-		Assert.assertTrue(expertAnswerChosenCount > 500)
+		Assert.assertTrue(expertAnswerChosenCount > 100)
 	}
 
 	@Test
