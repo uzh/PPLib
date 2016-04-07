@@ -35,14 +35,14 @@ abstract class AutoExperimentationEngine[INPUT, OUTPUT <: ResultWithCostfunction
 		lazy val medianResults = surfaceStructures.map(ss => new SurfaceStructureResult(ss, CompositeExperimentResult.medianResult(resultsForSurfaceStructure(ss).map(_.result))))
 
 		def bestProcess = {
-			val groups = surfaceStructures.map(s => s -> resultsForSurfaceStructure(s)).toMap
-			val sortedWithMean = groups.map(g => (g._1, MathUtils.mean(g._2.map(_.result.map(_.costFunctionResult).getOrElse(9999d))), MathUtils.stddev(g._2.map(_.result.map(_.costFunctionResult).getOrElse(9999d))))).toList.sortBy(_._2)
+			val groups = surfaceStructures.map(s => s -> resultsForSurfaceStructure(s).filter(_.result.isDefined)).toMap
+			val sortedWithMean = groups.map(g => (g._1, MathUtils.mean(g._2.map(_.result.get.costFunctionResult)), MathUtils.stddev(g._2.map(_.result.get.costFunctionResult)))).toList.sortBy(_._2)
 			val betterHalfSortedWithMean = sortedWithMean.take(sortedWithMean.size / 2)
 			val stdev = MathUtils.stddev(betterHalfSortedWithMean.map(_._2))
 			val withinOneStdev = betterHalfSortedWithMean.takeWhile(s => s._2 - s._3 < betterHalfSortedWithMean.head._2 + stdev)
 			val bestProcessesWithNonzeroStdev = (sortedWithMean.head :: withinOneStdev).filter(_._3 > 0)
 			val winningProcess = if (bestProcessesWithNonzeroStdev.nonEmpty) bestProcessesWithNonzeroStdev.minBy(_._3) else sortedWithMean.head
-			groups(winningProcess._1).minBy(_.result.map(_.costFunctionResult).getOrElse(9999d))
+			groups(winningProcess._1).minBy(_.result.get.costFunctionResult)
 		}
 	}
 
