@@ -52,7 +52,7 @@ object BTSExperiment extends App {
 	println("finished evaluation.")
 	expander.toCSV("btsresultsModel.csv", targetFeatures, results.surfaceStructures.map(ss => ss ->
 		results.resultsForSurfaceStructure(ss).zipWithIndex
-			.map(r => (r._2 + "_result") -> r._1.result.get.costFunctionResult).toMap
+			.map(r => (r._2 + "_result") -> r._1.result.map(_.costFunctionResult).getOrElse(9999d)).toMap
 	).toMap)
 
 	println(s"best result: ${results.bestProcess}")
