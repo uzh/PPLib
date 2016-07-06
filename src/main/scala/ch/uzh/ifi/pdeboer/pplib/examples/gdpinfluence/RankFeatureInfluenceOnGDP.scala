@@ -6,13 +6,14 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, TrivialInstructionGenerator}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest
 import ch.uzh.ifi.pdeboer.pplib.util.U
+import com.github.tototoshi.csv.CSVReader
 
 /**
   * Created by pdeboer on 06/07/16.
   */
 object RankFeatureInfluenceOnGDP extends App {
-	//val features = CSVReader.open("example_data/featuresWithInfluenceOnGDP.csv").all().map(l => Feature(l.head)(l(1)))
-	val features = List(Feature("f1")("Percentage of the GDP made in the agricultural sector (meat/wheat production, farms..)"), Feature("f2")("Percentage of government's budget spent on research"))
+	val features = CSVReader.open("example_data/featuresWithInfluenceOnGDP.csv").all().map(l => Feature(l.head)(l(1)))
+	//val features = List(Feature("f1")("Percentage of the GDP made in the agricultural sector (meat/wheat production, farms..)"), Feature("f2")("Percentage of government's budget spent on research"))
 	val portal = HComp.mechanicalTurk
 	U.initDBConnection()
 
@@ -21,13 +22,12 @@ object RankFeatureInfluenceOnGDP extends App {
 		else if (t2 == null) t1
 		else {
 			val instructions = new TrivialInstructionGenerator("Which of the two factors below do you think influences the average income of a country's people more.",
-				"Please rank these two influencing factors", questionAfter = "Please note, that we are NOT trying to find out which of the two factor's influences is more positive than the other. We are trying to see which factor is more important.")
+				"Please rank these two influencing factors", questionAfter = "Example: a country's crime rate has a higher impact on the average income per person than the amount of trees in said country.")
 			val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, Some(index)),
-				WORKER_COUNT.key -> 9, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-				QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
-				INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why do you think so?"),
-					"clear" -> FreetextQuery("We are planning on launching a large batch of such hits. Was this HIT clear to you? How could it be improved?")),
-				INSTRUCTIONS_ITALIC.key -> "Example: a country's crime rate has a higher impact on the average income per person than the amount of trees in said country."))
+				WORKER_COUNT.key -> 15, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+				QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 7),
+				INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why do you think so?")),
+				INSTRUCTIONS_ITALIC.key -> "Please note, that we are NOT trying to find out which of the two factor's influences is more positive than the other. We are trying to see which factor is more important."))
 			val res = contest.process(IndexedPatch.from(List(t1.description, t2.description)))
 			def featureByDescription(key: String) = List(t1, t2).find(_.description == key).get
 			val votes = contest.extractContestResultFromWinner(res).map(k => featureByDescription(k._1.get) -> k._2)
