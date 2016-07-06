@@ -27,7 +27,7 @@ object RankFeatureInfluenceOnGDP extends App {
 				WORKER_COUNT.key -> 15, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 				QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 7),
 				INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why do you think so?")),
-				INSTRUCTIONS_ITALIC.key -> "Please note, that we are NOT trying to find out which of the two factor's influences is more positive than the other. We are trying to see which factor is more important."))
+				INSTRUCTIONS_ITALIC.key -> "Please note, that we are NOT trying to find out which of the two factor's influences is more positive than the other. We are trying to see which factor is more important. You can take multiple of these HITs, but please answer only once for each combination of factors."))
 			val res = contest.process(IndexedPatch.from(List(t1.description, t2.description)))
 			def featureByDescription(key: String) = List(t1, t2).find(_.description == key).get
 			val votes = contest.extractContestResultFromWinner(res).map(k => featureByDescription(k._1.get) -> k._2)
