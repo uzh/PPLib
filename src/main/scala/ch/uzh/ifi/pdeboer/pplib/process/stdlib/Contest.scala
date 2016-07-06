@@ -5,8 +5,8 @@ import ch.uzh.ifi.pdeboer.pplib.process.entities._
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
 /**
- * Created by pdeboer on 31/10/14.
- */
+  * Created by pdeboer on 31/10/14.
+  */
 @PPLibProcess
 class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideProcess[List[Patch], Patch](params) with HCompPortalAccess with InstructionHandler with QueryInjection with HCompQueryBuilderSupport[List[Patch]] {
 
@@ -35,13 +35,19 @@ class Contest(params: Map[String, Any] = Map.empty[String, Any]) extends DecideP
 					}
 				)).toList
 
-			val valueOfAnswer: Option[String] = answers.groupBy(s => queryBuilder.parseAnswer[String](alternatives, s._2, this)).maxBy(s => s._2.length)._1
+			val parsedAnswersByPatch: Map[Option[String], List[(CompositeQueryAnswer, HCompAnswer)]] = answers.groupBy(s => queryBuilder.parseAnswer[String](alternatives, s._2, this))
+			val valueOfAnswer: Option[String] = parsedAnswersByPatch.maxBy(s => s._2.length)._1
 			logger.info("got answer " + valueOfAnswer)
 			val p = alternatives.find(_.value == valueOfAnswer.get).get
 			addInjectedAnswersToPatch(p, answers.map(_._1))
+			p.auxiliaryInformation += "contestResultNumbers" -> parsedAnswersByPatch.map(ans => (ans._1, ans._2.length)).toMap
 			p
 		}
 
+	}
+
+	def extractContestResultFromWinner(p: Patch) = {
+		p.auxiliaryInformation.getOrElse("contestResultNumbers", Map()).asInstanceOf[Map[Option[String], Int]]
 	}
 
 	def createMultipleChoiceQuestion(alternatives: List[Patch]) = {
