@@ -11,7 +11,7 @@ import com.github.tototoshi.csv.CSVReader
 /**
   * Created by pdeboer on 06/07/16.
   */
-object RankFeatureInfluenceOnGDP extends App {
+object RankFeatureInfluenceOnGDP_Experiment1 extends App {
 	val features = CSVReader.open("example_data/featuresWithInfluenceOnGDP.csv").all().map(l => Feature(l.head)(l(1)))
 	//val features = List(Feature("f1")("Percentage of the GDP made in the agricultural sector (meat/wheat production, farms..)"), Feature("f2")("Percentage of government's budget spent on research"))
 	val portal = HComp.mechanicalTurk
