@@ -21,7 +21,7 @@ object FeatureInfluenceOnGDP_Experiment2 extends App with LazyLogger {
 		val instructions = new TrivialInstructionGenerator("Do countries with high average income per person ...",
 			"Please estimate the influence of this economic factor", questionAfter = ".. than countries with low average income per person. Example: countries with high average income tend to have lower crime rates than countries with lower average income. Feel free to take multiple of these HITS, but only answer each influencing factor once. ")
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
-			WORKER_COUNT.key -> 1, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			WORKER_COUNT.key -> 31, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
 			INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why do you think so?")),
 			INSTRUCTIONS_ITALIC.key -> feature.description))
