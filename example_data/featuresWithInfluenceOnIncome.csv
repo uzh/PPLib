@@ -1,0 +1,8 @@
+marital-status_ Married-civ-spouse,"do people who are *married* tend to make higher or lower income than $50K/year"
+marital-status_ Never-married,"do people who have *never* married tend to make higher or lower income than $50K/year"
+education-num,"do people who have a higher income than $50K/year tend to spend a higher or a amount of years for their *education* than people who make less than $50k/year"
+age,"are people who have a higher income than $50K/year typically older [higher *age*] or younger [lower *age*] than people who make less than $50k/year"
+native-country_ Germany,"do people who originally come from *Germany*, but now live in the USA, typically make higher or lower income than $50K/year"
+native-country_ Canada,"do people who originally come from *Canada*, but now live in the USA, typically make higher or lower income than $50K/year"
+race_ Asian-Pac-Islander,"do people of *Asian race* typically make higher or lower income than $50K/year"
+race_ Black,"do people of *Black race* typically make higher or lower income than $50K/year"
