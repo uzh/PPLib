@@ -1,4 +1,4 @@
-marital-status_ Married-civ-spouse,"do people who are *married* tend to make higher or lower income than $50K/year"
+marital-status_ Married-civ-spouse,"do people who are *married* individually (not as a couple) tend to make higher or lower income than $50K/year"
 marital-status_ Never-married,"do people who have *never* married tend to make higher or lower income than $50K/year"
 education-num,"do people who have a higher income than $50K/year tend to spend a higher or a amount of years for their *education* than people who make less than $50k/year"
 age,"are people who have a higher income than $50K/year typically older [higher *age*] or younger [lower *age*] than people who make less than $50k/year"

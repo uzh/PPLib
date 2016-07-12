@@ -19,7 +19,7 @@ object FeatureInfluenceOnIncome_Experiment1 extends App with LazyLogger {
 
 	def getEstimationForFeature(feature: Feature) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following: In the USA, ",
-			"Please estimate the influence of this economic factor", questionAfter = "For example, people who earn more than $50k/yr tend to a lower amount of crimes recorded than people who earn less than $50k/yr.")
+			"Please estimate the influence of this economic factor", questionAfter = "For example, people who earn more than $50k/yr tend to a lower amount of crimes recorded than people who earn less than $50k/yr. You can accept multiple of these HITs, but please only one per variable")
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 35, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
