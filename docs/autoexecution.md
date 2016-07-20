@@ -16,7 +16,7 @@ _Algorithm 1. First step: define the surface structure's result object_
 ```scala
 class ShortNDeepStructure extends SimpleDeepStructure[String, ShortNResult] {
 	override def run(data: String, blueprint: RecombinedProcessBlueprint): ShortNResult = {
-	//..
+		//some deep structure here
 		return myShortnResult
 	}
 }
