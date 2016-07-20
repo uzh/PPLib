@@ -29,5 +29,7 @@ In order to get familiar with PPLib, we recommend the following steps:
 
 5. Learn how to use instruction generation by following this guide: [How to use question generation](https://github.com/uzh/PPLib/blob/master/docs/instructiongenerator.md)
 
+6. Learn how to use Auto-Execution by following this guide: [How to use Auto-Execution](docs/autoexecution.md)
+
 # Contact
 Write [Patrick](http://www.ifi.uzh.ch/ddis/people/deboer.html)
