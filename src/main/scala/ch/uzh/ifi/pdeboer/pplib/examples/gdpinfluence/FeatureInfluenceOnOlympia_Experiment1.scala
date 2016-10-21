@@ -34,5 +34,5 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 
 	import CollectionUtils._
 
-	features.head.mpar.foreach(getEstimationForFeatureThroughCollection)
+	features.take(1).mpar.foreach(getEstimationForFeatureThroughCollection)
 }
