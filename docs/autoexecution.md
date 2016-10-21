@@ -59,7 +59,7 @@ An example file using BOA is [the simulation example](https://github.com/uzh/PPL
 val recombinations = new Recombinator(deepStructure).recombine //contains all candidate crowd processes
 
 val autoExperimenter = new BOAutoExperimentationEngine(recombinations, new File("/Users/pdeboer/Spearmint"), "testBO")
-val results = autoExperimentation.run("my text to be shortened. blabla. shorten me") //runs one iteration of NAE on the supplied text. 
+val results = autoExperimentation.run("my text to be shortened. blabla. shorten me") //runs BOA on supplied text
 
 println(s"best result: ${results.bestProcess}")
 ```
