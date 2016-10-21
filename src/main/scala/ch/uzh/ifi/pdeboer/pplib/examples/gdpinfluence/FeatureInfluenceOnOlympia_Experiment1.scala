@@ -17,15 +17,12 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 	val portal = HComp.mechanicalTurk
 	U.initDBConnection()
 
-	val decoratedPortal = new MySQLDBPortalDecorator(portal, None)
-
-
 	def getEstimationForFeatureThroughCollection(feature: Feature) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following: ",
 			"Please estimate the influence of this factor", questionAfter = "Your answer must be a number. Characters are NOT allowed. You can accept multiple of these HITs, but please only *one per variable* (marked with the asterisks **). ")
 		val contest = new Collection(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
-			WORKER_COUNT.key -> 1, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5, qualifications = Nil),
+			WORKER_COUNT.key -> 29, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
 			INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why not more or less?")),
 			INSTRUCTIONS_ITALIC.key -> feature.description))
 		val res = contest.process(new Patch(""))
@@ -34,5 +31,6 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 
 	import CollectionUtils._
 
-	features.take(1).mpar.foreach(getEstimationForFeatureThroughCollection)
+	features.mpar.foreach(getEstimationForFeatureThroughCollection)
+	println("done")
 }
