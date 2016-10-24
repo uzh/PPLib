@@ -19,7 +19,7 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 
 	def getEstimationForFeatureThroughCollection(feature: Feature) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following: ",
-			"Please estimate the influence of this factor", questionAfter = "Your answer must be a number. Characters are NOT allowed. You can accept multiple of these HITs, but please only *one per variable* (marked with the asterisks **). ")
+			"How well can you predict the olympics?", questionAfter = "Your answer must be a number. Characters are NOT allowed. You can accept multiple of these HITs, but please only *one per variable* (marked with the asterisks **). ")
 		val contest = new Collection(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
