@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.gdpinfluence
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{FreetextQuery, HComp, HCompQueryProperties}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompQueryProperties}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, TrivialInstructionGenerator}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
@@ -22,8 +22,8 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 			"How well can you predict the olympics?", questionAfter = "Your answer must be a number. Characters are NOT allowed. You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **). ")
 		val contest = new Collection(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
-			INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why not more or less?")),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 4),
+			//INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why not more or less?")),
 			INSTRUCTIONS_ITALIC.key -> feature.description))
 		val res = contest.process(new Patch(""))
 		res
