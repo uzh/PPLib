@@ -11,7 +11,7 @@ import scala.collection.mutable
   * Created by pdeboer on 19/11/14.
   */
 @HCompPortal(builder = classOf[MechanicalTurkPortalBuilder], autoInit = true)
-class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, val sandbox: Boolean = true, val approveAll: Boolean = true, val waitingTimeGrowthFactorPerQuery: Double = 1.5d) extends HCompPortalAdapter with AnswerRejection with ForcedQueryPolling with LazyLogger {
+class MechanicalTurkPortalAdapter(val accessKey: String, val secretKey: String, val sandbox: Boolean = true, var approveAll: Boolean = true, val waitingTimeGrowthFactorPerQuery: Double = 1.5d) extends HCompPortalAdapter with AnswerRejection with ForcedQueryPolling with LazyLogger {
 	val serviceURL = if (sandbox) "https://mechanicalturk.sandbox.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 	else "https://mechanicalturk.amazonaws.com/?Service=AWSMechanicalTurkRequester"
 
