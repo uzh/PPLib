@@ -23,7 +23,7 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 			"How well can you predict the olympics?", questionAfter = "Your answer must be a number. Characters are NOT allowed. Please only accept one of these HITs per day. ") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 20, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 7),
 			INSTRUCTIONS_ITALIC.key -> feature.description))
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val res = contest.process(IndexedPatch.from(choices))
