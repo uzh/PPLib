@@ -1,11 +1,10 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.gdpinfluence
 
-import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
 import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompQueryProperties}
-import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
-import ch.uzh.ifi.pdeboer.pplib.process.entities.{Patch, TrivialInstructionGenerator}
-import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Collection
-import ch.uzh.ifi.pdeboer.pplib.util.{CollectionUtils, LazyLogger, U}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
+import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, TrivialInstructionGenerator}
+import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest
+import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.github.tototoshi.csv.CSVReader
 
 /**
@@ -17,20 +16,24 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 	val portal = HComp.mechanicalTurk
 	U.initDBConnection()
 
-	def getEstimationForFeatureThroughCollection(feature: Feature) = {
-		val instructions = new TrivialInstructionGenerator("What do you think about the following: ",
+	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
+
+	def getEstimationForFeature(feature: Feature) = {
+		val instructions = new TrivialInstructionGenerator("What do you think about the following: In the USA, ",
 			"How well can you predict the olympics?", questionAfter = "Your answer must be a number. Characters are NOT allowed. Please only accept one of these HITs per day. ") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
-		val contest = new Collection(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
-			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 4),
-			//INJECT_QUERIES.key -> Map("why" -> FreetextQuery("why not more or less?")),
+		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
+			WORKER_COUNT.key -> 20, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 5),
 			INSTRUCTIONS_ITALIC.key -> feature.description))
-		val res = contest.process(new Patch(""))
-		res
+		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
+		val res = contest.process(IndexedPatch.from(choices))
+		val votes = contest.extractContestResultFromWinner(res)
+		logger.info(s"Feature $feature received vote $votes")
+		votes
 	}
 
-	import CollectionUtils._
+	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	features.mpar.foreach(getEstimationForFeatureThroughCollection)
+	features.mpar.foreach(getEstimationForFeature)
 	println("done")
 }
