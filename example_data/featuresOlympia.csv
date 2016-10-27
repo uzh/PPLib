@@ -1,3 +1,4 @@
 "electricity consumption_[16.0455, 20.243]_1_v3","If a country's electricity consumption is less than 620 million kWh, what is the chance (or probability) that it won at least one gold medal in the last Olympics? Give your best guess (between 0 and 1)."
 "electricity consumption_[16.0455, 20.243]_1_v4","Given 10 randomly picked countries *whose electricity consumption is less than 620 million kWh*, how many won at least one medal in the last Olympics? Make a guess (between 0 and 10)."
 "electricity consumption_[16.0455, 20.243]_1_v6","Given a country *whose electricity consumption is less than 620 million kWh*, estimate the probability of winning at least one gold medal in the last Olympics."
+"electricity consumption_[16.0455, 20.243]_1_v6","Given a country *whose total electricity consumption is less than that of the Republic of Congo*, estimate the probability of winning at least one gold medal in the last Olympics."
