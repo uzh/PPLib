@@ -19,7 +19,7 @@ object FeatureInfluenceOnOlympia_Experiment1 extends App with LazyLogger {
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 
 	def getEstimationForFeature(feature: Feature) = {
-		val instructions = new TrivialInstructionGenerator("What do you think about the following: In the USA, ",
+		val instructions = new TrivialInstructionGenerator("What do you think about the following:  ",
 			"How well can you predict the olympics?", questionAfter = "Please only accept one of these HITs per day. ") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 20, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
