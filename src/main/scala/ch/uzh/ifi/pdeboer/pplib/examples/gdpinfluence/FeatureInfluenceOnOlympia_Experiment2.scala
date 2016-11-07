@@ -8,13 +8,14 @@ import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.github.tototoshi.csv.CSVReader
 
 import scala.util.Random
-
 /**
   * Created by pdeboer on 06/07/16.
   */
 object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
+	def featureGroup(s: String): String = if (s.endsWith("_0") || s.endsWith("_1")) s.substring(0, s.length - 2) else s
+
 	val features = CSVReader.open("example_data/featuresOlympia_hi_lo.csv").all().map(l => Feature(l.head)(l(1)))
-	val featureGroups = features.groupBy(_.name.take(6)).values.toList
+	val featureGroups = features.groupBy(f => featureGroup(f.name)).values.toList
 	//val features = List(Feature("f1")("have a higher or a lower share of their money made in the agricultural sector (meat/wheat production, farms..) .."), Feature("f2")("spend higher or lower amount of money of their government's budget on research .."))
 	val portal = HComp.mechanicalTurk
 	U.initDBConnection()
@@ -23,7 +24,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 
 	def getEstimationForFeatureGroup(features: List[Feature]) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following:  ",
-			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will first warn offenders and then block workers who answered more HITs despite the warning.") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
+			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. Since our software does not support rejections, we unfortunately have to block workers who accept more than one of our hits.") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 20, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
