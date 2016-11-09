@@ -18,6 +18,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 	val featureGroups = features.groupBy(f => featureGroup(f.name)).values.toList
 	//val features = List(Feature("f1")("have a higher or a lower share of their money made in the agricultural sector (meat/wheat production, farms..) .."), Feature("f2")("spend higher or lower amount of money of their government's budget on research .."))
 	val portal = HComp.mechanicalTurk
+	portal.approveAll = false
 	U.initDBConnection()
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
@@ -27,13 +28,12 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. Since our software does not support rejections, we unfortunately have to block workers who accept more than one of our hits.") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
-			WORKER_COUNT.key -> 20, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			WORKER_COUNT.key -> 3, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
 			INJECT_QUERIES.key -> features.drop(1).map(f => f.name -> MultipleChoiceQuery(f.description, Random.shuffle(choices), 1)).toMap
 		))
 		val res = contest.process(IndexedPatch.from(choices))
 		val votes = contest.extractContestResultFromWinner(res)
-		logger.info(s"Feature $features received vote $votes")
 		votes
 	}
 

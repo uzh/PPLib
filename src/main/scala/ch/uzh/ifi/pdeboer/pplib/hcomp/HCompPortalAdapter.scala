@@ -8,6 +8,7 @@ import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
 import com.typesafe.config.Config
 import org.joda.time.DateTime
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Future, _}
 import scala.xml.NodeSeq
@@ -123,6 +124,27 @@ trait AnswerRejection {
 
 trait ForcedQueryPolling {
 	def poll(query: HCompQuery): Unit
+}
+
+class RejectMultiAnswerHCompPortal(val decoratedPortal: HCompPortalAdapter with AnswerRejection) extends HCompPortalAdapter {
+	protected var approvedWorkers = mutable.HashSet.empty[HCompWorker]
+
+	//TODO we should hide this method somehow to the public
+	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
+		val answer = decoratedPortal.processQuery(query, properties)
+		answer.foreach(a => {
+			val workers: Iterable[HCompWorker] = answer.flatMap(_.responsibleWorkers)
+			if (workers.forall(w => !approvedWorkers.contains(w))) {
+				decoratedPortal.approveAndBonusAnswer(a, "Thank you! Please come back for more HITs tomorrow (we only accept 1 HIT per worker per day)")
+			} else {
+				logger.info(s"rejecting answer $a from $workers")
+				decoratedPortal.rejectAnswer(a, "You have already answered a HIT of ours today. Please try again tomorrow")
+			}
+		})
+		answer
+	}
+
+	override def cancelQuery(query: HCompQuery): Unit = decoratedPortal.cancelQuery(query)
 }
 
 class CostCountingEnabledHCompPortal(val decoratedPortal: HCompPortalAdapter) extends HCompPortalAdapter {
