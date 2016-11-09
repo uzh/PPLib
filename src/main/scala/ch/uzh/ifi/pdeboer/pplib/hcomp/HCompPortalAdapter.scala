@@ -133,7 +133,7 @@ class RejectMultiAnswerHCompPortal(val decoratedPortal: HCompPortalAdapter with 
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val answer = decoratedPortal.processQuery(query, properties)
 		answer.foreach(a => {
-			val workers: Iterable[String] = answer.flatMap(_.responsibleWorkers).map(_.id)
+			val workers: Iterable[String] = a.responsibleWorkers.map(_.id)
 			if (workers.forall(w => !approvedWorkers.contains(w))) {
 				decoratedPortal.approveAndBonusAnswer(a, "Thank you! Please come back for more HITs tomorrow (we only accept 1 HIT per worker per day)")
 				workers.foreach(w => approvedWorkers += w)
