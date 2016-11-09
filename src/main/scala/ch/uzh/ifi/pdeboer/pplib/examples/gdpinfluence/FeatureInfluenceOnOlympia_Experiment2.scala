@@ -25,10 +25,10 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 
 	def getEstimationForFeatureGroup(features: List[Feature]) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following:  ",
-			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. Since our software does not support rejections, we unfortunately have to block workers who accept more than one of our hits.") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
+			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will only approve one answer per worker and reject every further HITs (of the same worker).") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
-			WORKER_COUNT.key -> 3, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
 			INJECT_QUERIES.key -> features.drop(1).map(f => f.name -> MultipleChoiceQuery(f.description, Random.shuffle(choices), 1)).toMap
 		))
@@ -39,6 +39,6 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	featureGroups.mpar.foreach(getEstimationForFeatureGroup)
+	featureGroups.take(1).mpar.foreach(getEstimationForFeatureGroup)
 	println("done")
 }
