@@ -25,7 +25,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 
 	def getEstimationForFeatureGroup(features: List[Feature]) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following:  ",
-			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will only approve one answer per worker per 24h.") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
+			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will only approve one answer per worker (per day).") //You can accept multiple of these HITs, but please only *one per topic* (topics marked with the asterisks **).
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(portal, None),
 			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
