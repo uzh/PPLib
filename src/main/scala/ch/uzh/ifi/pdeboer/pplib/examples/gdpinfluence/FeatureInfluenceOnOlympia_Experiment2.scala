@@ -39,6 +39,6 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-	featureGroups.take(1).mpar.foreach(getEstimationForFeatureGroup)
+	featureGroups.mpar.foreach(getEstimationForFeatureGroup)
 	println("done")
 }
