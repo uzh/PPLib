@@ -14,7 +14,7 @@ import scala.util.Random
 object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 	def featureGroup(s: String): String = if (s.endsWith("_0") || s.endsWith("_1")) s.substring(0, s.length - 2) else s
 
-	val features = CSVReader.open("example_data/featuresOlympia_hi_lo.csv").all().map(l => Feature(l.head)(l(1)))
+	val features = CSVReader.open("example_data/featuresOlympia_extremeCM.csv").all().map(l => Feature(l.head)(l(1)))
 	val featureGroups = features.groupBy(f => featureGroup(f.name)).values.toList
 	//val features = List(Feature("f1")("have a higher or a lower share of their money made in the agricultural sector (meat/wheat production, farms..) .."), Feature("f2")("spend higher or lower amount of money of their government's budget on research .."))
 	val portal = HComp.mechanicalTurk
@@ -28,7 +28,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 			"How well can you predict the olympics?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will only approve one answer per worker (per day).")
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(new RejectMultiAnswerHCompPortal(portal), None),
-			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
+			WORKER_COUNT.key -> 1, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
 			INJECT_QUERIES.key -> features.drop(1).map(f => f.name -> MultipleChoiceQuery(f.description, Random.shuffle(choices), 1)).toMap
 		))
