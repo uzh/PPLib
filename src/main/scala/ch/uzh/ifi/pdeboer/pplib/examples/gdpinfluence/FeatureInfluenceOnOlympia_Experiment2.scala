@@ -1,7 +1,7 @@
 package ch.uzh.ifi.pdeboer.pplib.examples.gdpinfluence
 
 import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
-import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, HCompQueryProperties, MultipleChoiceQuery, RejectMultiAnswerHCompPortal}
+import ch.uzh.ifi.pdeboer.pplib.hcomp.{HComp, MultipleChoiceQuery, RejectMultiAnswerHCompPortal}
 import ch.uzh.ifi.pdeboer.pplib.process.entities.{IndexedPatch, TrivialInstructionGenerator}
 import ch.uzh.ifi.pdeboer.pplib.process.stdlib.Contest
 import ch.uzh.ifi.pdeboer.pplib.util.{LazyLogger, U}
@@ -29,7 +29,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
 		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(new RejectMultiAnswerHCompPortal(portal), None),
 			WORKER_COUNT.key -> 30, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
+			//QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
 			INJECT_QUERIES.key -> features.drop(1).map(f => f.name -> MultipleChoiceQuery(f.description, Random.shuffle(choices), 1)).toMap
 		))
