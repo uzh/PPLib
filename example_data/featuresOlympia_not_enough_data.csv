@@ -1,0 +1,7 @@
+"electricity consumption_(55576666666.667, 3890000000000]_0","If a country *has a medium or low electricity consumption (less than 56 billion kWh)*, what is the chance (or probability) that it won at least one gold medal in the last Olympics? Give your best guess."
+"electricity consumption_(55576666666.667, 3890000000000]_1","If a country *has a high electricity consumption (more than 56 billion kWh)*, what is the chance (or probability) that it won at least one gold medal in the last Olympics? Give your best guess."
+"electricity consumption_(55576666666.667, 3890000000000]","What is the percentage of countries *having a high electricity consumption (more than 56 billion kWh)*? Give your best guess."
+"electricity consumption per person_(4244.0286, 48501.33]_0","If a country *has a medium or low electricity consumption per person (less than 4200kWh)*, what is the chance (or probability) that it won at least one gold medal in the last Olympics? Give your best guess."
+"electricity consumption per person_(4244.0286, 48501.33]_1","If a country *has a high electricity consumption per person (more than 4200kWh)*, what is the chance (or probability) that it won at least one gold medal in the last Olympics? Give your best  guess."
+"electricity consumption per person_(4244.0286, 48501.33]","What is the percentage of countries *having a high electricity consumption per person (more than 4200kWh)*? Give your best  guess."
+medals,"What is the percentage of countries *having won at least one gold medal in the last Olympics*? Give your best guess."
