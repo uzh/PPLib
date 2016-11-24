@@ -43,4 +43,3 @@ Pstatus==T,"What is the percentage of high school students *whose parents live t
 Mjob_at_home_0,"If a high school *student's mother does not work at home*, what is the probability that the student’s final grade is among the better half of the class?"
 Mjob_at_home_1,"If a high school *student's mother works at home*, what is the probability that the student’s final grade is among the better half of the class?"
 Mjob_at_home,"What is the percentage of high school students *whose mothers work at home*?"
-G3,"What is the percentage of high school students *whose final grade is among the better half of the class*? Give your best guess (between 0 and 1)."
