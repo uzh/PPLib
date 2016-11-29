@@ -14,7 +14,7 @@ import scala.util.Random
 object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 	def featureGroup(s: String): String = if (s.endsWith("_0") || s.endsWith("_1")) s.substring(0, s.length - 2) else s
 
-	val features = CSVReader.open("example_data/featuresStudents.csv").all().map(l => Feature(l.head)(l(1)))
+	val features = CSVReader.open("example_data/featuresOlympia_not_enough_data.csv").all().map(l => Feature(l.head)(l(1)))
 	val featureGroups = features.groupBy(f => featureGroup(f.name)).values.toList
 	//val features = List(Feature("f1")("have a higher or a lower share of their money made in the agricultural sector (meat/wheat production, farms..) .."), Feature("f2")("spend higher or lower amount of money of their government's budget on research .."))
 	val portal = HComp.mechanicalTurk
