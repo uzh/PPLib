@@ -12,7 +12,7 @@ class ContestWithBeatByKVotingProcess(params: Map[String, Any] = Map.empty[Strin
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
 	import ch.uzh.ifi.pdeboer.pplib.process.stdlib.ContestWithBeatByKVotingProcess._
 
-	protected val votes = new VotesTable()
+	val votes = new VotesTable()
 
 	override protected def run(data: List[Patch]): Patch = {
 		if (data.size == 1) data.head
