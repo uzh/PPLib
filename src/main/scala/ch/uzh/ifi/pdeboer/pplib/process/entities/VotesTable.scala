@@ -7,6 +7,23 @@ import scala.collection.mutable
 /**
   * Created by pdeboer on 14/03/16.
   */
+class Vote(val selectedAnswer: Patch, val rawAnswer: HCompAnswer, var weight: Double = 1.0d, var parsedData: Map[String, Any] = Map.empty) {
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[Vote]
+
+	override def equals(other: Any): Boolean = {
+		if (this canEqual other) {
+			val that = other.asInstanceOf[Vote]
+			selectedAnswer == that.selectedAnswer &&
+				rawAnswer == that.rawAnswer &&
+				Math.abs(weight - that.weight) < 0.05 &&
+				parsedData == that.parsedData
+		} else false
+	}
+
+	override def toString = s"Vote($selectedAnswer, $weight)"
+}
+
 class VotesTable extends Serializable {
 	private var _answers = mutable.HashMap.empty[Patch, List[Vote]]
 
@@ -22,22 +39,7 @@ class VotesTable extends Serializable {
 
 	def votesCountFor(input: Patch) = _answers.getOrElse(input, Nil).map(_.weight).sum
 
-	class Vote(val selectedAnswer: Patch, val rawAnswer: HCompAnswer, var weight: Double = 1.0d, var parsedData: Map[String, Any] = Map.empty) {
 
-		def canEqual(other: Any): Boolean = other.isInstanceOf[Vote]
-
-		override def equals(other: Any): Boolean = {
-			if (this canEqual other) {
-				val that = other.asInstanceOf[Vote]
-				selectedAnswer == that.selectedAnswer &&
-					rawAnswer == that.rawAnswer &&
-					Math.abs(weight - that.weight) < 0.05 &&
-					parsedData == that.parsedData
-			} else false
-		}
-
-		override def toString = s"Vote($selectedAnswer, $weight)"
-	}
 
 	def addVote(selectedAnswer: Patch, rawAnswer: HCompAnswer) = {
 		val v = new Vote(selectedAnswer, rawAnswer)
