@@ -21,7 +21,7 @@ object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
 		val randomString = Random.alphanumeric.take(10).mkString
 		val theUrl = s"http://mbuehler.ch/?name=$randomString"
 
-		FreetextQuery("test")
+		//FreetextQuery("test")
 		portal.sendQueryAndAwaitResult()
 	}
 
