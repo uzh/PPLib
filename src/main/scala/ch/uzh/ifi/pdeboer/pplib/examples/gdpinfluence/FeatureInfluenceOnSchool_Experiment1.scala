@@ -13,7 +13,7 @@ import scala.util.Random
   * Created by pdeboer on 06/07/16.
   */
 object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
-	val portal = HComp.mechanicalTurk
+/*	val portal = HComp.mechanicalTurk
 	portal.approveAll = false
 	U.initDBConnection()
 
@@ -28,5 +28,5 @@ object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
 	import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
 	featureGroups.mpar.foreach(getEstimationForFeatureGroup)
-	println("done")
+	println("done") */
 }
