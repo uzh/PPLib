@@ -28,7 +28,6 @@ trait HCompPortalAdapter extends LazyLogger {
 
 	def budget = _budget
 
-	//TODO we should hide this method somehow to the public
 	def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer]
 
 	def sendQuery(query: HCompQuery, details: HCompQueryProperties = HCompQueryProperties(), omitBudgetCalculation: Boolean = false): Future[Option[HCompAnswer]] = Future {
@@ -129,7 +128,6 @@ trait ForcedQueryPolling {
 class RejectMultiAnswerHCompPortal(val decoratedPortal: HCompPortalAdapter with AnswerRejection) extends HCompPortalAdapter {
 	protected var approvedWorkers = mutable.HashSet.empty[String]
 
-	//TODO we should hide this method somehow to the public
 	override def processQuery(query: HCompQuery, properties: HCompQueryProperties): Option[HCompAnswer] = {
 		val answer = decoratedPortal.processQuery(query, properties)
 		answer.foreach(a => {
