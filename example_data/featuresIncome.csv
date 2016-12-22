@@ -1,0 +1,52 @@
+marital.status_Married-civ-spouse_0,"If a person working in the USA *is not married to a civilian (the person can be married to a member of the US military)*, what is the probability that this person earns more than $50,000 per year?"
+marital.status_Married-civ-spouse_1,"If a person working in the USA *is married to a civilian*, what is the probability that this person earns more than $50,000 per year?"
+marital.status_Married-civ-spouse,What is the percentage of people working in the USA who *are married to a civilian*?
+relationship_Husband_0,"If a person working in the USA *is not a husband*, what is the probability that this person earns more than $50,000 per year?"
+relationship_Husband_1,"If a person working in the USA *is a husband*, what is the probability that this person earns more than $50,000 per year?"
+relationship_Husband,What is the percentage of people working in the USA who *are husbands*?
+marital.status_Never-married_0,"If a person working in the USA *was married or is still married*, what is the probability that this person earns more than $50,000 per year?"
+marital.status_Never-married_1,"If a person working in the USA *has never been married*, what is the probability that this person earns more than $50,000 per year?"
+marital.status_Never-married,What is the percentage of people working in the USA who *have never been married*?
+"education.num_(11, 16]_0","If a person working in the USA *has spent less than 11 years of his/her life on education*, what is the probability that this person earns more than $50,000 per year?"
+"education.num_(11, 16]_1","If a person working in the USA *has spent 11 or more years of his/her life on education*, what is the probability that this person earns more than $50,000 per year?"
+"education.num_(11, 16]",What is the percentage of people working in the USA who *have spent 11 or more years of their lives on education*?
+relationship_Own-child_0,"If a person working in the USA *has no children*, what is the probability that this person earns more than $50,000 per year?"
+relationship_Own-child_1,"If a person working in the USA *has at least one child*, what is the probability that this person earns more than $50,000 per year?"
+relationship_Own-child,What is the percentage of people working in the USA who *have at least one child*?
+sex==Male_0,"If a person working in the USA *is female*, what is the probability that this person earns more than $50,000 per year?"
+sex==Male_1,"If a person working in the USA *is male*, what is the probability that this person earns more than $50,000 per year?"
+sex==Male,What is the percentage of people working in the USA who *are male*?
+"education.num_(6, 11]_0","If a person working in the USA *has spent less than 6 or more than 11 years of his/her life on education*, what is the probability that this person earns more than $50,000 per year?"
+"education.num_(6, 11]_1","If a person working in the USA *has spent between 6 and 11 years of his/her life on education*, what is the probability that this person earns more than $50,000 per year?"
+"education.num_(6, 11]",What is the percentage of people working in the USA who *have spent between 6 and 11 years of their lives on education*?
+"age_(41.333, 65.667]_0","If a person working in the USA *is younger than 41 years or older than 66 years*, what is the probability that this person earns more than $50,000 per year?"
+"age_(41.333, 65.667]_1","If a person working in the USA *is between 41 and 66 years old*, what is the probability that this person earns more than $50,000 per year?"
+"age_(41.333, 65.667]",What is the percentage of people working in the USA who *are between 41 and 66 years old*?
+"age_(16.927, 41.333]_0","If a person working in the USA *is older than 41 years*, what is the probability that this person earns more than $50,000 per year?"
+"age_(16.927, 41.333]_1","If a person working in the USA *is between 17 and 41 years old*, what is the probability that this person earns more than $50,000 per year?"
+"age_(16.927, 41.333]",What is the percentage of people working in the USA who *are between 17 and 41 years old*?
+"hours.per.week_(0.902, 33.667]_0","If a person working in the USA *spend more than 34 hours per week at work*, what is the probability that this person earns more than $50,000 per year?"
+"hours.per.week_(0.902, 33.667]_1","If a person working in the USA *spends less than 34 hours per week at work*, what is the probability that this person earns more than $50,000 per year?"
+"hours.per.week_(0.902, 33.667]",What is the percentage of people working in the USA who *spend less than 34 hours per week at work*?
+native.country_Ireland_0,"If a person working in the USA *is not from Ireland*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Ireland_1,"If a person working in the USA *is from Ireland*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Ireland,What is the percentage of people working in the USA who *are from Ireland*?
+"capital.loss_(2904, 4356]_0","If a person working in the USA *has no capital loss or a capital loss lower than $2900 from the purchase and sale of stocks, bonds, and other assets*, what is the probability that this person earns more than $50,000 per year?"
+"capital.loss_(2904, 4356]_1","If a person working in the USA *has a capital loss higher than $2900 from the purchase and sale of stocks, bonds, and other assets*, what is the probability that this person earns more than $50,000 per year?"
+"capital.loss_(2904, 4356]","What is the percentage of people working in the USA who *have a capital loss higher than $2900 from the purchase and sale of stocks, bonds, and other assets*?"
+education_Assoc-acdm_0,"If a person working in the USA *does not have an associate's degree*, what is the probability that this person earns more than $50,000 per year?"
+education_Assoc-acdm_1,"If a person working in the USA *has an associate's degree*, what is the probability that this person earns more than $50,000 per year?"
+education_Assoc-acdm,What is the percentage of people working in the USA who *have an associate's degree*?
+occupation_Armed-Forces_0,"If a person working in the USA *does not work for the US military*, what is the probability that this person earns more than $50,000 per year?"
+occupation_Armed-Forces_1,"If a person working in the USA *works for the US military*, what is the probability that this person earns more than $50,000 per year?"
+occupation_Armed-Forces,What is the percentage of people working in the USA who *work for the US military*?
+native.country_Hungary_0,"If a person working in the USA *is not from Hungary*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Hungary_1,"If a person working in the USA *is from Hungary*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Hungary,What is the percentage of people working in the USA who *are from Hungary*?
+education_Assoc-voc_0,"If a person working in the USA *does not have a vocational degree*, what is the probability that this person earns more than $50,000 per year?"
+education_Assoc-voc_1,"If a person working in the USA *has a vocational degree*, what is the probability that this person earns more than $50,000 per year?"
+education_Assoc-voc,What is the percentage of people working in the USA who *have a vocational degree*?
+native.country_Scotland_0,"If a person working in the USA *is not from Scotland*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Scotland_1,"If a person working in the USA *is from Scotland*, what is the probability that this person earns more than $50,000 per year?"
+native.country_Scotland,What is the percentage of people working in the USA who *are from Scotland*?
+income==>50K,"What is the percentage of people working in the USA who *earn more than $50,000 per year*?"
