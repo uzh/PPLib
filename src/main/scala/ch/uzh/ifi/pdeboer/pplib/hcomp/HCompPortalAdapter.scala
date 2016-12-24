@@ -132,12 +132,14 @@ class RejectMultiAnswerHCompPortal(val decoratedPortal: HCompPortalAdapter with 
 		val answer = decoratedPortal.processQuery(query, properties)
 		answer.foreach(a => {
 			val workers: Iterable[String] = a.responsibleWorkers.map(_.id)
-			if (workers.forall(w => !approvedWorkers.contains(w))) {
-				decoratedPortal.approveAndBonusAnswer(a, "Thank you! Please come back for more HITs tomorrow (we only accept 1 HIT per worker per day)")
-				workers.foreach(w => approvedWorkers += w)
-			} else {
-				logger.info(s"rejecting answer $a from $workers")
-				decoratedPortal.rejectAnswer(a, "You have already answered a HIT of ours today. Please try again tomorrow")
+      decoratedPortal.synchronized {
+        if (workers.forall(w => !approvedWorkers.contains(w))) {
+          decoratedPortal.approveAndBonusAnswer(a, "Thank you! Please come back for more HITs tomorrow (we only accept 1 HIT per worker per day)")
+          workers.foreach(w => approvedWorkers += w)
+        } else {
+          logger.info(s"rejecting answer $a from $workers")
+          decoratedPortal.rejectAnswer(a, "You have already answered a HIT of ours today. Please try again tomorrow")
+        }
 			}
 		})
 		answer
