@@ -20,14 +20,15 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 	val portal = HComp.mechanicalTurk
 	portal.approveAll = false
 	U.initDBConnection()
+  val decoratedPortal = new MySQLDBPortalDecorator(new RejectMultiAnswerHCompPortal(portal), None)
+
 
 	import ch.uzh.ifi.pdeboer.pplib.process.entities.DefaultParameters._
-
 	def getEstimationForFeatureGroup(features: List[Feature]) = {
 		val instructions = new TrivialInstructionGenerator("What do you think about the following:  ",
 			"How well can you predict people's income?", questionAfter = "Please do not accept more than one of my HITs per 24h. We will only approve one answer per worker (per day).")
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
-		val contest = new Contest(Map(PORTAL_PARAMETER.key -> new MySQLDBPortalDecorator(new RejectMultiAnswerHCompPortal(portal), None),
+    val contest = new Contest(Map(PORTAL_PARAMETER.key -> decoratedPortal,
       WORKER_COUNT.key -> 1, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
 			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
