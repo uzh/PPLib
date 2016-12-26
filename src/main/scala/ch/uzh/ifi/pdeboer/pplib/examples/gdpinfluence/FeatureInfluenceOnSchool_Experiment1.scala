@@ -16,13 +16,15 @@ object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
 
 	def runSingleTask(theNumber:Int) = {
 		val randomString = Random.alphanumeric.take(10).mkString
-		val theUrl = s"http://mbuehler.ch/?name=$randomString"
+		val theUrl = s"http://mbuehler.ch/?condition=2&name=$randomString"
+    val queryInstructions = "Please go to the url bellow and solve the given question. After submitting your answer, you will be given a token. Copy the token and paste it here to receive your reward."
+    val rejectedMsg = "You submitted an invalid token. Please solve the given task and submit the complete token displayed after solving the task."
+    val approvedMsg = "Successfully submitted your answer. Thank you for your efforts."
+    
+		val answer = portal.sendQueryAndAwaitResult(FreetextQuery(queryInstructions)).get
 
-
-		val answer = portal.sendQueryAndAwaitResult(FreetextQuery("test")).get
-
-    HComp.mechanicalTurk.rejectAnswer(answer, "asdf") //for rejection
-    HComp.mechanicalTurk.approveAndBonusAnswer(answer, "bla") //for approval
+    HComp.mechanicalTurk.rejectAnswer(answer, rejectedMsg) //for rejection
+    HComp.mechanicalTurk.approveAndBonusAnswer(answer, approvedMsg) //for approval
 
     answer
 	}
