@@ -24,9 +24,8 @@ object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
 
 		val answer = portal.sendQueryAndAwaitResult(FreetextQuery(queryInstructions)).get
 
-    val token = ""
-    val original = ""
-    val isValid = validateToken(token, original)
+    val token = "" // get answer token from answer object
+    val isValid = validateToken(token, randomString)
     if (isValid) {
       HComp.mechanicalTurk.approveAndBonusAnswer(answer, approvedMsg) //for approval
       println(answer)
