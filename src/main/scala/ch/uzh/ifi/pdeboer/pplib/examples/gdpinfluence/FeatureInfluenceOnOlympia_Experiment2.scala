@@ -30,7 +30,7 @@ object FeatureInfluenceOnOlympia_Experiment2 extends App with LazyLogger {
 		val choices: List[String] = (1 to 10).map(x => s"$x (${x}0%)").toList
     val contest = new Contest(Map(PORTAL_PARAMETER.key -> decoratedPortal,
       WORKER_COUNT.key -> 10, OVERRIDE_INSTRUCTION_GENERATOR.key -> Some(instructions),
-			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = 10),
+			QUESTION_PRICE.key -> HCompQueryProperties(paymentCents = if (features.size == 1) 4 else 10),
 			INSTRUCTIONS_ITALIC.key -> features.head.description,
 			INJECT_QUERIES.key -> features.drop(1).map(f => f.name -> MultipleChoiceQuery(f.description, Random.shuffle(choices), 1)).toMap
 		))
