@@ -13,7 +13,7 @@ import scala.util.Random
 object FeatureInfluenceOnSchool_Experiment1 extends App with LazyLogger {
   val answerCount = 20
   val paymentCents = 10
-  val dataset_name = s"income"// Adjust dataset name for other datasets
+  val dataset_name = s"olympia"// Adjust dataset name for other datasets
 
 	val portal = new MySQLDBPortalDecorator(HComp.mechanicalTurk)
   HComp.mechanicalTurk.approveAll = false
