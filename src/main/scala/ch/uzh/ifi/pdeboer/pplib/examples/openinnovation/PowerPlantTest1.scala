@@ -4,6 +4,8 @@ import ch.uzh.ifi.pdeboer.pplib.hcomp._
 import ch.uzh.ifi.pdeboer.pplib.hcomp.dbportal.MySQLDBPortalDecorator
 import ch.uzh.ifi.pdeboer.pplib.util.U
 
+import scala.util.Random
+
 /**
   * Created by pdeboer on 08.03.17.
   */
@@ -20,17 +22,23 @@ object PowerPlantTest1 extends App {
       |In this HIT, we are trying to figure out ideas for <b>ongoing cost</b> that are to be expected (i.e. those that accumulate after building the plant) such that we can decide what type of plant to build, and where (by weighing different options).</p>
       |<p>The most 5 creative (and useful) answers for our HIT’s will be bonused $5.</p>
       |<p>Feel free to give multiple answers in this HIT, we will review all of them individually to nominate the winners.
-      |Please collect all of your answers in one HIT and <b>do not submit more than one HIT of this type</b> (your 2nd, 3rd etc submission will be rejected, please submit only one per day of this type). You do not need to write something in each text field, these are just to help you think of differences - completely empty / too trivial answers will be rejected though.</p>
+      |Please collect all of your answers in one HIT and <b>do not submit more than one HIT of this type</b> (your 2nd, 3rd etc submission will be rejected, please submit only one per day of this type). You do not need to write something in each text field (just write 'nothing' where you have no idea), these are just to help you think of differences - completely empty / too trivial answers will be rejected though.</p>
     """.stripMargin
 
-  def individualInstructions(plantType: String, region: String) = s"What are typical ongoing cost of $plantType power plants $region?"
+  def individualInstructions(plantType: String, region: String) = s"What are typical ongoing cost of $plantType power plants? You might also want to consider locality (cities vs desert vs island (e.g. Hawaii) vs rural etc)"
 
   val types = List("nuclear", "coal", "water", "biowaste", "solar")
   val regions = List("on an island (e.g. Hawaii)", "in a rural area (e.g. Iowa)", "in the desert")
 
   val emailField = FreetextQuery("If you're interested in participating in a follow-up workshop with higher payment outside MTurk, please tell us your email")
 
-  val composite = CompositeQuery((types zip regions).map(tr => FreetextQuery(individualInstructions(tr._1, tr._2))) ::: List(emailField), globalInstructions, "Can you predict the cost of running a power plant?")
-  val answers = decoratedPortal.sendQueryAndAwaitResult(composite, HCompQueryProperties(15))
-  println(answers)
+  private val allQueries = types.flatMap(t => regions.map(r => FreetextQuery(individualInstructions(t, r))))
+
+  import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
+
+  val data = (1 to 10).mpar.map(i => {
+    val composite = CompositeQuery(Random.shuffle(allQueries).take(5) ::: List(emailField), globalInstructions, "Can you predict the cost of running a power plant?")
+    decoratedPortal.sendQueryAndAwaitResult(composite, HCompQueryProperties(15))
+  })
+  println(data)
 }
