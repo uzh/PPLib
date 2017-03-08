@@ -36,7 +36,7 @@ object PowerPlantTest1 extends App {
 
   import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-  val data = (1 to 10).mpar.map(i => {
+  val data = (1 to 3).mpar.map(i => {
     val composite = CompositeQuery(Random.shuffle(allQueries).take(5) ::: List(emailField), globalInstructions, "Can you predict the cost of running a power plant?")
     decoratedPortal.sendQueryAndAwaitResult(composite, HCompQueryProperties(15))
   })
