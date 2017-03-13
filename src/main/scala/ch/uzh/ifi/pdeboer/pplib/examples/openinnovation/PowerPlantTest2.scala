@@ -41,7 +41,7 @@ object PowerPlantTest2 extends App {
 
   import ch.uzh.ifi.pdeboer.pplib.util.CollectionUtils._
 
-  val data = (1 to 1).mpar.flatMap(i => {
+  val data = (1 to 5).mpar.flatMap(i => {
     composites.mpar.map(composite => decoratedPortal.sendQueryAndAwaitResult(composite, HCompQueryProperties(20)))
   })
   println(data)
