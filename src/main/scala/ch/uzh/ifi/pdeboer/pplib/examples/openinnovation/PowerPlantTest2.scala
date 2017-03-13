@@ -15,8 +15,8 @@ object PowerPlantTest2 extends App {
 
 
   private val plants = List(
-    """<a href="https://en.wikipedia.org/wiki/New_Melones_Dam">New_Melones_Dam</a> and <a href="https://en.wikipedia.org/wiki/Moss_Landing_Power_Plant">Moss_Landing_Power_Plant</a></p>""",
-    """<a href="https://en.wikipedia.org/wiki/George_E._Turner_Power_Plant">George_E._Turner_Power_Plant</a> and <a href="https://en.wikipedia.org/wiki/Windy_Point/Windy_Flats">Windy_Point/Windy_Flats</a></p>""",
+    """<a href="https://en.wikipedia.org/wiki/New_Melones_Dam">New_Melones_Dam</a> and <a href="https://en.wikipedia.org/wiki/Moss_Landing_Power_Plant">Moss_Landing_Power_Plant</a>""",
+    """<a href="https://en.wikipedia.org/wiki/George_E._Turner_Power_Plant">George_E._Turner_Power_Plant</a> and <a href="https://en.wikipedia.org/wiki/Windy_Point/Windy_Flats">Windy_Point/Windy_Flats</a>""",
     """<a href="https://en.wikipedia.org/wiki/Brayton_Point_Power_Station">Brayton Power Station</a> and <a href="https://en.wikipedia.org/wiki/Cimarron_Solar_Facility">Cimarron Solar</a>""")
 
   val composites = plants.map(powerPlantPair => {
@@ -24,7 +24,7 @@ object PowerPlantTest2 extends App {
       """<p>We are trying to better understand the costs of running power plants. To do so, we are asking you to do some thinking (and some reading :) ).
         We are comparing the following power plants in this HIT: <br/>
       """ + powerPlantPair +
-      """
+      """</p>
           <p>The most 5 creative (and useful) answers for our HIT's will be bonused $5. (Note, that we are looking for indirect/direct cost factors such as '<i>uranium disposal cost</i>' (more creative would be better), NOT the number)</p>
           <p>Feel free to give multiple answers in this HIT, we will review all of them individually to nominate the winners.
           Please collect all of your answers in one HIT and <b>do not submit more than one HIT of this type</b> (your 2nd, 3rd etc submission will be rejected, please submit only one per day of this type).</p>
